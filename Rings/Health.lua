@@ -1,3 +1,7 @@
+-- localization
+local LM = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Module")
+
+local moduleName = "Health"
 local module = ArcHUD:NewModule("Health")
 local _, _, rev = string.find("$Rev: 0 $", "([0-9]+)")
 module.version = "3.0." .. rev
@@ -22,6 +26,14 @@ module.options = {
 	hascolorfade = true,
 	attach = true,
 }
+module.optionsTable = {
+	type		= "group",
+	name		= LM[moduleName],
+	args = {
+		enabled = ArcHUD:GenerateModuleOption_Enabled(moduleName),
+	},
+}
+
 module.localized = true
 
 ----------------------------------------------
@@ -69,7 +81,7 @@ end
 ----------------------------------------------
 function module:Enable()
 	-- Initial setup
-	self:UpdateColor(self.defaults.Color)
+	self:UpdateColor(self.db.profile.Color)
 	self.f:SetMax(UnitHealthMax(self.unit))
 
 	self.f.pulse = false

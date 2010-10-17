@@ -1,8 +1,6 @@
 ## Interface: 40000
-## Title: ArcHUD3 - Phoenix
-## Notes: Combat HUD based on NurfedHUD
-## Notes-ruRU: Адд-он отображает статусную информацию игрока и его цели с помощью элемента по середине экрана. Основанный на NurfedHUD
-## Notes-esES: HUD de Combate basada en NurfedHUD
+## Title: ArcHUD3 (code name phoenix)
+## Notes: Basic combat HUD based on ArcHUD2
 ## Author: nyyr, Nenie
 ## SavedVariables: ArcHUDDB
 ## Version: 4.0

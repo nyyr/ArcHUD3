@@ -77,7 +77,7 @@ function module:Update()
 end
 
 function module:Enable()
-	self:UpdateColor(self.defaults.Color)
+	self:UpdateColor(self.db.profile.Color)
 	if(UnitExists(self.unit)) then
 		self.HPPerc:SetText(floor((UnitHealth(self.unit) / UnitHealthMax(self.unit)) * 100).."%")
 		self.f:SetMax(UnitHealthMax(self.unit))

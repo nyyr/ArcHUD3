@@ -1,4 +1,370 @@
 
+-- Locale object
+local L = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Core")
+local LM = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Module")
+
+-- Ace config libs
+local AceConfig = LibStub("AceConfig-3.0")
+local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+
+-- Debugging levels
+--   1 Warning
+--   2 Info
+--   3 Notice
+--   4 Off
+local debugLevels = {"warn", "info", "notice", "off"}
+local d_warn = 1
+local d_info = 2
+local d_notice = 3
+
+----------------------------------------------
+-- Command line options
+----------------------------------------------
+ArcHUD.configOptionsTableCmd = {
+	type = "group",
+	name = "ArcHUD",
+	args = {
+		reset = {
+			type 		= "group",
+			name		= "reset",
+			desc		= L["CMD_RESET"],
+			args		= {
+				confirm = {
+					type	= "execute",
+					name	= "CONFIRM",
+					desc	= L["CMD_RESET_CONFIRM"],
+					func	= function()
+						ArcHUD:ResetOptionsConfirm()
+					end
+				}
+			}
+		},
+		config = {
+			type		= "execute",
+			name		= "config",
+			desc		= L["CMD_OPTS_FRAME"],
+			func		= function()
+				AceConfigDialog:Open("ArcHUD_Core")
+			end,
+		},
+		debug = {
+			type		= "select",
+			name		= "debug",
+			desc		= L["CMD_OPTS_DEBUG"],
+			values		= {"off", "warn", "info", "notice"},
+			get			= function()
+				return debugLevels[ArcHUD:GetDebugLevel() or 4]
+			end,
+			set			= function(info, v)
+				if (v == 1) then 
+					ArcHUD:SetDebugLevel(nil)
+					ArcHUD.db.profile.Debug = nil
+				else 
+					ArcHUD:SetDebugLevel(v - 1)
+					ArcHUD.db.profile.Debug = v
+				end
+			end,
+			order 		= -2,
+		},
+	},
+}
+
+----------------------------------------------
+-- Core options
+----------------------------------------------
+ArcHUD.configOptionsTableCore = {
+	type = "group",
+	name = L["TEXT"]["TITLE"],
+	args = {
+		display = {
+			type		= "group",
+			name		= L["TEXT"]["DISPLAY"],
+			order		= 0,
+			args		= {
+				-- Target Frame
+				targetFrame = {
+					type		= "toggle",
+					name		= L["TEXT"]["TARGETFRAME"],
+					desc		= L["TOOLTIP"]["TARGETFRAME"],
+					get			= function ()
+						return ArcHUD.db.profile.TargetFrame
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.TargetFrame = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
+				-- Player 3d Model
+				playerModel = {
+					type		= "toggle",
+					name		= L["TEXT"]["PLAYERMODEL"],
+					desc		= L["TOOLTIP"]["PLAYERMODEL"],
+					get			= function ()
+						return ArcHUD.db.profile.PlayerModel
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.PlayerModel = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
+				-- Mob 3d Model
+				mobModel = {
+					type		= "toggle",
+					name		= L["TEXT"]["MOBMODEL"],
+					desc		= L["TOOLTIP"]["MOBMODEL"],
+					get			= function ()
+						return ArcHUD.db.profile.MobModel
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.MobModel = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
+				-- Show Guild
+				showGuild = {
+					type		= "toggle",
+					name		= L["TEXT"]["SHOWGUILD"],
+					desc		= L["TOOLTIP"]["SHOWGUILD"],
+					get			= function ()
+						return ArcHUD.db.profile.ShowGuild
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.ShowGuild = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
+				-- Show Class
+				showClass = {
+					type		= "toggle",
+					name		= L["TEXT"]["SHOWCLASS"],
+					desc		= L["TOOLTIP"]["SHOWCLASS"],
+					get			= function ()
+						return ArcHUD.db.profile.ShowClass
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.ShowClass = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
+				-- Show Buffs
+				showBuffs = {
+					type		= "toggle",
+					name		= L["TEXT"]["SHOWBUFFS"],
+					desc		= L["TOOLTIP"]["SHOWBUFFS"],
+					get			= function ()
+						return ArcHUD.db.profile.ShowBuffs
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.ShowBuffs = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
+				-- Show Combo Points
+				showComboPoints = {
+					type		= "toggle",
+					name		= L["TEXT"]["SHOWCOMBO"],
+					desc		= L["TOOLTIP"]["SHOWCOMBO"],
+					get			= function ()
+						return ArcHUD.db.profile.ShowComboPoints
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.ShowComboPoints = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
+				-- Show PvP flag
+				showPVP = {
+					type		= "toggle",
+					name		= L["TEXT"]["SHOWPVP"],
+					desc		= L["TOOLTIP"]["SHOWPVP"],
+					get			= function ()
+						return ArcHUD.db.profile.ShowPVP
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.ShowPVP = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
+				-- Target of target
+				targetTarget = {
+					type		= "toggle",
+					name		= L["TEXT"]["TOT"],
+					desc		= L["TOOLTIP"]["TOT"],
+					get			= function ()
+						return ArcHUD.db.profile.TargetTarget
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.TargetTarget = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
+				-- Target of target of target
+				targetTargetTarget = {
+					type		= "toggle",
+					name		= L["TEXT"]["TOTOT"],
+					desc		= L["TOOLTIP"]["TOTOT"],
+					get			= function ()
+						return ArcHUD.db.profile.TargetTargetTarget
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.TargetTargetTarget = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
+			},
+		}, -- display
+		
+		nameplates = {
+			type		= "group",
+			name		= L["TEXT"]["NAMEPLATES"],
+			order		= 1,
+			args		= {
+				-- Player nameplate
+				NameplatePlayer = {
+					type		= "toggle",
+					name		= L["TEXT"]["NPPLAYER"],
+					desc		= L["TOOLTIP"]["NPPLAYER"],
+					get			= function ()
+						return ArcHUD.db.profile.NameplatePlayer
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.NameplatePlayer = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
+				-- Pet nameplate
+				NameplatePet = {
+					type		= "toggle",
+					name		= L["TEXT"]["NPPET"],
+					desc		= L["TOOLTIP"]["NPPET"],
+					get			= function ()
+						return ArcHUD.db.profile.NameplatePet
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.NameplatePet = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
+				-- Target nameplate
+				NameplateTarget = {
+					type		= "toggle",
+					name		= L["TEXT"]["NPTARGET"],
+					desc		= L["TOOLTIP"]["NPTARGET"],
+					get			= function ()
+						return ArcHUD.db.profile.NameplateTarget
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.NameplateTarget = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
+				-- Target of target nameplate
+				NameplateTargettarget = {
+					type		= "toggle",
+					name		= L["TEXT"]["NPTOT"],
+					desc		= L["TOOLTIP"]["NPTOT"],
+					get			= function ()
+						return ArcHUD.db.profile.NameplateTargettarget
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.NameplateTargettarget = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
+				-- Target of target of target nameplate
+				NameplateTargettargettarget = {
+					type		= "toggle",
+					name		= L["TEXT"]["NPTOTOT"],
+					desc		= L["TOOLTIP"]["NPTOTOT"],
+					get			= function ()
+						return ArcHUD.db.profile.NameplateTargettargettarget
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.NameplateTargettargettarget = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
+				-- Target of target of target nameplate
+				NameplateCombat = {
+					type		= "toggle",
+					name		= L["TEXT"]["NPCOMBAT"],
+					desc		= L["TOOLTIP"]["NPCOMBAT"],
+					get			= function ()
+						return ArcHUD.db.profile.NameplateCombat
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.NameplateCombat = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
+			},
+		}, -- nameplates
+		
+		fade = {
+			type		= "group",
+			name		= L["TEXT"]["FADE"],
+			order		= 2,
+			args		= {
+			},
+		}, -- fade
+		
+		misc = {
+			type		= "group",
+			name		= L["TEXT"]["MISC"],
+			order		= 3,
+			args		= {
+			},
+		}, -- misc
+	},
+}
+
+----------------------------------------------
+-- Module options
+----------------------------------------------
+ArcHUD.configOptionsTableModules = {
+	type = "group",
+	name = LM["TEXT"]["TITLE"],
+	args = {},
+}
+
+----------------------------------------------
+-- Initialize config tools
+----------------------------------------------
+function ArcHUD:InitConfig()
+	-- Set up chat commands
+	AceConfig:RegisterOptionsTable("ArcHUD", self.configOptionsTableCmd, {"archud", "ah"})
+	
+	-- Set up core config options
+	AceConfig:RegisterOptionsTable("ArcHUD_Core", self.configOptionsTableCore)
+	self.configFrameCore = AceConfigDialog:AddToBlizOptions("ArcHUD_Core", "ArcHUD")
+	
+	-- Set up modules config options
+	AceConfig:RegisterOptionsTable("ArcHUD_Modules", self.configOptionsTableModules)
+	self.configFrameModules = AceConfigDialog:AddToBlizOptions("ArcHUD_Modules", LM["TEXT"]["TITLE"], self.configFrameCore)
+end
+
+function ArcHUD:AddModuleOptionsTable(moduleName, optionsTable)
+	self:LevelDebug(d_notice, "Inserting config options for "..moduleName)
+	ArcHUD.configOptionsTableModules.args[moduleName] = optionsTable
+end
+
+function ArcHUD:GenerateModuleOption_Enabled(moduleName)
+	return {
+		type		= "toggle",
+		name		= LM["TEXT"]["ENABLED"],
+		get			= function ()
+			return ArcHUD:GetModule(moduleName).db.profile.Enabled
+		end,
+		set			= function (info, v)
+			ArcHUD:GetModule(moduleName).db.profile.Enabled = v
+			if (v) then
+				ArcHUD:GetModule(moduleName):Enable()
+			else
+				ArcHUD:GetModule(moduleName):Disable()
+			end
+		end,
+	}
+end
 
 --[[
 ----------------------------------------------

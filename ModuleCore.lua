@@ -1,5 +1,8 @@
 -- localization
-local L = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Module")
+local LM = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Module")
+
+local AceConfig = LibStub("AceConfig-3.0")
+local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 
 -- Debug levels
 local d_warn = 1
@@ -19,6 +22,23 @@ function ArcHUD.modulePrototype:Debug(level, msg, ...)
 	if(self.parent.LevelDebug) then
 		self.parent:LevelDebug(level, "["..self.name.."] "..msg, ...)
 	end
+end
+
+function ArcHUD.modulePrototype:InitConfigOptions()
+	if(self.defaults and type(self.defaults) == "table") then
+		-- Add defaults to ArcHUD defaults table
+		self:Debug(d_notice, "Acquiring ring DB namespace")
+		self.db = self.parent.db:RegisterNamespace(self.name, self.defaults)
+		if(not self.db) then
+			self:Debug(d_warn, "Failed to acquire DB namespace")
+		end
+
+		-- Register options
+		if (self.optionsTable and type(self.optionsTable) == "table") then
+			self.parent:AddModuleOptionsTable(self.name, self.optionsTable)
+		end
+	end
+
 end
 
 --[[
@@ -322,17 +342,7 @@ function ArcHUD.modulePrototype:OnInitialize()
 		return
 	end
 	
-	if(self.defaults and type(self.defaults) == "table") then
-		-- Add defaults to ArcHUD defaults table
-		self:Debug(d_notice, "Acquiring ring DB namespace")
-		self.db = self.parent.db:RegisterNamespace(self.name, self.defaults)
-		if(not self.db) then
-			self:Debug(d_warn, "Failed to acquire DB namespace")
-		end
-
-		-- Register chat commands
-		-- self:RegisterDewdropSettings()
-	end
+	self:InitConfigOptions()
 
 	-- Add metadata for module if it doesn't exist
 	if(not self.version) then
@@ -591,7 +601,7 @@ function ArcHUD.modulePrototype:CreateFontString(parent, layer, size, fontsize, 
 
 	fs:SetWidth(width)
 	fs:SetHeight(height)
-	fs:SetFont("Fonts\\"..L["FONT"], fontsize, "OUTLINE")
+	fs:SetFont("Fonts\\"..LM["FONT"], fontsize, "OUTLINE")
 	if(color) then
 		fs:SetTextColor(unpack(color))
 	end

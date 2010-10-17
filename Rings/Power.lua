@@ -1,4 +1,8 @@
-local module = ArcHUD:NewModule("Power")
+-- localization
+local LM = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Module")
+
+local moduleName = "Power"
+local module = ArcHUD:NewModule(moduleName)
 local _, _, rev = string.find("$Rev: 0 $", "([0-9]+)")
 module.version = "3.0." .. rev
 module.unit = "player"
@@ -22,6 +26,13 @@ module.options = {
 	{name = "ShowPerc", text = "SHOWPERC", tooltip = "SHOWPERC"},
 	hasmanabar = true,
 	attach = true,
+}
+module.optionsTable = {
+	type		= "group",
+	name		= LM[moduleName],
+	args = {
+		enabled = ArcHUD:GenerateModuleOption_Enabled(moduleName),
+	},
 }
 module.localized = true
 

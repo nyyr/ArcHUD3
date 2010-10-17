@@ -49,6 +49,7 @@ local cfgDefaults = {
 		NameplatePlayer = true,
 		NameplatePet = true,
 		NameplateTarget = true,
+		NameplateTargettarget = true,
 		NameplateTargettargettarget = true,
 		NameplateCombat = true,
 		Scale = 1.0,
@@ -136,490 +137,6 @@ function ArcHUD:OnInitialize()
 	self.metroFrame = CreateFrame("Frame")
 	self.metroFrame:Hide()
 	self.metroFrame:SetScript("OnUpdate", self.OnMetroUpdate)
-	
-	----------------------------------------------
-	-- Set up chat commands
-	--
-	local AceConfig = LibStub("AceConfig-3.0")
-	AceConfig:RegisterOptionsTable("ArcHUD", {
-		type = "group",
-		name = "ArcHUD",
-		args = {
-			reset = {
-				type 		= "group",
-				name		= "reset",
-				desc		= L["CMD_RESET"],
-				args		= {
-					confirm = {
-						type	= "execute",
-						name	= "CONFIRM",
-						desc	= L["CMD_RESET_CONFIRM"],
-						func	= function()
-							ArcHUD:ResetOptionsConfirm()
-						end
-					}
-				}
-			},
-			config = {
-				type		= "execute",
-				name		= "config",
-				desc		= L["CMD_OPTS_FRAME"],
-				func		= function()
-					ArcHUD:LevelDebug(d_warn, "NYI config");
---[[
-					if not ddframe then
-						ddframe = CreateFrame("Frame", nil, UIParent)
-						ddframe:SetWidth(2)
-						ddframe:SetHeight(2)
-						ddframe:SetPoint("BOTTOMLEFT", GetCursorPosition())
-						ddframe:SetClampedToScreen(true)
-						dewdrop:Register(ddframe, 'dontHook', true, 'children', ArcHUD.createDDMenu)
-					end
-					local x,y = GetCursorPosition()
-					ddframe:SetPoint("BOTTOMLEFT", x / UIParent:GetScale(), y / UIParent:GetScale())
-					dewdrop:Open(ddframe)
-]]--
-				end,
-			},
-			debug = {
-				type		= "select",
-				name		= "debug",
-				desc		= L["CMD_OPTS_DEBUG"],
-				values		= {"off", "warn", "info", "notice"},
-				get			= function()
-					return debugLevels[ArcHUD:GetDebugLevel() or 4]
-				end,
-				set			= function(info, v)
-					if (v == 1) then 
-						ArcHUD:SetDebugLevel(nil)
-						ArcHUD.db.profile.Debug = nil
-					else 
-						ArcHUD:SetDebugLevel(v - 1)
-						ArcHUD.db.profile.Debug = v
-					end
-				end,
-				order 		= -2,
-			},
-		},
-	}, {"archud", "ah"})
-
---[[
-	self:LevelDebug(d_notice, "Creating core addon Dewdrop menu")
-	self.dewdrop_menu = {
-		["L1"] = {
-			{"text", L["TEXT"]["TITLE"], "isTitle", true},
-			{"text", L["Version: "]..self.version,	"notClickable", true},
-			{"text", L["Author: "]..self.author, "notClickable", true},
-			{},
-			{"text", L["TEXT"]["DISPLAY"], "hasArrow", true, "value", "L2_display"},
-			{"text", L["TEXT"]["NAMEPLATES"], "hasArrow", true, "value", "L2_nameplates"},
-			{"text", L["TEXT"]["MOVEFRAMES"], "hasArrow", true, "value", "L2_movable"},
-			{"text", L["TEXT"]["FADE"], "hasArrow", true, "value", "L2_fade"},
-			{"text", L["TEXT"]["MISC"], "hasArrow", true, "value", "L2_misc"},
-			{},
-			{"text", L["TEXT"]["RINGS"], "isTitle", true},
-		},
-		["L2_display"] = {
-			{
-				"text", L["TEXT"]["TARGETFRAME"],
-				"tooltipTitle", L["TEXT"]["TARGETFRAME"],
-				"tooltipText", L["TOOLTIP"]["TARGETFRAME"],
-				"checked", false,
-				"func", ArcHUD.modDB,
-				"arg1", "toggle",
-				"arg2", "TargetFrame"
-			},
-			{
-				"text", L["TEXT"]["BLIZZPLAYER"],
-				"tooltipTitle", L["TEXT"]["BLIZZPLAYER"],
-				"tooltipText", L["TOOLTIP"]["BLIZZPLAYER"],
-				"checked", false,
-				"func", ArcHUD.modDB,
-				"arg1", "toggle",
-				"arg2", "BlizzPlayer"
-			},
-			{
-				"text", L["TEXT"]["BLIZZTARGET"],
-				"tooltipTitle", L["TEXT"]["BLIZZTARGET"],
-				"tooltipText", L["TOOLTIP"]["BLIZZTARGET"],
-				"checked", false,
-				"func", ArcHUD.modDB,
-				"arg1", "toggle",
-				"arg2", "BlizzTarget"
-			},
-			{
-				"text", L["TEXT"]["PLAYERMODEL"],
-				"tooltipTitle", L["TEXT"]["PLAYERMODEL"],
-				"tooltipText", L["TOOLTIP"]["PLAYERMODEL"],
-				"checked", false,
-				"func", ArcHUD.modDB,
-				"arg1", "toggle",
-				"arg2", "PlayerModel"
-			},
-			{
-				"text", L["TEXT"]["MOBMODEL"],
-				"tooltipTitle", L["TEXT"]["MOBMODEL"],
-				"tooltipText", L["TOOLTIP"]["MOBMODEL"],
-				"checked", false,
-				"func", ArcHUD.modDB,
-				"arg1", "toggle",
-				"arg2", "MobModel"
-			},
-			{
-				"text", L["TEXT"]["SHOWGUILD"],
-				"tooltipTitle", L["TEXT"]["SHOWGUILD"],
-				"tooltipText", L["TOOLTIP"]["SHOWGUILD"],
-				"checked", false,
-				"func", ArcHUD.modDB,
-				"arg1", "toggle",
-				"arg2", "ShowGuild"
-			},
-			{
-				"text", L["TEXT"]["SHOWCLASS"],
-				"tooltipTitle", L["TEXT"]["SHOWCLASS"],
-				"tooltipText", L["TOOLTIP"]["SHOWCLASS"],
-				"checked", false,
-				"func", ArcHUD.modDB,
-				"arg1", "toggle",
-				"arg2", "ShowClass"
-			},
-			{
-				"text", L["TEXT"]["SHOWBUFFS"],
-				"tooltipTitle", L["TEXT"]["SHOWBUFFS"],
-				"tooltipText", L["TOOLTIP"]["SHOWBUFFS"],
-				"checked", false,
-				"func", ArcHUD.modDB,
-				"arg1", "toggle",
-				"arg2", "ShowBuffs"
-			},
-			{
-				"text", L["TEXT"]["SHOWCOMBO"],
-				"tooltipTitle", L["TEXT"]["SHOWCOMBO"],
-				"tooltipText", L["TOOLTIP"]["SHOWCOMBO"],
-				"checked", false,
-				"func", ArcHUD.modDB,
-				"arg1", "toggle",
-				"arg2", "ShowComboPoints"
-			},
-			{
-				"text", L["TEXT"]["SHOWPVP"],
-				"tooltipTitle", L["TEXT"]["SHOWPVP"],
-				"tooltipText", L["TOOLTIP"]["SHOWPVP"],
-				"checked", false,
-				"func", ArcHUD.modDB,
-				"arg1", "toggle",
-				"arg2", "ShowPVP"
-			},
-			{
-				"text", L["TEXT"]["ATTACHTOP"],
-				"tooltipTitle", L["TEXT"]["ATTACHTOP"],
-				"tooltipText", L["TOOLTIP"]["ATTACHTOP"],
-				"checked", false,
-				"func", ArcHUD.modDB,
-				"arg1", "toggle",
-				"arg2", "AttachTop"
-			},
-			{
-				"text", L["TEXT"]["TOT"],
-				"tooltipTitle", L["TEXT"]["TOT"],
-				"tooltipText", L["TOOLTIP"]["TOT"],
-				"checked", false,
-				"func", ArcHUD.modDB,
-				"arg1", "toggle",
-				"arg2", "TargetTarget"
-			},
-			{
-				"text", L["TEXT"]["TOTOT"],
-				"tooltipTitle", L["TEXT"]["TOTOT"],
-				"tooltipText", L["TOOLTIP"]["TOTOT"],
-				"checked", false,
-				"func", ArcHUD.modDB,
-				"arg1", "toggle",
-				"arg2", "TargetTargetTarget"
-			},
-		},
-		["L2_nameplates"] = {
-			{
-				"text", L["TEXT"]["NPPLAYER"],
-				"tooltipTitle", L["TEXT"]["NPPLAYER"],
-				"tooltipText", L["TOOLTIP"]["NPPLAYER"],
-				"checked", false,
-				"func", ArcHUD.modDB,
-				"arg1", "toggle",
-				"arg2", "Nameplate_player"
-			},
-			{
-				"text", L["TEXT"]["NPPET"],
-				"tooltipTitle", L["TEXT"]["NPPET"],
-				"tooltipText", L["TOOLTIP"]["NPPET"],
-				"checked", false,
-				"func", ArcHUD.modDB,
-				"arg1", "toggle",
-				"arg2", "Nameplate_pet"
-			},
-			{
-				"text", L["TEXT"]["NPTARGET"],
-				"tooltipTitle", L["TEXT"]["NPTARGET"],
-				"tooltipText", L["TOOLTIP"]["NPTARGET"],
-				"checked", false,
-				"func", ArcHUD.modDB,
-				"arg1", "toggle",
-				"arg2", "Nameplate_target"
-			},
-			{
-				"text", L["TEXT"]["NPTOT"],
-				"tooltipTitle", L["TEXT"]["NPTOT"],
-				"tooltipText", L["TOOLTIP"]["NPTOT"],
-				"checked", false,
-				"func", ArcHUD.modDB,
-				"arg1", "toggle",
-				"arg2", "Nameplate_targettarget"
-			},
-			{
-				"text", L["TEXT"]["NPTOTOT"],
-				"tooltipTitle", L["TEXT"]["NPTOTOT"],
-				"tooltipText", L["TOOLTIP"]["NPTOTOT"],
-				"checked", false,
-				"func", ArcHUD.modDB,
-				"arg1", "toggle",
-				"arg2", "Nameplate_targettargettarget"
-			},
-			{},
-			{
-				"text", L["TEXT"]["NPCOMBAT"],
-				"tooltipTitle", L["TEXT"]["NPCOMBAT"],
-				"tooltipText", L["TOOLTIP"]["NPCOMBAT"],
-				"checked", false,
-				"func", ArcHUD.modDB,
-				"arg1", "toggle",
-				"arg2", "NameplateCombat"
-			},
-			{
-				"text", L["TEXT"]["PETNPFADE"],
-				"tooltipTitle", L["TEXT"]["PETNPFADE"],
-				"tooltipText", L["TOOLTIP"]["PETNPFADE"],
-				"checked", false,
-				"func", ArcHUD.modDB,
-				"arg1", "toggle",
-				"arg2", "PetNameplateFade"
-			},
-			{
-				"text", L["TEXT"]["HOVERMSG"],
-				"tooltipTitle", L["TEXT"]["HOVERMSG"],
-				"tooltipText", L["TOOLTIP"]["HOVERMSG"],
-				"checked", false,
-				"func", ArcHUD.modDB,
-				"arg1", "toggle",
-				"arg2", "HoverMsg"
-			},
-			{
-				"text", L["TEXT"]["HOVERDELAY"],
-				"tooltipTitle", L["TEXT"]["HOVERDELAY"],
-				"tooltipText", L["TOOLTIP"]["HOVERDELAY"],
-				"hasArrow", true,
-				"hasSlider", true,
-				"sliderMin", 0,
-				"sliderMax", 5,
-				"sliderMinText", "Instant",
-				"sliderMaxText", "5s",
-				"sliderStep", 0.5,
-				"sliderValue", 0,
-				"sliderFunc", ArcHUD.modDB,
-				"sliderArg1", "set",
-				"sliderArg2", "HoverDelay"
-			},
-		},
-		["L2_movable"] = {
-			{
-				"text", L["TEXT"]["MFTHUD"],
-				"tooltipTitle", L["TEXT"]["MFTHUD"],
-				"tooltipText", L["TOOLTIP"]["MFTHUD"],
-				"checked", false,
-				"func", ArcHUD.toggleLock,
-				"arg1", "targethud",
-			},
-			{
-				"text", L["TEXT"]["MFTT"],
-				"tooltipTitle", L["TEXT"]["MFTT"],
-				"tooltipText", L["TOOLTIP"]["MFTT"],
-				"checked", false,
-				"func", ArcHUD.toggleLock,
-				"arg1", "targettarget",
-			},
-			{
-				"text", L["TEXT"]["MFTTT"],
-				"tooltipTitle", L["TEXT"]["MFTTT"],
-				"tooltipText", L["TOOLTIP"]["MFTTT"],
-				"checked", false,
-				"func", ArcHUD.toggleLock,
-				"arg1", "targettargettarget",
-			},
-			{},
-			{
-				"text", L["TEXT"]["RESETTHUD"],
-				"tooltipTitle", L["TEXT"]["RESETTHUD"],
-				"tooltipText", L["TOOLTIP"]["RESETTHUD"],
-				"func", ArcHUD.resetFrame,
-				"arg1", "targethud",
-			},
-			{
-				"text", L["TEXT"]["RESETTT"],
-				"tooltipTitle", L["TEXT"]["RESETTT"],
-				"tooltipText", L["TOOLTIP"]["RESETTT"],
-				"func", ArcHUD.resetFrame,
-				"arg1", "targettarget",
-			},
-			{
-				"text", L["TEXT"]["RESETTTT"],
-				"tooltipTitle", L["TEXT"]["RESETTTT"],
-				"tooltipText", L["TOOLTIP"]["RESETTTT"],
-				"func", ArcHUD.resetFrame,
-				"arg1", "targettargettarget",
-			},
-		},
-		["L2_fade"] = {
-			{
-				"text", L["TEXT"]["FADE_FULL"],
-				"tooltipTitle", L["TEXT"]["FADE_FULL"],
-				"tooltipText", L["TOOLTIP"]["FADE_FULL"],
-				"hasArrow", true,
-				"hasSlider", true,
-				"sliderStep", 0.01,
-				"sliderIsPercent", true,
-				"sliderValue", 0,
-				"sliderFunc", ArcHUD.modDB,
-				"sliderArg1", "set",
-				"sliderArg2", "FadeFull"
-			},
-			{
-				"text", L["TEXT"]["FADE_OOC"],
-				"tooltipTitle", L["TEXT"]["FADE_OOC"],
-				"tooltipText", L["TOOLTIP"]["FADE_OOC"],
-				"hasArrow", true,
-				"hasSlider", true,
-				"sliderStep", 0.01,
-				"sliderIsPercent", true,
-				"sliderValue", 0,
-				"sliderFunc", ArcHUD.modDB,
-				"sliderArg1", "set",
-				"sliderArg2", "FadeOOC"
-			},
-			{
-				"text", L["TEXT"]["FADE_IC"],
-				"tooltipTitle", L["TEXT"]["FADE_IC"],
-				"tooltipText", L["TOOLTIP"]["FADE_IC"],
-				"hasArrow", true,
-				"hasSlider", true,
-				"sliderStep", 0.01,
-				"sliderIsPercent", true,
-				"sliderValue", 0,
-				"sliderFunc", ArcHUD.modDB,
-				"sliderArg1", "set",
-				"sliderArg2", "FadeIC"
-			},
-		},
-		["L2_misc"] = {
-			{
-				"text", L["TEXT"]["WIDTH"],
-				"tooltipTitle", L["TEXT"]["WIDTH"],
-				"tooltipText", L["TOOLTIP"]["WIDTH"],
-				"hasArrow", true,
-				"hasSlider", true,
-				"sliderMin", 30,
-				"sliderMax", 100,
-				"sliderStep", 1,
-				"sliderValue", 0,
-				"sliderFunc", ArcHUD.modDB,
-				"sliderArg1", "set",
-				"sliderArg2", "Width"
-			},
-			{
-				"text", L["TEXT"]["YLOC"],
-				"tooltipTitle", L["TEXT"]["YLOC"],
-				"tooltipText", L["TOOLTIP"]["YLOC"],
-				"hasArrow", true,
-				"hasSlider", true,
-				"sliderMin", -200,
-				"sliderMax", 400,
-				"sliderStep", 1,
-				"sliderValue", 0,
-				"sliderFunc", ArcHUD.modDB,
-				"sliderArg1", "set",
-				"sliderArg2", "YLoc"
-			},
-			{
-				"text", L["TEXT"]["XLOC"],
-				"tooltipTitle", L["TEXT"]["XLOC"],
-				"tooltipText", L["TOOLTIP"]["XLOC"],
-				"hasArrow", true,
-				"hasSlider", true,
-				"sliderMin", -500,
-				"sliderMax", 500,
-				"sliderStep", 5,
-				"sliderValue", 0,
-				"sliderFunc", ArcHUD.modDB,
-				"sliderArg1", "set",
-				"sliderArg2", "XLoc"
-			},
-			{
-				"text", L["TEXT"]["SCALE"],
-				"tooltipTitle", L["TEXT"]["SCALE"],
-				"tooltipText", L["TOOLTIP"]["SCALE"],
-				"hasArrow", true,
-				"hasSlider", true,
-				"sliderStep", 0.01,
-				"sliderMax", 2,
-				"sliderIsPercent", true,
-				"sliderValue", 0,
-				"sliderFunc", ArcHUD.modDB,
-				"sliderArg1", "set",
-				"sliderArg2", "Scale"
-			},
-			{
-				"text", L["TEXT"]["RINGVIS"],
-				"tooltipTitle", L["TEXT"]["RINGVIS"],
-				"tooltipText", L["TOOLTIP"]["RINGVIS"],
-				"hasArrow", true,
-				"value", "L3_ringvis"
-			},
-		},
-		["L3_ringvis"] = {
-			{
-				"text", L["TEXT"]["RINGVIS_1"],
-				"tooltipTitle", L["TEXT"]["RINGVIS_1"],
-				"tooltipText", L["TOOLTIP"]["RINGVIS_1"],
-				"isRadio", true,
-				"checked", true,
-				"func", ArcHUD.modDB,
-				"arg1", "set",
-				"arg2", "RingVisibility",
-				"arg3", 1
-			},
-			{
-				"text", L["TEXT"]["RINGVIS_2"],
-				"tooltipTitle", L["TEXT"]["RINGVIS_2"],
-				"tooltipText", L["TOOLTIP"]["RINGVIS_2"],
-				"isRadio", true,
-				"checked", false,
-				"func", ArcHUD.modDB,
-				"arg1", "set",
-				"arg2", "RingVisibility",
-				"arg3", 2
-			},
-			{
-				"text", L["TEXT"]["RINGVIS_3"],
-				"tooltipTitle", L["TEXT"]["RINGVIS_3"],
-				"tooltipText", L["TOOLTIP"]["RINGVIS_3"],
-				"isRadio", true,
-				"checked", false,
-				"func", ArcHUD.modDB,
-				"arg1", "set",
-				"arg2", "RingVisibility",
-				"arg3", 3
-			},
-		},
-	}
-]]--
 
 	self:LevelDebug(d_notice, "Registering Metrognome timers")
 	self:RegisterMetro("UpdatePetNamePlate", self.UpdatePetNamePlate, 2, self)
@@ -630,6 +147,8 @@ function ArcHUD:OnInitialize()
 	self:LevelDebug(d_info, "Creating HUD frame elements")
 	self.TargetHUD = self:CreateHUDFrames()
 
+	self:InitConfig()
+	
 	self:SendMessage("ARCHUD_LOADED")
 	self:LevelDebug(d_info, "ArcHUD has been initialized.")
 end
@@ -648,7 +167,7 @@ function ArcHUD:OnEnable()
 	self:RegisterEvent("PET_ATTACK_START",		"CombatStatus")
 	self:RegisterEvent("PET_ATTACK_STOP",		"CombatStatus")
 
---	self:RegisterEvent("UNIT_FACTION",			"UpdateFaction")
+	self:RegisterEvent("UNIT_FACTION",			"UpdateFaction")
 	self:RegisterEvent("PARTY_MEMBERS_CHANGED",	"UpdateFaction")
 
 	self:RegisterEvent("RAID_TARGET_UPDATE",	"UpdateRaidTargetIcon")
@@ -832,6 +351,20 @@ function ArcHUD:ResetOptionsConfirm()
 end
 
 ----------------------------------------------
+-- Completely refresh HUD
+----------------------------------------------
+function ArcHUD:UpdateTargetHUD()
+	self:TargetUpdate()
+	
+	-- Show/Hide combopoints display
+	if(self.db.profile.ShowComboPoints) then
+		self.TargetHUD.Combo:Show()
+	else
+		self.TargetHUD.Combo:Hide()
+	end
+end
+
+----------------------------------------------
 -- TargetUpdate()
 ----------------------------------------------
 function ArcHUD:TargetUpdate()
@@ -972,7 +505,7 @@ function ArcHUD:TargetUpdate()
 
 		if(self.db.profile.ShowBuffs) then
 			-- Update buffs and debuffs for the target
-			self:TargetAuras()
+			self:TargetAuras(nil, "target")
 		end
 
 		self:UpdateFaction("target")
@@ -1010,7 +543,7 @@ end
 ----------------------------------------------
 -- TargetAuras()
 ----------------------------------------------
-function ArcHUD:TargetAuras()
+function ArcHUD:TargetAuras(event, arg1)
 	if(not arg1 == "target") then return end
 	local unit = "target"
 	local i, icon, buff, debuff, debuffborder, debuffcount, debuffType, color, duration, expirationTime

@@ -60,16 +60,16 @@ L["TEXT"] = {
 	FADE_OOC	= "Out of combat",
 	FADE_IC		= "In combat",
 
+	RINGVIS		= "Fade behaviour",
+	RINGVIS_1	= "FadeFull: Fade when full",
+	RINGVIS_2	= "FadeOOC: Fade when out of combat",
+	RINGVIS_3	= "FadeBoth: Fade when full or out of combat",
+	
 	MISC		= "Miscellanous options",
 	WIDTH		= "HUD width",
 	YLOC		= "Vertical alignment",
 	XLOC		= "Horizontal alignment",
 	SCALE		= "Scale",
-
-	RINGVIS		= "Fade behaviour",
-	RINGVIS_1	= "FadeFull: Fade when full",
-	RINGVIS_2	= "FadeOOC: Fade when out of combat",
-	RINGVIS_3	= "FadeBoth: Fade when full or out of combat",
 
 	RINGS		= "Ring options",
 	RING		= "Ring",
@@ -132,7 +132,7 @@ LM["Version: "]	= true
 LM["Author: "]	= true
 
 LM["Health"]		= "Player Health"
-LM["Mana"]			= "Player Mana"
+LM["Power"]			= "Player Power"
 LM["PetHealth"]		= "Pet Health"
 LM["PetMana"]		= "Pet Mana"
 LM["TargetCasting"]	= "Target Casting"
@@ -147,6 +147,8 @@ LM["ComboPoints"]	= "Combo Points"
 LM["EnergyTick"]	= "Energy Tick"
 
 LM["TEXT"] = {
+	TITLE		= "Modules Options",
+
 	ENABLED		= "Enabled",
 	OUTLINE		= "Ring outline",
 	SHOWTEXT	= "Show text",
