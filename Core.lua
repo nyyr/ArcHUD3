@@ -88,11 +88,34 @@ ArcHUD.RepColor = { "FF4444", "DD4444", "DD7744", "BB9944", "44DD44", "55EE44", 
 ----------------------------------------------
 -- Print debug message
 ----------------------------------------------
-function ArcHUD:LevelDebug(level, msg)
-	if (self.db.global.debugLevel < 4) then
+function ArcHUD:LevelDebug(level, msg, ...)
+	if (self.db.global.debugLevel ~= nil) then
 		if (level <= self.db.global.debugLevel) then
-			self:Print(msg)
+			self:Printf(msg, ...)
 		end
+	end
+end
+
+----------------------------------------------
+-- Return current debug level
+----------------------------------------------
+function ArcHUD:GetDebugLevel()
+	return self.db.global.debugLevel
+end
+
+----------------------------------------------
+-- Set debug level
+----------------------------------------------
+function ArcHUD:SetDebugLevel(level)
+	if (level == nil) or (level >= 0 and level < 4) then
+		local levelName = "off"
+		if (level ~= nil) then
+			levelName = debugLevels[level]
+		end
+		self:Printf(L["CMD_OPTS_DEBUG_SET"], levelName)
+		self.db.global.debugLevel = level
+	else
+		self:Print("Invalid debug level: "..level)
 	end
 end
 
@@ -102,11 +125,10 @@ end
 function ArcHUD:OnInitialize()
 	-- Set up database
 	self.db = LibStub("AceDB-3.0"):New("ArcHUDDB", cfgDefaults, "profile")
-	self.db.global.debugLevel = 1
 
 	-- Set debug level
 	--self:SetDebugging(true)
-	--self:SetDebugLevel(self.db.profile.Debug)
+	self:SetDebugLevel(self.db.profile.Debug)
 
 	local _, _, rev = string.find("$Rev: 0 $", "([0-9]+)")
 	self.version = self.version .. "." .. rev
@@ -132,7 +154,9 @@ function ArcHUD:OnInitialize()
 						type	= "execute",
 						name	= "CONFIRM",
 						desc	= L["CMD_RESET_CONFIRM"],
-						func	= "ResetOptionsConfirm",
+						func	= function()
+							ArcHUD:ResetOptionsConfirm()
+						end
 					}
 				}
 			},
@@ -158,32 +182,26 @@ function ArcHUD:OnInitialize()
 				end,
 			},
 			debug = {
-				type		= "text",
+				type		= "select",
 				name		= "debug",
 				desc		= L["CMD_OPTS_DEBUG"],
+				values		= {"off", "warn", "info", "notice"},
 				get			= function()
 					return debugLevels[ArcHUD:GetDebugLevel() or 4]
 				end,
-				set			= function(v)
-					if(v == "notice") then
-						ArcHUD:SetDebugLevel(3)
-						ArcHUD.db.profile.Debug = 3
-					elseif(v == "info") then
-						ArcHUD:SetDebugLevel(2)
-						ArcHUD.db.profile.Debug = 2
-					elseif(v == "warn") then
-						ArcHUD:SetDebugLevel(1)
-						ArcHUD.db.profile.Debug = 1
-					elseif(v == "off") then
+				set			= function(info, v)
+					if (v == 1) then 
 						ArcHUD:SetDebugLevel(nil)
 						ArcHUD.db.profile.Debug = nil
+					else 
+						ArcHUD:SetDebugLevel(v - 1)
+						ArcHUD.db.profile.Debug = v
 					end
 				end,
-				validate 	= {"off", "warn", "info", "notice"},
 				order 		= -2,
 			},
 		},
-	}, {"/archud", "/ah"})
+	}, {"archud", "ah"})
 
 --[[
 	self:LevelDebug(d_notice, "Creating core addon Dewdrop menu")
@@ -801,6 +819,8 @@ end
 -- ResetOptionsConfirm()
 ----------------------------------------------
 function ArcHUD:ResetOptionsConfirm()
+	self:LevelDebug(d_warn, "NYI: ResetOptionsConfirm()")
+--[[
 	self:ResetDB("profile")
 	self.updating = true
 	self:OnProfileDisable()
@@ -808,6 +828,7 @@ function ArcHUD:ResetOptionsConfirm()
 	self:TriggerEvent("ARCHUD_MODULE_UPDATE")
 	self.updating = false
 	self:Print(L["TEXT_RESET_CONFIRM"])
+]]--
 end
 
 ----------------------------------------------
@@ -818,7 +839,7 @@ function ArcHUD:TargetUpdate()
 	-- Make sure we are targeting someone and that ArcHUD is enabled
 	if (UnitExists("target") and self.db.profile.TargetFrame) then
 		self:LevelDebug(d_info, "TargetUpdate: Updating target frame...")
---[[
+
 		-- 3D target model
 		if((self.db.profile.PlayerModel and UnitIsPlayer("target")) or (self.db.profile.MobModel and not UnitIsPlayer("target"))) then
 			self.TargetHUD.Model:Show()
@@ -828,7 +849,6 @@ function ArcHUD:TargetUpdate()
 			self.TargetHUD.Model:Hide()
 			self:LevelDebug(d_notice, "TargetUpdate: Disabling 3D model")
 		end
-]]--
 
 		self.TargetHUD:SetAlpha(1)
 

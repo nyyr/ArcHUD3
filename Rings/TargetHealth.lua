@@ -117,7 +117,7 @@ function module:PLAYER_TARGET_CHANGED()
 	end
 end
 
-function module:UpdateHealth()
+function module:UpdateHealth(event, arg1)
 	if(arg1 == self.unit) then
 		if(UnitIsDead(self.unit)) then
 			self.f:GhostMode(false, self.unit)

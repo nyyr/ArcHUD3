@@ -232,12 +232,11 @@ function ArcHUD:CreateHUDFrames()
 	targethud.TargetTarget.HPText = AH_CreateFontString(targethud.TargetTarget, "ARTWORK", {50, 11}, 10, "LEFT", {1, 1, 1}, {"TOPLEFT", targethud.TargetTarget.Name, "BOTTOMLEFT", 0, -5})
 	targethud.TargetTarget.MPText = AH_CreateFontString(targethud.TargetTarget, "ARTWORK", {50, 11}, 10, "RIGHT", {1, 1, 1}, {"TOPRIGHT", targethud.TargetTarget.Name, "BOTTOMRIGHT", 0, -5})
 
---[[ TODO
+	-- 3d model
 	targethud.Model = AH_CreateFrame("PlayerModel", nil, targethud, {100, 100}, {"TOP", targethud.Name, "BOTTOM"}, "BACKGROUND")
 	targethud.Model:RegisterEvent("DISPLAY_SIZE_CHANGED")
 	targethud.Model:RegisterEvent("UNIT_MODEL_CHANGED")
-	targethud.Model:SetScript("OnEvent", function() this:RefreshUnit() end)
-]]--
+	targethud.Model:SetScript("OnEvent", self.Refresh3dUnitModel)
 
 	-- Create nameplates
 	local np = AH_CreateNameplate(main, "player", {50, 14}, {"BOTTOM", main, "BOTTOM", 0, 60})
@@ -288,4 +287,8 @@ function ArcHUD:CheckFrames()
 			frame.reset = nil
 		end
 	end
+end
+
+function ArcHUD:Refresh3dUnitModel()
+	ArcHUD.TargetHUD.Model:RefreshUnit()
 end

@@ -5,6 +5,7 @@ local L = LibStub("AceLocale-3.0"):NewLocale("ArcHUD_Core", "enUS", true)
 -- Core stuff
 L["CMD_OPTS_FRAME"]		= "Open options window"
 L["CMD_OPTS_DEBUG"]		= "Set debugging level"
+L["CMD_OPTS_DEBUG_SET"]	= "Setting debugging level to '%s'"
 L["CMD_RESET"]			= "Reset settings for this character to the defaults"
 L["CMD_RESET_HELP"]		= "This option will allow you to do two things, firstly you can reset your settings to their defaults.  To do this type 'CONFIRM' after the option so that the AddOn will know you've read this information"
 L["CMD_RESET_CONFIRM"]	= "This option will reset all of your options to the default values they had when the AddOn was installed"
