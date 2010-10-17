@@ -63,6 +63,8 @@ local cfgDefaults = {
 		PetNameplateFade = false,
 		Positions = {},
 		ShowResting = true,
+		ShowHolyPowerPoints = true,
+		ShowSoulShardPoints = true,
 	}
 }
 
@@ -612,9 +614,6 @@ function ArcHUD:OnInitialize()
 
 	self:SendMessage("ARCHUD_LOADED")
 	self:LevelDebug(d_info, "ArcHUD has been initialized.")
-	
-	-- TODO: check why this is needed
-	--self:Enable()
 end
 
 ----------------------------------------------
@@ -622,7 +621,6 @@ end
 ----------------------------------------------
 function ArcHUD:OnEnable()
 	self:LevelDebug(d_notice, "Registering events")
-	self:RegisterEvent("UNIT_COMBO_POINTS", 	"EventHandler")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD",	"EventHandler")
 
 	self:RegisterEvent("PLAYER_ENTER_COMBAT",	"CombatStatus")
@@ -762,12 +760,8 @@ function ArcHUD:OnProfileEnable()
 	-- Enable nameplate updates
 	self:StartNamePlateTimers()
 
-	-- Show/Hide combopoints display
-	if(self.db.profile.ShowComboPoints) then
-		self.TargetHUD.Combo:Show()
-	else
-		self.TargetHUD.Combo:Hide()
-	end
+	-- Combo points frame
+	self:InitComboPointsFrame()
 end
 
 ----------------------------------------------
@@ -1352,24 +1346,28 @@ function ArcHUD:EventHandler(event, arg1)
 				info = PowerBarColor[UnitPowerType(arg1)]
 			end
 			self.TargetHUD.MPText:SetTextColor(info.r, info.g, info.b)
+			
+		elseif (arg1 == "player") then
+			-- Affects Holy Power / Soul Shards
+			self:UpdateComboPointsFrame()
 		end
-	elseif (event == "UNIT_COMBO_POINTS") then
+		
+	elseif (event == "UNIT_POWER") then
 		if (arg1 == "player") then
-			local points = GetComboPoints("player")
-			if (points > 0) then
-				self.TargetHUD.Combo:SetText(points)
-			else
-				self.TargetHUD.Combo:SetText("")
-			end
+			-- Affects Holy Power / Soul Shards
+			self:UpdateComboPointsFrame()
 		end
+		
 	elseif (event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH") then
 		if (arg1 == "target") then
 			self.TargetHUD.HPText:SetText(UnitHealth(arg1).."/"..UnitHealthMax(arg1))
 		end
+		
 	elseif(event == "PLAYER_ENTERING_WORLD") then
 		self.PlayerIsInCombat = false
 		self.PlayerIsRegenOn = true
-		self.TargetHUD.Combo:SetText("")
+		self:SetComboPoints(0)
+		
 	else
 		if (arg1 == "target") then
 			self.TargetHUD.MPText:SetText(UnitPower(arg1).."/"..UnitPowerMax(arg1))

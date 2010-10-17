@@ -25,6 +25,7 @@ Locale_enUS.lua
 #Locale_zhTW.lua
 Core.lua
 Frames.lua
+ComboPoints.lua
 Nameplates.lua
 Utils.lua
 RingTemplate.lua
