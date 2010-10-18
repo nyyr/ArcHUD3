@@ -23,11 +23,11 @@ end
 
 function ArcHUD:UpdateComboPointsFrame()
 	local points = 0
-	local _, class = UnitClass("player");
+	local _, class = UnitClass("player")
 	if (class == "PALADIN") then
-		points = UnitPower("player", SPELL_POWER_HOLY_POWER);
+		points = UnitPower("player", SPELL_POWER_HOLY_POWER)
 	elseif (class == "WARLOCK") then
-		points = UnitPower("player", SPELL_POWER_SOUL_SHARDS);
+		points = UnitPower("player", SPELL_POWER_SOUL_SHARDS)
 	else
 		points = GetComboPoints("player")
 	end

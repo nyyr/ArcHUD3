@@ -35,6 +35,8 @@ L["TEXT"] = {
 	TOTOT		= "Enable target's target's target",
 	BLIZZPLAYER = "Blizzard player frame visible",
 	BLIZZTARGET = "Blizzard target frame visible",
+	HOLYPOWERCOMBO = "Show Holy Power as Combo Points",
+	SOULSHARDCOMBO = "Show Soul Shards as Combo Points",
 
 	NAMEPLATES	= "Nameplate options",
 	NPPLAYER	= "Player",
@@ -89,6 +91,8 @@ L["TOOLTIP"] = {
 	ATTACHTOP	= "Attach target frame to the top of the rings instead of the bottom",
 	BLIZZPLAYER = "Toggles visibility of the Blizzard player frame",
 	BLIZZTARGET = "Toggles visibility of the Blizzard target frame",
+	HOLYPOWERCOMBO = "Toggle display of Holy Power points as Combo Points (Combo Points must be turned on)",
+	SOULSHARDCOMBO = "Toggle display of Soul Shards as Combo Points (Combo Points must be turned on)",
 
 	NPPLAYER	= "Toggle display of player's nameplate",
 	NPPET		= "Toggle display of pet's nameplate",

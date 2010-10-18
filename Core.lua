@@ -356,9 +356,16 @@ end
 function ArcHUD:UpdateTargetHUD()
 	self:TargetUpdate()
 	
-	-- Show/Hide combopoints display
+	-- Show/Hide combopoints display and refresh it if necessary
 	if(self.db.profile.ShowComboPoints) then
 		self.TargetHUD.Combo:Show()
+		local _, class = UnitClass("player")
+		if ((class == "PALADIN" and not self.db.profile.ShowHolyPowerPoints) or
+			(class == "WARLOCK" and not self.db.profile.ShowSoulShardPoints)) then
+			self:SetComboPoints(0)
+		else
+			self:UpdateComboPointsFrame()
+		end
 	else
 		self.TargetHUD.Combo:Hide()
 	end
@@ -890,6 +897,11 @@ end
 -- Event Handler
 ----------------------------------------------
 function ArcHUD:EventHandler(event, arg1)
+	local class = nil
+	if (arg1) then
+		_, class = UnitClass(arg1)
+	end
+	
 	if (event == "UNIT_DISPLAYPOWER") then
 		local info = {}
 		if (arg1 == "target") then
@@ -900,13 +912,15 @@ function ArcHUD:EventHandler(event, arg1)
 			end
 			self.TargetHUD.MPText:SetTextColor(info.r, info.g, info.b)
 			
-		elseif (arg1 == "player") then
+		elseif ((arg1 == "player" and class == "PALADIN" and self.db.profile.ShowHolyPowerPoints) or
+				(arg1 == "player" and class == "WARLOCK" and self.db.profile.ShowSoulShardPoints)) then
 			-- Affects Holy Power / Soul Shards
 			self:UpdateComboPointsFrame()
 		end
 		
 	elseif (event == "UNIT_POWER") then
-		if (arg1 == "player") then
+		if ((arg1 == "player" and class == "PALADIN" and self.db.profile.ShowHolyPowerPoints) or
+			(arg1 == "player" and class == "WARLOCK" and self.db.profile.ShowSoulShardPoints)) then
 			-- Affects Holy Power / Soul Shards
 			self:UpdateComboPointsFrame()
 		end

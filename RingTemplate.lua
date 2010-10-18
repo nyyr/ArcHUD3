@@ -511,7 +511,7 @@ function ArcHUDRingTemplate:UpdateColor(color)
   	end
 end
 
-function ArcHUDRingTemplate:UpdateAlpha()
+function ArcHUDRingTemplate:UpdateAlpha(dummy, elapsed)
 
 	local isInCombat = false
 	local me = self:GetName()
@@ -525,7 +525,7 @@ function ArcHUDRingTemplate:UpdateAlpha()
 	end
 
 	if(self.f.pulse) then
-		self.f.alphaPulse = self.f.alphaPulse + (arg1/2)
+		self.f.alphaPulse = self.f.alphaPulse + (elapsed/2)
 		local camt = math.cos(self.f.alphaPulse * self.f.twoPi) * 0.3
 		self.f:SetAlpha(0.5-camt)
 	else

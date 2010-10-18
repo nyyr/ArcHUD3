@@ -76,6 +76,10 @@ ArcHUD.configOptionsTableCore = {
 	type = "group",
 	name = L["TEXT"]["TITLE"],
 	args = {
+		header = {
+			type 		= "header",
+			name		= "Version "..ArcHUD.version,
+		},
 		display = {
 			type		= "group",
 			name		= L["TEXT"]["DISPLAY"],
@@ -211,6 +215,45 @@ ArcHUD.configOptionsTableCore = {
 						ArcHUD:UpdateTargetHUD()
 					end,
 				},
+				-- Target of target of target
+				targetTargetTarget = {
+					type		= "toggle",
+					name		= L["TEXT"]["TOTOT"],
+					desc		= L["TOOLTIP"]["TOTOT"],
+					get			= function ()
+						return ArcHUD.db.profile.TargetTargetTarget
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.TargetTargetTarget = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
+				-- Holy Power as Combo Points
+				ShowHolyPowerPoints = {
+					type		= "toggle",
+					name		= L["TEXT"]["HOLYPOWERCOMBO"],
+					desc		= L["TOOLTIP"]["HOLYPOWERCOMBO"],
+					get			= function ()
+						return ArcHUD.db.profile.ShowHolyPowerPoints
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.ShowHolyPowerPoints = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
+				-- Soul Shards as Combo Points
+				ShowSoulShardPoints = {
+					type		= "toggle",
+					name		= L["TEXT"]["SOULSHARDCOMBO"],
+					desc		= L["TOOLTIP"]["SOULSHARDCOMBO"],
+					get			= function ()
+						return ArcHUD.db.profile.ShowSoulShardPoints
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.ShowSoulShardPoints = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
 			},
 		}, -- display
 		
@@ -284,7 +327,7 @@ ArcHUD.configOptionsTableCore = {
 						ArcHUD:UpdateTargetHUD()
 					end,
 				},
-				-- Target of target of target nameplate
+				-- Nameplates in combat
 				NameplateCombat = {
 					type		= "toggle",
 					name		= L["TEXT"]["NPCOMBAT"],
