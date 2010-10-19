@@ -511,8 +511,7 @@ function ArcHUDRingTemplate:UpdateColor(color)
   	end
 end
 
-function ArcHUDRingTemplate:UpdateAlpha(dummy, elapsed)
-
+function ArcHUDRingTemplate:UpdateAlpha(elapsed)
 	local isInCombat = false
 	local me = self:GetName()
 

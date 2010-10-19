@@ -90,7 +90,7 @@ ArcHUD.RepColor = { "FF4444", "DD4444", "DD7744", "BB9944", "44DD44", "55EE44", 
 -- Print debug message
 ----------------------------------------------
 function ArcHUD:LevelDebug(level, msg, ...)
-	if (self.db.global.debugLevel ~= nil) then
+	if (self.db.global.debugLevel) then
 		if (level <= self.db.global.debugLevel) then
 			self:Printf(msg, ...)
 		end
@@ -1195,7 +1195,7 @@ function ArcHUD:OnMetroUpdate(elapsed)
 			v.elapsed = v.elapsed + elapsed
 			if v.elapsed >= v.rate then
 				local mem, time = gcinfo(), GetTime()
-				-- ArcHUD:LevelDebug(d_notice, "Metronome is calling "..i)
+				-- ArcHUD:LevelDebug(d_notice, "Metronome is calling "..i.." ("..elapsed.."s)")
 				v.func(v.a1 or v.arg, v.a2 or v.elapsed, v.a3, v.a4, v.a5, v.a6)
 				mem, time = gcinfo() - mem, GetTime() - time
 				if mem >= 0 then v.mem, v.time, v.count = (v.mem or 0) + mem, (v.time or 0) + time, (v.count or 0) + 1 end
