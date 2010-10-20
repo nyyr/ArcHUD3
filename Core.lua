@@ -6,8 +6,9 @@ ArcHUD = LibStub("AceAddon-3.0"):NewAddon("ArcHUD",
 	"AceEvent-3.0",
 	"AceHook-3.0")
 
--- Major version
-ArcHUD.version = "3.0"
+-- Version
+local _, _, rev = string.find("$Rev$", "([0-9]+)")
+ArcHUD.version = "0.9."..rev
 	
 -- Locale object
 local L = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Core")
@@ -131,7 +132,7 @@ function ArcHUD:OnInitialize()
 	--self:SetDebugging(true)
 	self:SetDebugLevel(self.db.profile.Debug)
 
-	local _, _, rev = string.find("$Rev: 0 $", "([0-9]+)")
+	local _, _, rev = string.find("$Rev$", "([0-9]+)")
 	self.version = self.version .. "." .. rev
 	
 	self.metroFrame = CreateFrame("Frame")

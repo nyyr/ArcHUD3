@@ -47,6 +47,14 @@ ArcHUD.configOptionsTableCmd = {
 				AceConfigDialog:Open("ArcHUD_Core")
 			end,
 		},
+		modules = {
+			type		= "execute",
+			name		= "config",
+			desc		= L["CMD_OPTS_MODULES"],
+			func		= function()
+				AceConfigDialog:Open("ArcHUD_Modules")
+			end,
+		},
 		debug = {
 			type		= "select",
 			name		= "debug",
@@ -90,6 +98,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["TARGETFRAME"],
 					desc		= L["TOOLTIP"]["TARGETFRAME"],
+					order		= 0,
 					get			= function ()
 						return ArcHUD.db.profile.TargetFrame
 					end,
@@ -103,6 +112,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["PLAYERMODEL"],
 					desc		= L["TOOLTIP"]["PLAYERMODEL"],
+					order		= 1,
 					get			= function ()
 						return ArcHUD.db.profile.PlayerModel
 					end,
@@ -116,6 +126,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["MOBMODEL"],
 					desc		= L["TOOLTIP"]["MOBMODEL"],
+					order		= 2,
 					get			= function ()
 						return ArcHUD.db.profile.MobModel
 					end,
@@ -129,6 +140,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["SHOWGUILD"],
 					desc		= L["TOOLTIP"]["SHOWGUILD"],
+					order		= 3,
 					get			= function ()
 						return ArcHUD.db.profile.ShowGuild
 					end,
@@ -142,6 +154,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["SHOWCLASS"],
 					desc		= L["TOOLTIP"]["SHOWCLASS"],
+					order		= 4,
 					get			= function ()
 						return ArcHUD.db.profile.ShowClass
 					end,
@@ -155,6 +168,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["SHOWBUFFS"],
 					desc		= L["TOOLTIP"]["SHOWBUFFS"],
+					order		= 5,
 					get			= function ()
 						return ArcHUD.db.profile.ShowBuffs
 					end,
@@ -163,24 +177,12 @@ ArcHUD.configOptionsTableCore = {
 						ArcHUD:UpdateTargetHUD()
 					end,
 				},
-				-- Show Combo Points
-				showComboPoints = {
-					type		= "toggle",
-					name		= L["TEXT"]["SHOWCOMBO"],
-					desc		= L["TOOLTIP"]["SHOWCOMBO"],
-					get			= function ()
-						return ArcHUD.db.profile.ShowComboPoints
-					end,
-					set			= function (info, v)
-						ArcHUD.db.profile.ShowComboPoints = v
-						ArcHUD:UpdateTargetHUD()
-					end,
-				},
 				-- Show PvP flag
 				showPVP = {
 					type		= "toggle",
 					name		= L["TEXT"]["SHOWPVP"],
 					desc		= L["TOOLTIP"]["SHOWPVP"],
+					order		= 6,
 					get			= function ()
 						return ArcHUD.db.profile.ShowPVP
 					end,
@@ -194,6 +196,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["TOT"],
 					desc		= L["TOOLTIP"]["TOT"],
+					order		= 7,
 					get			= function ()
 						return ArcHUD.db.profile.TargetTarget
 					end,
@@ -207,6 +210,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["TOTOT"],
 					desc		= L["TOOLTIP"]["TOTOT"],
+					order		= 8,
 					get			= function ()
 						return ArcHUD.db.profile.TargetTargetTarget
 					end,
@@ -215,16 +219,25 @@ ArcHUD.configOptionsTableCore = {
 						ArcHUD:UpdateTargetHUD()
 					end,
 				},
-				-- Target of target of target
-				targetTargetTarget = {
+			},
+		}, -- display
+		
+		comboPoints = {
+			type		= "group",
+			name		= L["TEXT"]["COMBOPOINTS"],
+			order		= 1,
+			args		= {
+				-- Show Combo Points
+				showComboPoints = {
 					type		= "toggle",
-					name		= L["TEXT"]["TOTOT"],
-					desc		= L["TOOLTIP"]["TOTOT"],
+					name		= L["TEXT"]["SHOWCOMBO"],
+					desc		= L["TOOLTIP"]["SHOWCOMBO"],
+					order		= 0,
 					get			= function ()
-						return ArcHUD.db.profile.TargetTargetTarget
+						return ArcHUD.db.profile.ShowComboPoints
 					end,
 					set			= function (info, v)
-						ArcHUD.db.profile.TargetTargetTarget = v
+						ArcHUD.db.profile.ShowComboPoints = v
 						ArcHUD:UpdateTargetHUD()
 					end,
 				},
@@ -233,6 +246,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["HOLYPOWERCOMBO"],
 					desc		= L["TOOLTIP"]["HOLYPOWERCOMBO"],
+					order		= 1,
 					get			= function ()
 						return ArcHUD.db.profile.ShowHolyPowerPoints
 					end,
@@ -246,6 +260,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["SOULSHARDCOMBO"],
 					desc		= L["TOOLTIP"]["SOULSHARDCOMBO"],
+					order		= 2,
 					get			= function ()
 						return ArcHUD.db.profile.ShowSoulShardPoints
 					end,
@@ -255,12 +270,13 @@ ArcHUD.configOptionsTableCore = {
 					end,
 				},
 			},
-		}, -- display
+			
+		}, -- comboPoints
 		
 		nameplates = {
 			type		= "group",
 			name		= L["TEXT"]["NAMEPLATES"],
-			order		= 1,
+			order		= 2,
 			args		= {
 				-- Player nameplate
 				NameplatePlayer = {
@@ -346,16 +362,144 @@ ArcHUD.configOptionsTableCore = {
 		fade = {
 			type		= "group",
 			name		= L["TEXT"]["FADE"],
-			order		= 2,
+			order		= 3,
 			args		= {
+				-- FadeIC
+				FadeIC = {
+					type		= "range",
+					min			= 0.0,
+					max			= 1.0,
+					step		= 0.1,
+					name		= L["TEXT"]["FADE_IC"],
+					desc		= L["TOOLTIP"]["FADE_IC"],
+					order		= 0,
+					get			= function ()
+						return ArcHUD.db.profile.FadeIC
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.FadeIC = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
+				-- FadeOOC
+				FadeOOC = {
+					type		= "range",
+					min			= 0.0,
+					max			= 1.0,
+					step		= 0.1,
+					name		= L["TEXT"]["FADE_OOC"],
+					desc		= L["TOOLTIP"]["FADE_OOC"],
+					order		= 1,
+					get			= function ()
+						return ArcHUD.db.profile.FadeOOC
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.FadeOOC = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
+				-- FadeFull
+				FadeFull = {
+					type		= "range",
+					min			= 0.0,
+					max			= 1.0,
+					step		= 0.1,
+					name		= L["TEXT"]["FADE_FULL"],
+					desc		= L["TOOLTIP"]["FADE_FULL"],
+					order		= 2,
+					get			= function ()
+						return ArcHUD.db.profile.FadeFull
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.FadeFull = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
 			},
 		}, -- fade
 		
 		misc = {
 			type		= "group",
 			name		= L["TEXT"]["MISC"],
-			order		= 3,
+			order		= 4,
 			args		= {
+				-- Scaling
+				Scale = {
+					type		= "range",
+					min			= 0.2,
+					max			= 2.0,
+					step		= 0.1,
+					name		= L["TEXT"]["SCALE"],
+					desc		= L["TOOLTIP"]["SCALE"],
+					order		= 0,
+					get			= function ()
+						return ArcHUD.db.profile.Scale
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.Scale = v
+						ArcHUDFrame:SetScale(v)
+					end,
+				},
+				-- YLoc
+				YLoc = {
+					type		= "range",
+					min			= -500,
+					max			= 500,
+					step		= 1,
+					name		= L["TEXT"]["YLOC"],
+					desc		= L["TOOLTIP"]["YLOC"],
+					order		= 1,
+					get			= function ()
+						return ArcHUD.db.profile.YLoc
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.YLoc = v
+						ArcHUDFrame:ClearAllPoints()
+						ArcHUDFrame:SetPoint("CENTER", WorldFrame, "CENTER", ArcHUD.db.profile.XLoc, ArcHUD.db.profile.YLoc)
+					end,
+				},
+				-- XLoc
+				XLoc = {
+					type		= "range",
+					min			= -500,
+					max			= 500,
+					step		= 1,
+					name		= L["TEXT"]["XLOC"],
+					desc		= L["TOOLTIP"]["XLOC"],
+					order		= 2,
+					get			= function ()
+						return ArcHUD.db.profile.XLoc
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.XLoc = v
+						ArcHUDFrame:ClearAllPoints()
+						ArcHUDFrame:SetPoint("CENTER", WorldFrame, "CENTER", ArcHUD.db.profile.XLoc, ArcHUD.db.profile.YLoc)
+					end,
+				},
+				-- Width
+				Width = {
+					type		= "range",
+					min			= 0,
+					max			= 500,
+					step		= 1,
+					name		= L["TEXT"]["WIDTH"],
+					desc		= L["TOOLTIP"]["WIDTH"],
+					order		= 3,
+					get			= function ()
+						return ArcHUD.db.profile.Width
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.Width = v
+						-- Position the HUD according to user settings
+						anchorModule = ArcHUD:GetModule("Anchors", true)
+						if not (anchorModule == nil) then
+							ArcHUD:GetModule("Anchors").Left:ClearAllPoints()
+							ArcHUD:GetModule("Anchors").Left:SetPoint("TOPLEFT", ArcHUDFrame, "TOPLEFT", 0-ArcHUD.db.profile.Width, 0)
+							ArcHUD:GetModule("Anchors").Right:ClearAllPoints()
+							ArcHUD:GetModule("Anchors").Right:SetPoint("TOPLEFT", ArcHUDFrame, "TOPRIGHT", ArcHUD.db.profile.Width, 0)
+						end
+					end,
+				},
 			},
 		}, -- misc
 	},
@@ -389,24 +533,6 @@ end
 function ArcHUD:AddModuleOptionsTable(moduleName, optionsTable)
 	self:LevelDebug(d_notice, "Inserting config options for "..moduleName)
 	ArcHUD.configOptionsTableModules.args[moduleName] = optionsTable
-end
-
-function ArcHUD:GenerateModuleOption_Enabled(moduleName)
-	return {
-		type		= "toggle",
-		name		= LM["TEXT"]["ENABLED"],
-		get			= function ()
-			return ArcHUD:GetModule(moduleName).db.profile.Enabled
-		end,
-		set			= function (info, v)
-			ArcHUD:GetModule(moduleName).db.profile.Enabled = v
-			if (v) then
-				ArcHUD:GetModule(moduleName):Enable()
-			else
-				ArcHUD:GetModule(moduleName):Disable()
-			end
-		end,
-	}
 end
 
 --[[

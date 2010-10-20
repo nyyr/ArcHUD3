@@ -3,8 +3,8 @@ local LM = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Module")
 
 local moduleName = "Health"
 local module = ArcHUD:NewModule("Health")
-local _, _, rev = string.find("$Rev: 0 $", "([0-9]+)")
-module.version = "3.0." .. rev
+local _, _, rev = string.find("$Rev$", "([0-9]+)")
+module.version = "0.9." .. rev
 module.unit = "player"
 module.defaults = {
 	profile = {
@@ -26,13 +26,6 @@ module.options = {
 	hascolorfade = true,
 	attach = true,
 }
-module.optionsTable = {
-	type		= "group",
-	name		= LM[moduleName],
-	args = {
-		enabled = ArcHUD:GenerateModuleOption_Enabled(moduleName),
-	},
-}
 
 module.localized = true
 
@@ -47,6 +40,8 @@ function module:Initialize()
 	self.HPText = self:CreateFontString(self.f, "BACKGROUND", {150, 15}, 14, "RIGHT", {1.0, 1.0, 0.0}, {"TOPRIGHT", ArcHUDFrameCombo, "TOPLEFT", 0, 0})
 	self.HPPerc = self:CreateFontString(self.f, "BACKGROUND", {70, 14}, 12, "RIGHT", {1.0, 1.0, 1.0}, {"TOPRIGHT", self.HPText, "BOTTOMRIGHT", 0, 0})
 	self.DefText = self:CreateFontString(self.f, "BACKGROUND", {70, 14}, 11, "RIGHT", {1.0, 0.2, 0.2}, {"BOTTOMRIGHT", self.HPText, "TOPRIGHT", 0, 0})
+	
+	self:CreateStandardModuleOptions()
 end
 
 ----------------------------------------------

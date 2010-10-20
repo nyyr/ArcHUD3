@@ -4,6 +4,7 @@ local L = LibStub("AceLocale-3.0"):NewLocale("ArcHUD_Core", "enUS", true)
 
 -- Core stuff
 L["CMD_OPTS_FRAME"]		= "Open options window"
+L["CMD_OPTS_MODULES"]	= "Open module options window"
 L["CMD_OPTS_DEBUG"]		= "Set debugging level"
 L["CMD_OPTS_DEBUG_SET"]	= "Setting debugging level to '%s'"
 L["CMD_RESET"]			= "Reset settings for this character to the defaults"
@@ -28,15 +29,17 @@ L["TEXT"] = {
 	SHOWGUILD	= "Show player guild",
 	SHOWCLASS	= "Show target class",
 	SHOWBUFFS 	= "Show buffs/debuffs",
-	SHOWCOMBO	= "Show combopoint text",
 	SHOWPVP		= "Show player PVP status flag",
 	ATTACHTOP	= "Attach target frame to top",
 	TOT			= "Enable target's target",
 	TOTOT		= "Enable target's target's target",
 	BLIZZPLAYER = "Blizzard player frame visible",
 	BLIZZTARGET = "Blizzard target frame visible",
-	HOLYPOWERCOMBO = "Show Holy Power as Combo Points",
-	SOULSHARDCOMBO = "Show Soul Shards as Combo Points",
+	
+	COMBOPOINTS = "Combo points options",
+	SHOWCOMBO	= "Show combo point text",
+	HOLYPOWERCOMBO = "Show Holy Power as combo points",
+	SOULSHARDCOMBO = "Show Soul Shards as combo points",
 
 	NAMEPLATES	= "Nameplate options",
 	NPPLAYER	= "Player",
@@ -84,15 +87,16 @@ L["TOOLTIP"] = {
 	SHOWGUILD	= "Show player guild information next to their name",
 	SHOWCLASS	= "Show target class or creature type",
 	SHOWBUFFS	= "Toggle display of buffs and debuffs",
-	SHOWCOMBO	= "Toggle display of combopoints in the center of the HUD",
 	SHOWPVP		= "Toggle display of PVP status flag on the player nameplate",
 	TOT			= "Enable displaying of target's target",
 	TOTOT		= "Enable displaying of target's target's target",
 	ATTACHTOP	= "Attach target frame to the top of the rings instead of the bottom",
 	BLIZZPLAYER = "Toggles visibility of the Blizzard player frame",
 	BLIZZTARGET = "Toggles visibility of the Blizzard target frame",
-	HOLYPOWERCOMBO = "Toggle display of Holy Power points as Combo Points (Combo Points must be turned on)",
-	SOULSHARDCOMBO = "Toggle display of Soul Shards as Combo Points (Combo Points must be turned on)",
+	
+	SHOWCOMBO	= "Toggle display of combo points in the center of the HUD",
+	HOLYPOWERCOMBO = "Toggle display of Holy Power points as combo points (combo points must be turned on)",
+	SOULSHARDCOMBO = "Toggle display of Soul Shards as combo points (combo points must be turned on)",
 
 	NPPLAYER	= "Toggle display of player's nameplate",
 	NPPET		= "Toggle display of pet's nameplate",

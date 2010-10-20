@@ -692,4 +692,29 @@ function ArcHUD.modulePrototype:GetPowerBarColorText(powerType)
 	end
 end
 
+function ArcHUD.modulePrototype:CreateStandardModuleOptions()
+	self.optionsTable = {
+		type		= "group",
+		name		= LM[self:GetName()],
+		args 		= {
+			enabled = {
+				type		= "toggle",
+				name		= LM["TEXT"]["ENABLED"],
+				order		= 0,
+				get			= function ()
+					return self.db.profile.Enabled
+				end,
+				set			= function (info, v)
+					self.db.profile.Enabled = v
+					if (v) then
+						self:Enable()
+					else
+						self:Disable()
+					end
+				end,
+			},
+		},
+	}
+end
+
 ArcHUD:SetDefaultModulePrototype(ArcHUD.modulePrototype)
