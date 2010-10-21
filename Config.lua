@@ -84,14 +84,25 @@ ArcHUD.configOptionsTableCore = {
 	type = "group",
 	name = L["TEXT"]["TITLE"],
 	args = {
+		info1 = {
+			type		= "description",
+			name		= "Version "..ArcHUD.version..", code name "..ArcHUD.codename,
+			order		= 0,
+		},
+		info2 = {
+			type		= "description",
+			name		= "Authors: "..ArcHUD.authors,
+			order		= 1,
+		},
 		header = {
-			type 		= "header",
-			name		= "Version "..ArcHUD.version,
+			type		= "header",
+			name		= "General settings",
+			order		= 2,
 		},
 		display = {
 			type		= "group",
 			name		= L["TEXT"]["DISPLAY"],
-			order		= 0,
+			order		= 10,
 			args		= {
 				-- Target Frame
 				targetFrame = {
@@ -225,7 +236,7 @@ ArcHUD.configOptionsTableCore = {
 		comboPoints = {
 			type		= "group",
 			name		= L["TEXT"]["COMBOPOINTS"],
-			order		= 1,
+			order		= 11,
 			args		= {
 				-- Show Combo Points
 				showComboPoints = {
@@ -276,7 +287,7 @@ ArcHUD.configOptionsTableCore = {
 		nameplates = {
 			type		= "group",
 			name		= L["TEXT"]["NAMEPLATES"],
-			order		= 2,
+			order		= 12,
 			args		= {
 				-- Player nameplate
 				NameplatePlayer = {
@@ -362,7 +373,7 @@ ArcHUD.configOptionsTableCore = {
 		fade = {
 			type		= "group",
 			name		= L["TEXT"]["FADE"],
-			order		= 3,
+			order		= 13,
 			args		= {
 				-- FadeIC
 				FadeIC = {
@@ -421,7 +432,7 @@ ArcHUD.configOptionsTableCore = {
 		misc = {
 			type		= "group",
 			name		= L["TEXT"]["MISC"],
-			order		= 4,
+			order		= 14,
 			args		= {
 				-- Scaling
 				Scale = {
@@ -523,7 +534,7 @@ function ArcHUD:InitConfig()
 	
 	-- Set up core config options
 	AceConfig:RegisterOptionsTable("ArcHUD_Core", self.configOptionsTableCore)
-	self.configFrameCore = AceConfigDialog:AddToBlizOptions("ArcHUD_Core", "ArcHUD")
+	self.configFrameCore = AceConfigDialog:AddToBlizOptions("ArcHUD_Core", "ArcHUD ("..ArcHUD.codename..")")
 	
 	-- Set up modules config options
 	AceConfig:RegisterOptionsTable("ArcHUD_Modules", self.configOptionsTableModules)

@@ -1,6 +1,7 @@
-local module = ArcHUD:NewModule("PetHealth")
-local _, _, rev = string.find("$Rev: 0 $", "([0-9]+)")
-module.version = "3.0." .. rev
+local moduleName = "PetHealth"
+local module = ArcHUD:NewModule(moduleName)
+local _, _, rev = string.find("$Rev$", "([0-9]+)")
+module.version = "0.9 (r"..rev..")"
 module.unit = "pet"
 module.defaults = {
 	profile = {
@@ -29,6 +30,8 @@ function module:Initialize()
 	self.f:SetAlpha(0)
 
 	self.HPPerc = self:CreateFontString(self.f, "BACKGROUND", {100, 17}, 16, "RIGHT", {1.0, 1.0, 1.0}, {"BOTTOMLEFT", self.f, "BOTTOMLEFT", -165, -125})
+	
+	self:CreateStandardModuleOptions(35)
 end
 
 function module:Update()
@@ -76,7 +79,7 @@ function module:Update()
 	self:UpdateColor()
 end
 
-function module:Enable()
+function module:OnModuleEnable()
 	self:UpdateColor(self.db.profile.Color)
 	if(UnitExists(self.unit)) then
 		self.HPPerc:SetText(floor((UnitHealth(self.unit) / UnitHealthMax(self.unit)) * 100).."%")

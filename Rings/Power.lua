@@ -4,7 +4,7 @@ local LM = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Module")
 local moduleName = "Power"
 local module = ArcHUD:NewModule(moduleName)
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "0.9." .. rev
+module.version = "0.9 (r"..rev..")"
 module.unit = "player"
 module.defaults = {
 	profile = {
@@ -42,7 +42,7 @@ function module:Initialize()
 	self.MPPerc = self:CreateFontString(self.f, "BACKGROUND", {40, 14}, 12, "LEFT", {1.0, 1.0, 1.0}, {"TOPLEFT", self.MPText, "BOTTOMLEFT", 0, 0})
 	self.parent:RegisterMetro(self.name .. "UpdatePowerBar", self.UpdatePower, 0.1, self, self.unit)
 	
-	self:CreateStandardModuleOptions()
+	self:CreateStandardModuleOptions(10)
 end
 
 ----------------------------------------------
@@ -68,7 +68,7 @@ end
 ----------------------------------------------
 -- Enable
 ----------------------------------------------
-function module:Enable()
+function module:OnModuleEnable()
 	self.f.pulse = false
 
 	if(UnitIsGhost(self.unit)) then

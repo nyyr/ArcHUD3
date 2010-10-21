@@ -1,5 +1,5 @@
 local module = ArcHUD:NewModule("FocusHealth")
-local _, _, rev = string.find("$Rev: 81 $", "([0-9]+)")
+local _, _, rev = string.find("$Rev$", "([0-9]+)")
 module.version = "2.1." .. rev
 module.unit = "focus"
 module.defaults = {

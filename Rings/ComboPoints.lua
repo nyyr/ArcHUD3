@@ -1,13 +1,15 @@
 local module = ArcHUD:NewModule("ComboPoints")
-local _, _, rev = string.find("$Rev: 106 $", "([0-9]+)")
-module.version = "2.0." .. rev
+local _, _, rev = string.find("$Rev$", "([0-9]+)")
+module.version = "0.9 (r" .. rev .. ")"
 module.unit = "player"
 module.defaults = {
-	Enabled = true,
-	Outline = true,
-	Flash = true,
-	Side = 2,
-	Level = 1,
+	profile = {
+		Enabled = true,
+		Outline = true,
+		Flash = true,
+		Side = 2,
+		Level = 2,
+	}
 }
 module.options = {
 	{name = "Flash", text = "FLASH", tooltip = "FLASH"},
@@ -22,14 +24,16 @@ function module:Initialize()
 	self.f:SetAlpha(0)
 
 	-- Override Update timer
-	self:RegisterMetro(self.name .. "Update", self.UpdateAlpha, 0.05, self.f)
+	self.parent:RegisterMetro(self.name .. "Update", self.UpdateAlpha, 0.05, self.f)
+	
+	self:CreateStandardModuleOptions(45)
 end
 
 function module:Update()
 	self.Flash = self.db.profile.Flash
 end
 
-function module:Enable()
+function module:OnModuleEnable()
 	self.f.dirty = true
 	self.f.fadeIn = 0.25
 
@@ -42,14 +46,14 @@ function module:Enable()
 	self:RegisterEvent("PLAYER_TARGET_CHANGED",	"UpdateComboPoints")
 
 	-- Activate the timers
-	self:StartMetro(self.name .. "Alpha")
-	self:StartMetro(self.name .. "Fade")
-	self:StartMetro(self.name .. "Update")
+	self.parent:StartMetro(self.name .. "Alpha")
+	self.parent:StartMetro(self.name .. "Fade")
+	self.parent:StartMetro(self.name .. "Update")
 
 	self.f:Show()
 end
 
-function module:UpdateAlpha()
+function module:UpdateAlpha(arg1)
 	if(self.pulse) then
 		self.alphaPulse = self.alphaPulse + arg1/2
 		local amt = math.sin(self.alphaPulse * self.twoPi) * 0.5 + 0.5
@@ -57,7 +61,7 @@ function module:UpdateAlpha()
 	end
 end
 
-function module:UpdateComboPoints()
+function module:UpdateComboPoints(event, arg1)
 	if (arg1 == self.unit) then
 		self.f:SetValue(GetComboPoints(self.unit))
 		if(GetComboPoints(self.unit) < 5 and GetComboPoints(self.unit) >= 0) then

@@ -335,8 +335,8 @@ function ArcHUD.modulePrototype:OnInitialize()
 	if(self.Initialize) then
 		self:Initialize()
 		self:Debug(d_info, "Ring initialized")
-		self:RegisterEvent("ARCHUD_MODULE_ENABLE")
-		self:RegisterEvent("ARCHUD_MODULE_UPDATE")
+		self:RegisterMessage("ARCHUD_MODULE_ENABLE")
+		self:RegisterMessage("ARCHUD_MODULE_UPDATE")
 	else
 		self:Debug(d_warn, "Missing Initialize(). Aborting")
 		return
@@ -393,12 +393,14 @@ function ArcHUD.modulePrototype:OnEnable()
 			end
 			self.eventsDisabled = TRUE
 		end
-		self:Debug(d_notice, "Calling Update handler")
-		self:ARCHUD_MODULE_UPDATE(self:GetName())
-		self:Debug(d_notice, "Calling self:Enable()")
-		self:Enable()
-		self:RegisterEvent("ARCHUD_MODULE_DISABLE")
-		self:RegisterEvent("ARCHUD_MODULE_UPDATE")
+		if (self.OnModuleEnable) then
+			self:OnModuleEnable()
+		else
+			self:Debug(d_info, "Ring "..self:GetName().." has no OnModuleEnable() handler")
+		end
+		self:ARCHUD_MODULE_UPDATE("ARCHUD_MODULE_UPDATE", self:GetName())
+		self:RegisterMessage("ARCHUD_MODULE_DISABLE")
+		self:RegisterMessage("ARCHUD_MODULE_UPDATE")
 		self:Debug(d_info, "Ring enabled")
 	else
 		self:Debug(d_info, "Ring disabled as per user setting")
@@ -431,8 +433,8 @@ function ArcHUD.modulePrototype:OnDisable()
 	if(self.Disable) then
 		self:Disable()
 	end
-	self:RegisterEvent("ARCHUD_MODULE_ENABLE")
-	self:RegisterEvent("ARCHUD_MODULE_UPDATE")
+	self:RegisterMessage("ARCHUD_MODULE_ENABLE")
+	self:RegisterMessage("ARCHUD_MODULE_UPDATE")
 	self:Debug(d_info, "Ring disabled")
 end
 
@@ -453,7 +455,7 @@ end
 ----------------------------------------------
 -- ARCHUD_MODULE_UPDATE
 ----------------------------------------------
-function ArcHUD.modulePrototype:ARCHUD_MODULE_UPDATE(module)
+function ArcHUD.modulePrototype:ARCHUD_MODULE_UPDATE(message, module)
 	if(module == self:GetName()) then
 		if(self.db.profile.Enabled and not self:IsEnabled()) then
 			self:Enable()
@@ -692,15 +694,22 @@ function ArcHUD.modulePrototype:GetPowerBarColorText(powerType)
 	end
 end
 
-function ArcHUD.modulePrototype:CreateStandardModuleOptions()
+function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 	self.optionsTable = {
 		type		= "group",
 		name		= LM[self:GetName()],
+		order		= order or 100,
 		args 		= {
+			header = {
+				type		= "header",
+				name		= LM[self:GetName()] .. " v" .. self.version,
+				order		= 0,
+			},
 			enabled = {
 				type		= "toggle",
 				name		= LM["TEXT"]["ENABLED"],
-				order		= 0,
+				desc		= LM["TOOLTIP"]["ENABLED"],
+				order		= 1,
 				get			= function ()
 					return self.db.profile.Enabled
 				end,
@@ -713,8 +722,68 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions()
 					end
 				end,
 			},
+			side = {
+				type		= "select",
+				name		= LM["TEXT"]["SIDE"],
+				desc		= LM["TOOLTIP"]["SIDE"],
+				values		= {LM["SIDE"]["LEFT"], LM["SIDE"]["RIGHT"]},
+				order		= 2,
+				get			= function ()
+					return self.db.profile.Side
+				end,
+				set			= function (info, v)
+					self.db.profile.Side = v
+					self:SendMessage("ARCHUD_MODULE_UPDATE", self:GetName())
+				end,
+			},
+			level = {
+				type		= "range",
+				name		= LM["TEXT"]["LEVEL"],
+				desc		= LM["TOOLTIP"]["LEVEL"],
+				min			= -5,
+				max			= 5,
+				step		= 1,
+				order		= 3,
+				get			= function ()
+					return self.db.profile.Level
+				end,
+				set			= function (info, v)
+					self.db.profile.Level = v
+					self:SendMessage("ARCHUD_MODULE_UPDATE", self:GetName())
+				end,
+			},
 		},
 	}
+	
+	
+	for k,v in ipairs(self.options) do
+		if(type(v) == "table") then
+			t = {
+				type		= "toggle",
+				name		= LM["TEXT"][v.text],
+				desc		= LM["TOOLTIP"][v.tooltip],
+				order		= 20,
+				get			= function ()
+					return self.db.profile[v.name]
+				end,
+				set			= function (info, val)
+					self.db.profile[v.name] = val
+					self:SendMessage("ARCHUD_MODULE_UPDATE", self:GetName())
+				end,
+			}
+			self.optionsTable.args[v.name] = t
+		end
+	end
+end
+
+function ArcHUD.modulePrototype:AppendModuleOptions(optionsTable)
+	if not (self.optionsTable) then
+		self:Debug(d_warn, "Cannot append options, options table not initialized.")
+		return
+	end
+	for k, o in pairs(optionsTable) do
+		self.optionsTable.args[k] = o
+	end
 end
 
 ArcHUD:SetDefaultModulePrototype(ArcHUD.modulePrototype)

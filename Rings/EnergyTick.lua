@@ -1,5 +1,5 @@
 local module = ArcHUD:NewModule("EnergyTick")
-local _, _, rev = string.find("$Rev: 102 $", "([0-9]+)")
+local _, _, rev = string.find("$Rev$", "([0-9]+)")
 module.version = "2.1." .. rev
 module.unit = "player"
 module.defaults = {

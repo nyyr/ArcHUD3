@@ -20,7 +20,7 @@ L["Author: "]		= true
 
 --	Options
 L["TEXT"] = {
-	TITLE		= "ArcHUD Options",
+	TITLE		= "ArcHUD3 Options",
 
 	DISPLAY		= "Display options",
 	TARGETFRAME	= "Target frame",
@@ -142,13 +142,13 @@ LM["Author: "]	= true
 LM["Health"]		= "Player Health"
 LM["Power"]			= "Player Power"
 LM["PetHealth"]		= "Pet Health"
-LM["PetMana"]		= "Pet Mana"
+LM["PetPower"]		= "Pet Power"
 LM["TargetCasting"]	= "Target Casting"
 LM["TargetHealth"]	= "Target Health"
-LM["TargetMana"]	= "Target Mana"
+LM["TargetPower"]	= "Target Power"
 LM["FocusHealth"]	= "Focus Health"
-LM["FocusMana"]		= "Focus Mana"
-LM["Casting"]		= true
+LM["FocusPower"]	= "Focus Power"
+LM["Casting"]		= "Player Casting"
 LM["DruidMana"]		= "Druid Mana"
 LM["MirrorTimer"]	= "Mirror Timer"
 LM["ComboPoints"]	= "Combo Points"

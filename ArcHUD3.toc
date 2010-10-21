@@ -1,14 +1,11 @@
 ## Interface: 40000
-## Title: ArcHUD3 (code name phoenix)
-## Notes: Basic combat HUD based on ArcHUD2
+## Title: ArcHUD3
+## Notes: Smooth combat HUD based on ArcHUD2
 ## Author: nyyr, Nenie
 ## SavedVariables: ArcHUDDB
-## Version: 4.0
-## X-Date: $Date: 2008-11-06 23:34:53 +0100 (Do, 06 Nov 2008) $
-## X-Category: Interface Enhancements
-## X-RelSite-Curse: 3153
-## X-RelSite-UI.WoW: 1950
-## X-AceForum: 1896
+## Version: 0.9 beta 1
+## X-Date: $Date$
+## X-Category: HUDs
 
 # Libraries
 embeds.xml
@@ -34,15 +31,15 @@ Config.lua
 Rings\Anchors.lua
 Rings\Health.lua
 Rings\Power.lua
-Rings\TargetCasting.lua
+Rings\Casting.lua
 Rings\TargetHealth.lua
 Rings\TargetPower.lua
-Rings\PetPower.lua
+Rings\TargetCasting.lua
 Rings\PetHealth.lua
+Rings\PetPower.lua
+Rings\ComboPoints.lua
 #Rings\FocusHealth.lua
 #Rings\FocusPower.lua
-Rings\Casting.lua
 #Rings\MirrorTimer.lua
-#Rings\ComboPoints.lua
-Rings\DruidMana.lua
+#Rings\DruidMana.lua
 #Rings\EnergyTick.lua

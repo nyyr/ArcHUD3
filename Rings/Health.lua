@@ -4,7 +4,7 @@ local LM = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Module")
 local moduleName = "Health"
 local module = ArcHUD:NewModule("Health")
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "0.9." .. rev
+module.version = "0.9 (r"..rev..")"
 module.unit = "player"
 module.defaults = {
 	profile = {
@@ -41,7 +41,7 @@ function module:Initialize()
 	self.HPPerc = self:CreateFontString(self.f, "BACKGROUND", {70, 14}, 12, "RIGHT", {1.0, 1.0, 1.0}, {"TOPRIGHT", self.HPText, "BOTTOMRIGHT", 0, 0})
 	self.DefText = self:CreateFontString(self.f, "BACKGROUND", {70, 14}, 11, "RIGHT", {1.0, 0.2, 0.2}, {"BOTTOMRIGHT", self.HPText, "TOPRIGHT", 0, 0})
 	
-	self:CreateStandardModuleOptions()
+	self:CreateStandardModuleOptions(5)
 end
 
 ----------------------------------------------
@@ -72,9 +72,9 @@ function module:Update()
 end
 
 ----------------------------------------------
--- Enable
+-- OnModuleEnable
 ----------------------------------------------
-function module:Enable()
+function module:OnModuleEnable()
 	-- Initial setup
 	self:UpdateColor(self.db.profile.Color)
 	self.f:SetMax(UnitHealthMax(self.unit))

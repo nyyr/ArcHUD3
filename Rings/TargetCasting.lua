@@ -1,6 +1,7 @@
-local module = ArcHUD:NewModule("TargetCasting")
-local _, _, rev = string.find("$Rev: 0 $", "([0-9]+)")
-module.version = "3.0." .. rev
+local moduleName = "TargetCasting"
+local module = ArcHUD:NewModule(moduleName)
+local _, _, rev = string.find("$Rev$", "([0-9]+)")
+module.version = "0.9 (r"..rev..")"
 module.unit = "target"
 module.defaults = {
 	profile = {
@@ -33,6 +34,8 @@ function module:Initialize()
 
 	-- Register timers
 	self.parent:RegisterMetro(self.name .. "Casting", self.Casting, 0.01, self)
+	
+	self:CreateStandardModuleOptions(30)
 end
 
 function module:Update()
@@ -49,7 +52,7 @@ function module:Update()
 	end
 end
 
-function module:Enable()
+function module:OnModuleEnable()
 	self.OnTaxi = nil
 	self.flying = nil
 	self.f.fadeIn = 0.25

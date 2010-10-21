@@ -1,6 +1,7 @@
-local module = ArcHUD:NewModule("TargetHealth")
-local _, _, rev = string.find("$Rev: 0 $", "([0-9]+)")
-module.version = "3.0." .. rev
+local moduleName = "TargetHealth"
+local module = ArcHUD:NewModule(moduleName)
+local _, _, rev = string.find("$Rev$", "([0-9]+)")
+module.version = "0.9 (r"..rev..")"
 module.unit = "target"
 module.defaults = {
 	profile = {
@@ -27,6 +28,8 @@ function module:Initialize()
 	self.f:SetAlpha(0)
 
 	self.HPPerc = self:CreateFontString(self.f, "BACKGROUND", {40, 12}, 11, "RIGHT", {1.0, 1.0, 1.0}, {"TOPLEFT", self.f, "BOTTOMLEFT", -100, -115})
+	
+	self:CreateStandardModuleOptions(20)
 end
 
 function module:Update()
@@ -57,7 +60,7 @@ function module:Update()
 	end
 end
 
-function module:Enable()
+function module:OnModuleEnable()
 	if not UnitExists(self.unit) then
 		self.f:SetMax(100)
 		self.f:SetValue(0)

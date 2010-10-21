@@ -1,6 +1,7 @@
-local module = ArcHUD:NewModule("TargetPower")
-local _, _, rev = string.find("$Rev: 0 $", "([0-9]+)")
-module.version = "3.0." .. rev
+local moduleName = "TargetPower"
+local module = ArcHUD:NewModule(moduleName)
+local _, _, rev = string.find("$Rev$", "([0-9]+)")
+module.version = "0.9 (r"..rev..")"
 module.unit = "target"
 module.defaults = {
 	profile = {
@@ -13,7 +14,7 @@ module.defaults = {
 		ColorFocus = PowerBarColor[2],
 		ColorEnergy = PowerBarColor[3],
 		Side = 2,
-		Level = 2,
+		Level = 1,
 	}
 }
 module.options = {
@@ -30,6 +31,8 @@ function module:Initialize()
 
 	self.MPPerc = self:CreateFontString(self.f, "BACKGROUND", {40, 12}, 11, "RIGHT", {1.0, 1.0, 1.0}, {"TOPLEFT", self.f, "BOTTOMLEFT", -100, -115})
 	self.parent:RegisterMetro(self.name .. "UpdatePowerBar", self.UpdatePower, 0.1, self)
+	
+	self:CreateStandardModuleOptions(25)
 end
 
 function module:Update()
@@ -54,7 +57,7 @@ function module:Update()
 	end
 end
 
-function module:Enable()
+function module:OnModuleEnable()
 	if not UnitExists(self.unit) then
 		self.f:SetMax(100)
 		self.f:SetValue(0)

@@ -1,5 +1,5 @@
 local module = ArcHUD:NewModule("DruidMana")
-local _, _, rev = string.find("$Rev: 113 $", "([0-9]+)")
+local _, _, rev = string.find("$Rev$", "([0-9]+)")
 module.version = "2.0." .. rev
 module.unit = "player"
 module.defaults = {

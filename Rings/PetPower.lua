@@ -1,6 +1,7 @@
-local module = ArcHUD:NewModule("PetPower")
-local _, _, rev = string.find("$Rev: 0 $", "([0-9]+)")
-module.version = "3.0." .. rev
+local moduleName = "PetPower"
+local module = ArcHUD:NewModule(moduleName)
+local _, _, rev = string.find("$Rev$", "([0-9]+)")
+module.version = "0.9 (r"..rev..")"
 module.unit = "pet"
 module.defaults = {
 	profile = {
@@ -36,6 +37,8 @@ function module:Initialize()
 	self.f:SetAlpha(0)
 
 	self.MPPerc = self:CreateFontString(self.f, "BACKGROUND", {100, 17}, 16, "LEFT", {1.0, 1.0, 1.0}, {"BOTTOMLEFT", self.f, "BOTTOMLEFT", 65, -125})
+	
+	self:CreateStandardModuleOptions(40)
 end
 
 function module:Update()
@@ -83,7 +86,7 @@ function module:Update()
 	self:UpdateColor(UnitPowerType(self.unit))
 end
 
-function module:Enable()
+function module:OnModuleEnable()
 	self.f:SetMax(10)
 	self.f:SetValue(10)
 
