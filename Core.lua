@@ -11,7 +11,7 @@ local _, _, rev = string.find("$Rev$", "([0-9]+)")
 ArcHUD.version = "0.9 beta 1 (r"..rev..")"
 ArcHUD.codename = "Phoenix"
 ArcHUD.authors = "nyyr, Nenie"
-	
+
 -- Locale object
 local L = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Core")
 
@@ -128,12 +128,12 @@ end
 ----------------------------------------------
 function ArcHUD:OnInitialize()
 	-- Set up database
-	self.db = LibStub("AceDB-3.0"):New("ArcHUDDB", cfgDefaults, "profile")
+	self.db = LibStub("AceDB-3.0"):New("ArcHUD3DB", cfgDefaults, "profile")
 
 	-- Set debug level
 	--self:SetDebugging(true)
 	self:SetDebugLevel(self.db.profile.Debug)
-	
+
 	self.metroFrame = CreateFrame("Frame")
 	self.metroFrame:Hide()
 	self.metroFrame:SetScript("OnUpdate", self.OnMetroUpdate)
@@ -148,7 +148,7 @@ function ArcHUD:OnInitialize()
 	self.TargetHUD = self:CreateHUDFrames()
 
 	self:InitConfig()
-	
+
 	self:SendMessage("ARCHUD_LOADED")
 	self:LevelDebug(d_info, "ArcHUD has been initialized.")
 end
@@ -355,7 +355,7 @@ end
 ----------------------------------------------
 function ArcHUD:UpdateTargetHUD()
 	self:TargetUpdate()
-	
+
 	-- Show/Hide combopoints display and refresh it if necessary
 	if(self.db.profile.ShowComboPoints) then
 		self.TargetHUD.Combo:Show()
@@ -901,7 +901,7 @@ function ArcHUD:EventHandler(event, arg1)
 	if (arg1) then
 		_, class = UnitClass(arg1)
 	end
-	
+
 	if (event == "UNIT_DISPLAYPOWER") then
 		local info = {}
 		if (arg1 == "target") then
@@ -911,30 +911,30 @@ function ArcHUD:EventHandler(event, arg1)
 				info = PowerBarColor[UnitPowerType(arg1)]
 			end
 			self.TargetHUD.MPText:SetTextColor(info.r, info.g, info.b)
-			
+
 		elseif ((arg1 == "player" and class == "PALADIN" and self.db.profile.ShowHolyPowerPoints) or
 				(arg1 == "player" and class == "WARLOCK" and self.db.profile.ShowSoulShardPoints)) then
 			-- Affects Holy Power / Soul Shards
 			self:UpdateComboPointsFrame()
 		end
-		
+
 	elseif (event == "UNIT_POWER") then
 		if ((arg1 == "player" and class == "PALADIN" and self.db.profile.ShowHolyPowerPoints) or
 			(arg1 == "player" and class == "WARLOCK" and self.db.profile.ShowSoulShardPoints)) then
 			-- Affects Holy Power / Soul Shards
 			self:UpdateComboPointsFrame()
 		end
-		
+
 	elseif (event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH") then
 		if (arg1 == "target") then
 			self.TargetHUD.HPText:SetText(UnitHealth(arg1).."/"..UnitHealthMax(arg1))
 		end
-		
+
 	elseif(event == "PLAYER_ENTERING_WORLD") then
 		self.PlayerIsInCombat = false
 		self.PlayerIsRegenOn = true
 		self:SetComboPoints(0)
-		
+
 	else
 		if (arg1 == "target") then
 			self.TargetHUD.MPText:SetText(UnitPower(arg1).."/"..UnitPowerMax(arg1))
@@ -979,7 +979,7 @@ function ArcHUD:CombatStatus(event)
 end
 
 
---[[ 
+--[[
 ----------------------------------------------
 -- Blizzard Frame functions
 -- Taken from AceUnitFrames
@@ -1126,11 +1126,11 @@ end
 ----------------------------------------------
 function ArcHUD:RegisterMetro(name, func, rate, a1, a2, a3, a4, a5, a6)
 	self:LevelDebug(d_notice, "Registering metronome on "..name)
-	
+
 	if self.metroHandlers[name] then
 		self:LevelDebug(d_warn, "A timer with the name "..name.." is already registered")
 	end
-	
+
 	if func == nil then
 		self:LevelDebug(d_warn, "*** Attempt to register "..name.." without a function")
 		return
@@ -1155,10 +1155,10 @@ function ArcHUD:UnregisterMetro(a1,a2,a3,a4,a5,a6,a7,a8,a9,a10)
 	self:LevelDebug(d_notice, "Unregistering metronome on "..a1)
 
 	if not self.metroHandlers[a1] then return end
-	
+
 	reclaimtable(self.metroHandlers[a1])
 	self.metroHandlers[a1] = nil
-	
+
 	if a2 then self:UnregisterMetro(a2,a3,a4,a5,a6,a7,a8,a9,a10)
 	elseif not next(self.metroHandlers) then self.metroFrame:Hide() end
 	return true
@@ -1218,12 +1218,12 @@ end
 ----------------------------------------------
 function ArcHUD:StartMetro(name, numexec)
 	-- self:LevelDebug(d_notice, "Starting metronome on "..name)
-	
-	if not self.metroHandlers[name] then 
+
+	if not self.metroHandlers[name] then
 		self:LevelDebug(d_warn, "Attempt to start unregistered metronome callback "..name)
 		return
 	end
-	
+
 	self.metroHandlers[name].limit = numexec
 	self.metroHandlers[name].elapsed = 0
 	self.metroHandlers[name].running = true
@@ -1243,7 +1243,7 @@ function ArcHUD:StopMetro(name)
 	-- self:LevelDebug(d_notice, "Stopping metronome on "..name)
 
 	if not self.metroHandlers[name] then return end
-	
+
 	self.metroHandlers[name].running = nil
 	self.metroHandlers[name].limit = nil
 	if not next(self.metroHandlers) then self.metroFrame:Hide() end

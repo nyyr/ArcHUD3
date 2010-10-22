@@ -2,7 +2,7 @@
 ## Title: ArcHUD3
 ## Notes: Smooth combat HUD based on ArcHUD2
 ## Author: nyyr, Nenie
-## SavedVariables: ArcHUDDB
+## SavedVariables: ArcHUD3DB
 ## Version: 0.9 beta 1
 ## X-Date: $Date$
 ## X-Category: HUDs
@@ -10,14 +10,10 @@
 # Libraries
 embeds.xml
 
+# Locales
+Locales\Locales.xml
+
 # Core addon
-Locale_enUS.lua
-#Locale_ruRU.lua
-#Locale_deDE.lua
-#Locale_zhCN.lua
-#Locale_esES.lua
-#Locale_koKR.lua
-#Locale_zhTW.lua
 Core.lua
 Frames.lua
 ComboPoints.lua
@@ -28,18 +24,4 @@ ModuleCore.lua
 Config.lua
 
 # Rings
-Rings\Anchors.lua
-Rings\Health.lua
-Rings\Power.lua
-Rings\Casting.lua
-Rings\TargetHealth.lua
-Rings\TargetPower.lua
-Rings\TargetCasting.lua
-Rings\PetHealth.lua
-Rings\PetPower.lua
-Rings\ComboPoints.lua
-#Rings\FocusHealth.lua
-#Rings\FocusPower.lua
-#Rings\MirrorTimer.lua
-#Rings\DruidMana.lua
-#Rings\EnergyTick.lua
+Rings\Rings.xml

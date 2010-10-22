@@ -35,7 +35,7 @@ L["TEXT"] = {
 	TOTOT		= "Enable target's target's target",
 	BLIZZPLAYER = "Blizzard player frame visible",
 	BLIZZTARGET = "Blizzard target frame visible",
-	
+
 	COMBOPOINTS = "Combo points options",
 	SHOWCOMBO	= "Show combo point text",
 	HOLYPOWERCOMBO = "Show Holy Power as combo points",
@@ -69,7 +69,7 @@ L["TEXT"] = {
 	RINGVIS_1	= "FadeFull: Fade when full",
 	RINGVIS_2	= "FadeOOC: Fade when out of combat",
 	RINGVIS_3	= "FadeBoth: Fade when full or out of combat",
-	
+
 	MISC		= "Miscellanous options",
 	WIDTH		= "HUD width",
 	YLOC		= "Vertical alignment",
@@ -93,7 +93,7 @@ L["TOOLTIP"] = {
 	ATTACHTOP	= "Attach target frame to the top of the rings instead of the bottom",
 	BLIZZPLAYER = "Toggles visibility of the Blizzard player frame",
 	BLIZZTARGET = "Toggles visibility of the Blizzard target frame",
-	
+
 	SHOWCOMBO	= "Toggle display of combo points in the center of the HUD",
 	HOLYPOWERCOMBO = "Toggle display of Holy Power points as combo points (combo points must be turned on)",
 	SOULSHARDCOMBO = "Toggle display of Soul Shards as combo points (combo points must be turned on)",
