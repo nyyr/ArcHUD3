@@ -129,12 +129,12 @@ function module:PLAYER_TARGET_CHANGED()
 	local casting, _, _, _, _, _ = UnitCastingInfo(self.unit)
 	local channel, _, _, _, _, _ = UnitChannelInfo(self.unit)
 	if(casting) then
-		self:UNIT_SPELLCAST_START(self.unit)
+		self:UNIT_SPELLCAST_START("PLAYER_TARGET_CHANGED", self.unit)
 	elseif(channel) then
-		self:UNIT_SPELLCAST_CHANNEL_START(self.unit)
+		self:UNIT_SPELLCAST_CHANNEL_START("PLAYER_TARGET_CHANGED", self.unit)
 	else
-		self:SpellcastStop(self.unit, true)
-		self:SpellcastChannelStop(self.unit, true)
+		self:SpellcastStop("PLAYER_TARGET_CHANGED", self.unit, true)
+		self:SpellcastChannelStop("PLAYER_TARGET_CHANGED", self.unit, true)
 	end
 end
 
