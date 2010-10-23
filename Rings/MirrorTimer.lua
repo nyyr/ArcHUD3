@@ -1,14 +1,20 @@
-local module = ArcHUD:NewModule("MirrorTimer")
+-- localization
+local LM = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Module")
+
+local moduleName = "MirrorTimer"
+local module = ArcHUD:NewModule(moduleName)
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "2.0." .. rev
+module.version = "0.9 (r"..rev..")"
 module.unit = "player"
 module.defaults = {
-	Enabled = true,
-	Outline = true,
-	ShowSpell = true,
-	ColorMode = "default",
-	Side = 1,
-	Level = -1,
+	profile = {
+		Enabled = true,
+		Outline = true,
+		ShowSpell = true,
+		ColorMode = "default",
+		Side = 1,
+		Level = -1,
+	}
 }
 module.options = {
 	{name = "ShowSpell", text = "SHOWSPELL", tooltip = "SHOWSPELL"},
@@ -34,7 +40,9 @@ function module:Initialize()
 	self.Text[3] = self:CreateFontString(self.f, "BACKGROUND", {140, 16}, 14, "CENTER", {1.0, 1.0, 1.0}, {"TOPLEFT", self.Text[2], "BOTTOMLEFT", 0, 0})
 
 	-- Override Update timer
-	self:RegisterMetro(self.name .. "Update", self.UpdateTimers, 0.05, self)
+	self.parent:RegisterMetro(self.name .. "Update", self.UpdateTimers, 0.05, self)
+	
+	self:CreateStandardModuleOptions(50)
 end
 
 function module:Update()
@@ -49,7 +57,7 @@ function module:Update()
 	end
 end
 
-function module:Enable()
+function module:OnModuleEnable()
 	self.f.fadeIn = 0.25
 	self.f.fadeOut = 2
 
@@ -62,9 +70,9 @@ function module:Enable()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 
 	-- Activate the timers
-	self:StartMetro(self.name .. "Update")
-	self:StartMetro(self.name .. "Alpha")
-	self:StartMetro(self.name .. "Fade")
+	self.parent:StartMetro(self.name .. "Update")
+	self.parent:StartMetro(self.name .. "Alpha")
+	self.parent:StartMetro(self.name .. "Fade")
 
 	if(not self.timers) then
 		self.timers = {count = 0}
@@ -107,7 +115,7 @@ function module:UpdateTimers(elapsed)
 	end
 end
 
-function module:MIRROR_TIMER_START()
+function module:MIRROR_TIMER_START(event, arg1, arg2, arg3, arg4, arg5, arg6)
 	-- Find a free timer table
 	local updTimer, newTimer
 	for i=1,MIRRORTIMER_NUMTIMERS do
@@ -159,7 +167,7 @@ function module:MIRROR_TIMER_START()
 	end
 end
 
-function module:MIRROR_TIMER_PAUSE()
+function module:MIRROR_TIMER_PAUSE(event, arg1)
 	for i=1,MIRRORTIMER_NUMTIMERS do
 		if(self.timers[i]) then
 			self.timers[i].paused = (arg1 > 0 and 1 or nil)
@@ -167,7 +175,7 @@ function module:MIRROR_TIMER_PAUSE()
 	end
 end
 
-function module:MIRROR_TIMER_STOP()
+function module:MIRROR_TIMER_STOP(event, arg1)
 	for i=1,MIRRORTIMER_NUMTIMERS do
 		if(self.timers[i] and self.timers[i].timer == arg1) then
 			if(self.timers[i+1]) then
