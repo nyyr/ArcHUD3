@@ -25,6 +25,7 @@ module.options = {
 	{name = "ShowDef", text = "DEFICIT", tooltip = "DEFICIT"},
 	hascolorfade = true,
 	attach = true,
+--	hascolor = true,
 }
 
 module.localized = true

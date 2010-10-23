@@ -289,17 +289,37 @@ ArcHUD.configOptionsTableCore = {
 			name		= L["TEXT"]["NAMEPLATES"],
 			order		= 12,
 			args		= {
+				-- Nameplates in combat
+				NameplateCombat = {
+					type		= "toggle",
+					name		= L["TEXT"]["NPCOMBAT"],
+					desc		= L["TOOLTIP"]["NPCOMBAT"],
+					order		= 10,
+					get			= function ()
+						return ArcHUD.db.profile.NameplateCombat
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.NameplateCombat = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
+				-- Separator
+				NameplatePlayerSep = {
+					type		= "header",
+					name		= L["TEXT"]["NPPLAYEROPT"],
+					order		= 11,
+				},
 				-- Player nameplate
 				NameplatePlayer = {
 					type		= "toggle",
 					name		= L["TEXT"]["NPPLAYER"],
 					desc		= L["TOOLTIP"]["NPPLAYER"],
+					order		= 12,
 					get			= function ()
-						return ArcHUD.db.profile.NameplatePlayer
+						return ArcHUD.db.profile.Nameplate_player
 					end,
 					set			= function (info, v)
-						ArcHUD.db.profile.NameplatePlayer = v
-						ArcHUD:UpdateTargetHUD()
+						ArcHUD:UpdateNameplateSetting("player", v)
 					end,
 				},
 				-- Pet nameplate
@@ -307,25 +327,77 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["NPPET"],
 					desc		= L["TOOLTIP"]["NPPET"],
+					order		= 13,
 					get			= function ()
-						return ArcHUD.db.profile.NameplatePet
+						return ArcHUD.db.profile.Nameplate_pet
 					end,
 					set			= function (info, v)
-						ArcHUD.db.profile.NameplatePet = v
-						ArcHUD:UpdateTargetHUD()
+						ArcHUD:UpdateNameplateSetting("pet", v)
 					end,
+				},
+				-- Pet nameplate
+				PetNameplateFade = {
+					type		= "toggle",
+					name		= L["TEXT"]["PETNPFADE"],
+					desc		= L["TOOLTIP"]["PETNPFADE"],
+					order		= 14,
+					get			= function ()
+						return ArcHUD.db.profile.PetNameplateFade
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.PetNameplateFade = v
+						if ((not ArcHUD.Nameplates.pet.state) and ArcHUD.db.profile.PetNameplateFade and (self.Nameplates.pet.alpha > 0)) then
+							ArcHUDRingTemplate.SetRingAlpha(self.Nameplates.pet, alpha)
+						end
+					end,
+				},
+				-- Player/pet nameplates hover delay
+				NameplateHoverMsg = {
+					type		= "toggle",
+					name		= L["TEXT"]["HOVERMSG"],
+					desc		= L["TOOLTIP"]["HOVERMSG"],
+					order		= 15,
+					get			= function ()
+						return ArcHUD.db.profile.HoverMsg
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.HoverMsg = v
+					end,
+				},
+				-- Player/pet nameplates hover delay
+				NameplateHoverDelay = {
+					type		= "range",
+					name		= L["TEXT"]["HOVERDELAY"],
+					desc		= L["TOOLTIP"]["HOVERDELAY"],
+					min			= 0,
+					max			= 5,
+					step		= 0.1,
+					order		= 16,
+					get			= function ()
+						return ArcHUD.db.profile.HoverDelay
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.HoverDelay = v
+						ArcHUD:RestartNamePlateTimers()
+					end,
+				},
+				-- Separator
+				NameplateTargetSep = {
+					type		= "header",
+					name		= L["TEXT"]["NPTARGETOPT"],
+					order		= 20,
 				},
 				-- Target nameplate
 				NameplateTarget = {
 					type		= "toggle",
 					name		= L["TEXT"]["NPTARGET"],
 					desc		= L["TOOLTIP"]["NPTARGET"],
+					order		= 21,
 					get			= function ()
-						return ArcHUD.db.profile.NameplateTarget
+						return ArcHUD.db.profile.Nameplate_target
 					end,
 					set			= function (info, v)
-						ArcHUD.db.profile.NameplateTarget = v
-						ArcHUD:UpdateTargetHUD()
+						ArcHUD:UpdateNameplateSetting("target", v)
 					end,
 				},
 				-- Target of target nameplate
@@ -333,12 +405,12 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["NPTOT"],
 					desc		= L["TOOLTIP"]["NPTOT"],
+					order		= 22,
 					get			= function ()
-						return ArcHUD.db.profile.NameplateTargettarget
+						return ArcHUD.db.profile.Nameplate_targettarget
 					end,
 					set			= function (info, v)
-						ArcHUD.db.profile.NameplateTargettarget = v
-						ArcHUD:UpdateTargetHUD()
+						ArcHUD:UpdateNameplateSetting("targettarget", v)
 					end,
 				},
 				-- Target of target of target nameplate
@@ -346,25 +418,12 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["NPTOTOT"],
 					desc		= L["TOOLTIP"]["NPTOTOT"],
+					order		= 23,
 					get			= function ()
-						return ArcHUD.db.profile.NameplateTargettargettarget
+						return ArcHUD.db.profile.Nameplate_targettargettarget
 					end,
 					set			= function (info, v)
-						ArcHUD.db.profile.NameplateTargettargettarget = v
-						ArcHUD:UpdateTargetHUD()
-					end,
-				},
-				-- Nameplates in combat
-				NameplateCombat = {
-					type		= "toggle",
-					name		= L["TEXT"]["NPCOMBAT"],
-					desc		= L["TOOLTIP"]["NPCOMBAT"],
-					get			= function ()
-						return ArcHUD.db.profile.NameplateCombat
-					end,
-					set			= function (info, v)
-						ArcHUD.db.profile.NameplateCombat = v
-						ArcHUD:UpdateTargetHUD()
+						ArcHUD:UpdateNameplateSetting("targettargettarget", v)
 					end,
 				},
 			},
@@ -538,7 +597,7 @@ function ArcHUD:InitConfig()
 	
 	-- Set up modules config options
 	AceConfig:RegisterOptionsTable("ArcHUD_Modules", self.configOptionsTableModules)
-	self.configFrameModules = AceConfigDialog:AddToBlizOptions("ArcHUD_Modules", LM["TEXT"]["TITLE"], self.configFrameCore)
+	self.configFrameModules = AceConfigDialog:AddToBlizOptions("ArcHUD_Modules", LM["TEXT"]["TITLE"], "ArcHUD_Core")
 end
 
 function ArcHUD:AddModuleOptionsTable(moduleName, optionsTable)

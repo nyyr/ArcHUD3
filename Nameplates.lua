@@ -11,11 +11,12 @@ function ArcHUD:InitNameplate(this, unit)
 	this:SetAttribute("*type2", "menu")
 	this:SetAttribute("unit", this.unit)
 	this.menu = function(self)
-		ToggleDropDownMenu(1, nil, getglobal(ArcHUD:strcap(self:GetAttribute("unit")).."FrameDropDown"), "cursor", 0, 0)
+		local unit = ArcHUD:strcap(self.unit).."FrameDropDown"
+		local dd = getglobal(unit)
+		if (dd) then
+			ToggleDropDownMenu(1, nil, dd, "cursor", 0, 0)
+		end
 	end
-
-	this:EnableMouse(false)
-	this:SetToplevel(false)
 
 	this.OnEnter = function(self)
 		if(SpellIsTargeting()) then
@@ -38,19 +39,20 @@ function ArcHUD:InitNameplate(this, unit)
 			GameTooltip:Hide()
 		end
 	end
-	this.OnEvent = function(self)
-		if(self.disabled or not ArcHUD.db.profile.NameplateCombat) then return end
-
+	this.OnEvent = function(self, event)
+		-- no change if disabled and if nameplates are active in combat anyway
+		if(self.disabled or ArcHUD.db.profile.NameplateCombat) then return end
+		
 		if(event == "PLAYER_REGEN_ENABLED") then
-			self:Disable(true)
+			self:Enable()
 		elseif(event == "PLAYER_REGEN_DISABLED") then
-			self:Enable(true)
+			self:Disable()
 		end
 	end
 
-	this:SetScript("OnEnter", function() this:OnEnter() end)
-	this:SetScript("OnLeave", function() this:OnLeave() end)
-	this:SetScript("OnEvent", function() this:OnEvent() end)
+	this:SetScript("OnEnter", this.OnEnter)
+	this:SetScript("OnLeave", this.OnLeave)
+	this:SetScript("OnEvent", this.OnEvent)
 
 	this:RegisterEvent("PLAYER_REGEN_ENABLED")
 	this:RegisterEvent("PLAYER_REGEN_DISABLED")
@@ -59,41 +61,59 @@ function ArcHUD:InitNameplate(this, unit)
 	ClickCastFrames = ClickCastFrames or {}
 	ClickCastFrames[this] = true
 
-	self.state = false
-	this.Enable = function(self, lock)
-		if(InCombatLockdown() or self.state or self.disabled or self.lock) then return end
+	this.disabled = not ArcHUD.db.profile["Nameplate_"..unit]
+	this.lock = false -- do not change enabled-state in any case
+	this.state = true
+	
+	this.Enable = function(self)
+		-- ArcHUD:LevelDebug(3, "Enable: unit "..self.unit..", state "..tostring(self.state)..", disabled "..tostring(self.disabled)..", lock "..tostring(self.lock)..", lockdown "..tostring(InCombatLockdown())..", npcombat "..tostring(ArcHUD.db.profile.NameplateCombat))
+	
+		if ((InCombatLockdown() and not ArcHUD.db.profile.NameplateCombat) or self.state or self.disabled or self.lock) then return end
+		
+		if(self.unit == "player" or self.unit == "pet") then
+			ArcHUD:StopMetro("Enable_"..self.unit)
+			
+			if (not MouseIsOver(ArcHUD.Nameplates[self.unit])) then
+				-- happens after leaving combat or when pet happiness changes
+				return
+			end
 
-		self.lock = (lock==true and true or false)
-
+			ArcHUDRingTemplate.SetRingAlpha(ArcHUD.Nameplates[self.unit], 1.0)
+			if(ArcHUD.db.profile.HoverMsg) then
+				ArcHUD:Print("Enabling mouse input for "..self.unit.." nameplate")
+			end
+		end
+		
 		self:EnableMouse(true)
 		self:SetToplevel(true)
 
-		if(not self.lock and (self.unit == "player" or self.unit == "pet")) then
-			ArcHUD:StopMetro("Enable_"..self.unit)
-			if(ArcHUD.db.profile.HoverMsg) then
-				ArcHUD:Print("Enabling mouse input for "..self.unit)
-			end
-		end
-
 		self.state = true
 	end
-	this.Disable = function(self, lock)
-		if(InCombatLockdown() or not self.state or (self.lock and not lock)) then return end
+	
+	this.Disable = function(self)
+		if ((not self.state) or self.lock) then return end
+		
+		-- ArcHUD:LevelDebug(3, "Disable: unit "..self.unit..", state "..tostring(self.state)..", disabled "..tostring(self.disabled)..", lock "..tostring(self.lock))
 
 		self:EnableMouse(false)
 		self:SetToplevel(false)
 
-		self.lock = false
 		self.state = false
 	end
 
-	this.disabled = not ArcHUD.db.profile["Nameplate_"..unit]
-
 	-- Add nameplate to list
 	self.Nameplates[unit] = this
+	
+	-- Initial state
+	if (this.disabled or unit == "player" or unit == "pet") then
+		this:Disable()
+	else
+		this:Enable()
+	end
 end
 
-function ArcHUD:StartNamePlateTimers()
+-- For delayed clickable nameplates
+function ArcHUD:RestartNamePlateTimers()
 	local units = {"player", "pet"}
 	local metrostarted = false
 
@@ -106,14 +126,12 @@ function ArcHUD:StartNamePlateTimers()
 
 			this.started = true
 
+			this.fadeIn = 0.25
+			this.fadeOut = 0.25
 			if(not self:MetroStatus(unit.."Alpha")) then
 				self:RegisterMetro(unit.."Alpha", ArcHUDRingTemplate.AlphaUpdate, 0.01, this)
 			end
 			self:StartMetro(unit.."Alpha")
-
-			this.fadeIn = 0.25
-			this.fadeOut = 0.25
-
 			ArcHUDRingTemplate.SetRingAlpha(this, self.db.profile.FadeFull)
 
 			metrostarted = true
@@ -137,7 +155,6 @@ function ArcHUD:CheckNamePlateMouseOver()
 	-- Check player nameplate
 	if(MouseIsOver(self.Nameplates.player) and not self.Nameplates.player.disabled) then
 		if(not self.Nameplates.player.started) then
-			ArcHUDRingTemplate.SetRingAlpha(self.Nameplates.player, 1.0)
 			self.Nameplates.player.started = true
 			self:StartMetro("Enable_player")
 		end
@@ -151,12 +168,9 @@ function ArcHUD:CheckNamePlateMouseOver()
 	end
 
 	-- Check pet nameplate
-	if(not UnitExists("pet")) then
-		return
-	end
+	if(not UnitExists("pet")) then return end
 	if(MouseIsOver(self.Nameplates.pet) and not self.Nameplates.pet.disabled) then
 		if(not self.Nameplates.pet.started) then
-			ArcHUDRingTemplate.SetRingAlpha(self.Nameplates.pet, 1.0)
 			self.Nameplates.pet.started = true
 			self:StartMetro("Enable_pet")
 		end
@@ -171,5 +185,15 @@ function ArcHUD:CheckNamePlateMouseOver()
 			self.Nameplates.pet.started = false
 			self.Nameplates.pet:Disable()
 		end
+	end
+end
+
+function ArcHUD:UpdateNameplateSetting(unit, value)
+	ArcHUD.db.profile["Nameplate_"..unit] = value
+	ArcHUD.Nameplates[unit].disabled = not value
+	if (value) then
+		ArcHUD.Nameplates[unit]:Enable()
+	else
+		ArcHUD.Nameplates[unit]:Disable()
 	end
 end

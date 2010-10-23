@@ -42,15 +42,18 @@ L["TEXT"] = {
 	SOULSHARDCOMBO = "Show Soul Shards as combo points",
 
 	NAMEPLATES	= "Nameplate options",
+	NPPLAYEROPT = "Player",
 	NPPLAYER	= "Player",
 	NPPET		= "Pet",
+	HOVERMSG	= "Nameplate hover message",
+	HOVERDELAY	= "Nameplate hover delay",
+	
+	NPTARGETOPT = "Targets",
 	NPTARGET	= "Target",
 	NPTOT		= "Target's target",
 	NPTOTOT		= "Target's target's target",
 	NPCOMBAT	= "Enable nameplates in combat",
 	PETNPFADE	= "Adjust pet nameplate alpha",
-	HOVERMSG	= "Nameplate hover message",
-	HOVERDELAY	= "Nameplate hover delay",
 
 	MOVEFRAMES	= "Movable Frames",
 	MFTHUD		= "Unlock target frame",
@@ -98,15 +101,15 @@ L["TOOLTIP"] = {
 	HOLYPOWERCOMBO = "Toggle display of Holy Power points as combo points (combo points must be turned on)",
 	SOULSHARDCOMBO = "Toggle display of Soul Shards as combo points (combo points must be turned on)",
 
-	NPPLAYER	= "Toggle display of player's nameplate",
-	NPPET		= "Toggle display of pet's nameplate",
-	NPTARGET	= "Toggle display of target's nameplate",
-	NPTOT		= "Toggle display of target's target nameplate",
-	NPTOTOT		= "Toggle display of target's target's target nameplate",
-	NPCOMBAT	= "Toggle always enabling nameplates when entering combat",
+	NPPLAYER	= "Toggle clickable player's nameplate",
+	NPPET		= "Toggle clickable pet's nameplate",
+	NPTARGET	= "Toggle clickable target's nameplate",
+	NPTOT		= "Toggle clickable target's target nameplate",
+	NPTOTOT		= "Toggle clickable target's target's target nameplate",
+	NPCOMBAT	= "Toggle always enabling clickable nameplates when entering combat",
 	PETNPFADE	= "Automatically adjust the pet nameplate alpha based on pet happiness",
-	HOVERMSG	= "Toggle displaying of nameplate mouse input enabled in chat",
-	HOVERDELAY	= "Amount of seconds needed to hover above the nameplate to activate it",
+	HOVERMSG	= "Toggle displaying of a chat message when mouse input is enabled",
+	HOVERDELAY	= "Amount of seconds needed to hover above the player/pet nameplate to activate it",
 
 	MFTHUD		= "Unlock the target frame to allow moving it",
 	MFTT		= "Unlock the target's target frame to allow moving it",
@@ -155,7 +158,7 @@ LM["ComboPoints"]	= "Combo Points"
 LM["EnergyTick"]	= "Energy Tick"
 
 LM["TEXT"] = {
-	TITLE		= "Modules Options",
+	TITLE		= "Arcs Options",
 
 	ENABLED		= "Enabled",
 	OUTLINE		= "Ring outline",
@@ -172,7 +175,8 @@ LM["TEXT"] = {
 	ATTACH		= "Attachment",
 	SIDE		= "Side",
 	LEVEL		= "Level",
-	COLOR		= "Ring color",
+	COLOR		= "Arc color",
+	COLORRESET	= "Reset color",
 	COLORFADE	= "Color fading",
 	COLORDEF	= "Default color",
 	COLORCUST	= "Custom color",
@@ -201,7 +205,8 @@ LM["TOOLTIP"] = {
 	SHOWINSTEALTH="Toggle showing ticking while stealthed",
 	SIDE		= "Set which side to attach to",
 	LEVEL		= "Set at which level it should be attached relative to the anchor (<-1: towards center, 0: at anchor, >1: away from center)",
-	COLOR		= "Options for ring color",
+	COLOR		= "Set a custom arc color",
+	COLORRESET	= "Reset color to the arc's default color",
 	COLORFADE	= "Set the ring color to fade (green to red for health)",
 	COLORDEF	= "Set the ring color to the default",
 	COLORCUST	= "Set the ring color to custom defined colors",

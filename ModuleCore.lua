@@ -3,6 +3,7 @@ local LM = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Module")
 
 local AceConfig = LibStub("AceConfig-3.0")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+local AceConfigRegistry = LibStub("AceConfigRegistry-3.0")
 
 -- Debug levels
 local d_warn = 1
@@ -773,6 +774,42 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 			}
 			self.optionsTable.args[v.name] = t
 		end
+	end
+	
+	-- doesn't work if color mode is "fade"
+	if (self.options.hascolor) then
+		-- Color
+		t = {
+			type		= "color",
+			name		= LM["TEXT"]["COLOR"],
+			desc		= LM["TOOLTIP"]["COLOR"],
+			order		= 21,
+			get			= function ()
+				return self.db.profile.Color.r, self.db.profile.Color.g, self.db.profile.Color.b
+			end,
+			set			= function (info, r, g, b, a)
+				self.db.profile.Color.r, self.db.profile.Color.g, self.db.profile.Color.b = r, g, b
+				self:UpdateColor(self.db.profile.Color)
+				self:SendMessage("ARCHUD_MODULE_UPDATE", self:GetName())
+			end,
+		}
+		self.optionsTable.args.color = t
+		
+		-- Reset to default
+		t = {
+			type		= "execute",
+			name		= LM["TEXT"]["COLORRESET"],
+			desc		= LM["TOOLTIP"]["COLORRESET"],
+			order		= 22,
+			func		= function ()
+				self.db.profile.Color.r, self.db.profile.Color.g, self.db.profile.Color.b = 
+					self.defaults.profile.Color.r, self.defaults.profile.Color.g, self.defaults.profile.Color.b
+				self:UpdateColor(self.db.profile.Color)
+				self:SendMessage("ARCHUD_MODULE_UPDATE", self:GetName())
+				AceConfigRegistry:NotifyChange("ArcHUD_Modules")
+			end,
+		}
+		self.optionsTable.args.colorReset = t
 	end
 end
 

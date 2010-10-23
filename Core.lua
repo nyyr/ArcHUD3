@@ -49,22 +49,22 @@ local cfgDefaults = {
 		PartyLock = true,
 		TargetTarget = true,
 		TargetTargetTarget = true,
-		NameplatePlayer = true,
-		NameplatePet = true,
-		NameplateTarget = true,
-		NameplateTargettarget = true,
-		NameplateTargettargettarget = true,
+		Nameplate_player = true,
+		Nameplate_pet = true,
+		Nameplate_target = true,
+		Nameplate_targettarget = true,
+		Nameplate_targettargettarget = true,
 		NameplateCombat = true,
+		HoverMsg = false,
+		HoverDelay = 1.5,
+		PetNameplateFade = true,
 		Scale = 1.0,
 		AttachTop = false,
 		ShowBuffs = true,
-		HoverMsg = true,
-		HoverDelay = 3,
 		BlizzPlayer = true,
 		BlizzTarget = true,
 		ShowPVP = true,
 		ShowComboPoints = true,
-		PetNameplateFade = false,
 		Positions = {},
 		ShowResting = true,
 		ShowHolyPowerPoints = true,
@@ -295,7 +295,7 @@ function ArcHUD:OnProfileEnable()
 	self:PLAYER_UPDATE_RESTING()
 
 	-- Enable nameplate updates
-	self:StartNamePlateTimers()
+	self:RestartNamePlateTimers()
 
 	-- Combo points frame
 	self:InitComboPointsFrame()
@@ -626,8 +626,7 @@ end
 -- SetAuraTooltip()
 ----------------------------------------------
 function ArcHUD:SetAuraTooltip(this)
-	self:LevelDebug(d_notice, "NYI: SetAuraTooltip()")
---[[
+	-- self:LevelDebug(d_notice, "NYI: SetAuraTooltip()")
 	if (not this:IsVisible()) then return end
 	GameTooltip:SetOwner(this, "ANCHOR_BOTTOMRIGHT")
 	local unit = this.unit
@@ -636,7 +635,6 @@ function ArcHUD:SetAuraTooltip(this)
 	else
 		GameTooltip:SetUnitBuff(unit, this:GetID())
 	end
-]]--
 end
 
 ----------------------------------------------
@@ -726,28 +724,27 @@ end
 function ArcHUD:UpdatePetNamePlate()
 	if(UnitExists("pet")) then
 		local happiness, _, _ = GetPetHappiness()
-		local color, alpha
+		local color = "ffffff"
+		local alpha = 0.0
 		if(happiness) then
 			if(happiness == 1) then
 				color = "ff0000"
 				happiness = " :("
-				alpha = 0.75
+				alpha = self.db.profile.FadeIC
 			elseif(happiness == 2) then
 				color = "ffff00"
 				happiness = " :||"
-				alpha = 0.50
+				alpha = self.db.profile.FadeOOC
 			elseif(happiness == 3) then
 				color = "00ff00"
 				happiness = " :)"
-				alpha = 0.0
+				alpha = self.db.profile.FadeFull
 			end
 		else
-			color = "ffffff"
 			happiness = ""
-			alpha = 0.0
 		end
 		self.Nameplates.pet.alpha = alpha
-		if(not self.Nameplates.pet.Started) then
+		if ((not self.Nameplates.pet.state) and ArcHUD.db.profile.PetNameplateFade) then
 			ArcHUDRingTemplate.SetRingAlpha(self.Nameplates.pet, alpha)
 		end
 		self.Nameplates.pet.Text:SetText("|cff"..color..UnitName("pet").." "..happiness.."|r")
