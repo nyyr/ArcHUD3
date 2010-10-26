@@ -131,6 +131,7 @@ function module:UpdatePet(event, arg1)
 		self.MPPerc:SetText(floor((UnitPower(self.unit) / UnitPowerMax(self.unit)) * 100).."%")
 		self.f:Show()
 	else
+		self.parent.PetIsInCombat = false
 		self.f:Hide()
 	end
 end

@@ -438,7 +438,7 @@ function ArcHUDRingTemplate:DoFadeUpdate(tdelta)
 	end
 end
 
-function ArcHUDRingTemplate:AlphaUpdate(arg1)
+function ArcHUDRingTemplate:AlphaUpdate(elapsed)
 --[[
 	if getglobal(self:GetName() .. "MoveAnchor"):IsVisible() then
 		self:SetAlpha(0.8)
@@ -446,60 +446,50 @@ function ArcHUDRingTemplate:AlphaUpdate(arg1)
 		return
 	end
 ]]
-   if(not self.fadeIn) then
-      self.fadeIn = 1
-   end
-   if(not self.fadeOut) then
-	  self.fadeOut = 1
-   end
-   local destAlpha = self.destAlpha
-   if (not destAlpha) then
-      return
-   end
-   local nowAlpha = self:GetAlpha()
-   if (nowAlpha < destAlpha) then
-      nowAlpha = nowAlpha + (arg1/self.fadeIn)
-      if (nowAlpha > destAlpha) then
-	 nowAlpha = destAlpha
-      end
-   elseif (nowAlpha > destAlpha) then
-      nowAlpha = nowAlpha - (arg1/self.fadeOut)
-      if (nowAlpha < destAlpha) then
-	 nowAlpha = destAlpha
-      end
-   end
+	if(not self.fadeIn) then
+		self.fadeIn = 1
+	end
+	if(not self.fadeOut) then
+		self.fadeOut = 1
+	end
+	local destAlpha = self.destAlpha
+	if (not destAlpha) then
+		return
+	end
+	local nowAlpha = self:GetAlpha()
+	if (nowAlpha < destAlpha) then
+		nowAlpha = nowAlpha + (elapsed/self.fadeIn)
+		if (nowAlpha > destAlpha) then
+			nowAlpha = destAlpha
+		end
+	elseif (nowAlpha > destAlpha) then
+		nowAlpha = nowAlpha - (elapsed/self.fadeOut)
+		if (nowAlpha < destAlpha) then
+			nowAlpha = destAlpha
+		end
+	end
 
-   self:SetAlpha(nowAlpha)
+	self:SetAlpha(nowAlpha)
 
-   if (destAlpha == nowAlpha) then
-      self.destAlpha = nil
-   end
+	if (destAlpha == nowAlpha) then
+		self.destAlpha = nil
+	end
 end
 
 function ArcHUDRingTemplate:SetRingAlpha(destAlpha, instant)
+	if (destAlpha < 0) then
+		destAlpha = 0.0
+	elseif (destAlpha > 1) then
+		destAlpha = 1.0
+	end
 
-   if (destAlpha < 0) then
-      destAlpha = 0.0
-   elseif (destAlpha > 1) then
-      destAlpha = 1.0
-   end
-
-   if (instant) then
-      self:SetAlpha(destAlpha)
-      self.destAlpha = nil
-      return
-   end
-
---[[
-   if (self:GetAlpha() == destAlpha) then
-      return
-   end
-]]
-   if (self.destAlpha == destAlpha) then
-      return
-   end
-
-   self.destAlpha = destAlpha
+	if (instant) then
+		self:SetAlpha(destAlpha)
+		self.destAlpha = nil
+		return
+	elseif (self.destAlpha ~= destAlpha) then
+		self.destAlpha = destAlpha
+	end
 end
 
 function ArcHUDRingTemplate:UpdateColor(color)
@@ -515,7 +505,7 @@ function ArcHUDRingTemplate:UpdateAlpha(elapsed)
 	local isInCombat = false
 	local me = self:GetName()
 
-	if(self == self.parent:GetModule("PetHealth", true) or self == self.parent:GetModule("PetPower", true)) then
+	if ((self == self.parent:GetModule("PetHealth", true)) or (self == self.parent:GetModule("PetPower", true))) then
 		isInCombat = self.parent.PetIsInCombat
 	elseif(string.find(self.name, "Party")) then
 		isInCombat = self.isInCombat or false
