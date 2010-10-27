@@ -289,6 +289,15 @@ function ArcHUD:CheckFrames()
 	end
 end
 
-function ArcHUD:Refresh3dUnitModel()
-	ArcHUD.TargetHUD.Model:RefreshUnit()
+function ArcHUD:Refresh3dUnitModel(event, arg1)
+	ArcHUD:LevelDebug(3, "ArcHUD:Refresh3dUnitModel("..tostring(event)..", "..tostring(arg1)..")")
+	if (ArcHUD.db.profile.TargetFrame) then
+		if ((event ~= "UNIT_MODEL_CHANGED" and UnitExists("target")) or
+			(event == "UNIT_MODEL_CHANGED" and arg1 == "target")) then
+			if ((ArcHUD.db.profile.PlayerModel and UnitIsPlayer("target")) or 
+				(ArcHUD.db.profile.MobModel and not UnitIsPlayer("target"))) then
+				ArcHUD.TargetHUD.Model:RefreshUnit()
+			end
+		end
+	end
 end
