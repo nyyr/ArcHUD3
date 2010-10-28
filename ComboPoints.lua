@@ -2,8 +2,11 @@
 -- Show combo points / holy power / soul shards
 --
 
+local oldComboPoints = 0
+
 function ArcHUD:InitComboPointsFrame()
-	self:RegisterEvent("UNIT_COMBO_POINTS")
+	self:RegisterEvent("UNIT_COMBO_POINTS", "UpdateComboPoints")
+	self:RegisterEvent("PLAYER_TARGET_CHANGED", "UpdateComboPoints")
 	
 	-- Show/Hide combopoints display
 	if(self.db.profile.ShowComboPoints) then
@@ -34,9 +37,23 @@ function ArcHUD:UpdateComboPointsFrame()
 	self:SetComboPoints(points)
 end
 
-function ArcHUD:UNIT_COMBO_POINTS(event, arg1)
-	if (arg1 == "player") then
-		self:SetComboPoints(GetComboPoints("player"))
+function ArcHUD:UpdateComboPoints(event, arg1)
+	if ((arg1 == "player") or
+		(event == "PLAYER_TARGET_CHANGED" and GetComboPoints("player") > 0)) then
+		
+		self.TargetHUD.Combo:SetTextColor(
+			self.db.profile.ColorComboPoints.r, 
+			self.db.profile.ColorComboPoints.g, 
+			self.db.profile.ColorComboPoints.b)
+		
+		oldComboPoints = GetComboPoints("player")
+		self:SetComboPoints(oldComboPoints)
+	else
+		-- we have still some points on previous target
+		self.TargetHUD.Combo:SetTextColor(
+			self.db.profile.ColorOldComboPoints.r, 
+			self.db.profile.ColorOldComboPoints.g, 
+			self.db.profile.ColorOldComboPoints.b)
 	end
 end
 

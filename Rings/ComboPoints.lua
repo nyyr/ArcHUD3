@@ -9,6 +9,8 @@ module.defaults = {
 		Flash = true,
 		Side = 2,
 		Level = 2,
+		Color = {r = 1, g = 0, b = 0},
+		ColorOldPoints = {r = 0.5, g = 0.5, b = 0.5},
 	}
 }
 module.options = {
@@ -17,6 +19,8 @@ module.options = {
 	attach = true,
 }
 module.localized = true
+
+module.oldPoints = 0
 
 function module:Initialize()
 	-- Setup the frame we need
@@ -37,7 +41,7 @@ function module:OnModuleEnable()
 	self.f.dirty = true
 	self.f.fadeIn = 0.25
 
-	self.f:UpdateColor({["r"] = 1, ["g"] = 0, ["b"] = 0})
+	self.f:UpdateColor(self.db.profile.Color)
 	self.f:SetMax(5)
 	self.f:SetValue(GetComboPoints(self.unit))
 
@@ -57,14 +61,18 @@ function module:UpdateAlpha(arg1)
 	if(self.pulse) then
 		self.alphaPulse = self.alphaPulse + arg1/2
 		local amt = math.sin(self.alphaPulse * self.twoPi) * 0.5 + 0.5
-		self:UpdateColor({["r"] = 1, ["g"] = amt, ["b"] = amt})
+		self:UpdateColor({self.db.profile.Color.r, ["g"] = amt, ["b"] = amt})
 	end
 end
 
 function module:UpdateComboPoints(event, arg1)
-	if (arg1 == self.unit) then
-		self.f:SetValue(GetComboPoints(self.unit))
-		if(GetComboPoints(self.unit) < 5 and GetComboPoints(self.unit) >= 0) then
+	self:Debug(3, "UpdateComboPoints("..tostring(event)..", "..tostring(arg1)..")")
+	if ((arg1 == self.unit) or
+		(event == "PLAYER_TARGET_CHANGED" and GetComboPoints(self.unit) > 0)) then
+		
+		self.oldPoints = GetComboPoints(self.unit)
+		self.f:SetValue(self.oldPoints)
+		if(self.oldPoints < 5 and self.oldPoints >= 0) then
 			self.f.pulse = false
 			self.f.alphaPulse = 0
 			self.f:UpdateColor({["r"] = 1, ["g"] = 0, ["b"] = 0})
@@ -75,7 +83,7 @@ function module:UpdateComboPoints(event, arg1)
 				self.f.pulse = false
 			end
 		end
-		if(GetComboPoints(self.unit) > 0) then
+		if(self.oldPoints > 0) then
 			if(ArcHUD.db.profile.FadeIC > ArcHUD.db.profile.FadeOOC) then
 				self.f:SetRingAlpha(ArcHUD.db.profile.FadeIC)
 			else
@@ -84,6 +92,10 @@ function module:UpdateComboPoints(event, arg1)
 		else
 			self.f:SetRingAlpha(0)
 		end
+		
+	elseif (self.oldPoints > 0) then
+		-- we have still some points on previous target
+		self.f:UpdateColor(self.db.profile.ColorOldPoints)
 	end
 end
 

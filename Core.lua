@@ -69,6 +69,8 @@ local cfgDefaults = {
 		ShowResting = true,
 		ShowHolyPowerPoints = true,
 		ShowSoulShardPoints = true,
+		ColorComboPoints = {r = 1, g = 1, b = 0},
+		ColorOldComboPoints = {r = 0.5, g = 0.5, b = 0.5},
 	}
 }
 
