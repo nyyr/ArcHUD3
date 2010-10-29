@@ -71,6 +71,7 @@ local cfgDefaults = {
 		ShowSoulShardPoints = true,
 		ColorComboPoints = {r = 1, g = 1, b = 0},
 		ColorOldComboPoints = {r = 0.5, g = 0.5, b = 0.5},
+		OldComboPointsDecay = 10.0,
 	}
 }
 
@@ -376,8 +377,13 @@ end
 ----------------------------------------------
 -- TargetUpdate()
 ----------------------------------------------
-function ArcHUD:TargetUpdate()
+function ArcHUD:TargetUpdate(event, arg1)
 	self:LevelDebug(d_info, "TargetUpdate called")
+	
+	if (event == "PLAYER_TARGET_CHANGED") then
+		ArcHUD:UpdateComboPoints(event, arg1)
+	end
+	
 	-- Make sure we are targeting someone and that ArcHUD is enabled
 	if (UnitExists("target") and self.db.profile.TargetFrame) then
 		self:LevelDebug(d_info, "TargetUpdate: Updating target frame...")

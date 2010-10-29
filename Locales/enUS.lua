@@ -38,6 +38,7 @@ L["TEXT"] = {
 
 	COMBOPOINTS = "Combo points options",
 	SHOWCOMBO	= "Show combo point text",
+	COMBODECAY	= "Decay delay",
 	HOLYPOWERCOMBO = "Show Holy Power as combo points",
 	SOULSHARDCOMBO = "Show Soul Shards as combo points",
 
@@ -98,6 +99,7 @@ L["TOOLTIP"] = {
 	BLIZZTARGET = "Toggles visibility of the Blizzard target frame",
 
 	SHOWCOMBO	= "Toggle display of combo points in the center of the HUD",
+	COMBODECAY	= "Set delay in seconds before combo points on previous target fade",
 	HOLYPOWERCOMBO = "Toggle display of Holy Power points as combo points (combo points must be turned on)",
 	SOULSHARDCOMBO = "Toggle display of Soul Shards as combo points (combo points must be turned on)",
 

@@ -3,10 +3,14 @@
 --
 
 local oldComboPoints = 0
+local class = ""
+local RemoveOldComboPoints_started = false
 
 function ArcHUD:InitComboPointsFrame()
 	self:RegisterEvent("UNIT_COMBO_POINTS", "UpdateComboPoints")
-	self:RegisterEvent("PLAYER_TARGET_CHANGED", "UpdateComboPoints")
+	self:RegisterMetro("RemoveOldComboPoints", self.RemoveOldComboPoints, self.db.profile.OldComboPointsDecay, self)
+	
+	_, class = UnitClass("player")
 	
 	-- Show/Hide combopoints display
 	if(self.db.profile.ShowComboPoints) then
@@ -38,8 +42,14 @@ function ArcHUD:UpdateComboPointsFrame()
 end
 
 function ArcHUD:UpdateComboPoints(event, arg1)
+	self:LevelDebug(3, "UpdateComboPoints("..tostring(event)..", "..tostring(arg1)..")")
 	if ((arg1 == "player") or
 		(event == "PLAYER_TARGET_CHANGED" and GetComboPoints("player") > 0)) then
+		
+		if (RemoveOldComboPoints_started) then
+			self:StopMetro("RemoveOldComboPoints")
+			RemoveOldComboPoints_started = false
+		end
 		
 		self.TargetHUD.Combo:SetTextColor(
 			self.db.profile.ColorComboPoints.r, 
@@ -48,12 +58,23 @@ function ArcHUD:UpdateComboPoints(event, arg1)
 		
 		oldComboPoints = GetComboPoints("player")
 		self:SetComboPoints(oldComboPoints)
-	else
+		
+	elseif (not RemoveOldComboPoints_started) then
 		-- we have still some points on previous target
-		self.TargetHUD.Combo:SetTextColor(
-			self.db.profile.ColorOldComboPoints.r, 
-			self.db.profile.ColorOldComboPoints.g, 
-			self.db.profile.ColorOldComboPoints.b)
+		if (class ~= "PALADIN" and class ~= "WARLOCK") then
+			self.TargetHUD.Combo:SetTextColor(
+				self.db.profile.ColorOldComboPoints.r, 
+				self.db.profile.ColorOldComboPoints.g, 
+				self.db.profile.ColorOldComboPoints.b)
+			self:StartMetro("RemoveOldComboPoints")
+			RemoveOldComboPoints_started = true
+		end
 	end
 end
 
+function ArcHUD:RemoveOldComboPoints(elapsed)
+	self:StopMetro("RemoveOldComboPoints")
+	RemoveOldComboPoints_started = false
+	oldComboPoints = 0
+	self:SetComboPoints(0)
+end

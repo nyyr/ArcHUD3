@@ -21,6 +21,7 @@ module.options = {
 module.localized = true
 
 module.oldPoints = 0
+module.RemoveOldCP_started = false
 
 function module:Initialize()
 	-- Setup the frame we need
@@ -29,6 +30,7 @@ function module:Initialize()
 
 	-- Override Update timer
 	self.parent:RegisterMetro(self.name .. "Update", self.UpdateAlpha, 0.05, self.f)
+	self.parent:RegisterMetro(self.name .. "RemoveOldCP", self.RemoveOldCP, self.parent.db.profile.OldComboPointsDecay, self)
 	
 	self:CreateStandardModuleOptions(45)
 end
@@ -61,7 +63,7 @@ function module:UpdateAlpha(arg1)
 	if(self.pulse) then
 		self.alphaPulse = self.alphaPulse + arg1/2
 		local amt = math.sin(self.alphaPulse * self.twoPi) * 0.5 + 0.5
-		self:UpdateColor({self.db.profile.Color.r, ["g"] = amt, ["b"] = amt})
+		self:UpdateColor({["r"] = module.db.profile.Color.r, ["g"] = amt, ["b"] = amt})
 	end
 end
 
@@ -70,12 +72,17 @@ function module:UpdateComboPoints(event, arg1)
 	if ((arg1 == self.unit) or
 		(event == "PLAYER_TARGET_CHANGED" and GetComboPoints(self.unit) > 0)) then
 		
+		if (self.RemoveOldCP_started) then
+			self.parent:StopMetro(self.name .. "RemoveOldCP")
+			self.RemoveOldCP_started = false
+		end
+		
 		self.oldPoints = GetComboPoints(self.unit)
 		self.f:SetValue(self.oldPoints)
 		if(self.oldPoints < 5 and self.oldPoints >= 0) then
 			self.f.pulse = false
 			self.f.alphaPulse = 0
-			self.f:UpdateColor({["r"] = 1, ["g"] = 0, ["b"] = 0})
+			self.f:UpdateColor(self.db.profile.Color)
 		else
 			if(self.Flash) then
 				self.f.pulse = true
@@ -95,7 +102,17 @@ function module:UpdateComboPoints(event, arg1)
 		
 	elseif (self.oldPoints > 0) then
 		-- we have still some points on previous target
-		self.f:UpdateColor(self.db.profile.ColorOldPoints)
+		if (not self.RemoveOldCP_started) then
+			self.f:UpdateColor(self.db.profile.ColorOldPoints)
+			self.parent:StartMetro(self.name .. "RemoveOldCP")
+			self.RemoveOldCP_started = true
+		end
 	end
 end
 
+function module:RemoveOldCP()
+	self.parent:StopMetro(self.name .. "RemoveOldCP")
+	self.RemoveOldCP_started = false
+	self.oldPoints = 0
+	self.f:SetRingAlpha(0)
+end

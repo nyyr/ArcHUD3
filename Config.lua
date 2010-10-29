@@ -252,12 +252,27 @@ ArcHUD.configOptionsTableCore = {
 						ArcHUD:UpdateTargetHUD()
 					end,
 				},
+				comboPointsDecay = {
+					type		= "range",
+					name		= L["TEXT"]["COMBODECAY"],
+					desc		= L["TOOLTIP"]["COMBODECAY"],
+					min			= 0.1,
+					max			= 10.0,
+					step		= 0.1,
+					order		= 1,
+					get			= function ()
+						return ArcHUD.db.profile.OldComboPointsDecay
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.OldComboPointsDecay = v
+					end,
+				},
 				-- Holy Power as Combo Points
 				ShowHolyPowerPoints = {
 					type		= "toggle",
 					name		= L["TEXT"]["HOLYPOWERCOMBO"],
 					desc		= L["TOOLTIP"]["HOLYPOWERCOMBO"],
-					order		= 1,
+					order		= 10,
 					get			= function ()
 						return ArcHUD.db.profile.ShowHolyPowerPoints
 					end,
@@ -271,7 +286,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["SOULSHARDCOMBO"],
 					desc		= L["TOOLTIP"]["SOULSHARDCOMBO"],
-					order		= 2,
+					order		= 11,
 					get			= function ()
 						return ArcHUD.db.profile.ShowSoulShardPoints
 					end,
