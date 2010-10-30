@@ -81,12 +81,13 @@ end
 
 function module:OnModuleEnable()
 	self:UpdateColor(self.db.profile.Color)
-	if(UnitExists(self.unit)) then
+	if(UnitExists(self.unit) and UnitHealthMax(self.unit) > 0) then
 		self.HPPerc:SetText(floor((UnitHealth(self.unit) / UnitHealthMax(self.unit)) * 100).."%")
 		self.f:SetMax(UnitHealthMax(self.unit))
 		self.f:SetValue(UnitHealth(self.unit))
 	else
 		self.HPPerc:SetText("")
+		self.f:SetMax(0)
 		self.f:SetValue(0)
 	end
 
@@ -115,8 +116,13 @@ function module:UpdatePet(event, arg1)
 		self:UpdateColor()
 		self.f:SetMax(UnitHealthMax(self.unit))
 		self.f:SetValue(UnitHealth(self.unit))
-		self.HPPerc:SetText(floor((UnitHealth(self.unit) / UnitHealthMax(self.unit)) * 100).."%")
-		self.f:Show()
+		if (UnitHealthMax(self.unit) > 0) then
+			self.HPPerc:SetText(floor((UnitHealth(self.unit) / UnitHealthMax(self.unit)) * 100).."%")
+			self.f:Show()
+		else
+			self.MPPerc:SetText("")
+			self.f:Hide()
+		end
 	else
 		self.parent.PetIsInCombat = false
 		self.f:Hide()
@@ -153,7 +159,11 @@ function module:UpdateHealth(event, arg1)
 				self.f:SetMax(UnitHealthMax(self.unit))
 			end
 			self.f:SetValue(UnitHealth(self.unit))
-			self.HPPerc:SetText(floor((UnitHealth(self.unit) / UnitHealthMax(self.unit)) * 100).."%")
+			if (UnitHealthMax(self.unit) > 0) then
+				self.HPPerc:SetText(floor((UnitHealth(self.unit) / UnitHealthMax(self.unit)) * 100).."%")
+			else
+				self.HPPerc:SetText("")
+			end
 		end
 	end
 end

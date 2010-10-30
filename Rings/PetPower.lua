@@ -90,8 +90,8 @@ function module:OnModuleEnable()
 	self.f:SetMax(10)
 	self.f:SetValue(10)
 
-	if(UnitExists(self.unit)) then
-		self.MPPerc:SetText(floor((UnitHealth(self.unit) / UnitHealthMax(self.unit)) * 100).."%")
+	if(UnitExists(self.unit) and UnitPowerMax(self.unit) > 0) then
+		self.MPPerc:SetText(floor((UnitPower(self.unit) / UnitPowerMax(self.unit)) * 100).."%")
 		self.f:SetMax(UnitPowerMax(self.unit))
 		self.f:SetValue(UnitPower(self.unit))
 	else
@@ -128,8 +128,13 @@ function module:UpdatePet(event, arg1)
 		self:UpdateColor(UnitPowerType(self.unit))
 		self.f:SetMax(UnitPowerMax(self.unit))
 		self.f:SetValue(UnitPower(self.unit))
-		self.MPPerc:SetText(floor((UnitPower(self.unit) / UnitPowerMax(self.unit)) * 100).."%")
-		self.f:Show()
+		if (UnitPowerMax(self.unit) > 0) then
+			self.MPPerc:SetText(floor((UnitPower(self.unit) / UnitPowerMax(self.unit)) * 100).."%")
+			self.f:Show()
+		else
+			self.MPPerc:SetText("")
+			self.f:Hide()
+		end
 	else
 		self.parent.PetIsInCombat = false
 		self.f:Hide()
@@ -143,7 +148,11 @@ function module:UpdatePower(event, arg1)
 			self.f:SetMax(UnitPowerMax(self.unit))
 		else
 			self.f:SetValue(UnitPower(self.unit))
-			self.MPPerc:SetText(floor((UnitPower(self.unit) / UnitPowerMax(self.unit)) * 100).."%")
+			if (UnitPowerMax(self.unit) > 0) then
+				self.MPPerc:SetText(floor((UnitPower(self.unit) / UnitPowerMax(self.unit)) * 100).."%")
+			else
+				self.MPPerc:SetText("")
+			end
 		end
 	end
 end
