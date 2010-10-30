@@ -99,7 +99,7 @@ L["TOOLTIP"] = {
 	BLIZZTARGET = "Toggles visibility of the Blizzard target frame",
 
 	SHOWCOMBO	= "Toggle display of combo points in the center of the HUD",
-	COMBODECAY	= "Set delay in seconds before combo points on previous target fade",
+	COMBODECAY	= "Set delay in seconds before combo points on previous target disappear (set to 0 to disable this feature)",
 	HOLYPOWERCOMBO = "Toggle display of Holy Power points as combo points (combo points must be turned on)",
 	SOULSHARDCOMBO = "Toggle display of Soul Shards as combo points (combo points must be turned on)",
 

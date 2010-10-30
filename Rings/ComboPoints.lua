@@ -37,6 +37,8 @@ end
 
 function module:Update()
 	self.Flash = self.db.profile.Flash
+	self.parent:UnregisterMetro(self.name .. "RemoveOldCP")
+	self.parent:RegisterMetro(self.name .. "RemoveOldCP", self.RemoveOldCP, self.parent.db.profile.OldComboPointsDecay, self)
 end
 
 function module:OnModuleEnable()
@@ -70,7 +72,8 @@ end
 function module:UpdateComboPoints(event, arg1)
 	self:Debug(3, "UpdateComboPoints("..tostring(event)..", "..tostring(arg1)..")")
 	if ((arg1 == self.unit) or
-		(event == "PLAYER_TARGET_CHANGED" and GetComboPoints(self.unit) > 0)) then
+		(event == "PLAYER_TARGET_CHANGED" and GetComboPoints(self.unit) > 0 and
+			UnitExists("target") and not UnitIsDead("target"))) then
 		
 		if (self.RemoveOldCP_started) then
 			self.parent:StopMetro(self.name .. "RemoveOldCP")
@@ -100,13 +103,17 @@ function module:UpdateComboPoints(event, arg1)
 			self.f:SetRingAlpha(0)
 		end
 		
-	elseif (self.oldPoints > 0) then
-		-- we have still some points on previous target
-		if (not self.RemoveOldCP_started) then
+	elseif (ArcHUD.db.profile.OldComboPointsDecay > 0.0) then
+		if (not self.RemoveOldCP_started and self.oldPoints > 0) then
+			-- we have still some points on previous target
 			self.f:UpdateColor(self.db.profile.ColorOldPoints)
 			self.parent:StartMetro(self.name .. "RemoveOldCP")
 			self.RemoveOldCP_started = true
 		end
+		
+	else
+		self.oldPoints = 0
+		self.f:SetRingAlpha(0)
 	end
 end
 

@@ -67,8 +67,8 @@ local cfgDefaults = {
 		ShowComboPoints = true,
 		Positions = {},
 		ShowResting = true,
-		ShowHolyPowerPoints = true,
-		ShowSoulShardPoints = true,
+		ShowHolyPowerPoints = false,
+		ShowSoulShardPoints = false,
 		ColorComboPoints = {r = 1, g = 1, b = 0},
 		ColorOldComboPoints = {r = 0.5, g = 0.5, b = 0.5},
 		OldComboPointsDecay = 10.0,
@@ -561,16 +561,25 @@ end
 function ArcHUD:TargetAuras(event, arg1)
 	if(not arg1 == "target") then return end
 	local unit = "target"
-	local i, icon, buff, debuff, debuffborder, debuffcount, debuffType, color, duration, expirationTime
+	local i, icon, buff, count, buffType, color, duration, expirationTime
+	
+	-- buffs
 	for i = 1, 16 do
-		_, _, buff, _, _, duration, expirationTime, _, _ = UnitBuff(unit, i)
+		_, _, buff, count, buffType, duration, expirationTime, _, _ = UnitBuff(unit, i)
 		button = self.TargetHUD["Buff"..i]
 		if (buff) then
-			--icon = getglobal(button:GetName().."Icon")
 			button.Icon:SetTexture(buff)
 			button:Show()
 			button.unit = unit
 
+			if (count > 1) then
+				button.Count:SetText(count)
+				button.Count:Show()
+				button.Count:SetPoint("CENTER", button, "CENTER", 2, 0)
+			else
+				button.Count:Hide()
+			end
+			
 			if(duration) then
 				if(duration > 0) then
 					button.Cooldown:Show()
@@ -587,27 +596,28 @@ function ArcHUD:TargetAuras(event, arg1)
 		end
 	end
 
+	-- debuffs
 	for i = 1, 16 do
-		_, _, debuff, debuffApplications, debuffType, duration, expirationTime, _, _ = UnitDebuff(unit, i)
+		_, _, buff, count, buffType, duration, expirationTime, _, _ = UnitDebuff(unit, i)
 		button = self.TargetHUD["Debuff"..i]
-		if (debuff) then
-			--icon = getglobal(button:GetName().."Icon")
-			--debuffborder = getglobal(button:GetName().."Border")
-			--debuffcount = getglobal(button:GetName().."Count")
-			button.Icon:SetTexture(debuff)
+		if (buff) then
+			button.Icon:SetTexture(buff)
 			button:Show()
 			button.Border:Show()
 			button.isdebuff = 1
 			button.unit = unit
-			if ( debuffType ) then
-				color = DebuffTypeColor[debuffType]
+			
+			if ( buffType ) then
+				color = DebuffTypeColor[buffType]
 			else
 				color = DebuffTypeColor["none"]
 			end
 			button.Border:SetVertexColor(color.r, color.g, color.b)
-			if (debuffApplications > 1) then
-				button.Count:SetText(debuffApplications)
+			
+			if (count > 1) then
+				button.Count:SetText(count)
 				button.Count:Show()
+				button.Count:SetPoint("CENTER", button, "CENTER", 2, 0)
 			else
 				button.Count:Hide()
 			end
@@ -984,138 +994,46 @@ function ArcHUD:CombatStatus(event)
 end
 
 
---[[
 ----------------------------------------------
 -- Blizzard Frame functions
--- Taken from AceUnitFrames
-function ArcHUD:HideBlizzardPlayer(hide)
-	self.BlizzPlayerHidden = not hide
-	if not hide then
-		PlayerFrame:UnregisterAllEvents()
-		PlayerFrameHealthBar:UnregisterAllEvents()
-		PlayerFrameManaBar:UnregisterAllEvents()
-		PlayerFrame:Hide()
+-- Hide/show player & pet frame
+----------------------------------------------
+function ArcHUD:HideBlizzardPlayer(show)
+	self.BlizzPlayerHidden = not show
+	if not show then
+		PlayerFrame:SetScript("OnEvent", nil);
+		PlayerFrame:Hide();
 
-		PetFrame:UnregisterAllEvents()
-		PetFrameHealthBar:UnregisterAllEvents()
-		PetFrameManaBar:UnregisterAllEvents()
-		PetFrame:Hide()
+		PetFrame:SetScript("OnEvent", nil);
+		PetFrame:Hide();
 	else
-		PlayerFrame:RegisterEvent("UNIT_LEVEL")
-		PlayerFrame:RegisterEvent("UNIT_COMBAT")
-		PlayerFrame:RegisterEvent("UNIT_PVP_UPDATE")
-		PlayerFrame:RegisterEvent("UNIT_MAXMANA")
-		PlayerFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-		PlayerFrame:RegisterEvent("PLAYER_ENTER_COMBAT")
-		PlayerFrame:RegisterEvent("PLAYER_LEAVE_COMBAT")
-		PlayerFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
-		PlayerFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
-		PlayerFrame:RegisterEvent("PLAYER_UPDATE_RESTING")
-		PlayerFrame:RegisterEvent("PARTY_MEMBERS_CHANGED")
-		PlayerFrame:RegisterEvent("PARTY_LEADER_CHANGED")
-		PlayerFrame:RegisterEvent("PARTY_LOOT_METHOD_CHANGED")
-		PlayerFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-		PlayerFrame:RegisterEvent("RAID_ROSTER_UPDATE")
-		PlayerFrame:RegisterEvent("PLAYTIME_CHANGED")
-		PlayerFrame:RegisterEvent("UNIT_NAME_UPDATE")
-		PlayerFrame:RegisterEvent("UNIT_PORTRAIT_UPDATE")
-		PlayerFrame:RegisterEvent("UNIT_DISPLAYPOWER")
-		PlayerFrameHealthBar:RegisterEvent("CVAR_UPDATE")
-		PlayerFrameHealthBar:RegisterEvent("UNIT_HEALTH")
-		PlayerFrameHealthBar:RegisterEvent("UNIT_MAXHEALTH")
-		PlayerFrameManaBar:RegisterEvent("CVAR_UPDATE")
-		PlayerFrameManaBar:RegisterEvent("UNIT_MANA")
-		PlayerFrameManaBar:RegisterEvent("UNIT_RAGE")
-		PlayerFrameManaBar:RegisterEvent("UNIT_FOCUS")
-		PlayerFrameManaBar:RegisterEvent("UNIT_ENERGY")
-		PlayerFrameManaBar:RegisterEvent("UNIT_HAPPINESS")
-		PlayerFrameManaBar:RegisterEvent("UNIT_MAXMANA")
-		PlayerFrameManaBar:RegisterEvent("UNIT_MAXRAGE")
-		PlayerFrameManaBar:RegisterEvent("UNIT_MAXFOCUS")
-		PlayerFrameManaBar:RegisterEvent("UNIT_MAXENERGY")
-		PlayerFrameManaBar:RegisterEvent("UNIT_MAXHAPPINESS")
-		PlayerFrameManaBar:RegisterEvent("UNIT_DISPLAYPOWER")
+		PlayerFrame:SetScript("OnEvent", PlayerFrame_OnEvent);
 		PlayerFrame:Show()
-
-		PetFrame:RegisterEvent("UNIT_PET")
-		PetFrame:RegisterEvent("UNIT_COMBAT")
-		PetFrame:RegisterEvent("UNIT_AURA")
-		PetFrame:RegisterEvent("PET_ATTACK_START")
-		PetFrame:RegisterEvent("PET_ATTACK_STOP")
-		PetFrame:RegisterEvent("UNIT_HAPPINESS")
-		PetFrame:RegisterEvent("UNIT_NAME_UPDATE")
-		PetFrame:RegisterEvent("UNIT_PORTRAIT_UPDATE")
-		PetFrame:RegisterEvent("UNIT_DISPLAYPOWER")
-		PetFrameHealthBar:RegisterEvent("CVAR_UPDATE")
-		PetFrameHealthBar:RegisterEvent("UNIT_HEALTH")
-		PetFrameHealthBar:RegisterEvent("UNIT_MAXHEALTH")
-		PetFrameManaBar:RegisterEvent("CVAR_UPDATE")
-		PetFrameManaBar:RegisterEvent("UNIT_MANA")
-		PetFrameManaBar:RegisterEvent("UNIT_RAGE")
-		PetFrameManaBar:RegisterEvent("UNIT_FOCUS")
-		PetFrameManaBar:RegisterEvent("UNIT_ENERGY")
-		PetFrameManaBar:RegisterEvent("UNIT_HAPPINESS")
-		PetFrameManaBar:RegisterEvent("UNIT_MAXMANA")
-		PetFrameManaBar:RegisterEvent("UNIT_MAXRAGE")
-		PetFrameManaBar:RegisterEvent("UNIT_MAXFOCUS")
-		PetFrameManaBar:RegisterEvent("UNIT_MAXENERGY")
-		PetFrameManaBar:RegisterEvent("UNIT_MAXHAPPINESS")
-		PetFrameManaBar:RegisterEvent("UNIT_DISPLAYPOWER")
+		
+		PetFrame:SetScript("OnEvent", PetFrame_OnEvent);
 		if(UnitExists("pet")) then
 			PetFrame:Show()
 		end
 	end
 end
-function ArcHUD:HideBlizzardTarget(hide)
-	self.BlizzTargetHidden = not hide
-	if not hide then
-		TargetFrame:UnregisterAllEvents()
-		TargetFrameHealthBar:UnregisterAllEvents()
-		TargetFrameManaBar:UnregisterAllEvents()
-		TargetFrame:Hide()
 
-		ComboFrame:UnregisterAllEvents()
+----------------------------------------------
+-- Blizzard Frame functions
+-- Hide/show player & pet frame
+----------------------------------------------
+function ArcHUD:HideBlizzardTarget(show)
+	self.BlizzTargetHidden = not show
+	if not show then
+		TargetFrame:SetScript("OnEvent", nil);
+		TargetFrame:Hide();
 	else
-		TargetFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
-		TargetFrame:RegisterEvent("PLAYER_FOCUS_CHANGED")
-		TargetFrame:RegisterEvent("UNIT_HEALTH")
-		TargetFrame:RegisterEvent("UNIT_LEVEL")
-		TargetFrame:RegisterEvent("UNIT_FACTION")
-		TargetFrame:RegisterEvent("UNIT_CLASSIFICATION_CHANGED")
-		TargetFrame:RegisterEvent("UNIT_AURA")
-		TargetFrame:RegisterEvent("PLAYER_FLAGS_CHANGED")
-		TargetFrame:RegisterEvent("PARTY_MEMBERS_CHANGED")
-		TargetFrame:RegisterEvent("UNIT_NAME_UPDATE")
-		TargetFrame:RegisterEvent("UNIT_PORTRAIT_UPDATE")
-		TargetFrame:RegisterEvent("UNIT_DISPLAYPOWER")
-		TargetFrame:RegisterEvent("RAID_TARGET_UPDATE")
-		TargetFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-		TargetFrameHealthBar:RegisterEvent("CVAR_UPDATE")
-		TargetFrameHealthBar:RegisterEvent("UNIT_HEALTH")
-		TargetFrameHealthBar:RegisterEvent("UNIT_MAXHEALTH")
-		TargetFrameManaBar:RegisterEvent("CVAR_UPDATE")
-		TargetFrameManaBar:RegisterEvent("UNIT_MANA")
-		TargetFrameManaBar:RegisterEvent("UNIT_RAGE")
-		TargetFrameManaBar:RegisterEvent("UNIT_FOCUS")
-		TargetFrameManaBar:RegisterEvent("UNIT_ENERGY")
-		TargetFrameManaBar:RegisterEvent("UNIT_HAPPINESS")
-		TargetFrameManaBar:RegisterEvent("UNIT_MAXMANA")
-		TargetFrameManaBar:RegisterEvent("UNIT_MAXRAGE")
-		TargetFrameManaBar:RegisterEvent("UNIT_MAXFOCUS")
-		TargetFrameManaBar:RegisterEvent("UNIT_MAXENERGY")
-		TargetFrameManaBar:RegisterEvent("UNIT_MAXHAPPINESS")
-		TargetFrameManaBar:RegisterEvent("UNIT_DISPLAYPOWER")
-		--if(UnitExists("target")) then
-			--TargetFrame:Show()
-		--end
-		this = TargetFrame
-		TargetFrame_Update()
-
-		ComboFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
-		ComboFrame:RegisterEvent("UNIT_COMBO_POINTS")
+		TargetFrame:SetScript("OnEvent", TargetFrame_OnEvent);
+		if(UnitExists("target")) then
+			TargetFrame:Show()
+			TargetFrame_OnEvent(TargetFrame, "PLAYER_TARGET_CHANGED")
+		end
 	end
 end
-]]--
 
 ----------------------------------------------
 -- Register callback for metronome
@@ -1161,7 +1079,7 @@ function ArcHUD:UnregisterMetro(a1,a2,a3,a4,a5,a6,a7,a8,a9,a10)
 
 	if not self.metroHandlers[a1] then return end
 
-	reclaimtable(self.metroHandlers[a1])
+	--reclaimtable(self.metroHandlers[a1])
 	self.metroHandlers[a1] = nil
 
 	if a2 then self:UnregisterMetro(a2,a3,a4,a5,a6,a7,a8,a9,a10)

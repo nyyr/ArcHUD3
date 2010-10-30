@@ -723,12 +723,25 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 					end
 				end,
 			},
+			outline = {
+				type		= "toggle",
+				name		= LM["TEXT"]["OUTLINE"],
+				desc		= LM["TOOLTIP"]["OUTLINE"],
+				order		= 2,
+				get			= function ()
+					return self.db.profile.Outline
+				end,
+				set			= function (info, v)
+					self.db.profile.Outline = v
+					self:SendMessage("ARCHUD_MODULE_UPDATE", self:GetName())
+				end,
+			},
 			side = {
 				type		= "select",
 				name		= LM["TEXT"]["SIDE"],
 				desc		= LM["TOOLTIP"]["SIDE"],
 				values		= {LM["SIDE"]["LEFT"], LM["SIDE"]["RIGHT"]},
-				order		= 2,
+				order		= 3,
 				get			= function ()
 					return self.db.profile.Side
 				end,
@@ -744,7 +757,7 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 				min			= -5,
 				max			= 5,
 				step		= 1,
-				order		= 3,
+				order		= 4,
 				get			= function ()
 					return self.db.profile.Level
 				end,

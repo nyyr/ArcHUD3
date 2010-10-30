@@ -80,7 +80,7 @@ local function AH_CreateBuffButton(parent, id, point)
 	f.Border:Hide()
 
 	f.Count = f:CreateFontString(nil, "OVERLAY", "NumberFontNormalSmall")
-	f.Count:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -1, 0)
+	f.Count:SetPoint("CENTER", f)
 	f.Count:Show()
 
 	f.Cooldown = CreateFrame("Cooldown", nil, f, "CooldownFrameTemplate")

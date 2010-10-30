@@ -230,6 +230,34 @@ ArcHUD.configOptionsTableCore = {
 						ArcHUD:UpdateTargetHUD()
 					end,
 				},
+				-- Blizzard player frame
+				blizzPlayer = {
+					type		= "toggle",
+					name		= L["TEXT"]["BLIZZPLAYER"],
+					desc		= L["TOOLTIP"]["BLIZZPLAYER"],
+					order		= 9,
+					get			= function ()
+						return ArcHUD.db.profile.BlizzPlayer
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.BlizzPlayer = v
+						ArcHUD:HideBlizzardPlayer(v)
+					end,
+				},
+				-- Blizzard target frame
+				blizzTarget = {
+					type		= "toggle",
+					name		= L["TEXT"]["BLIZZTARGET"],
+					desc		= L["TOOLTIP"]["BLIZZTARGET"],
+					order		= 10,
+					get			= function ()
+						return ArcHUD.db.profile.BlizzTarget
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.BlizzTarget = v
+						ArcHUD:HideBlizzardTarget(v)
+					end,
+				},
 			},
 		}, -- display
 		
@@ -256,7 +284,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "range",
 					name		= L["TEXT"]["COMBODECAY"],
 					desc		= L["TOOLTIP"]["COMBODECAY"],
-					min			= 0.1,
+					min			= 0.0,
 					max			= 10.0,
 					step		= 0.1,
 					order		= 1,
@@ -265,6 +293,9 @@ ArcHUD.configOptionsTableCore = {
 					end,
 					set			= function (info, v)
 						ArcHUD.db.profile.OldComboPointsDecay = v
+						ArcHUD:UnregisterMetro("RemoveOldComboPoints")
+						ArcHUD:RegisterMetro("RemoveOldComboPoints", ArcHUD.RemoveOldComboPoints, ArcHUD.db.profile.OldComboPointsDecay, ArcHUD)
+						ArcHUD:SendMessage("ARCHUD_MODULE_UPDATE", "ComboPoints")
 					end,
 				},
 				-- Holy Power as Combo Points
