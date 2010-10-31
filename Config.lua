@@ -185,6 +185,15 @@ ArcHUD.configOptionsTableCore = {
 					end,
 					set			= function (info, v)
 						ArcHUD.db.profile.ShowBuffs = v
+						if(ArcHUD.db.profile.ShowBuffs) then
+							ArcHUD:RegisterEvent("UNIT_AURA", "TargetAuras")
+						else
+							ArcHUD:UnregisterEvent("UNIT_AURA")
+							for i=1,16 do
+								ArcHUD.TargetHUD["Buff"..i]:Hide()
+								ArcHUD.TargetHUD["Debuff"..i]:Hide()
+							end
+						end
 						ArcHUD:UpdateTargetHUD()
 					end,
 				},
