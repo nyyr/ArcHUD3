@@ -420,7 +420,7 @@ function ArcHUD:TargetUpdate(event, arg1)
 			addtolevel = " " .. (UnitIsPlayer("target") and UnitClass("target") or UnitCreatureFamily("target") or UnitCreatureType("target") or "Unknown")
 			self.TargetHUD.Level:SetJustifyH("CENTER")
 		else
-			self.TargetHUD.Level:SetJustifyH("LEFT")
+			self.TargetHUD.Level:SetJustifyH("CENTER")
 		end
 		-- What kind of target is it? If UnitLevel returns negative we have a target whose
 		--   level are too high to show or a boss
@@ -549,6 +549,8 @@ function ArcHUD:TargetUpdate(event, arg1)
 		else
 			self.TargetHUD:SetAlpha(1)
 		end
+		
+		self.TargetHUD.Model:Hide()
 
 		self:StopMetro("UpdateTargetPower")
 		self.Nameplates.target:Disable()

@@ -120,7 +120,7 @@ function module:UpdatePet(event, arg1)
 			self.HPPerc:SetText(floor((UnitHealth(self.unit) / UnitHealthMax(self.unit)) * 100).."%")
 			self.f:Show()
 		else
-			self.MPPerc:SetText("")
+			self.HPPerc:SetText("")
 			self.f:Hide()
 		end
 	else
