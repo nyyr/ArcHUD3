@@ -1,5 +1,7 @@
 local L = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Core")
 
+ArcHUDFrame = nil
+
 ---------------------------------------------------------------------------------------------------
 -- Local functions to assist with widget creation
 local function AH_CreateFrame(type, name, parent, size, point, strata)
@@ -192,6 +194,7 @@ end
 function ArcHUD:CreateHUDFrames()
 	-- Create main frame
 	local main = AH_CreateFrame("Frame", "ArcHUDFrame", UIParent, {50, 350}, {"CENTER", WorldFrame, "CENTER"}, "LOW")
+	ArcHUDFrame = main
 
 	-- Create target hud frame
 	local targethud = AH_CreateFrame("Frame", nil, main, {300, 100}, {"TOP", main, "BOTTOM", 0, -50}, nil)

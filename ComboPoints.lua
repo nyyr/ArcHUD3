@@ -43,7 +43,7 @@ end
 
 function ArcHUD:UpdateComboPoints(event, arg1)
 	self:LevelDebug(3, "UpdateComboPoints("..tostring(event)..", "..tostring(arg1)..")")
-	if ((arg1 == "player") or
+	if ((event == "UNIT_COMBO_POINTS" and arg1 == "player") or
 		(event == "PLAYER_TARGET_CHANGED" and GetComboPoints("player") > 0 and
 			UnitExists("target") and not UnitIsDead("target"))) then
 		
@@ -60,21 +60,22 @@ function ArcHUD:UpdateComboPoints(event, arg1)
 		oldComboPoints = GetComboPoints("player")
 		self:SetComboPoints(oldComboPoints)
 		
-	elseif (self.db.profile.OldComboPointsDecay > 0.0) then
-		if (not RemoveOldComboPoints_started and oldComboPoints > 0 and
-			class ~= "PALADIN" and class ~= "WARLOCK") then
-			-- we have still some points on previous target
-			self.TargetHUD.Combo:SetTextColor(
-				self.db.profile.ColorOldComboPoints.r, 
-				self.db.profile.ColorOldComboPoints.g, 
-				self.db.profile.ColorOldComboPoints.b)
-			self:StartMetro("RemoveOldComboPoints")
-			RemoveOldComboPoints_started = true
+	elseif (event == "PLAYER_TARGET_CHANGED") then
+		if (self.db.profile.OldComboPointsDecay > 0.0) then
+			if (not RemoveOldComboPoints_started and oldComboPoints > 0 and
+				class ~= "PALADIN" and class ~= "WARLOCK") then
+				-- we have still some points on previous target
+				self.TargetHUD.Combo:SetTextColor(
+					self.db.profile.ColorOldComboPoints.r, 
+					self.db.profile.ColorOldComboPoints.g, 
+					self.db.profile.ColorOldComboPoints.b)
+				self:StartMetro("RemoveOldComboPoints")
+				RemoveOldComboPoints_started = true
+			end
+		else
+			oldComboPoints = 0
+			self:SetComboPoints(0)
 		end
-		
-	else
-		oldComboPoints = 0
-		self:SetComboPoints(0)
 	end
 end
 

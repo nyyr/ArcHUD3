@@ -71,7 +71,7 @@ end
 
 function module:UpdateComboPoints(event, arg1)
 	self:Debug(3, "UpdateComboPoints("..tostring(event)..", "..tostring(arg1)..")")
-	if ((arg1 == self.unit) or
+	if ((event == "UNIT_COMBO_POINTS" and arg1 == self.unit) or
 		(event == "PLAYER_TARGET_CHANGED" and GetComboPoints(self.unit) > 0 and
 			UnitExists("target") and not UnitIsDead("target"))) then
 		
@@ -103,17 +103,18 @@ function module:UpdateComboPoints(event, arg1)
 			self.f:SetRingAlpha(0)
 		end
 		
-	elseif (ArcHUD.db.profile.OldComboPointsDecay > 0.0) then
-		if (not self.RemoveOldCP_started and self.oldPoints > 0) then
-			-- we have still some points on previous target
-			self.f:UpdateColor(self.db.profile.ColorOldPoints)
-			self.parent:StartMetro(self.name .. "RemoveOldCP")
-			self.RemoveOldCP_started = true
+	elseif (event == "PLAYER_TARGET_CHANGED") then
+		if (ArcHUD.db.profile.OldComboPointsDecay > 0.0) then
+			if (not self.RemoveOldCP_started and self.oldPoints > 0) then
+				-- we have still some points on previous target
+				self.f:UpdateColor(self.db.profile.ColorOldPoints)
+				self.parent:StartMetro(self.name .. "RemoveOldCP")
+				self.RemoveOldCP_started = true
+			end
+		else
+			self.oldPoints = 0
+			self.f:SetRingAlpha(0)
 		end
-		
-	else
-		self.oldPoints = 0
-		self.f:SetRingAlpha(0)
 	end
 end
 

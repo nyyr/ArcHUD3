@@ -111,8 +111,8 @@ end
 function module:UpdatePet(event, arg1)
 	if(event == "UNIT_PET" and arg1 ~= "player") then return end
 	if(UnitExists(self.unit)) then
-		--self:Debug(3, "PetHealth:UpdatePet("..event..", "..tostring(arg1).."): max = "..
-		--	tostring(UnitHealthMax(self.unit))..", health = "..tostring(UnitHealth(self.unit)))
+		self:Debug(3, "PetHealth:UpdatePet("..event..", "..tostring(arg1).."): max = "..
+			tostring(UnitHealthMax(self.unit))..", health = "..tostring(UnitHealth(self.unit)))
 		self:UpdateColor()
 		self.f:SetMax(UnitHealthMax(self.unit))
 		self.f:SetValue(UnitHealth(self.unit))
@@ -148,8 +148,8 @@ function module:UpdateHealth(event, arg1)
 			self:UpdateColor()
 		end
 
-		--self:Debug(3, "PetHealth:UpdateHealth("..event..", "..arg1.."): max = "..
-		--	tostring(UnitHealthMax(self.unit))..", health = "..tostring(UnitHealth(self.unit)))
+		self:Debug(3, "PetHealth:UpdateHealth("..event..", "..arg1.."): max = "..
+			tostring(UnitHealthMax(self.unit))..", health = "..tostring(UnitHealth(self.unit)))
 		
 		if (event == "UNIT_MAXHEALTH") then
 			self.f:SetMax(UnitHealthMax(self.unit))

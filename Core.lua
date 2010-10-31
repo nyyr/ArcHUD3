@@ -1009,11 +1009,10 @@ function ArcHUD:HideBlizzardPlayer(show)
 	else
 		PlayerFrame:SetScript("OnEvent", PlayerFrame_OnEvent);
 		PlayerFrame:Show()
+		PlayerFrame_Update()
 		
 		PetFrame:SetScript("OnEvent", PetFrame_OnEvent);
-		if(UnitExists("pet")) then
-			PetFrame:Show()
-		end
+		PetFrame_Update(PetFrame, true)
 	end
 end
 
@@ -1024,14 +1023,17 @@ end
 function ArcHUD:HideBlizzardTarget(show)
 	self.BlizzTargetHidden = not show
 	if not show then
-		TargetFrame:SetScript("OnEvent", nil);
-		TargetFrame:Hide();
+		TargetFrame:SetScript("OnEvent", nil)
+		TargetFrame:Hide()
+		
+		ComboFrame:SetScript("OnEvent", nil)
+		ComboFrame:Hide()
 	else
-		TargetFrame:SetScript("OnEvent", TargetFrame_OnEvent);
-		if(UnitExists("target")) then
-			TargetFrame:Show()
-			TargetFrame_OnEvent(TargetFrame, "PLAYER_TARGET_CHANGED")
-		end
+		TargetFrame:SetScript("OnEvent", TargetFrame_OnEvent)
+		TargetFrame_Update(TargetFrame)
+		
+		ComboFrame:SetScript("OnEvent", ComboFrame_OnEvent)
+		ComboFrame_Update()
 	end
 end
 
@@ -1117,11 +1119,11 @@ function ArcHUD:OnMetroUpdate(elapsed)
 		if v.running then
 			v.elapsed = v.elapsed + elapsed
 			if v.elapsed >= v.rate then
-				local mem, time = gcinfo(), GetTime()
+				-- local mem, time = gcinfo(), GetTime()
 				-- ArcHUD:LevelDebug(d_notice, "Metronome is calling "..i.." ("..elapsed.."s)")
 				v.func(v.a1 or v.arg, v.a2 or v.elapsed, v.a3, v.a4, v.a5, v.a6)
-				mem, time = gcinfo() - mem, GetTime() - time
-				if mem >= 0 then v.mem, v.time, v.count = (v.mem or 0) + mem, (v.time or 0) + time, (v.count or 0) + 1 end
+				-- mem, time = gcinfo() - mem, GetTime() - time
+				-- if mem >= 0 then v.mem, v.time, v.count = (v.mem or 0) + mem, (v.time or 0) + time, (v.count or 0) + 1 end
 				v.elapsed = 0
 				if v.limit then v.limit = v.limit - 1 end
 				if v.limit and v.limit <= 0 then ArcHUD:StopMetro(i) end
