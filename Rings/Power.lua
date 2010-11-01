@@ -86,7 +86,6 @@ function module:OnModuleEnable()
 	end
 
 	-- Register the events we will use
-	self:RegisterEvent("UNIT_RUNIC_POWER",	"UpdatePowerEvent")
 	self:RegisterEvent("UNIT_POWER", 		"UpdatePowerEvent")
 	self:RegisterEvent("UNIT_MAXPOWER", 	"UpdatePowerEvent")
 	self:RegisterEvent("UNIT_DISPLAYPOWER", "UpdatePowerType")

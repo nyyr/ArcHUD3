@@ -642,14 +642,14 @@ end
 ----------------------------------------------
 local color_switch = {
 	friendfoe = {
-		[1] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.ColorFriend or self.db.profile.ColorFriend) end,
-		[2] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.ColorFoe or self.db.profile.ColorFoe) end,
+		[1] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.ColorFriend or self.db.profile.ColorFriend) end,
+		[2] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.ColorFoe or self.db.profile.ColorFoe) end,
 	},
 	manabar = {
-		[0] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.ColorMana or self.db.profile.ColorMana) end,
-		[1] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.ColorRage or self.db.profile.ColorRage) end,
-		[2] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.ColorFocus or self.db.profile.ColorFocus) end,
-		[3] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.ColorEnergy or self.db.profile.ColorEnergy) end,
+		[0] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.ColorMana or self.db.profile.ColorMana) end,
+		[1] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.ColorRage or self.db.profile.ColorRage) end,
+		[2] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.ColorFocus or self.db.profile.ColorFocus) end,
+		[3] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.ColorEnergy or self.db.profile.ColorEnergy) end,
 	}
 }
 
@@ -673,7 +673,7 @@ function ArcHUD.modulePrototype:UpdateColor(color)
 		end
 	else
 		if(self.ColorMode == "fade") then return end
-		self.f:UpdateColor(self.ColorMode == "default" and self.defaults.Color or self.db.profile.Color)
+		self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.Color or self.db.profile.Color)
 	end
 end
 

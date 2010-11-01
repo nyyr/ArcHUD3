@@ -533,7 +533,8 @@ function ArcHUDRingTemplate:UpdateAlpha(elapsed)
 					self.f:SetRingAlpha(self.parent.db.profile.FadeIC)
 				end
 			else
-				if(string.find(me, "Power") and me ~= "PetPower" and UnitPowerType(self.unit or self:GetParent().unit or "player") == 1 and self.f.maxValue > 0) then
+				local _, powerTypeStr = UnitPowerType(self.unit or self:GetParent().unit or "player")
+				if(string.find(me, "Power") and me ~= "PetPower" and (powerTypeStr == "RAGE" or powerTypeStr == "RUNIC_POWER") and self.f.maxValue > 0) then
 					if(math.floor(self.f.startValue) > 0) then
 						self.f:SetRingAlpha(self.parent.db.profile.FadeOOC)
 					elseif(math.floor(self.f.startValue) == 0) then
@@ -624,8 +625,8 @@ function ArcHUDRingTemplate:GhostMode(state, unit)
 		end
 		if(fm and fm.f.pulse) then
 			fm.f.pulse = false
-			fm.f:SetMax(UnitManaMax(unit))
-			fm.f:SetValue(UnitMana(unit))
+			fm.f:SetMax(UnitPowerMax(unit))
+			fm.f:SetValue(UnitPower(unit))
 			fm.f:UpdateColor(PowerBarColor[UnitPowerType(unit)])
 		end
 	end
