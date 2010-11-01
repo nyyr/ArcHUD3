@@ -1,16 +1,19 @@
-local module = ArcHUD:NewModule("FocusHealth")
+local moduleName = "FocusHealth"
+local module = ArcHUD:NewModule(moduleName)
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "2.1." .. rev
+module.version = "0.9 (r" .. rev .. ")"
 module.unit = "focus"
 module.defaults = {
-	Enabled = false,
-	Outline = true,
-	ShowPerc = true,
-	ColorMode = "default",
-	ColorFriend = {r = 0, g = 0.5, b = 1},
-	ColorFoe = {r = 1, g = 0, b = 0},
-	Side = 1,
-	Level = 1,
+	profile = {
+		Enabled = false,
+		Outline = true,
+		ShowPerc = true,
+		ColorMode = "default",
+		ColorFriend = {r = 0, g = 0.5, b = 1},
+		ColorFoe = {r = 1, g = 0, b = 0},
+		Side = 1,
+		Level = 3,
+	},
 }
 module.options = {
 	{name = "ShowPerc", text = "SHOWPERC", tooltip = "SHOWPERC"},
@@ -25,6 +28,8 @@ function module:Initialize()
 	self.f:SetAlpha(0)
 
 	self.HPPerc = self:CreateFontString(self.f, "BACKGROUND", {40, 12}, 11, "RIGHT", {1.0, 1.0, 1.0}, {"TOPLEFT", self.f, "BOTTOMLEFT", -100, -115})
+	
+	self:CreateStandardModuleOptions(40)
 end
 
 function module:Update()
@@ -55,7 +60,7 @@ function module:Update()
 	end
 end
 
-function module:Enable()
+function module:OnModuleEnable()
 	if not UnitExists(self.unit) then
 		self.f:SetMax(100)
 		self.f:SetValue(0)
@@ -67,14 +72,14 @@ function module:Enable()
 	end
 
 	-- Register the events we will use
-	self:RegisterEvent("UNIT_HEALTH",			"UpdateHealth")
-	self:RegisterEvent("UNIT_MAXHEALTH",		"UpdateHealth")
+	self:RegisterEvent("UNIT_HEALTH",		"UpdateHealth")
+	self:RegisterEvent("UNIT_MAXHEALTH",	"UpdateHealth")
 	self:RegisterEvent("PLAYER_FOCUS_CHANGED")
 
 	-- Activate the timers
-	self:StartMetro(self.name .. "Alpha")
-	self:StartMetro(self.name .. "Fade")
-	self:StartMetro(self.name .. "Update")
+	self.parent:StartMetro(self.name .. "Alpha")
+	self.parent:StartMetro(self.name .. "Fade")
+	self.parent:StartMetro(self.name .. "Update")
 
 	self.f:Show()
 end
@@ -115,7 +120,7 @@ function module:PLAYER_FOCUS_CHANGED()
 	end
 end
 
-function module:UpdateHealth()
+function module:UpdateHealth(event, arg1)
 	if(arg1 == self.unit) then
 		if(UnitIsDead(self.unit)) then
 			self.f:GhostMode(false, self.unit)

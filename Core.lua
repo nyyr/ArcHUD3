@@ -63,6 +63,7 @@ local cfgDefaults = {
 		ShowBuffs = true,
 		BlizzPlayer = true,
 		BlizzTarget = true,
+		BlizzFocus = true,
 		ShowPVP = true,
 		ShowComboPoints = true,
 		Positions = {},
@@ -204,6 +205,7 @@ function ArcHUD:OnDisable()
 
 	self:HideBlizzardPlayer(true)
 	self:HideBlizzardTarget(true)
+	self:HideBlizzardFocus(true)
 
 	-- Hide frame
 	ArcHUDFrame:Hide()
@@ -222,7 +224,10 @@ function ArcHUD:OnProfileEnable()
 	if(self.db.profile.BlizzTarget and self.BlizzTargetHidden or not self.db.profile.BlizzTarget and not self.BlizzTargetHidden) then
 		self:HideBlizzardTarget(self.db.profile.BlizzTarget)
 	end
-
+	if(self.db.profile.BlizzFocus and self.BlizzFocusHidden or not self.db.profile.BlizzFocus and not self.BlizzFocusHidden) then
+		self:HideBlizzardFocus(self.db.profile.BlizzFocus)
+	end
+	
 	if(self.db.profile.TargetFrame) then
 		self:LevelDebug(d_notice, "Targetframe enabled. Registering unit events")
 		self:RegisterEvent("UNIT_HEALTH", 			"EventHandler")
@@ -1003,39 +1008,54 @@ end
 function ArcHUD:HideBlizzardPlayer(show)
 	self.BlizzPlayerHidden = not show
 	if not show then
-		PlayerFrame:SetScript("OnEvent", nil);
+		PlayerFrame:UnregisterAllEvents()
 		PlayerFrame:Hide();
 
-		PetFrame:SetScript("OnEvent", nil);
+		PetFrame:UnregisterAllEvents()
 		PetFrame:Hide();
 	else
-		PlayerFrame:SetScript("OnEvent", PlayerFrame_OnEvent);
+		PlayerFrame:RegisterAllEvents()
 		PlayerFrame:Show()
 		PlayerFrame_Update()
 		
-		PetFrame:SetScript("OnEvent", PetFrame_OnEvent);
+		PetFrame:RegisterAllEvents()
 		PetFrame_Update(PetFrame, true)
 	end
 end
 
 ----------------------------------------------
 -- Blizzard Frame functions
--- Hide/show player & pet frame
+-- Hide/show target frame
 ----------------------------------------------
 function ArcHUD:HideBlizzardTarget(show)
 	self.BlizzTargetHidden = not show
 	if not show then
-		TargetFrame:SetScript("OnEvent", nil)
+		TargetFrame:UnregisterAllEvents()
 		TargetFrame:Hide()
 		
-		ComboFrame:SetScript("OnEvent", nil)
+		ComboFrame:UnregisterAllEvents()
 		ComboFrame:Hide()
 	else
-		TargetFrame:SetScript("OnEvent", TargetFrame_OnEvent)
+		TargetFrame:RegisterAllEvents()
 		TargetFrame_Update(TargetFrame)
 		
-		ComboFrame:SetScript("OnEvent", ComboFrame_OnEvent)
+		ComboFrame:RegisterAllEvents()
 		ComboFrame_Update()
+	end
+end
+
+----------------------------------------------
+-- Blizzard Frame functions
+-- Hide/show focus frame
+----------------------------------------------
+function ArcHUD:HideBlizzardFocus(show)
+	self.BlizzFocusHidden = not show
+	if not show then
+		FocusFrame:UnregisterAllEvents()
+		FocusFrame:Hide()
+	else
+		FocusFrame:RegisterAllEvents()
+		-- TODO: need to refresh focus frame
 	end
 end
 

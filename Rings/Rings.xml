@@ -11,8 +11,8 @@
 <Script file="PetPower.lua" />
 <Script file="ComboPoints.lua" />
 <Script file="MirrorTimer.lua" />
-<!-- <Script file="FocusHealth.lua" /> -->
-<!-- <Script file="FocusPower.lua" /> -->
+<Script file="FocusHealth.lua" />
+<Script file="FocusPower.lua" />
 <!-- <Script file="DruidMana.lua" /> -->
 <!-- <Script file="EnergyTick.lua" /> -->
 

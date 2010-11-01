@@ -267,6 +267,20 @@ ArcHUD.configOptionsTableCore = {
 						ArcHUD:HideBlizzardTarget(v)
 					end,
 				},
+				-- Blizzard focus frame
+				blizzFocus = {
+					type		= "toggle",
+					name		= L["TEXT"]["BLIZZFOCUS"],
+					desc		= L["TOOLTIP"]["BLIZZFOCUS"],
+					order		= 10,
+					get			= function ()
+						return ArcHUD.db.profile.BlizzFocus
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.BlizzFocus = v
+						ArcHUD:HideBlizzardFocus(v)
+					end,
+				},
 			},
 		}, -- display
 		

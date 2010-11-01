@@ -35,6 +35,7 @@ L["TEXT"] = {
 	TOTOT		= "Enable target's target's target",
 	BLIZZPLAYER = "Blizzard player frame visible",
 	BLIZZTARGET = "Blizzard target frame visible",
+	BLIZZFOCUS = "Blizzard focus frame visible",
 
 	COMBOPOINTS = "Combo points options",
 	SHOWCOMBO	= "Show combo point text",
@@ -97,6 +98,7 @@ L["TOOLTIP"] = {
 	ATTACHTOP	= "Attach target frame to the top of the rings instead of the bottom",
 	BLIZZPLAYER = "Toggles visibility of the Blizzard player frame",
 	BLIZZTARGET = "Toggles visibility of the Blizzard target frame",
+	BLIZZFOCUS  = "Toggles visibility of the Blizzard focus frame",
 
 	SHOWCOMBO	= "Toggle display of combo points in the center of the HUD",
 	COMBODECAY	= "Set delay in seconds before combo points on previous target disappear (set to 0 to disable this feature)",
