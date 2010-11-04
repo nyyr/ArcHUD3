@@ -141,25 +141,27 @@ end
 function module:UNIT_SPELLCAST_START(event, arg1)
 	if(arg1 == self.unit) then
 		local spell, rank, displayName, icon, startTime, endTime = UnitCastingInfo(self.unit)
-		if(UnitIsFriend("player", self.unit)) then
-			self:UpdateColor(1)
-			self.Text:SetTextColor(1, 1, 1)
-			self.Time:SetTextColor(1, 1, 1)
-		else
-			self:UpdateColor(2)
-			self.Text:SetTextColor(1, 0, 0)
-			self.Time:SetTextColor(1, 0, 0)
-		end
-		self.Text:SetText(displayName)
-		self.startValue = 0
-		self.f:SetMax(endTime - startTime)
-		self.f.casting = 1
-		self.channeling = 0
-		self.spellstart = startTime
-		if(ArcHUD.db.profile.FadeIC > ArcHUD.db.profile.FadeOOC) then
-			self.f:SetRingAlpha(ArcHUD.db.profile.FadeIC)
-		else
-			self.f:SetRingAlpha(ArcHUD.db.profile.FadeOOC)
+		if (spell) then 
+			if(UnitIsFriend("player", self.unit)) then
+				self:UpdateColor(1)
+				self.Text:SetTextColor(1, 1, 1)
+				self.Time:SetTextColor(1, 1, 1)
+			else
+				self:UpdateColor(2)
+				self.Text:SetTextColor(1, 0, 0)
+				self.Time:SetTextColor(1, 0, 0)
+			end
+			self.Text:SetText(displayName)
+			self.startValue = 0
+			self.f:SetMax(endTime - startTime)
+			self.f.casting = 1
+			self.channeling = 0
+			self.spellstart = startTime
+			if(ArcHUD.db.profile.FadeIC > ArcHUD.db.profile.FadeOOC) then
+				self.f:SetRingAlpha(ArcHUD.db.profile.FadeIC)
+			else
+				self.f:SetRingAlpha(ArcHUD.db.profile.FadeOOC)
+			end
 		end
 	end
 end
@@ -167,26 +169,28 @@ end
 function module:UNIT_SPELLCAST_CHANNEL_START(event, arg1)
 	if(arg1 == self.unit) then
 		local spell, rank, displayName, icon, startTime, endTime = UnitChannelInfo(self.unit)
-		if(UnitIsFriend("player", self.unit)) then
-			self:UpdateColor(1)
-			self.Text:SetTextColor(1, 1, 1)
-			self.Time:SetTextColor(1, 1, 1)
-		else
-			self:UpdateColor(2)
-			self.Text:SetTextColor(1, 0, 0)
-			self.Time:SetTextColor(1, 0, 0)
-		end
-		self.Text:SetText(displayName)
-		self.startValue = 0
-		self.f:SetMax(endTime - startTime)
-		self.f:SetValue(endTime - startTime)
-		self.channeling = 1
-		self.f.casting = 1
-		self.spellstart = startTime
-		if(ArcHUD.db.profile.FadeIC > ArcHUD.db.profile.FadeOOC) then
-			self.f:SetRingAlpha(ArcHUD.db.profile.FadeIC)
-		else
-			self.f:SetRingAlpha(ArcHUD.db.profile.FadeOOC)
+		if (spell) then 
+			if(UnitIsFriend("player", self.unit)) then
+				self:UpdateColor(1)
+				self.Text:SetTextColor(1, 1, 1)
+				self.Time:SetTextColor(1, 1, 1)
+			else
+				self:UpdateColor(2)
+				self.Text:SetTextColor(1, 0, 0)
+				self.Time:SetTextColor(1, 0, 0)
+			end
+			self.Text:SetText(displayName)
+			self.startValue = 0
+			self.f:SetMax(endTime - startTime)
+			self.f:SetValue(endTime - startTime)
+			self.channeling = 1
+			self.f.casting = 1
+			self.spellstart = startTime
+			if(ArcHUD.db.profile.FadeIC > ArcHUD.db.profile.FadeOOC) then
+				self.f:SetRingAlpha(ArcHUD.db.profile.FadeIC)
+			else
+				self.f:SetRingAlpha(ArcHUD.db.profile.FadeOOC)
+			end
 		end
 	end
 end
