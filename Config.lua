@@ -74,6 +74,14 @@ ArcHUD.configOptionsTableCmd = {
 			end,
 			order 		= -2,
 		},
+		perf = {
+			type		= "execute",
+			name		= "config",
+			desc		= "Show performance infos on timers",
+			func		= function()
+				ArcHUD:MetroPrintPerf()
+			end,
+		}
 	},
 }
 

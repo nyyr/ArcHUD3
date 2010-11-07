@@ -357,14 +357,16 @@ function ArcHUD.modulePrototype:OnInitialize()
 	end
 
 	self:Debug(d_notice, "Registering Metrognome timers")
-	if(not self.parent:MetroStatus(self.name .. "Alpha")) then
-		self.parent:RegisterMetro(self.name .. "Alpha", ArcHUDRingTemplate.AlphaUpdate, 0.01, self.f)
-	end
+	
+	-- Gradually updates ring filling towards set value
 	if(not self.parent:MetroStatus(self.name .. "Fade")) then
-		self.parent:RegisterMetro(self.name .. "Fade", ArcHUDRingTemplate.DoFadeUpdate, 0.01, self.f)
+		self.parent:RegisterMetro(self.name .. "Fade", ArcHUDRingTemplate.DoFadeUpdate, 0.02, self.f)
 	end
-	if(not self.parent:MetroStatus(self.name .. "Update")) then
-		self.parent:RegisterMetro(self.name .. "Update", ArcHUDRingTemplate.UpdateAlpha, 0.05, self)
+	
+	-- Check for necessary alpha updates (e.g. on entering combat)
+	-- TODO: maybe change to event-based triggers
+	if(not self.parent:MetroStatus(self.name .. "CheckAlpha") and not self.noAutoAlpha) then
+		self.parent:RegisterMetro(self.name .. "CheckAlpha", ArcHUDRingTemplate.CheckAlpha, 0.1, self)
 	end
 	self:Debug(d_info, "Ring loaded")
 end
@@ -522,69 +524,26 @@ end
 ----------------------------------------------
 function ArcHUD.modulePrototype:CreateRing(hasBG, parent)
 	-- Create frame
-	local f = CreateFrame("Frame", nil, parent)
+	local f = CreateFrame("Frame", "ArcHUD_"..self:GetName().."_Ring", parent, "ArcHUDRingTemplate")
 	f:SetFrameStrata("BACKGROUND")
 	f:SetFrameLevel(10)
-	f:SetWidth(256)
-	f:SetHeight(256)
-
-	-- Set up textures
-	local t
 
 	f.quadrants = {}
-
-	t = f:CreateTexture(nil, "ARTWORK")
-	t:SetTexture("Interface\\Addons\\ArcHUD3\\Icons\\Ring.tga")
-	t:SetAllPoints(f)
-	f.quadrants[1] = t
-
-	t = f:CreateTexture(nil, "ARTWORK")
-	t:SetTexture("Interface\\Addons\\ArcHUD3\\Icons\\Ring.tga")
-	t:SetAllPoints(f)
-	f.quadrants[2] = t
-
-	t = f:CreateTexture(nil, "ARTWORK")
-	t:SetTexture("Interface\\Addons\\ArcHUD3\\Icons\\Ring.tga")
-	t:SetAllPoints(f)
-	f.chip = t
-
-	t = f:CreateTexture(nil, "ARTWORK")
-	t:SetTexture("Interface\\Addons\\ArcHUD3\\Icons\\Slice.tga")
-	t:SetAllPoints(f)
-	f.slice = t
+	f.quadrants[1] = f.ringQuadrant1
+	f.quadrants[2] = f.ringQuadrant2
 
 	-- Set up frame
 	ArcHUDRingTemplate:OnLoad(f)
 
 	if(hasBG) then
 		-- Create frame
-		local fBG = CreateFrame("Frame", nil, f)
+		local fBG = CreateFrame("Frame", "ArcHUD_"..self:GetName().."_Ring_BG", f, "ArcHUDRingTemplateBG")
 		fBG:SetFrameLevel(0)
 		fBG:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 0, 0)
-		fBG:SetWidth(256)
-		fBG:SetHeight(256)
 
-		-- Set up textures
 		fBG.quadrants = {}
-		t = fBG:CreateTexture(nil, "BACKGROUND")
-		t:SetTexture("Interface\\Addons\\ArcHUD3\\Icons\\RingBG.tga")
-		t:SetAllPoints(fBG)
-		fBG.quadrants[1] = t
-
-		t = fBG:CreateTexture(nil, "BACKGROUND")
-		t:SetTexture("Interface\\Addons\\ArcHUD3\\Icons\\RingBG.tga")
-		t:SetAllPoints(fBG)
-		fBG.quadrants[2] = t
-
-		t = fBG:CreateTexture(nil, "BACKGROUND")
-		t:SetTexture("Interface\\Addons\\ArcHUD3\\Icons\\RingBG.tga")
-		t:SetAllPoints(fBG)
-		fBG.chip = t
-
-		t = fBG:CreateTexture(nil, "BACKGROUND")
-		t:SetTexture("Interface\\Addons\\ArcHUD3\\Icons\\Slice.tga")
-		t:SetAllPoints(fBG)
-		fBG.slice = t
+		fBG.quadrants[1] = fBG.ringQuadrant1
+		fBG.quadrants[2] = fBG.ringQuadrant2
 
 		-- Set up frame
 		ArcHUDRingTemplate:OnLoadBG(fBG)
@@ -635,6 +594,16 @@ function ArcHUD.modulePrototype:CreateTexture(parent, layer, size, texture, poin
 	t:Show()
 
 	return t
+end
+
+----------------------------------------------
+-- Start ring timers (filling and alpha)
+----------------------------------------------
+function ArcHUD.modulePrototype:StartRingTimers()
+	self.parent:StartMetro(self.name .. "Fade")
+	if (not self.noAutoAlpha) then
+		self.parent:StartMetro(self.name .. "CheckAlpha")
+	end
 end
 
 ----------------------------------------------

@@ -1,8 +1,11 @@
 local moduleName = "Casting"
 local module = ArcHUD:NewModule(moduleName)
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "0.9 (r"..rev..")"
+module.version = "1.0 (r"..rev..")"
+
 module.unit = "player"
+module.noAutoAlpha = true
+
 module.defaults = {
 	profile = {
 		Enabled = true,
@@ -36,8 +39,8 @@ function module:Initialize()
 	self.Time = self:CreateFontString(self.f, "BACKGROUND", {40, 14}, 12, "RIGHT", {1.0, 1.0, 1.0}, {"TOPLEFT", self.Text, "TOPRIGHT", 0, 0})
 
 	-- Register timers
-	self.parent:RegisterMetro(self.name .. "Casting", self.Casting, 0.01, self)
-	self.parent:RegisterMetro(self.name .. "CheckTaxi", self.CheckTaxi, 0.1, self)
+	self.parent:RegisterMetro(self.name .. "Casting", self.Casting, 0.02, self)
+	--self.parent:RegisterMetro(self.name .. "CheckTaxi", self.CheckTaxi, 0.1, self)
 	
 	self:CreateStandardModuleOptions(15)
 end
@@ -76,6 +79,7 @@ function module:OnModuleEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", 		"SpellcastSuccess")
 
 	-- Do hooks for flight timers
+--[[
 	if(FlightMapTimes_BeginFlight and FlightMapTimes_EndFlight) then
 		self:Debug(2, "Hooking FlightMap")
 		self:Hook("FlightMapTimes_BeginFlight", "BeginFlight", true)
@@ -86,19 +90,21 @@ function module:OnModuleEnable()
 		self:Hook("TakeTaxiNode", "BeginFlight", true)
 		self.parent:StartMetro(self.name .. "CheckTaxi")
 		self.using = "ToFu"
---[[	elseif(InFlight) then
+-- [ [	elseif(InFlight) then
 		self:Debug(2, "Hooking InFlight")
 		self:Hook(InFlight, "StartTimer", "BeginFlight", true)
 		self:StartMetro(self.name .. "CheckTaxi")
-		self.using = "InFlight"]]
+		self.using = "InFlight" ] ]
 	else
 		self.using = "none"
 	end
+]]
 
 	-- Activate the timers
 	self.parent:StartMetro(self.name .. "Casting")
-	self.parent:StartMetro(self.name .. "Alpha")
-	self.parent:StartMetro(self.name .. "Fade")
+	
+	-- Activate ring timers
+	self:StartRingTimers()
 
 	self.f:Show()
 end
@@ -146,6 +152,7 @@ function module:Casting()
 	end
 end
 
+--[[
 function module:BeginFlight(duration, destination)
 	local slot = duration
 	if(self.using == "ToFu") then
@@ -210,6 +217,7 @@ function module:CheckTaxi()
 		end
 	end
 end
+]]
 
 function module:UNIT_SPELLCAST_START(event, arg1)
 	if(arg1 == self.unit) then

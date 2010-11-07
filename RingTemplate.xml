@@ -1,0 +1,48 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+<Script file="RingTemplate.lua" />
+
+<Frame name="ArcHUDRingTemplate" virtual="true">
+	<Size x="256" y="256"/>
+	
+	<Layers>
+		<Layer level="ARTWORK">
+			<Texture name="$parentQ1"    parentKey="ringQuadrant1" file="Interface\Addons\ArcHUD3\Icons\Ring.tga"></Texture>
+			<Texture name="$parentQ2"    parentKey="ringQuadrant2" file="Interface\Addons\ArcHUD3\Icons\Ring.tga"></Texture>
+			<Texture name="$parentChip"  parentKey="chip"          file="Interface\Addons\ArcHUD3\Icons\Ring.tga"></Texture>
+			<Texture name="$parentSlice" parentKey="slice"         file="Interface\Addons\ArcHUD3\Icons\Slice.tga"></Texture>
+		</Layer>
+	</Layers>
+
+	<Animations>
+		<AnimationGroup parentKey="applyAlpha">
+			<Alpha parentKey="alphaAnim" change="0" duration="0.5" order="1" />
+			<Scripts>
+				<OnLoad>
+					self.ring = self:GetParent();
+				</OnLoad>
+				<OnFinished>
+					self.ring:SetAlpha(self.ring.destAlpha);
+				</OnFinished>
+			</Scripts>
+		</AnimationGroup>
+	</Animations>
+
+</Frame>
+
+<Frame name="ArcHUDRingTemplateBG" virtual="true">
+	<Size x="256" y="256"/>
+	
+	<Layers>
+		<Layer level="BACKGROUND">
+			<Texture name="$parentQ1"    parentKey="ringQuadrant1" file="Interface\Addons\ArcHUD3\Icons\RingBG.tga"></Texture>
+			<Texture name="$parentQ2"    parentKey="ringQuadrant2" file="Interface\Addons\ArcHUD3\Icons\RingBG.tga"></Texture>
+			<Texture name="$parentChip"  parentKey="chip"          file="Interface\Addons\ArcHUD3\Icons\RingBG.tga"></Texture>
+			<Texture name="$parentSlice" parentKey="slice"         file="Interface\Addons\ArcHUD3\Icons\Slice.tga"></Texture>
+		</Layer>
+	</Layers>
+
+</Frame>
+
+</Ui>

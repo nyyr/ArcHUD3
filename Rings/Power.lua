@@ -4,8 +4,9 @@ local LM = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Module")
 local moduleName = "Power"
 local module = ArcHUD:NewModule(moduleName)
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "0.9 (r"..rev..")"
+module.version = "1.0 (r"..rev..")"
 module.unit = "player"
+module.isPower = true
 module.defaults = {
 	profile = {
 		Enabled = true,
@@ -40,7 +41,7 @@ function module:Initialize()
 
 	self.MPText = self:CreateFontString(self.f, "BACKGROUND", {150, 15}, 14, "LEFT", {1.0, 1.0, 0.0}, {"TOPLEFT", ArcHUDFrameCombo, "TOPRIGHT", 0, 0})
 	self.MPPerc = self:CreateFontString(self.f, "BACKGROUND", {40, 14}, 12, "LEFT", {1.0, 1.0, 1.0}, {"TOPLEFT", self.MPText, "BOTTOMLEFT", 0, 0})
-	self.parent:RegisterMetro(self.name .. "UpdatePowerBar", self.UpdatePower, 0.1, self, self.unit)
+	self.parent:RegisterMetro(self.name .. "UpdatePowerBar", self.UpdatePowerBar, 0.1, self, self.unit)
 	
 	self:CreateStandardModuleOptions(10)
 end
@@ -92,10 +93,8 @@ function module:OnModuleEnable()
 	self:RegisterEvent("PLAYER_ALIVE", 		"UpdatePowerEvent")
 	self:RegisterEvent("PLAYER_LEVEL_UP")
 
-	-- Activate the timers
-	self.parent:StartMetro(self.name .. "Alpha")
-	self.parent:StartMetro(self.name .. "Fade")
-	self.parent:StartMetro(self.name .. "Update")
+	-- Activate ring timers
+	self:StartRingTimers()
 
 	self.f:Show()
 end
@@ -110,20 +109,20 @@ end
 ----------------------------------------------
 -- Update Power (metronome)
 ----------------------------------------------
-function module:UpdatePower()
-	if(UnitIsGhost(self.unit) or (UnitIsDead(self.unit) and event == "PLAYER_ALIVE")) then
-		self.f:GhostMode(true, self.unit)
-	else
-		self.f:GhostMode(false, self.unit)
+function module:UpdatePowerBar()
+	if (not UnitIsGhost(self.unit)) then
+		local power = UnitPower(self.unit)
+		local maxPower = UnitPowerMax(self.unit)
 
-		self.MPText:SetText(UnitPower(self.unit).."/"..UnitPowerMax(self.unit))
-		self.MPPerc:SetText(floor((UnitPower(self.unit)/UnitPowerMax(self.unit))*100).."%")
+		self.MPText:SetText(power.."/"..maxPower)
+		self.MPPerc:SetText(floor((power/maxPower)*100).."%")
 
-		self.f:SetMax(UnitPowerMax(self.unit))
-		self.f:SetValue(UnitPower(self.unit))
-	end
-	if (UnitPower(self.unit) == UnitPowerMax(self.unit) or UnitPower(self.unit) == 0) then
-		self.parent:StopMetro(self.name .. "UpdatePowerBar")
+		self.f:SetMax(maxPower)
+		self.f:SetValue(power)
+		
+		if (power == maxPower or power == 0) then
+			self.parent:StopMetro(self.name .. "UpdatePowerBar")
+		end
 	end
 end
 

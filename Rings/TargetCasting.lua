@@ -1,8 +1,11 @@
 local moduleName = "TargetCasting"
 local module = ArcHUD:NewModule(moduleName)
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "0.9 (r"..rev..")"
+module.version = "1.0 (r"..rev..")"
+
 module.unit = "target"
+module.noAutoAlpha = true
+
 module.defaults = {
 	profile = {
 		Enabled = true,
@@ -33,7 +36,7 @@ function module:Initialize()
 	self.Time = self:CreateFontString(self.f, "BACKGROUND", {40, 14}, 10, "RIGHT", {1.0, 1.0, 1.0}, {"TOPLEFT", self.Text, "TOPRIGHT", 0, 0})
 
 	-- Register timers
-	self.parent:RegisterMetro(self.name .. "Casting", self.Casting, 0.01, self)
+	self.parent:RegisterMetro(self.name .. "Casting", self.Casting, 0.02, self)
 	
 	self:CreateStandardModuleOptions(30)
 end
@@ -73,8 +76,9 @@ function module:OnModuleEnable()
 
 	-- Activate the timers
 	self.parent:StartMetro(self.name .. "Casting")
-	self.parent:StartMetro(self.name .. "Alpha")
-	self.parent:StartMetro(self.name .. "Fade")
+	
+	-- Activate ring timers
+	self:StartRingTimers()
 
 	self.f:Show()
 end

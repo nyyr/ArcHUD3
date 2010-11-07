@@ -19,8 +19,13 @@ Frames.lua
 ComboPoints.lua
 Nameplates.lua
 Utils.lua
+
+# Module core
+RingTemplate.xml
 RingTemplate.lua
 ModuleCore.lua
+
+# Config
 Config.lua
 
 # Rings

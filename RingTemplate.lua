@@ -12,7 +12,7 @@
 
 ---------------------------------------------------------------------------
 -- QUADRANT MAPPING FUNCTIONS
---   The subsetting code is all written relative to the first quandrant, but
+--   The subsetting code is all written relative to the first quadrant, but
 --   each quadrant has a pair of functions to manage mapping location and
 --   texture operations from that 'normalized' coordinate system into the
 --   appropriate one for the quadrant in question
@@ -49,38 +49,38 @@ ArcHUDRingTemplate = {}
 
 -- Q3: BOTTOM LEFT
 setSubsetFuncs[1] = function(tex, parname, radius, xlo, xhi, ylo, yhi, notex)
-   if (not notex) then
-     tex:SetTexCoord(xhi, xlo, ylo, yhi)
-   end
-   tex:SetPoint("BOTTOMRIGHT", parname, "BOTTOMLEFT", -xlo*radius, -yhi*radius)
-   tex:SetPoint("TOPLEFT", parname, "BOTTOMLEFT", -xhi*radius, -ylo*radius)
+	if (not notex) then
+		tex:SetTexCoord(xhi, xlo, ylo, yhi)
+	end
+	tex:SetPoint("BOTTOMRIGHT", parname, "BOTTOMLEFT", -xlo*radius, -yhi*radius)
+	tex:SetPoint("TOPLEFT", parname, "BOTTOMLEFT", -xhi*radius, -ylo*radius)
 end
 
 -- Q4: TOP LEFT
 setSubsetFuncs[2] = function(tex, parname, radius, xlo, xhi, ylo, yhi, notex)
-   if (not notex) then
-      tex:SetTexCoord(yhi, ylo, xhi, xlo)
-   end
-   tex:SetPoint("BOTTOMLEFT", parname, "BOTTOMLEFT", -yhi*radius, xlo*radius)
-   tex:SetPoint("TOPRIGHT", parname, "BOTTOMLEFT", -ylo*radius, xhi*radius)
+	if (not notex) then
+		tex:SetTexCoord(yhi, ylo, xhi, xlo)
+	end
+	tex:SetPoint("BOTTOMLEFT", parname, "BOTTOMLEFT", -yhi*radius, xlo*radius)
+	tex:SetPoint("TOPRIGHT", parname, "BOTTOMLEFT", -ylo*radius, xhi*radius)
 end
 
 -- Q1: TOP RIGHT
 setSubsetFuncs[3] = function(tex, parname, radius, xlo, xhi, ylo, yhi, notex)
-   if (not notex) then
-      tex:SetTexCoord(xlo, xhi, yhi, ylo)
-   end
-   tex:SetPoint("TOPLEFT", parname, "BOTTOMLEFT", xlo*radius, yhi*radius)
-   tex:SetPoint("BOTTOMRIGHT", parname, "BOTTOMLEFT", xhi*radius, ylo*radius)
+	if (not notex) then
+		tex:SetTexCoord(xlo, xhi, yhi, ylo)
+	end
+	tex:SetPoint("TOPLEFT", parname, "BOTTOMLEFT", xlo*radius, yhi*radius)
+	tex:SetPoint("BOTTOMRIGHT", parname, "BOTTOMLEFT", xhi*radius, ylo*radius)
 end
 
 -- Q2: BOTTOM RIGHT
 setSubsetFuncs[4] = function(tex, parname, radius, xlo, xhi, ylo, yhi, notex)
-   if (not notex) then
-      tex:SetTexCoord(ylo, yhi, xlo, xhi)
-   end
-   tex:SetPoint("TOPRIGHT", parname, "BOTTOMLEFT", yhi*radius, -xlo*radius)
-   tex:SetPoint("BOTTOMLEFT", parname, "BOTTOMLEFT", ylo*radius, -xhi*radius)
+	if (not notex) then
+		tex:SetTexCoord(ylo, yhi, xlo, xhi)
+	end
+	tex:SetPoint("TOPRIGHT", parname, "BOTTOMLEFT", yhi*radius, -xlo*radius)
+	tex:SetPoint("BOTTOMLEFT", parname, "BOTTOMLEFT", ylo*radius, -xhi*radius)
 end
 
 -- Slice text coord setting funcs
@@ -89,6 +89,7 @@ setSliceFuncs[2] = function(tex) tex:SetTexCoord(1, 0, 1, 0) end
 setSliceFuncs[3] = function(tex) tex:SetTexCoord(1, 0, 0, 1) end
 setSliceFuncs[4] = function(tex) tex:SetTexCoord(0, 1, 0, 1) end
 
+-----------------------------------------------------------
 -- The 'Work' function, which handles subset rendering for a single
 -- quadrant (normalized to Q1)
 --
@@ -97,123 +98,124 @@ setSliceFuncs[4] = function(tex) tex:SetTexCoord(0, 1, 0, 1) end
 --  A    - The angle within the quadrant (degrees, 0 <= A < 90)
 --  T    - The main texture for the quadrant
 --  SS   - The texture subset mapping function for the quadrant
-
+-----------------------------------------------------------
 function ArcHUDRingTemplate:DoQuadrantReversed(A, T, SS)
-   -- Grab local references to important textures
-   local C = self.chip
-   local S = self.slice
+	-- Grab local references to important textures
+	local C = self.chip
+	local S = self.slice
 
-   -- If no part of self quadrant is visible, just hide all the textures
-   -- and be done.
-   if (A == 0) then
-      T:Hide()
-      C:Hide()
-      S:Hide()
-      return
-   end
+	-- If no part of self quadrant is visible, just hide all the textures
+	-- and be done.
+	if (A == 0) then
+		T:Hide()
+		C:Hide()
+		S:Hide()
+		return
+	end
 
-   -- More local references, grab the ring dimensions, and the frame name.
-   local RF = self.ringFactor
-   local OR = self.radius
-   --local name = self.name
+	-- More local references, grab the ring dimensions, and the frame name.
+	local RF = self.ringFactor
+	local OR = self.radius
 
-   -- Drawing scheme uses three locations
-   --   E (Ex,Ey) - The 'End' position (Nx=1, Ny=0)
-   --   O (Ox,Oy) - Intersection of angle line with Outer edge
-   --   I (Ix,Iy) - Intersection of angle line with Inner edge
+	-- Drawing scheme uses three locations
+	--   E (Ex,Ey) - The 'End' position (Nx=1, Ny=0)
+	--   O (Ox,Oy) - Intersection of angle line with Outer edge
+	--   I (Ix,Iy) - Intersection of angle line with Inner edge
 
-   -- Calculated locations:
-   --   Arad  - Angle in radians
-   --   Ox,Oy - O coordinates
-   --   Ix,Iy - I coordinates
-   local Arad = math.rad(A)
-   local Ox = math.cos(Arad)
-   local Oy = math.sin(Arad)
-   local Ix = Ox * RF
-   local Iy = Oy * RF
+	-- Calculated locations:
+	--   Arad  - Angle in radians
+	--   Ox,Oy - O coordinates
+	--   Ix,Iy - I coordinates
+	local Arad = math.rad(A)
+	local Ox = math.cos(Arad)
+	local Oy = math.sin(Arad)
+	local Ix = Ox * RF
+	local Iy = Oy * RF
 
-   -- Treat first and last halves differently to maximize size of main
-   -- texture subset.
-   if (A <= 45) then
-      -- Main subset is from N to I
-      SS(T, self, OR, Ix, 1,  0, Iy)
-      -- Chip is subset from (Ix,Oy) to (Ox,Ny) (Right edge of main)
-      SS(C, self, OR, Ox, 1, Iy, Oy)
-   else
-      -- Main subset is from N to O
-      SS(T, self, OR, Ox, 1,  0, Oy)
-      -- Chip is subset from (Nx,Iy) to (Ix,Oy) (Bottom edge of main)
-      SS(C, self, OR, Ix, Ox, 0, Iy)
-   end
-   -- Strech slice between I and O
-   SS(S, self, OR, Ix, Ox, Iy, Oy, 1)
-   -- All three textures are visible
-   T:Show()
-   C:Show()
-   S:Show()
+	-- Treat first and last halves differently to maximize size of main
+	-- texture subset.
+	if (A <= 45) then
+		-- Main subset is from N to I
+		SS(T, self, OR, Ix, 1,  0, Iy)
+		-- Chip is subset from (Ix,Oy) to (Ox,Ny) (Right edge of main)
+		SS(C, self, OR, Ox, 1, Iy, Oy)
+	else
+		-- Main subset is from N to O
+		SS(T, self, OR, Ox, 1,  0, Oy)
+		-- Chip is subset from (Nx,Iy) to (Ix,Oy) (Bottom edge of main)
+		SS(C, self, OR, Ix, Ox, 0, Iy)
+	end
+	-- Strech slice between I and O
+	SS(S, self, OR, Ix, Ox, Iy, Oy, 1)
+	-- All three textures are visible
+	T:Show()
+	C:Show()
+	S:Show()
 end
 
 function ArcHUDRingTemplate:DoQuadrant(A, T, SS)
-   -- Grab local references to important textures
-   local C = self.chip
-   local S = self.slice
+	-- Grab local references to important textures
+	local C = self.chip
+	local S = self.slice
 
-   -- If no part of self quadrant is visible, just hide all the textures
-   -- and be done.
-   if (A == 0) then
-      T:Hide()
-      C:Hide()
-      S:Hide()
-      return
-   end
+	-- If no part of self quadrant is visible, just hide all the textures
+	-- and be done.
+	if (A == 0) then
+		T:Hide()
+		C:Hide()
+		S:Hide()
+		return
+	end
 
-   -- More local references, grab the ring dimensions, and the frame name.
-   local RF = self.ringFactor
-   local OR = self.radius
-   --local name = self.name
+	-- More local references, grab the ring dimensions, and the frame name.
+	local RF = self.ringFactor
+	local OR = self.radius
 
-   -- Drawing scheme uses three locations
-   --   N (Nx,Ny) - The 'Noon' position (Nx=0, Ny=1)
-   --   O (Ox,Oy) - Intersection of angle line with Outer edge
-   --   I (Ix,Iy) - Intersection of angle line with Inner edge
+	-- Drawing scheme uses three locations
+	--   N (Nx,Ny) - The 'Noon' position (Nx=0, Ny=1)
+	--   O (Ox,Oy) - Intersection of angle line with Outer edge
+	--   I (Ix,Iy) - Intersection of angle line with Inner edge
 
-   -- Calculated locations:
-   --   Arad  - Angle in radians
-   --   Ox,Oy - O coordinates
-   --   Ix,Iy - I coordinates
-   local Arad = math.rad(A)
-   local Ox = math.sin(Arad)
-   local Oy = math.cos(Arad)
-   local Ix = Ox * RF
-   local Iy = Oy * RF
+	-- Calculated locations:
+	--   Arad  - Angle in radians
+	--   Ox,Oy - O coordinates
+	--   Ix,Iy - I coordinates
+	local Arad = math.rad(A)
+	local Ox = math.sin(Arad)
+	local Oy = math.cos(Arad)
+	local Ix = Ox * RF
+	local Iy = Oy * RF
 
-   -- Treat first and last halves differently to maximize size of main
-   -- texture subset.
-   if (A <= 45) then
-      -- Main subset is from N to I
-      SS(T, self, OR, 0, Ix, Iy, 1)
-      -- Chip is subset from (Ix,Oy) to (Ox,Ny) (Right edge of main)
-      SS(C, self, OR, Ix, Ox, Oy, 1)
-   else
-      -- Main subset is from N to O
-      SS(T, self, OR, 0, Ox, Oy, 1)
-      -- Chip is subset from (Nx,Iy) to (Ix,Oy) (Bottom edge of main)
-      SS(C, self, OR, 0, Ix, Iy, Oy)
-   end
-   -- Strech slice between I and O
-   SS(S, self, OR, Ix, Ox, Iy, Oy, 1)
-   -- All three textures are visible
-   T:Show()
-   C:Show()
-   S:Show()
+	-- Treat first and last halves differently to maximize size of main
+	-- texture subset.
+	if (A <= 45) then
+		-- Main subset is from N to I
+		SS(T, self, OR, 0, Ix, Iy, 1)
+		-- Chip is subset from (Ix,Oy) to (Ox,Ny) (Right edge of main)
+		SS(C, self, OR, Ix, Ox, Oy, 1)
+	else
+		-- Main subset is from N to O
+		SS(T, self, OR, 0, Ox, Oy, 1)
+		-- Chip is subset from (Nx,Iy) to (Ix,Oy) (Bottom edge of main)
+		SS(C, self, OR, 0, Ix, Iy, Oy)
+	end
+	
+	-- Strech slice between I and O
+	SS(S, self, OR, Ix, Ox, Iy, Oy, 1)
+	
+	-- All three textures are visible
+	T:Show()
+	C:Show()
+	S:Show()
 end
 
+-----------------------------------------------------------
 -- Method function to set the angle to display
 --
 -- Param:
 --  self  - The ring template instance
 --  angle - The angle in degrees (0 <= angle <= 180)
-
+-----------------------------------------------------------
 function ArcHUDRingTemplate:SetAngle(angle)
 
 	-- Bounds checking on the angle so that it's between 0 and 180 (inclusive)
@@ -234,12 +236,12 @@ function ArcHUDRingTemplate:SetAngle(angle)
 	local quad = math.floor(angle / 90) + 1
 	local A = math.fmod(angle, 90)
 	local quadOfs = self.quadOffset or 0
-	   local effQuad
-	   if (self.reversed) then
-	      effQuad = math.fmod((4-quad)+quadOfs, 4)+1
-	   else
-	      effQuad = math.fmod(quad+quadOfs-1, 4)+1
-	   end
+	local effQuad
+	if (self.reversed) then
+		effQuad = math.fmod((4-quad)+quadOfs, 4)+1
+	else
+		effQuad = math.fmod(quad+quadOfs-1, 4)+1
+	end
 
 	-- Check to see if we've changed quandrants since the last time we were
 	-- called. Quadrant changes re-configure some textures.
@@ -247,50 +249,34 @@ function ArcHUDRingTemplate:SetAngle(angle)
 		-- Loop through all quadrants
 		for i=1,2 do
 			T=self.quadrants[i]
-			 if (self.reversed) then
-			    qi = math.fmod((4-i)+quadOfs, 4)+1
-			 else
-			    qi = math.fmod(i+quadOfs-1, 4)+1
-			 end
-			if (i < quad) then
-			   -- If self quadrant is full shown, then show all of the texture
-			   T:ClearAllPoints()
-			   --if (self.reversed) then
-				--setSubsetFuncs[i+2](T, self.name, self.radius, 0.0, 1.0, 0.0, 1.0)
-			   --else
-				setSubsetFuncs[qi](T, self, self.radius, 0.0, 1.0, 0.0, 1.0)
-			   --end
-
-			   T:Show()
-			elseif (i == quad) then
-			   -- If self quadrant is partially or fully shown, begin by
-			   -- showing all of the texture. Also configure the slice
-			   -- texture's orientation.
-			   T:ClearAllPoints()
-			   setSubsetFuncs[qi](T, self, self.radius, 0.0, 0.8, 0.4, 1.0)
-			   --[[
-			   if (self.reversed) then
-				setSubsetFuncs[qi](T, self.name, self.radius, 0.0, 0.8, 0.4, 1.0)
-			   else
-				setSubsetFuncs[i](T, self.name, self.radius, 0.0, 0.8, 0.4, 1.0)
-			   end
-			   ]]
-			   T:Show()
-			    if (self.reversed) then
-			       setSliceFuncs[math.fmod(qi+1,4)+1](self.slice)
-			    else
-			       setSliceFuncs[qi](self.slice)
-			    end
-			   --[[
-			   if (self.reversed) then
-				setSliceFuncs[i+2](self.slice)
-			   else
-				setSliceFuncs[i](self.slice)
-			   end
-			   ]]
+			if (self.reversed) then
+				qi = math.fmod((4-i)+quadOfs, 4)+1
 			else
-			   -- If self quadrant is not shown at all, hide it.
-			   T:Hide()
+				qi = math.fmod(i+quadOfs-1, 4)+1
+			end
+			
+			if (i < quad) then
+				-- If self quadrant is full shown, then show all of the texture
+				T:ClearAllPoints()
+				setSubsetFuncs[qi](T, self, self.radius, 0.0, 1.0, 0.0, 1.0)
+				T:Show()
+				
+			elseif (i == quad) then
+				-- If self quadrant is partially or fully shown, begin by
+				-- showing all of the texture. Also configure the slice
+				-- texture's orientation.
+				T:ClearAllPoints()
+				setSubsetFuncs[qi](T, self, self.radius, 0.0, 0.8, 0.4, 1.0)
+				T:Show()
+				if (self.reversed) then
+					setSliceFuncs[math.fmod(qi+1,4)+1](self.slice)
+				else
+					setSliceFuncs[qi](self.slice)
+				end
+
+			else
+				-- If self quadrant is not shown at all, hide it.
+				T:Hide()
 			end
 		end
 
@@ -315,7 +301,6 @@ function ArcHUDRingTemplate:SetAngle(angle)
 
 	-- Get quadrant-specific elements
 	local T = self.quadrants[quad]
-	--local SS = setSubsetFuncs[quad]
 	local SS = setSubsetFuncs[effQuad]
 
 	-- Call the quadrant function to do the work
@@ -329,26 +314,22 @@ function ArcHUDRingTemplate:SetAngle(angle)
 	self.dirty = false
 end
 
-
-
----------------------------------------------------------------------------
--- Some handy method functions
-
+-----------------------------------------------------------
 -- StatsRingRingTemplate:CallTextureMethod(method, ...)
 --
 -- Invokes the named method on all of the textures in the ring,
 -- passing in whatever arguments are given.
 --
 --  e.g. ring:CallTextureMethod("SetVertexColor", 1.0, 0.5, 0.2, 1.0)
-
+-----------------------------------------------------------
 function ArcHUDRingTemplate:CallTextureMethod(method, ...)
-   self.quadrants[1][method](self.quadrants[1], ...)
-   self.quadrants[2][method](self.quadrants[2], ...)
-   self.chip[method](self.chip, ...)
-   self.slice[method](self.slice, ...)
+	self.quadrants[1][method](self.quadrants[1], ...)
+	self.quadrants[2][method](self.quadrants[2], ...)
+	self.chip[method](self.chip, ...)
+	self.slice[method](self.slice, ...)
 end
 
-
+-----------------------------------------------------------
 -- StatsRingRingTemplate:SetRingTextures(ringFactor,ringTexFile,sliceTexFile)
 --
 -- Sets the textures to use for self ring
@@ -357,62 +338,73 @@ end
 --   ringFactor   - The ring factor (Inner Radius / Outer Radius)
 --   ringTexFile  - The ring texture filename
 --   sliceTexFile - The slice texture filename
+-----------------------------------------------------------
+function ArcHUDRingTemplate:SetRingTextures(ringFactor, ringTexture, sliceTexture)
+	--DEFAULT_CHAT_FRAME:AddMessage("called setringtextures")
+	local savedAngle = self.angle
+	self.angle = nil
+	self.lastQuad = nil
 
-function ArcHUDRingTemplate:SetRingTextures(ringFactor,
-						      ringTexture,
-						      sliceTexture)
-	DEFAULT_CHAT_FRAME:AddMessage("called setringtextures")
-   local savedAngle = self.angle
-   self.angle = nil
-   self.lastQuad = nil
+	self.ringFactor = ringFactor
 
-   self.ringFactor = ringFactor
+	for i=1,2 do
+		self.quadrants[i]:SetTexture(ringTexture)
+	end
+	self.chip:SetTexture(ringTexture)
+	self.slice:SetTexture(sliceTexture)
 
-   for i=1,2 do
-      self.quadrants[i]:SetTexture(ringTexture)
-   end
-   self.chip:SetTexture(ringTexture)
-   self.slice:SetTexture(sliceTexture)
-
-   if (savedAngle) then
-      self:SetAngle(savedAngle)
-   end
+	if (savedAngle) then
+		self:SetAngle(savedAngle)
+	end
 end
 
+-----------------------------------------------------------
 -- Method function to set whether or not ring growth is reversed.
 --
 -- Param:
 --  self       - The ring template instance
 --  isReversed - Whether to reverse or not
+-----------------------------------------------------------
 function ArcHUDRingTemplate:SetReversed(isReversed)
-   if (isReversed) then
-      isReversed = true
-   else
-      isReversed = nil
-   end
-   if (isReversed == self.reversed) then
-      return
-   end
-   self.reversed = isReversed
-   self.dirty = true
+	if (isReversed) then
+		isReversed = true
+	else
+		isReversed = nil
+	end
+	if (isReversed == self.reversed) then
+		return
+	end
+	self.reversed = isReversed
+	self.dirty = true
 end
 
+-----------------------------------------------------------
+-- Set maximum value for ring (i.e., value equivalent to 100%)
+-----------------------------------------------------------
 function ArcHUDRingTemplate:SetMax(max)
 	if max == nil then max = 1 end
 	self.maxValue = max
 end
 
+-----------------------------------------------------------
+-- Set current value for ring
+-----------------------------------------------------------
 function ArcHUDRingTemplate:SetValue(value)
 	if value == nil then value = 0 end
 	if value == 0 then
 		value = self.maxValue / 10000
 	end
 	if self.casting == 1 then
-		self.startValue = value end
+		self.startValue = value
+	end
 	self.endValue = value
 	self.fadeTime = 0
 end
 
+-----------------------------------------------------------
+-- Update ring filling towards set value
+-- Should be called at least every 40ms for smooth animation
+-----------------------------------------------------------
 function ArcHUDRingTemplate:DoFadeUpdate(tdelta)
 	if self.fadeTime < self.maxFadeTime then
 		self.fadeTime = self.fadeTime + tdelta
@@ -427,55 +419,14 @@ function ArcHUDRingTemplate:DoFadeUpdate(tdelta)
 			self.ringFactor = 0.9 + ((90 - angle) / (90/0.1))
 		elseif angle <= 180 then
 			self.ringFactor = 0.9 + ((angle - 90) / (90/0.1))
-		--[[
-		elseif angle <= 270 then
-			self.ringFactor = 0.9 + ((270 - angle) / (90/0.1))
-		elseif angle > 270 then
-			self.ringFactor = 0.9 + ((angle - 270) / (90/0.1))
-		]]
 		end
 		self:SetAngle((self.startValue / self.maxValue) * 180)
 	end
 end
 
-function ArcHUDRingTemplate:AlphaUpdate(elapsed)
---[[
-	if getglobal(self:GetName() .. "MoveAnchor"):IsVisible() then
-		self:SetAlpha(0.8)
-		self:SetAngle(180)
-		return
-	end
-]]
-	if(not self.fadeIn) then
-		self.fadeIn = 1
-	end
-	if(not self.fadeOut) then
-		self.fadeOut = 1
-	end
-	local destAlpha = self.destAlpha
-	if (not destAlpha) then
-		return
-	end
-	local nowAlpha = self:GetAlpha()
-	if (nowAlpha < destAlpha) then
-		nowAlpha = nowAlpha + (elapsed/self.fadeIn)
-		if (nowAlpha > destAlpha) then
-			nowAlpha = destAlpha
-		end
-	elseif (nowAlpha > destAlpha) then
-		nowAlpha = nowAlpha - (elapsed/self.fadeOut)
-		if (nowAlpha < destAlpha) then
-			nowAlpha = destAlpha
-		end
-	end
-
-	self:SetAlpha(nowAlpha)
-
-	if (destAlpha == nowAlpha) then
-		self.destAlpha = nil
-	end
-end
-
+-----------------------------------------------------------
+-- Set ring alpha value
+-----------------------------------------------------------
 function ArcHUDRingTemplate:SetRingAlpha(destAlpha, instant)
 	if (destAlpha < 0) then
 		destAlpha = 0.0
@@ -483,15 +434,25 @@ function ArcHUDRingTemplate:SetRingAlpha(destAlpha, instant)
 		destAlpha = 1.0
 	end
 
-	if (instant) then
+	if (instant or not self.applyAlpha) then
 		self:SetAlpha(destAlpha)
 		self.destAlpha = nil
 		return
+		
 	elseif (self.destAlpha ~= destAlpha) then
+		ArcHUD:LevelDebug(1, "ArcHUDRingTemplate:SetRingAlpha("..tostring(destAlpha).."), current "..tostring(self.destAlpha)..", name "..tostring(self:GetName()))
 		self.destAlpha = destAlpha
+		if (self.applyAlpha:IsPlaying()) then
+			self.applyAlpha:Pause()
+		end
+		self.applyAlpha.alphaAnim:SetChange(destAlpha - self:GetAlpha())
+		self.applyAlpha:Play()
 	end
 end
 
+-----------------------------------------------------------
+-- Set ring color
+-----------------------------------------------------------
 function ArcHUDRingTemplate:UpdateColor(color)
 	if color == nil then
 		color = {["r"] = 1, ["g"] = 0.6, ["b"] = 0.1}
@@ -501,14 +462,22 @@ function ArcHUDRingTemplate:UpdateColor(color)
   	end
 end
 
-function ArcHUDRingTemplate:UpdateAlpha(elapsed)
+-----------------------------------------------------------
+-- Trigger update of alpha value (e.g. on entering combat)
+-- TODO: maybe change to event-based triggers
+-----------------------------------------------------------
+function ArcHUDRingTemplate:CheckAlpha(elapsed)
+	if (self.noAutoAlpha) then
+		self:Debug(1, "WARN: noAutoAlpha, but CheckAlpha timer started!")
+		return
+	end
+
 	local isInCombat = false
 	local me = self:GetName()
+	local unit = self.unit or self:GetParent().unit or "player"
 
-	if ((self == self.parent:GetModule("PetHealth", true)) or (self == self.parent:GetModule("PetPower", true))) then
+	if (unit == "pet") then
 		isInCombat = self.parent.PetIsInCombat
-	elseif(string.find(self.name, "Party")) then
-		isInCombat = self.isInCombat or false
 	else
 		isInCombat = self.parent.PlayerIsInCombat
 	end
@@ -518,37 +487,32 @@ function ArcHUDRingTemplate:UpdateAlpha(elapsed)
 		local camt = math.cos(self.f.alphaPulse * self.f.twoPi) * 0.3
 		self.f:SetAlpha(0.5-camt)
 	else
+		-- 1: Fade out when rings are full, regardless of combat status
+		-- 2: Always fade out when out of combat, regardless of ring status
+		-- 3: Fade out when out of combat or rings are full
 		if(self.parent.db.profile.RingVisibility == 1 or self.parent.db.profile.RingVisibility == 3) then
-
 			if(self.parent.db.profile.RingVisibility == 3 and isInCombat) then
-				if(me == "TargetHealth" and UnitIsDead("target") or me == "FocusHealth" and UnitIsDead("focus")) then
+				if (not UnitExists(unit)) or (self.isPower and (UnitIsDead(unit) or self.f.maxValue == 0)) then
+					self.f:SetRingAlpha(0)
+				elseif (self.isHealth and UnitIsDead(unit)) then
 					self.f:SetRingAlpha(self.parent.db.profile.FadeFull)
-				elseif(me == "TargetPower" and (UnitIsDead("target") or self.f.maxValue == 0) or me == "FocusPower" and (UnitIsDead("focus") or self.f.maxValue == 0)) then
-					self.f:SetRingAlpha(0)
-				elseif(string.find(me, "Target") and not UnitExists("target") or string.find(me, "Focus") and not UnitExists("focus")) then
-					self.f:SetRingAlpha(0)
-				elseif(string.find(me, "Pet") and not UnitExists("pet")) then
-					self.f:SetRingAlpha(0)
 				else
 					self.f:SetRingAlpha(self.parent.db.profile.FadeIC)
 				end
 			else
-				local _, powerTypeStr = UnitPowerType(self.unit or self:GetParent().unit or "player")
-				if(string.find(me, "Power") and me ~= "PetPower" and (powerTypeStr == "RAGE" or powerTypeStr == "RUNIC_POWER") and self.f.maxValue > 0) then
+				local powerTypeId, _ = UnitPowerType(unit)
+				-- powerTypeId: 1 = rage, 6 = runic_power
+				if (self.isPower and unit ~= "pet" and (powerTypeId == 1 or powerTypeId == 6) and self.f.maxValue > 0) then
 					if(math.floor(self.f.startValue) > 0) then
 						self.f:SetRingAlpha(self.parent.db.profile.FadeOOC)
 					elseif(math.floor(self.f.startValue) == 0) then
 						self.f:SetRingAlpha(self.parent.db.profile.FadeFull)
 					end
 				else
-					if(me == "TargetHealth" and UnitIsDead("target") or me == "FocusHealth" and UnitIsDead("focus")) then
+					if (not UnitExists(unit)) or (self.isPower and (UnitIsDead(unit) or self.f.maxValue == 0)) then
+						self.f:SetRingAlpha(0)
+					elseif (self.isHealth and UnitIsDead(unit)) then
 						self.f:SetRingAlpha(self.parent.db.profile.FadeFull)
-					elseif(me == "TargetPower" and (UnitIsDead("target") or self.f.maxValue == 0) or me == "FocusPower" and (UnitIsDead("focus") or self.f.maxValue == 0)) then
-						self.f:SetRingAlpha(0)
-					elseif(string.find(me, "Target") and not UnitExists("target") or string.find(me, "Focus") and not UnitExists("focus")) then
-						self.f:SetRingAlpha(0)
-					elseif(string.find(me, "Pet") and not UnitExists("pet")) then
-						self.f:SetRingAlpha(0)
 					else
 						if(self.f.startValue < self.f.maxValue) then
 							self.f:SetRingAlpha(self.parent.db.profile.FadeOOC)
@@ -560,15 +524,11 @@ function ArcHUDRingTemplate:UpdateAlpha(elapsed)
 			end
 
 		elseif(self.parent.db.profile.RingVisibility == 2) then
-
-			if(me == "TargetHealth" and UnitIsDead("target") or me == "FocusHealth" and UnitIsDead("focus")) then
+		
+			if ((not UnitExists(unit)) or (self.isPower and (UnitIsDead(unit) or self.f.maxValue == 0))) then
+				self.f:SetRingAlpha(0)
+			elseif (self.isHealth and UnitIsDead(unit)) then
 				self.f:SetRingAlpha(self.parent.db.profile.FadeFull)
-			elseif(me == "TargetPower" and (UnitIsDead("target") or self.f.maxValue == 0) or me == "FocusPower" and (UnitIsDead("focus") or self.f.maxValue == 0)) then
-				self.f:SetRingAlpha(0)
-			elseif(string.find(me, "Target") and not UnitExists("target") or string.find(me, "Focus") and not UnitExists("focus")) then
-				self.f:SetRingAlpha(0)
-			elseif(string.find(me, "Pet") and not UnitExists("pet")) then
-				self.f:SetRingAlpha(0)
 			else
 				if(isInCombat) then
 					self.f:SetRingAlpha(self.parent.db.profile.FadeIC)
@@ -576,18 +536,27 @@ function ArcHUDRingTemplate:UpdateAlpha(elapsed)
 					self.f:SetRingAlpha(self.parent.db.profile.FadeFull)
 				end
 			end
+			
 		end
 	end
 end
 
+-----------------------------------------------------------
+-- (Un)set ghost mode
+-----------------------------------------------------------
 function ArcHUDRingTemplate:GhostMode(state, unit)
 	local color = {["r"] = 0.75, ["g"] = 0.75, ["b"] = 0.75}
 	local fh, fm
-	if(unit == "player") then
+	if (unit == "player") then
 		fh, fm = ArcHUD:GetModule("Health"), ArcHUD:GetModule("Power")
 	else
-		fh, fm = ArcHUD:GetModule("TargetHealth"), ArcHUD:GetModule("TargetPower")
+		local capUnit = ArcHUD:strcap(unit)
+		fh, fm = ArcHUD:GetModule(capUnit.."Health", true), ArcHUD:GetModule(capUnit.."Power", true)
+		if (not fh or not fm) then
+			return
+		end
 	end
+	
 	if(state) then
 		-- Prepare health ring
 		if(fh and not fh.f.pulse) then
@@ -596,11 +565,11 @@ function ArcHUDRingTemplate:GhostMode(state, unit)
 			fh.f:SetMax(1)
 			fh.f:SetValue(1)
 			if(unit == "player") then
-				fh.HPText:SetText("Dead")
+				fh.HPText:SetText(DEAD)
 				fh.HPText:SetTextColor(1, 0, 0)
 				fh.HPPerc:SetText("")
 			else
-				fh.HPPerc:SetText("Dead")
+				fh.HPPerc:SetText(DEAD)
 			end
 			-- Enable pulsing
 			fh.f.pulse = true
@@ -679,7 +648,6 @@ function ArcHUDRingTemplate:OnLoad(frame)
 	frame.pulse = false
 	frame.alphaPulse = 0
 
-
 	-- Set angle to zero (initializes texture visibility)
 	frame:SetAngle(0)
 end
@@ -715,5 +683,4 @@ function ArcHUDRingTemplate:OnLoadBG(frame)
 	frame:UpdateColor({r = 0, g = 0, b = 0})
 	frame.UpdateColor = nil
 	frame.CallTextureMethod = nil
-
 end

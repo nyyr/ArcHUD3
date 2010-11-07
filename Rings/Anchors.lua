@@ -1,5 +1,7 @@
 local module = ArcHUD:NewModule("Anchors")
 
+module.noAutoAlpha = true
+
 module.defaults = {
 	profile = {
 		Enabled = true

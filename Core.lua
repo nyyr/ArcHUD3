@@ -5,11 +5,12 @@ ArcHUD = LibStub("AceAddon-3.0"):NewAddon("ArcHUD",
 	"AceConsole-3.0",
 	"AceEvent-3.0",
 	"AceHook-3.0")
+--	"LibShefkiTimer-1.0")
 
 -- Version
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-ArcHUD.version = "0.9 (r"..rev..")"
-ArcHUD.codename = "Phoenix"
+ArcHUD.version = "1.0 (r"..rev..")"
+ArcHUD.codename = "Plainsrunner"
 ArcHUD.authors = "nyyr, Nenie"
 
 -- Locale object
@@ -1141,11 +1142,11 @@ function ArcHUD:OnMetroUpdate(elapsed)
 		if v.running then
 			v.elapsed = v.elapsed + elapsed
 			if v.elapsed >= v.rate then
-				-- local mem, time = gcinfo(), GetTime()
+				local mem, time = gcinfo(), GetTime()
 				-- ArcHUD:LevelDebug(d_notice, "Metronome is calling "..i.." ("..elapsed.."s)")
 				v.func(v.a1 or v.arg, v.a2 or v.elapsed, v.a3, v.a4, v.a5, v.a6)
-				-- mem, time = gcinfo() - mem, GetTime() - time
-				-- if mem >= 0 then v.mem, v.time, v.count = (v.mem or 0) + mem, (v.time or 0) + time, (v.count or 0) + 1 end
+				mem, time = gcinfo() - mem, GetTime() - time
+				if mem >= 0 then v.mem, v.time, v.count = (v.mem or 0) + mem, (v.time or 0) + time, (v.count or 0) + 1 end
 				v.elapsed = 0
 				if v.limit then v.limit = v.limit - 1 end
 				if v.limit and v.limit <= 0 then ArcHUD:StopMetro(i) end
@@ -1195,4 +1196,19 @@ function ArcHUD:StopMetro(name)
 	self.metroHandlers[name].limit = nil
 	if not next(self.metroHandlers) then self.metroFrame:Hide() end
 	return true
+end
+
+
+function ArcHUD:MetroPrintPerf()
+	local n = 0
+	local count, mem, time = 0, 0, 0
+	for i,v in pairs(ArcHUD.metroHandlers) do
+		self:Print(tostring(i)..": "..tostring(v.count).."x "..tostring(v.mem).."bytes "..tostring(v.time).."s")
+		n = n + 1
+		if (v.count) then count = count + v.count end
+		if (v.mem) then mem = mem + v.mem end
+		if (v.time) then time = time + v.time end
+	end
+	self:Print(tostring(n).." registered")
+	self:Print("Totals: "..tostring(count).."x "..tostring(mem).."bytes "..tostring(time).."s")
 end

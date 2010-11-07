@@ -4,8 +4,11 @@ local LM = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Module")
 local moduleName = "MirrorTimer"
 local module = ArcHUD:NewModule(moduleName)
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "0.9 (r"..rev..")"
+module.version = "1.0 (r"..rev..")"
+
 module.unit = "player"
+module.noAutoAlpha = true
+
 module.defaults = {
 	profile = {
 		Enabled = true,
@@ -69,10 +72,8 @@ function module:OnModuleEnable()
 	self:RegisterEvent("MIRROR_TIMER_STOP")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 
-	-- Activate the timers
-	self.parent:StartMetro(self.name .. "Update")
-	self.parent:StartMetro(self.name .. "Alpha")
-	self.parent:StartMetro(self.name .. "Fade")
+	-- Activate ring timers
+	self:StartRingTimers()
 
 	if(not self.timers) then
 		self.timers = {count = 0}

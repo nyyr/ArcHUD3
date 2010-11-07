@@ -160,6 +160,7 @@ LM["DruidMana"]		= "Druid Mana"
 LM["MirrorTimer"]	= "Mirror Timer"
 LM["ComboPoints"]	= "Combo Points"
 LM["EnergyTick"]	= "Energy Tick"
+LM["HolyPower"]		= "Holy Power"
 
 LM["TEXT"] = {
 	TITLE		= "Arcs Options",

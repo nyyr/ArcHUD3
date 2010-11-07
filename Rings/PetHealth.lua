@@ -1,8 +1,11 @@
 local moduleName = "PetHealth"
 local module = ArcHUD:NewModule(moduleName)
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "0.9 (r"..rev..")"
+module.version = "1.0 (r"..rev..")"
+
 module.unit = "pet"
+module.isHealth = true
+
 module.defaults = {
 	profile = {
 		Enabled = true,
@@ -100,10 +103,8 @@ function module:OnModuleEnable()
 	self:RegisterEvent("UNIT_MAXHEALTH", 		"UpdateHealth")
 	--f:RegisterEvent("PET_UI_CLOSE")
 
-	-- Activate the timers
-	self.parent:StartMetro(self.name .. "Alpha")
-	self.parent:StartMetro(self.name .. "Fade")
-	self.parent:StartMetro(self.name .. "Update")
+	-- Activate ring timers
+	self:StartRingTimers()
 
 	self.f:Show()
 end
