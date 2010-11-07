@@ -112,12 +112,32 @@ ArcHUD.configOptionsTableCore = {
 			name		= L["TEXT"]["DISPLAY"],
 			order		= 10,
 			args		= {
+				-- Player Frame
+				playerFrame = {
+					type		= "toggle",
+					name		= L["TEXT"]["PLAYERFRAME"],
+					desc		= L["TOOLTIP"]["PLAYERFRAME"],
+					order		= 0,
+					get			= function ()
+						return ArcHUD.db.profile.PlayerFrame
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.PlayerFrame = v
+						if (v) then
+							ArcHUD.Nameplates.player:Show()
+							ArcHUD.Nameplates.pet:Show()
+						else
+							ArcHUD.Nameplates.player:Hide()
+							ArcHUD.Nameplates.pet:Hide()
+						end
+					end,
+				},
 				-- Target Frame
 				targetFrame = {
 					type		= "toggle",
 					name		= L["TEXT"]["TARGETFRAME"],
 					desc		= L["TOOLTIP"]["TARGETFRAME"],
-					order		= 0,
+					order		= 1,
 					get			= function ()
 						return ArcHUD.db.profile.TargetFrame
 					end,
@@ -131,7 +151,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["PLAYERMODEL"],
 					desc		= L["TOOLTIP"]["PLAYERMODEL"],
-					order		= 1,
+					order		= 2,
 					get			= function ()
 						return ArcHUD.db.profile.PlayerModel
 					end,
@@ -145,7 +165,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["MOBMODEL"],
 					desc		= L["TOOLTIP"]["MOBMODEL"],
-					order		= 2,
+					order		= 3,
 					get			= function ()
 						return ArcHUD.db.profile.MobModel
 					end,
@@ -159,7 +179,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["SHOWGUILD"],
 					desc		= L["TOOLTIP"]["SHOWGUILD"],
-					order		= 3,
+					order		= 4,
 					get			= function ()
 						return ArcHUD.db.profile.ShowGuild
 					end,
@@ -173,7 +193,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["SHOWCLASS"],
 					desc		= L["TOOLTIP"]["SHOWCLASS"],
-					order		= 4,
+					order		= 5,
 					get			= function ()
 						return ArcHUD.db.profile.ShowClass
 					end,
@@ -187,7 +207,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["SHOWBUFFS"],
 					desc		= L["TOOLTIP"]["SHOWBUFFS"],
-					order		= 5,
+					order		= 6,
 					get			= function ()
 						return ArcHUD.db.profile.ShowBuffs
 					end,
@@ -210,7 +230,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["SHOWPVP"],
 					desc		= L["TOOLTIP"]["SHOWPVP"],
-					order		= 6,
+					order		= 7,
 					get			= function ()
 						return ArcHUD.db.profile.ShowPVP
 					end,
@@ -224,7 +244,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["TOT"],
 					desc		= L["TOOLTIP"]["TOT"],
-					order		= 7,
+					order		= 8,
 					get			= function ()
 						return ArcHUD.db.profile.TargetTarget
 					end,
@@ -238,7 +258,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["TOTOT"],
 					desc		= L["TOOLTIP"]["TOTOT"],
-					order		= 8,
+					order		= 9,
 					get			= function ()
 						return ArcHUD.db.profile.TargetTargetTarget
 					end,
@@ -252,7 +272,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["BLIZZPLAYER"],
 					desc		= L["TOOLTIP"]["BLIZZPLAYER"],
-					order		= 9,
+					order		= 10,
 					get			= function ()
 						return ArcHUD.db.profile.BlizzPlayer
 					end,
@@ -266,7 +286,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["BLIZZTARGET"],
 					desc		= L["TOOLTIP"]["BLIZZTARGET"],
-					order		= 10,
+					order		= 11,
 					get			= function ()
 						return ArcHUD.db.profile.BlizzTarget
 					end,
@@ -280,7 +300,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["BLIZZFOCUS"],
 					desc		= L["TOOLTIP"]["BLIZZFOCUS"],
-					order		= 10,
+					order		= 12,
 					get			= function ()
 						return ArcHUD.db.profile.BlizzFocus
 					end,

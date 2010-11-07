@@ -194,12 +194,11 @@ end
 function ArcHUD:CreateHUDFrames()
 	-- Main frame (defined in Frames.xml)
 	local main = ArcHUDFrame
+	local targethud = ArcHUDFrame.TargetHUD
+	
+	--AH_CreateMoverFrame(targethud, "targethud", {320, 120}, {"TOPLEFT", -10, 10}, {"TOP", main, "BOTTOM", 0, -50})
 
-	-- Create target hud frame
-	local targethud = AH_CreateFrame("Frame", nil, main, {300, 100}, {"TOP", main, "BOTTOM", 0, -50}, nil)
-	AH_CreateMoverFrame(targethud, "targethud", {320, 120}, {"TOPLEFT", -10, 10}, {"TOP", main, "BOTTOM", 0, -50})
-
-	-- Create font strings
+	-- Set up font strings
 	targethud.Combo = AH_CreateFontString(main, "BACKGROUND", {40, 30}, 30, "CENTER", {1, 1, 0}, {"BOTTOM", main, "BOTTOM"}, "ArcHUDFrameCombo")
 	targethud.Name = AH_CreateFontString(targethud, "OVERLAY", {400, 16}, 15, "CENTER", {1, 1, 1}, {"TOP", targethud, "TOP"})
 	targethud.HPText = AH_CreateFontString(targethud, "OVERLAY", {200, 14}, 13, "RIGHT", {1, 1, 1}, {"TOPLEFT", targethud.Name, "BOTTOMLEFT", -50, 0})

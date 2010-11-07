@@ -9,7 +9,7 @@ ArcHUD = LibStub("AceAddon-3.0"):NewAddon("ArcHUD",
 
 -- Version
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-ArcHUD.version = "1.0 (r"..rev..")"
+ArcHUD.version = "1.0 alpha (r"..rev..")"
 ArcHUD.codename = "Plainsrunner"
 ArcHUD.authors = "nyyr, Nenie"
 
@@ -36,6 +36,7 @@ local cfgDefaults = {
 	profile = {
 		Debug = nil,
 		TargetFrame = true,
+		PlayerFrame = true,
 		PlayerModel = true,
 		MobModel = false,
 		ShowGuild = true,
@@ -227,6 +228,14 @@ function ArcHUD:OnProfileEnable()
 	end
 	if(self.db.profile.BlizzFocus and self.BlizzFocusHidden or not self.db.profile.BlizzFocus and not self.BlizzFocusHidden) then
 		self:HideBlizzardFocus(self.db.profile.BlizzFocus)
+	end
+	
+	if (self.db.profile.PlayerFrame) then
+		self.Nameplates.player:Show()
+		self.Nameplates.pet:Show()
+	else
+		self.Nameplates.player:Hide()
+		self.Nameplates.pet:Hide()
 	end
 	
 	if(self.db.profile.TargetFrame) then
@@ -550,7 +559,7 @@ function ArcHUD:TargetUpdate(event, arg1)
 		if(self.BlizzTargetHidden and not self.updating) then
 			PlaySound("INTERFACESOUND_LOSTTARGETUNIT")
 		end
-		if(self.TargetHUD.locked) then
+		if (not self.TargetHUD.locked) then
 			self.TargetHUD:SetAlpha(0)
 		else
 			self.TargetHUD:SetAlpha(1)

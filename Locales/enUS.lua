@@ -23,6 +23,7 @@ L["TEXT"] = {
 	TITLE		= "ArcHUD3 Options",
 
 	DISPLAY		= "Display options",
+	PLAYERFRAME	= "Show player frame",
 	TARGETFRAME	= "Target frame",
 	PLAYERMODEL	= "3D model for players",
 	MOBMODEL	= "3D model for mobs",
@@ -86,6 +87,7 @@ L["TEXT"] = {
 }
 
 L["TOOLTIP"] = {
+	PLAYERFRAME	= "Toggle display of player and pet nameplates",
 	TARGETFRAME = "Toggle display of entire target frame",
 	PLAYERMODEL = "Toggle display of 3D target model of players",
 	MOBMODEL	= "Toggle display of 3D target model of mobs",
@@ -161,6 +163,7 @@ LM["MirrorTimer"]	= "Mirror Timer"
 LM["ComboPoints"]	= "Combo Points"
 LM["EnergyTick"]	= "Energy Tick"
 LM["HolyPower"]		= "Holy Power"
+LM["SoulShards"]	= "Soul Shards"
 
 LM["TEXT"] = {
 	TITLE		= "Arcs Options",

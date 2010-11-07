@@ -14,6 +14,7 @@
 <Script file="FocusHealth.lua" />
 <Script file="FocusPower.lua" />
 <Script file="HolyPower.lua" />
+<Script file="SoulShards.lua" />
 <!-- <Script file="DruidMana.lua" /> -->
 <!-- <Script file="EnergyTick.lua" /> -->
 
