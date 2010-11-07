@@ -15,14 +15,13 @@ Locales\Locales.xml
 
 # Core addon
 Core.lua
-Frames.lua
+Frames.xml
 ComboPoints.lua
 Nameplates.lua
 Utils.lua
 
 # Module core
 RingTemplate.xml
-RingTemplate.lua
 ModuleCore.lua
 
 # Config

@@ -406,6 +406,9 @@ end
 -- Should be called at least every 40ms for smooth animation
 -----------------------------------------------------------
 function ArcHUDRingTemplate:DoFadeUpdate(tdelta)
+	if (self.UpdateHook) then
+		self:UpdateHook(tdelta)
+	end
 	if self.fadeTime < self.maxFadeTime then
 		self.fadeTime = self.fadeTime + tdelta
 		if self.fadeTime > self.maxFadeTime then
@@ -489,7 +492,7 @@ function ArcHUDRingTemplate:CheckAlpha(elapsed)
 	else
 		-- 1: Fade out when rings are full, regardless of combat status
 		-- 2: Always fade out when out of combat, regardless of ring status
-		-- 3: Fade out when out of combat or rings are full
+		-- 3: Fade out when out of combat or rings are full (default)
 		if(self.parent.db.profile.RingVisibility == 1 or self.parent.db.profile.RingVisibility == 3) then
 			if(self.parent.db.profile.RingVisibility == 3 and isInCombat) then
 				if (not UnitExists(unit)) or (self.isPower and (UnitIsDead(unit) or self.f.maxValue == 0)) then
@@ -604,18 +607,23 @@ end
 -- The OnLoad method, call self for each template object to set it up and
 -- get things going
 function ArcHUDRingTemplate:OnLoad(frame)
+
+	frame.quadrants = {}
+	frame.quadrants[1] = frame.ringQuadrant1
+	frame.quadrants[2] = frame.ringQuadrant2
+
 	--  Just do global self resolution once.
 	--local self = self
 
 	-- Grab texture references and frame name
 	--frame.name = frame
-	if(not frame.quadrants) then
-		frame.quadrants = {}
-		frame.quadrants[1] = getglobal(frame.name .. "TQ1")
-		frame.quadrants[2] = getglobal(frame.name .. "TQ2")
-		frame.chip         = getglobal(frame.name .. "TC")
-		frame.slice        = getglobal(frame.name .. "TS")
-	end
+	-- if(not frame.quadrants) then
+		-- frame.quadrants = {}
+		-- frame.quadrants[1] = getglobal(frame.name .. "TQ1")
+		-- frame.quadrants[2] = getglobal(frame.name .. "TQ2")
+		-- frame.chip         = getglobal(frame.name .. "TC")
+		-- frame.slice        = getglobal(frame.name .. "TS")
+	-- end
 
 	-- Initialize size and default texture ringFactor
 	frame.radius = (frame:GetWidth() * 0.5)
@@ -647,22 +655,30 @@ function ArcHUDRingTemplate:OnLoad(frame)
 	frame.twoPi = (frame.PI * 2)
 	frame.pulse = false
 	frame.alphaPulse = 0
+	
+	-- Animation groups
+	frame.fillUpdate = frame.fillUpdateFrame.fillUpdate
 
 	-- Set angle to zero (initializes texture visibility)
 	frame:SetAngle(0)
 end
 
 function ArcHUDRingTemplate:OnLoadBG(frame)
+
+	frame.quadrants = {}
+	frame.quadrants[1] = frame.ringQuadrant1
+	frame.quadrants[2] = frame.ringQuadrant2
+
 	-- Grab texture references and frame name
 	--frame.name = frame
 --	frame.name = frame
-	if(not frame.quadrants) then
-		frame.quadrants = {}
-		frame.quadrants[1] = getglobal(frame.name .. "TQ1")
-		frame.quadrants[2] = getglobal(frame.name .. "TQ2")
-		frame.chip         = getglobal(frame.name .. "TC")
-		frame.slice        = getglobal(frame.name .. "TS")
-	end
+	-- if(not frame.quadrants) then
+		-- frame.quadrants = {}
+		-- frame.quadrants[1] = getglobal(frame.name .. "TQ1")
+		-- frame.quadrants[2] = getglobal(frame.name .. "TQ2")
+		-- frame.chip         = getglobal(frame.name .. "TC")
+		-- frame.slice        = getglobal(frame.name .. "TS")
+	-- end
 
 	-- Initialize size and default texture ringFactor
 	frame.radius = (frame:GetWidth() * 0.5)

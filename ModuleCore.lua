@@ -355,13 +355,6 @@ function ArcHUD.modulePrototype:OnInitialize()
 	if(not self.date) then
 		self.date = self.parent.date
 	end
-
-	self:Debug(d_notice, "Registering Metrognome timers")
-	
-	-- Gradually updates ring filling towards set value
-	if(not self.parent:MetroStatus(self.name .. "Fade")) then
-		self.parent:RegisterMetro(self.name .. "Fade", ArcHUDRingTemplate.DoFadeUpdate, 0.02, self.f)
-	end
 	
 	-- Check for necessary alpha updates (e.g. on entering combat)
 	-- TODO: maybe change to event-based triggers
@@ -525,31 +518,7 @@ end
 function ArcHUD.modulePrototype:CreateRing(hasBG, parent)
 	-- Create frame
 	local f = CreateFrame("Frame", "ArcHUD_"..self:GetName().."_Ring", parent, "ArcHUDRingTemplate")
-	f:SetFrameStrata("BACKGROUND")
-	f:SetFrameLevel(10)
-
-	f.quadrants = {}
-	f.quadrants[1] = f.ringQuadrant1
-	f.quadrants[2] = f.ringQuadrant2
-
-	-- Set up frame
-	ArcHUDRingTemplate:OnLoad(f)
-
-	if(hasBG) then
-		-- Create frame
-		local fBG = CreateFrame("Frame", "ArcHUD_"..self:GetName().."_Ring_BG", f, "ArcHUDRingTemplateBG")
-		fBG:SetFrameLevel(0)
-		fBG:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 0, 0)
-
-		fBG.quadrants = {}
-		fBG.quadrants[1] = fBG.ringQuadrant1
-		fBG.quadrants[2] = fBG.ringQuadrant2
-
-		-- Set up frame
-		ArcHUDRingTemplate:OnLoadBG(fBG)
-
-		f.BG = fBG
-	end
+	f.module = self
 
 	return f
 end
@@ -597,10 +566,12 @@ function ArcHUD.modulePrototype:CreateTexture(parent, layer, size, texture, poin
 end
 
 ----------------------------------------------
--- Start ring timers (filling and alpha)
+-- Start ring timers (filling and alpha check)
 ----------------------------------------------
 function ArcHUD.modulePrototype:StartRingTimers()
-	self.parent:StartMetro(self.name .. "Fade")
+	if (self.f:GetAlpha() > 0) then
+		self.f.fillUpdate:Play()
+	end
 	if (not self.noAutoAlpha) then
 		self.parent:StartMetro(self.name .. "CheckAlpha")
 	end

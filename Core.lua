@@ -4,8 +4,8 @@
 ArcHUD = LibStub("AceAddon-3.0"):NewAddon("ArcHUD",
 	"AceConsole-3.0",
 	"AceEvent-3.0",
-	"AceHook-3.0")
---	"LibShefkiTimer-1.0")
+	"AceHook-3.0",
+	"LibShefkiTimer-1.0")
 
 -- Version
 local _, _, rev = string.find("$Rev$", "([0-9]+)")

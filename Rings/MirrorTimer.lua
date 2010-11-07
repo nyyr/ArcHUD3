@@ -43,7 +43,7 @@ function module:Initialize()
 	self.Text[3] = self:CreateFontString(self.f, "BACKGROUND", {140, 16}, 14, "CENTER", {1.0, 1.0, 1.0}, {"TOPLEFT", self.Text[2], "BOTTOMLEFT", 0, 0})
 
 	-- Override Update timer
-	self.parent:RegisterMetro(self.name .. "Update", self.UpdateTimers, 0.05, self)
+	--self.parent:RegisterMetro(self.name .. "Update", self.UpdateTimers, 0.05, self)
 	
 	self:CreateStandardModuleOptions(50)
 end
@@ -60,30 +60,8 @@ function module:Update()
 	end
 end
 
-function module:OnModuleEnable()
-	self.f.fadeIn = 0.25
-	self.f.fadeOut = 2
-
-	self.f.dirty = true
-
-	-- Register the events we will use
-	self:RegisterEvent("MIRROR_TIMER_START")
-	self:RegisterEvent("MIRROR_TIMER_PAUSE")
-	self:RegisterEvent("MIRROR_TIMER_STOP")
-	self:RegisterEvent("PLAYER_ENTERING_WORLD")
-
-	-- Activate ring timers
-	self:StartRingTimers()
-
-	if(not self.timers) then
-		self.timers = {count = 0}
-		self.timer = 0
-	end
-
-	self.f:Show()
-end
-
-function module:UpdateTimers(elapsed)
+local function MirrorTimer_UpdateTimers(frame, elapsed)
+	self = frame.module
 	for i=1,MIRRORTIMER_NUMTIMERS do
 		if(self.timers[i] and not self.timers[i].paused) then
 			self.timers[i].value = self.timers[i].value + self.timers[i].scale * elapsed*1000
@@ -114,6 +92,32 @@ function module:UpdateTimers(elapsed)
 			self.Text[i]:SetText("")
 		end
 	end
+end
+
+function module:OnModuleEnable()
+	self.f.fadeIn = 0.25
+	self.f.fadeOut = 2
+
+	self.f.dirty = true
+
+	-- Register the events we will use
+	self:RegisterEvent("MIRROR_TIMER_START")
+	self:RegisterEvent("MIRROR_TIMER_PAUSE")
+	self:RegisterEvent("MIRROR_TIMER_STOP")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	
+	-- Add update hook
+	self.f.UpdateHook = MirrorTimer_UpdateTimers
+
+	-- Activate ring timers
+	self:StartRingTimers()
+
+	if(not self.timers) then
+		self.timers = {count = 0}
+		self.timer = 0
+	end
+
+	self.f:Show()
 end
 
 function module:MIRROR_TIMER_START(event, arg1, arg2, arg3, arg4, arg5, arg6)

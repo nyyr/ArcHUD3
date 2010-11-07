@@ -39,7 +39,6 @@ function module:Initialize()
 	self.Time = self:CreateFontString(self.f, "BACKGROUND", {40, 14}, 12, "RIGHT", {1.0, 1.0, 1.0}, {"TOPLEFT", self.Text, "TOPRIGHT", 0, 0})
 
 	-- Register timers
-	self.parent:RegisterMetro(self.name .. "Casting", self.Casting, 0.02, self)
 	--self.parent:RegisterMetro(self.name .. "CheckTaxi", self.CheckTaxi, 0.1, self)
 	
 	self:CreateStandardModuleOptions(15)
@@ -56,6 +55,50 @@ function module:Update()
 		self.Time:Show()
 	else
 		self.Time:Hide()
+	end
+end
+
+local function Player_Casting(frame, elapsed)
+	self = frame.module
+	if ( self.f.casting == nil ) then
+		self.f.casting = 0 end
+	if ( self.channeling == nil ) then
+		self.channeling = 0 end
+	if ( self.spellstart == nil ) then
+		self.spellstart = GetTime()*1000 end
+
+	if ( self.f.casting == 1) then
+		local status = (GetTime()*1000 - self.spellstart)
+		local time_remaining = self.f.maxValue - status
+
+		if ( self.channeling == 1) then
+			status = time_remaining
+		end
+
+		if ( status > self.f.maxValue ) then
+			status = self.f.maxValue
+		end
+
+		self.f:SetValue(status)
+
+		if ( time_remaining < 0 ) then
+			time_remaining = 0
+		end
+
+		local texttime = ""
+		if((time_remaining/1000) > 60) then
+			local minutes = math.floor(time_remaining/60000)
+			local seconds = math.floor(((time_remaining/60000) - minutes) * 60)
+			if(seconds < 10) then
+				texttime = minutes..":0"..seconds
+			else
+				texttime = minutes..":"..seconds
+			end
+		else
+			local intlength = string.len(string.format("%u",time_remaining/1000))
+			texttime = strsub(string.format("%f",time_remaining/1000),1,intlength+2)
+		end
+		self.Time:SetText(texttime)
 	end
 end
 
@@ -99,57 +142,14 @@ function module:OnModuleEnable()
 		self.using = "none"
 	end
 ]]
-
-	-- Activate the timers
-	self.parent:StartMetro(self.name .. "Casting")
+	
+	-- Add update hook
+	self.f.UpdateHook = Player_Casting
 	
 	-- Activate ring timers
 	self:StartRingTimers()
 
 	self.f:Show()
-end
-
-function module:Casting()
-	if ( self.f.casting == nil ) then
-		self.f.casting = 0 end
-	if ( self.channeling == nil ) then
-		self.channeling = 0 end
-	if ( self.spellstart == nil ) then
-		self.spellstart = GetTime()*1000 end
-
-	if ( self.f.casting == 1) then
-		local status = (GetTime()*1000 - self.spellstart)
-		local time_remaining = self.f.maxValue - status
-
-		if ( self.channeling == 1) then
-			status = time_remaining
-		end
-
-		if ( status > self.f.maxValue ) then
-			status = self.f.maxValue
-		end
-
-		self.f:SetValue(status)
-
-		if ( time_remaining < 0 ) then
-			time_remaining = 0
-		end
-
-		local texttime = ""
-		if((time_remaining/1000) > 60) then
-			local minutes = math.floor(time_remaining/60000)
-			local seconds = math.floor(((time_remaining/60000) - minutes) * 60)
-			if(seconds < 10) then
-				texttime = minutes..":0"..seconds
-			else
-				texttime = minutes..":"..seconds
-			end
-		else
-			local intlength = string.len(string.format("%u",time_remaining/1000))
-			texttime = strsub(string.format("%f",time_remaining/1000),1,intlength+2)
-		end
-		self.Time:SetText(texttime)
-	end
 end
 
 --[[

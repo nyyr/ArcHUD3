@@ -34,9 +34,6 @@ function module:Initialize()
 
 	self.Text = self:CreateFontString(self.f, "BACKGROUND", {175, 14}, 10, "LEFT", {1.0, 1.0, 1.0}, {"TOP", "ArcHUDFrameCombo", "BOTTOM", -28, -14})
 	self.Time = self:CreateFontString(self.f, "BACKGROUND", {40, 14}, 10, "RIGHT", {1.0, 1.0, 1.0}, {"TOPLEFT", self.Text, "TOPRIGHT", 0, 0})
-
-	-- Register timers
-	self.parent:RegisterMetro(self.name .. "Casting", self.Casting, 0.02, self)
 	
 	self:CreateStandardModuleOptions(30)
 end
@@ -55,35 +52,8 @@ function module:Update()
 	end
 end
 
-function module:OnModuleEnable()
-	self.OnTaxi = nil
-	self.flying = nil
-	self.f.fadeIn = 0.25
-	self.f.fadeOut = 2
-
-	self.f.dirty = true
-
-	-- Register the events we will use
-	self:RegisterEvent("UNIT_SPELLCAST_START")
-	self:RegisterEvent("UNIT_SPELLCAST_DELAYED")
-	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
-	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_UPDATE")
-
-	self:RegisterEvent("UNIT_SPELLCAST_STOP", 			"SpellcastStop")
-	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP", 	"SpellcastChannelStop")
-
-	self:RegisterEvent("PLAYER_TARGET_CHANGED")
-
-	-- Activate the timers
-	self.parent:StartMetro(self.name .. "Casting")
-	
-	-- Activate ring timers
-	self:StartRingTimers()
-
-	self.f:Show()
-end
-
-function module:Casting()
+local function Target_Casting(frame, elapsed)
+	self = frame.module
 	if ( self.f.casting == nil ) then
 		self.f.casting = 0 end
 	if ( self.channeling == nil ) then
@@ -127,6 +97,34 @@ function module:Casting()
 			self:SpellcastStop(self.unit)
 		end
 	end
+end
+
+function module:OnModuleEnable()
+	self.OnTaxi = nil
+	self.flying = nil
+	self.f.fadeIn = 0.25
+	self.f.fadeOut = 2
+
+	self.f.dirty = true
+
+	-- Register the events we will use
+	self:RegisterEvent("UNIT_SPELLCAST_START")
+	self:RegisterEvent("UNIT_SPELLCAST_DELAYED")
+	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
+	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_UPDATE")
+
+	self:RegisterEvent("UNIT_SPELLCAST_STOP", 			"SpellcastStop")
+	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP", 	"SpellcastChannelStop")
+
+	self:RegisterEvent("PLAYER_TARGET_CHANGED")
+
+	-- Add update hook
+	self.f.UpdateHook = Target_Casting
+	
+	-- Activate ring timers
+	self:StartRingTimers()
+
+	self.f:Show()
 end
 
 function module:PLAYER_TARGET_CHANGED()

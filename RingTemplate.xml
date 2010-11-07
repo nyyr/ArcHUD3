@@ -3,7 +3,7 @@
 
 <Script file="RingTemplate.lua" />
 
-<Frame name="ArcHUDRingTemplate" virtual="true">
+<Frame name="ArcHUDRingTemplate" frameStrata="BACKGROUND" frameLevel="10" virtual="true">
 	<Size x="256" y="256"/>
 	
 	<Layers>
@@ -14,6 +14,49 @@
 			<Texture name="$parentSlice" parentKey="slice"         file="Interface\Addons\ArcHUD3\Icons\Slice.tga"></Texture>
 		</Layer>
 	</Layers>
+	
+	<Frames>
+		<Frame name="$parentBG" frameLevel="0" parentKey="BG">
+			<Size x="256" y="256"/>
+			
+			<Anchors>
+				<Anchor point="BOTTOMLEFT" />
+			</Anchors>
+			
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="$parentQ1"    parentKey="ringQuadrant1" file="Interface\Addons\ArcHUD3\Icons\RingBG.tga"></Texture>
+					<Texture name="$parentQ2"    parentKey="ringQuadrant2" file="Interface\Addons\ArcHUD3\Icons\RingBG.tga"></Texture>
+					<Texture name="$parentChip"  parentKey="chip"          file="Interface\Addons\ArcHUD3\Icons\RingBG.tga"></Texture>
+					<Texture name="$parentSlice" parentKey="slice"         file="Interface\Addons\ArcHUD3\Icons\Slice.tga"></Texture>
+				</Layer>
+			</Layers>
+
+			<Scripts>
+				<OnLoad>
+					ArcHUDRingTemplate:OnLoadBG(self)
+				</OnLoad>
+			</Scripts>
+			
+		</Frame>
+		
+		<Frame name="$parentFillUpdateFrame" parentKey="fillUpdateFrame">
+			<Animations>
+				<AnimationGroup parentKey="fillUpdate" looping="REPEAT">
+					<Animation duration="1" maxFramerate="30" order="1">
+						<Scripts>
+							<OnLoad>
+								self.ring = self:GetParent():GetParent():GetParent();
+							</OnLoad>
+							<OnUpdate>
+								ArcHUDRingTemplate.DoFadeUpdate(self.ring, elapsed);
+							</OnUpdate>
+						</Scripts>
+					</Animation>
+				</AnimationGroup>
+			</Animations>
+		</Frame>
+	</Frames>
 
 	<Animations>
 		<AnimationGroup parentKey="applyAlpha">
@@ -22,26 +65,26 @@
 				<OnLoad>
 					self.ring = self:GetParent();
 				</OnLoad>
+				<OnPlay>
+					if (not self.ring.fillUpdate:IsPlaying()) then
+						self.ring.fillUpdate:Play();
+					end
+				</OnPlay>
 				<OnFinished>
 					self.ring:SetAlpha(self.ring.destAlpha);
+					if (self.ring.destAlpha == 0 and self.ring.fillUpdate:IsPlaying()) then
+						self.ring.fillUpdate:Stop();
+					end
 				</OnFinished>
 			</Scripts>
 		</AnimationGroup>
 	</Animations>
-
-</Frame>
-
-<Frame name="ArcHUDRingTemplateBG" virtual="true">
-	<Size x="256" y="256"/>
 	
-	<Layers>
-		<Layer level="BACKGROUND">
-			<Texture name="$parentQ1"    parentKey="ringQuadrant1" file="Interface\Addons\ArcHUD3\Icons\RingBG.tga"></Texture>
-			<Texture name="$parentQ2"    parentKey="ringQuadrant2" file="Interface\Addons\ArcHUD3\Icons\RingBG.tga"></Texture>
-			<Texture name="$parentChip"  parentKey="chip"          file="Interface\Addons\ArcHUD3\Icons\RingBG.tga"></Texture>
-			<Texture name="$parentSlice" parentKey="slice"         file="Interface\Addons\ArcHUD3\Icons\Slice.tga"></Texture>
-		</Layer>
-	</Layers>
+	<Scripts>
+		<OnLoad>
+			ArcHUDRingTemplate:OnLoad(self)
+		</OnLoad>
+	</Scripts>
 
 </Frame>
 
