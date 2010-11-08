@@ -158,7 +158,7 @@ function module:UpdatePowerType(event, arg1)
 			info = self:GetPowerBarColorText(UnitPowerType(self.unit))
 			self.MPText:SetVertexColor(info.r, info.g, info.b)
 		end
-		self:UpdatePower()
+		self:UpdatePowerBar()
 	end
 end
 

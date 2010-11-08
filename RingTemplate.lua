@@ -506,7 +506,7 @@ function ArcHUDRingTemplate:CheckAlpha(elapsed)
 				local powerTypeId, _ = UnitPowerType(unit)
 				-- powerTypeId: 1 = rage, 6 = runic_power
 				if (self.isPower and unit ~= "pet" and (powerTypeId == 1 or powerTypeId == 6) and self.f.maxValue > 0) then
-					if(math.floor(self.f.startValue) > 0) then
+					if(math.floor(self.f.startValue) > 0 or self.f.fadeTime < self.f.maxFadeTime) then
 						self.f:SetRingAlpha(self.parent.db.profile.FadeOOC)
 					elseif(math.floor(self.f.startValue) == 0) then
 						self.f:SetRingAlpha(self.parent.db.profile.FadeFull)
@@ -517,7 +517,7 @@ function ArcHUDRingTemplate:CheckAlpha(elapsed)
 					elseif (self.isHealth and UnitIsDead(unit)) then
 						self.f:SetRingAlpha(self.parent.db.profile.FadeFull)
 					else
-						if(self.f.startValue < self.f.maxValue) then
+						if(self.f.startValue < self.f.maxValue or self.f.fadeTime < self.f.maxFadeTime) then
 							self.f:SetRingAlpha(self.parent.db.profile.FadeOOC)
 						elseif(self.f.startValue == self.f.maxValue) then
 							self.f:SetRingAlpha(self.parent.db.profile.FadeFull)
