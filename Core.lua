@@ -38,7 +38,7 @@ local cfgDefaults = {
 		TargetFrame = true,
 		PlayerFrame = true,
 		PlayerModel = true,
-		MobModel = false,
+		MobModel = true,
 		ShowGuild = true,
 		ShowClass = false,
 		Width = 30,
@@ -181,7 +181,7 @@ function ArcHUD:OnEnable()
 	self:RegisterEvent("PLAYER_FLAGS_CHANGED")
 	self:RegisterEvent("PLAYER_UPDATE_RESTING")
 
-	self:RegisterEvent("ArcHUD_FramesMoved", 	"CheckFrames")
+	self:RegisterMessage("ARCHUD_FRAME_MOVED", 	"CheckFrames")
 
 	-- Set initial combat flags
 	self.PlayerIsInCombat = false
@@ -324,17 +324,17 @@ end
 ----------------------------------------------
 function ArcHUD:OnProfileDisable()
 	self:LevelDebug(d_notice, "Unregistering events")
-	if(self:IsEventRegistered("UNIT_HEALTH")) then
-		self:UnregisterEvent("UNIT_HEALTH")
-		self:UnregisterEvent("UNIT_MAXHEALTH")
-		self:UnregisterEvent("UNIT_POWER")
-		self:UnregisterEvent("UNIT_MAXPOWER")
-		self:UnregisterEvent("UNIT_DISPLAYPOWER")
-	end
-	if(self:IsEventRegistered("UNIT_AURA")) then self:UnregisterEvent("UNIT_AURA") end
-	if(self:IsEventRegistered("UNIT_FACTION")) then self:UnregisterEvent("UNIT_FACTION") end
-	if(self:IsEventRegistered("PLAYER_TARGET_CHANGED")) then self:UnregisterEvent("PLAYER_TARGET_CHANGED") end
-	if(self:IsEventRegistered("PLAYER_FOCUS_CHANGED")) then self:UnregisterEvent("PLAYER_FOCUS_CHANGED") end
+
+	self:UnregisterEvent("UNIT_HEALTH")
+	self:UnregisterEvent("UNIT_MAXHEALTH")
+	self:UnregisterEvent("UNIT_POWER")
+	self:UnregisterEvent("UNIT_MAXPOWER")
+	self:UnregisterEvent("UNIT_DISPLAYPOWER")
+
+	self:UnregisterEvent("UNIT_AURA")
+	self:UnregisterEvent("UNIT_FACTION") 
+	self:UnregisterEvent("PLAYER_TARGET_CHANGED") 
+	self:UnregisterEvent("PLAYER_FOCUS_CHANGED") 
 
 	self:LevelDebug(d_notice, "Disabling timers")
 	self:StopMetro("UpdateTargetTarget")
@@ -356,16 +356,13 @@ end
 -- ResetOptionsConfirm()
 ----------------------------------------------
 function ArcHUD:ResetOptionsConfirm()
-	self:LevelDebug(d_warn, "NYI: ResetOptionsConfirm()")
---[[
-	self:ResetDB("profile")
+	self.db:ResetDB()
 	self.updating = true
 	self:OnProfileDisable()
 	self:OnProfileEnable()
-	self:TriggerEvent("ARCHUD_MODULE_UPDATE")
+	self:SendMessage("ARCHUD_MODULE_UPDATE")
 	self.updating = false
 	self:Print(L["TEXT_RESET_CONFIRM"])
-]]--
 end
 
 ----------------------------------------------
@@ -559,7 +556,7 @@ function ArcHUD:TargetUpdate(event, arg1)
 		if(self.BlizzTargetHidden and not self.updating) then
 			PlaySound("INTERFACESOUND_LOSTTARGETUNIT")
 		end
-		if (not self.TargetHUD.locked) then
+		if (self.TargetHUD.locked) then
 			self.TargetHUD:SetAlpha(0)
 		else
 			self.TargetHUD:SetAlpha(1)

@@ -585,10 +585,51 @@ ArcHUD.configOptionsTableCore = {
 			},
 		}, -- fade
 		
+		movableFrames = {
+			type		= "group",
+			name		= L["TEXT"]["MOVEFRAMES"],
+			order		= 14,
+			args		= {
+				-- Unlock frames
+				unlock = {
+					type		= "toggle",
+					name		= L["TEXT"]["MFUNLOCK"],
+					desc		= L["TOOLTIP"]["MFUNLOCK"],
+					order		= 0,
+					get			= function ()
+						return not ArcHUD.TargetHUD.locked
+					end,
+					set			= function (info, v)
+						if (v) then
+							ArcHUD.TargetHUD:Unlock()
+							ArcHUD.TargetHUD.Target:Unlock()
+							ArcHUD.TargetHUD.TargetTarget:Unlock()
+						else
+							ArcHUD.TargetHUD:Lock()
+							ArcHUD.TargetHUD.Target:Lock()
+							ArcHUD.TargetHUD.TargetTarget:Lock()
+						end
+					end,
+				},
+				-- Reset frames
+				reset = {
+					type		= "execute",
+					name		= L["TEXT"]["MFRESET"],
+					desc		= L["TOOLTIP"]["MFRESET"],
+					order		= 1,
+					func		= function ()
+						ArcHUD.TargetHUD:ResetPos()
+						ArcHUD.TargetHUD.Target:ResetPos()
+						ArcHUD.TargetHUD.TargetTarget:ResetPos()
+					end,
+				},
+			},
+		}, -- movable frames
+		
 		misc = {
 			type		= "group",
 			name		= L["TEXT"]["MISC"],
-			order		= 14,
+			order		= 20,
 			args		= {
 				-- Scaling
 				Scale = {

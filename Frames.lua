@@ -124,17 +124,18 @@ local function AH_CreateMoverFrame(parent, name, size, point, origpoint)
 	f:EnableMouse(true)
 	f:RegisterForDrag("LeftButton")
 
-	f:SetScript("OnDragStart", function()
-		if(not this:GetParent().locked) then
-			this:GetParent():ClearAllPoints()
-			this:GetParent():StartMoving()
+	f:SetScript("OnDragStart", function(self)
+		if(not self:GetParent().locked) then
+			self:GetParent():ClearAllPoints()
+			self:GetParent():StartMoving()
 		end
 	end)
 
-	f:SetScript("OnDragStop", function()
-		this:GetParent():StopMovingOrSizing()
-		this:GetParent().moved = true
-		ArcHUD:TriggerEvent("ArcHUD_FramesMoved")
+	f:SetScript("OnDragStop", function(self)
+		self:GetParent():StopMovingOrSizing()
+		self:GetParent().moved = true
+		ArcHUD:LevelDebug(1, "Sending ARCHUD_FRAME_MOVED")
+		ArcHUD:SendMessage("ARCHUD_FRAME_MOVED")
 	end)
 
 	parent.ResetPos = function(self, newpoint)
@@ -147,7 +148,7 @@ local function AH_CreateMoverFrame(parent, name, size, point, origpoint)
 		self:Lock()
 
 		self.reset = true
-		ArcHUD:TriggerEvent("ArcHUD_FramesMoved")
+		ArcHUD:SendMessage("ARCHUD_FRAME_MOVED")
 	end
 	parent.Lock = function(self)
 		if(self.locked) then return end
@@ -196,7 +197,7 @@ function ArcHUD:CreateHUDFrames()
 	local main = ArcHUDFrame
 	local targethud = ArcHUDFrame.TargetHUD
 	
-	--AH_CreateMoverFrame(targethud, "targethud", {320, 120}, {"TOPLEFT", -10, 10}, {"TOP", main, "BOTTOM", 0, -50})
+	AH_CreateMoverFrame(targethud, "targethud", {320, 120}, {"TOPLEFT", -10, 10}, {"TOP", main, "BOTTOM", 0, -50})
 
 	-- Set up font strings
 	targethud.Combo = AH_CreateFontString(main, "BACKGROUND", {40, 30}, 30, "CENTER", {1, 1, 0}, {"BOTTOM", main, "BOTTOM"}, "ArcHUDFrameCombo")
@@ -276,8 +277,10 @@ function ArcHUD:CreateHUDFrames()
 end
 
 function ArcHUD:CheckFrames()
+	ArcHUD:LevelDebug(1, "CheckFrames")
 	for id, frame in pairs(self.movableFrames) do
 		if(frame.moved) then
+			ArcHUD:LevelDebug(1, "Update of "..id)
 			self.db.profile.Positions[id] = {
 				x = frame:GetLeft(),
 				y = frame:GetBottom(),

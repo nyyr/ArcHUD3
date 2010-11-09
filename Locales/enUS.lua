@@ -36,7 +36,7 @@ L["TEXT"] = {
 	TOTOT		= "Enable target's target's target",
 	BLIZZPLAYER = "Blizzard player frame visible",
 	BLIZZTARGET = "Blizzard target frame visible",
-	BLIZZFOCUS = "Blizzard focus frame visible",
+	BLIZZFOCUS  = "Blizzard focus frame visible",
 
 	COMBOPOINTS = "Combo points options",
 	SHOWCOMBO	= "Show combo point text",
@@ -59,12 +59,8 @@ L["TEXT"] = {
 	PETNPFADE	= "Adjust pet nameplate alpha",
 
 	MOVEFRAMES	= "Movable Frames",
-	MFTHUD		= "Unlock target frame",
-	MFTT		= "Unlock target's target frame",
-	MFTTT		= "Unlock target's target's target frame",
-	RESETTHUD	= "Reset target frame",
-	RESETTT		= "Reset target's target frame",
-	RESETTTT	= "Reset target's target's target frame",
+	MFUNLOCK	= "Unlock movable frames",
+	MFRESET		= "Reset positions",
 
 	FADE		= "Fade options",
 	FADE_FULL	= "When full",
@@ -72,9 +68,9 @@ L["TEXT"] = {
 	FADE_IC		= "In combat",
 
 	RINGVIS		= "Fade behaviour",
-	RINGVIS_1	= "FadeFull: Fade when full",
-	RINGVIS_2	= "FadeOOC: Fade when out of combat",
-	RINGVIS_3	= "FadeBoth: Fade when full or out of combat",
+	RINGVIS_1	= "Fade Full: Fade when full",
+	RINGVIS_2	= "Fade OOC: Fade when out of combat",
+	RINGVIS_3	= "Fade Both: Fade when full or out of combat",
 
 	MISC		= "Miscellanous options",
 	WIDTH		= "HUD width",
@@ -117,12 +113,8 @@ L["TOOLTIP"] = {
 	HOVERMSG	= "Toggle displaying of a chat message when mouse input is enabled",
 	HOVERDELAY	= "Amount of seconds needed to hover above the player/pet nameplate to activate it",
 
-	MFTHUD		= "Unlock the target frame to allow moving it",
-	MFTT		= "Unlock the target's target frame to allow moving it",
-	MFTTT		= "Unlock the target's target's target frame to allow moving it",
-	RESETTHUD	= "Reset target frame to default position",
-	RESETTT		= "Reset target's target frame to default position",
-	RESETTTT	= "Reset target's target's target frame to default position",
+	MFUNLOCK	= "Allows you to move frames around freely",
+	MFRESET		= "Reset positions of movable frames",
 
 	FADE_FULL	= "Alpha to fade to when out of combat and ring at 100%",
 	FADE_OOC	= "Alpha to fade to when out of combat or ring not at 100%",
@@ -136,7 +128,7 @@ L["TOOLTIP"] = {
 	RINGVIS		= "Sets when the rings fade out",
 	RINGVIS_1	= "Fade out when rings are full, regardless of combat status",
 	RINGVIS_2	= "Always fade out when out of combat, regardless of ring status",
-	RINGVIS_3	= "Fade out when out of combat or rings are full",
+	RINGVIS_3	= "Fade out when out of combat or rings are full (default)",
 }
 
 
