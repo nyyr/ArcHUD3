@@ -42,6 +42,9 @@ function module:Initialize()
 	--self.parent:RegisterMetro(self.name .. "CheckTaxi", self.CheckTaxi, 0.1, self)
 	
 	self:CreateStandardModuleOptions(15)
+	
+	self.f.casting = 0
+	self.channeling = 0
 end
 
 function module:Update()
@@ -60,12 +63,9 @@ end
 
 local function Player_Casting(frame, elapsed)
 	self = frame.module
-	if ( self.f.casting == nil ) then
-		self.f.casting = 0 end
-	if ( self.channeling == nil ) then
-		self.channeling = 0 end
 	if ( self.spellstart == nil ) then
-		self.spellstart = GetTime()*1000 end
+		self.spellstart = GetTime()*1000
+	end
 
 	if ( self.f.casting == 1) then
 		local status = (GetTime()*1000 - self.spellstart)
@@ -222,18 +222,20 @@ end
 function module:UNIT_SPELLCAST_START(event, arg1)
 	if(arg1 == self.unit) then
 		local spell, rank, displayName, icon, startTime, endTime = UnitCastingInfo(self.unit)
-		self.f:UpdateColor({["r"] = 1.0, ["g"] = 0.7, ["b"] = 0})
-		self.Text:SetText(displayName)
-		self.startValue = 0
-		self.f:SetMax(endTime - startTime)
-		self.f.casting = 1
-		self.channeling = 0
-		self.spellstart = startTime
-		self.stopSet = false
-		if(ArcHUD.db.profile.FadeIC > ArcHUD.db.profile.FadeOOC) then
-			self.f:SetRingAlpha(ArcHUD.db.profile.FadeIC)
-		else
-			self.f:SetRingAlpha(ArcHUD.db.profile.FadeOOC)
+		if (spell) then
+			self.f:UpdateColor({["r"] = 1.0, ["g"] = 0.7, ["b"] = 0})
+			self.Text:SetText(displayName)
+			self.startValue = 0
+			self.f:SetMax(endTime - startTime)
+			self.f.casting = 1
+			self.channeling = 0
+			self.spellstart = startTime
+			self.stopSet = false
+			if(ArcHUD.db.profile.FadeIC > ArcHUD.db.profile.FadeOOC) then
+				self.f:SetRingAlpha(ArcHUD.db.profile.FadeIC)
+			else
+				self.f:SetRingAlpha(ArcHUD.db.profile.FadeOOC)
+			end
 		end
 	end
 end
@@ -241,18 +243,20 @@ end
 function module:UNIT_SPELLCAST_CHANNEL_START(event, arg1)
 	if(arg1 == self.unit) then
 		local spell, rank, displayName, icon, startTime, endTime = UnitChannelInfo(self.unit)
-		self.f:UpdateColor({["r"] = 0.3, ["g"] = 0.3, ["b"] = 1.0})
-		self.Text:SetText(displayName)
-		self.startValue = 0
-		self.f:SetMax(endTime - startTime)
-		self.f:SetValue(endTime - startTime)
-		self.channeling = 1
-		self.f.casting = 1
-		self.spellstart = startTime
-		if(ArcHUD.db.profile.FadeIC > ArcHUD.db.profile.FadeOOC) then
-			self.f:SetRingAlpha(ArcHUD.db.profile.FadeIC)
-		else
-			self.f:SetRingAlpha(ArcHUD.db.profile.FadeOOC)
+		if (spell) then
+			self.f:UpdateColor({["r"] = 0.3, ["g"] = 0.3, ["b"] = 1.0})
+			self.Text:SetText(displayName)
+			self.startValue = 0
+			self.f:SetMax(endTime - startTime)
+			self.f:SetValue(endTime - startTime)
+			self.channeling = 1
+			self.f.casting = 1
+			self.spellstart = startTime
+			if(ArcHUD.db.profile.FadeIC > ArcHUD.db.profile.FadeOOC) then
+				self.f:SetRingAlpha(ArcHUD.db.profile.FadeIC)
+			else
+				self.f:SetRingAlpha(ArcHUD.db.profile.FadeOOC)
+			end
 		end
 	end
 end
@@ -260,6 +264,12 @@ end
 function module:UNIT_SPELLCAST_CHANNEL_UPDATE(event, arg1)
 	if(arg1 == self.unit) then
 		local spell, rank, displayName, icon, startTime, endTime = UnitChannelInfo(arg1)
+		if (spell == nil) then
+			-- might be due to lag
+			-- SpellcastChannelStop resets all
+			self:SpellcastChannelStop(event, arg1)
+			return
+		end
 		self.f:SetValue(self.f.startValue - (startTime - self.spellstart))
 		self.spellstart = startTime
 	end
@@ -268,13 +278,18 @@ end
 function module:UNIT_SPELLCAST_DELAYED(event, arg1)
 	if(arg1 == self.unit) then
 		local spell, rank, displayName, icon, startTime, endTime = UnitCastingInfo(arg1)
+		if (spell == nil) then
+			-- might be due to lag
+			-- SpellcastChannelStop resets all
+			self:SpellcastChannelStop(event, arg1)
+			return
+		end
 		self.f:SetMax(endTime - self.spellstart)
 	end
 end
 
 function module:SpellcastStop(event, arg1)
 	if(arg1 == self.unit and self.f.casting == 1 and self.channeling == 0) then
-		local spell, rank, displayName, icon, startTime, endTime = UnitCastingInfo(arg1)
 		self.f:SetValue(self.f.maxValue)
 		self.f.casting = 0
 		if(self.spellStatus) then
@@ -282,10 +297,10 @@ function module:SpellcastStop(event, arg1)
 				self.f:UpdateColor({["r"] = 0, ["g"] = 1.0, ["b"] = 0})
 			elseif(self.spellStatus == "failed") then
 				self.f:UpdateColor({["r"] = 1.0, ["g"] = 0, ["b"] = 0})
-				self.Text:SetText("Failed")
+				self.Text:SetText(FAILED)
 			elseif(self.spellStatus == "interrupted") then
 				self.f:UpdateColor({["r"] = 1.0, ["g"] = 0, ["b"] = 0})
-				self.Text:SetText("Interrupted")
+				self.Text:SetText(INTERRUPTED)
 			end
 		else
 			self.f:UpdateColor({["r"] = 1.0, ["g"] = 0, ["b"] = 0})
@@ -298,7 +313,6 @@ end
 
 function module:SpellcastChannelStop(event, arg1)
 	if(arg1 == self.unit and self.f.casting == 1) then
-		local spell, rank, displayName, icon, startTime, endTime = UnitChannelInfo(arg1)
 		self.f.casting = 0
 		self.channeling = 0
 		self.Text:SetText("")

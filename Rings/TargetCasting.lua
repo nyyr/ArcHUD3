@@ -36,6 +36,9 @@ function module:Initialize()
 	self.Time = self:CreateFontString(self.f, "BACKGROUND", {40, 14}, 10, "RIGHT", {1.0, 1.0, 1.0}, {"TOPLEFT", self.Text, "TOPRIGHT", 0, 0})
 	
 	self:CreateStandardModuleOptions(30)
+	
+	self.f.casting = 0
+	self.channeling = 0
 end
 
 function module:Update()
@@ -54,12 +57,9 @@ end
 
 local function Target_Casting(frame, elapsed)
 	self = frame.module
-	if ( self.f.casting == nil ) then
-		self.f.casting = 0 end
-	if ( self.channeling == nil ) then
-		self.channeling = 0 end
 	if ( self.spellstart == nil ) then
-		self.spellstart = GetTime()*1000 end
+		self.spellstart = GetTime()*1000
+	end
 
 	if ( self.f.casting == 1) then
 		local status = (GetTime()*1000 - self.spellstart)
@@ -200,6 +200,12 @@ end
 function module:UNIT_SPELLCAST_CHANNEL_UPDATE(event, arg1)
 	if(arg1 == self.unit) then
 		local spell, rank, displayName, icon, startTime, endTime = UnitChannelInfo(arg1)
+		if (spell == nil) then
+			-- might be due to lag
+			-- SpellcastChannelStop resets all
+			self:SpellcastChannelStop(event, arg1, true)
+			return
+		end
 		self.f:SetValue(self.f.startValue - (startTime - self.spellstart))
 		self.spellstart = startTime
 	end
@@ -208,6 +214,12 @@ end
 function module:UNIT_SPELLCAST_DELAYED(event, arg1)
 	if(arg1 == self.unit) then
 		local spell, rank, displayName, icon, startTime, endTime = UnitCastingInfo(arg1)
+		if (spell == nil) then
+			-- might be due to lag
+			-- SpellcastChannelStop resets all
+			self:SpellcastChannelStop(event, arg1, true)
+			return
+		end
 		self.f:SetMax(endTime - self.spellstart)
 	end
 end

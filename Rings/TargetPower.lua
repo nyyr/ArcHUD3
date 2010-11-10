@@ -90,50 +90,61 @@ function module:PLAYER_TARGET_CHANGED()
 		self.f:SetValue(0)
 		self.MPPerc:SetText("")
 	else
+		local power = UnitPower(self.unit)
+		local maxPower = UnitPowerMax(self.unit)
+		
 		self.f.pulse = false
-		self.f:SetMax(UnitPowerMax(self.unit))
+		self.f:SetMax(maxPower)
 		self:UpdateColor(PowerBarColor[UnitPowerType(self.unit)])
-		if(UnitIsDead(self.unit) or UnitIsGhost(self.unit) or UnitPowerMax(self.unit) == 0) then
+		if(UnitIsDead(self.unit) or UnitIsGhost(self.unit) or maxPower == 0) then
 			self.f:SetValue(0)
 			self.MPPerc:SetText("")
 		else
-			self.f:SetValue(UnitPower(self.unit))
-			self.MPPerc:SetText(floor((UnitPower(self.unit) / UnitPowerMax(self.unit)) * 100).."%")
+			self.f:SetValue(power)
+			self.MPPerc:SetText(floor((power / maxPower) * 100).."%")
 		end
 	end
 end
 
-function module:UNIT_DISPLAYPOWER(arg1)
+function module:UNIT_DISPLAYPOWER(event, arg1)
 	if(arg1 ~= self.unit) then return end
+	
+	local power = UnitPower(self.unit)
+	local maxPower = UnitPowerMax(self.unit)
 
 	self:UpdateColor(PowerBarColor[UnitPowerType(self.unit)])
-	self.f:SetValue(UnitPower(self.unit))
-	self.f:SetMax(UnitPowerMax(self.unit))
+	self.f:SetValue(power)
+	self.f:SetMax(maxPower)
 
-	if(UnitPowerMax(self.unit) > 0) then
-		self.MPPerc:SetText(floor((UnitPower(self.unit) / UnitPowerMax(self.unit)) * 100).."%")
+	if(maxPower > 0) then
+		self.MPPerc:SetText(floor((power / maxPower) * 100).."%")
 	else
 		self.MPPerc:SetText("")
 	end
 end
 
-function module:UpdatePower(event)
+function module:UpdatePower(event, arg1)
+	if (arg1 ~= self.unit) then return end
+	
+	local power = UnitPower(self.unit)
+	local maxPower = UnitPowerMax(self.unit)
+	
 	if(event == "UNIT_MAXPOWER") then
-		self.f:SetMax(UnitPowerMax(self.unit))
-		if(UnitPowerMax(self.unit) > 0) then
-			self.MPPerc:SetText(floor((UnitPower(self.unit) / UnitPowerMax(self.unit)) * 100).."%")
+		self.f:SetMax(maxPower)
+		if(maxPower > 0) then
+			self.MPPerc:SetText(floor((power / maxPower) * 100).."%")
 		else
 			self.MPPerc:SetText("")
 		end
 	else
-		self.f:SetValue(UnitPower(self.unit))
-		if(UnitPowerMax(self.unit) > 0) then
-			self.MPPerc:SetText(floor((UnitPower(self.unit) / UnitPowerMax(self.unit)) * 100).."%")
+		self.f:SetValue(power)
+		if(maxPower > 0) then
+			self.MPPerc:SetText(floor((power / maxPower) * 100).."%")
 		else
 			self.MPPerc:SetText("")
 		end
 	end
-	if(UnitPower(self.unit) == UnitPowerMax(self.unit) or UnitPower(self.unit) == 0) then
+	if(power == maxPower or power == 0) then
 		self.parent:StopMetro(self.name .. "UpdatePowerBar")
 	else
 		self.parent:StartMetro(self.name .. "UpdatePowerBar")

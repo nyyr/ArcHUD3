@@ -113,13 +113,18 @@ function module:UpdatePowerBar()
 	if (not UnitIsGhost(self.unit)) then
 		local power = UnitPower(self.unit)
 		local maxPower = UnitPowerMax(self.unit)
-
-		self.MPText:SetText(power.."/"..maxPower)
-		self.MPPerc:SetText(floor((power/maxPower)*100).."%")
-
+		
+		if (maxPower > 0) then
+			self.MPText:SetText(power.."/"..maxPower)
+			self.MPPerc:SetText(floor((power/maxPower)*100).."%")
+		else
+			self.MPText:SetText("")
+			self.MPPerc:SetText("")
+		end
+		
 		self.f:SetMax(maxPower)
 		self.f:SetValue(power)
-		
+			
 		if (power == maxPower or power == 0) then
 			self.parent:StopMetro(self.name .. "UpdatePowerBar")
 		end
@@ -131,18 +136,27 @@ end
 ----------------------------------------------
 function module:UpdatePowerEvent(event, arg1)
 	if (arg1 == self.unit) then
+		local power = UnitPower(self.unit)
+		local maxPower = UnitPowerMax(self.unit)
+		
 		if(UnitIsGhost(self.unit) or (UnitIsDead(self.unit) and event == "PLAYER_ALIVE")) then
 			self.f:GhostMode(true, self.unit)
 		else
 			self.f:GhostMode(false, self.unit)
+			
+			if (maxPower > 0) then
+				self.MPText:SetText(power.."/"..maxPower)
+				self.MPPerc:SetText(floor((power/maxPower)*100).."%")
+			else
+				self.MPText:SetText("")
+				self.MPPerc:SetText("")
+			end
 
-			self.MPText:SetText(UnitPower(self.unit).."/"..UnitPowerMax(self.unit))
-			self.MPPerc:SetText(floor((UnitPower(self.unit)/UnitPowerMax(self.unit))*100).."%")
-
-			self.f:SetMax(UnitPowerMax(self.unit))
-			self.f:SetValue(UnitPower(self.unit))
+			self.f:SetMax(maxPower)
+			self.f:SetValue(power)
 		end
-		if (UnitPower(self.unit) == UnitPowerMax(self.unit) or UnitPower(self.unit) == 0) then
+		
+		if (power == maxPower or power == 0) then
 			self.parent:StopMetro(self.name .. "UpdatePowerBar")
 		else
 			self.parent:StartMetro(self.name .. "UpdatePowerBar")
