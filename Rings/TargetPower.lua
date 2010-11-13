@@ -33,12 +33,12 @@ function module:Initialize()
 	self.f:SetAlpha(0)
 
 	self.MPPerc = self:CreateFontString(self.f, "BACKGROUND", {40, 12}, 11, "RIGHT", {1.0, 1.0, 1.0}, {"TOPLEFT", self.f, "BOTTOMLEFT", -100, -115})
-	self.parent:RegisterMetro(self.name .. "UpdatePowerBar", self.UpdatePower, 0.1, self)
+	self:RegisterTimer("UpdatePowerBar", self.UpdatePower, 0.1, self, true)
 	
 	self:CreateStandardModuleOptions(25)
 end
 
-function module:Update()
+function module:OnModuleUpdate()
 	if(self.db.profile.ShowPerc) then
 		self.MPPerc:Show()
 	else
@@ -145,8 +145,8 @@ function module:UpdatePower(event, arg1)
 		end
 	end
 	if(power == maxPower or power == 0) then
-		self.parent:StopMetro(self.name .. "UpdatePowerBar")
+		self:StopTimer("UpdatePowerBar")
 	else
-		self.parent:StartMetro(self.name .. "UpdatePowerBar")
+		self:StartTimer("UpdatePowerBar")
 	end
 end

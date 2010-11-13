@@ -18,7 +18,7 @@ module.defaults = {
 }
 module.options = {
 	{name = "Flash", text = "FLASH", tooltip = "FLASH"},
-	nocolor = true,
+	hascolor = true,
 	attach = true,
 }
 module.localized = true
@@ -32,16 +32,15 @@ function module:Initialize()
 	self.f:SetAlpha(0)
 
 	-- Override Update timer
-	self.parent:RegisterMetro(self.name .. "Update", self.UpdateAlpha, 0.05, self.f)
-	self.parent:RegisterMetro(self.name .. "RemoveOldCP", self.RemoveOldCP, self.parent.db.profile.OldComboPointsDecay, self)
+	self:RegisterTimer("RemoveOldCP", self.RemoveOldCP, self.parent.db.profile.OldComboPointsDecay, self)
 	
 	self:CreateStandardModuleOptions(45)
 end
 
-function module:Update()
+function module:OnModuleUpdate()
 	self.Flash = self.db.profile.Flash
-	self.parent:UnregisterMetro(self.name .. "RemoveOldCP")
-	self.parent:RegisterMetro(self.name .. "RemoveOldCP", self.RemoveOldCP, self.parent.db.profile.OldComboPointsDecay, self)
+	--self.parent:UnregisterMetro(self.name .. "RemoveOldCP")
+	self:RegisterTimer("RemoveOldCP", self.RemoveOldCP, self.parent.db.profile.OldComboPointsDecay, self)
 end
 
 function module:OnModuleEnable()
@@ -62,36 +61,26 @@ function module:OnModuleEnable()
 	self.f:Show()
 end
 
-function module:UpdateAlpha(arg1)
-	if(self.pulse) then
-		self.alphaPulse = self.alphaPulse + arg1/2
-		local amt = math.sin(self.alphaPulse * self.twoPi) * 0.5 + 0.5
-		self:UpdateColor({["r"] = module.db.profile.Color.r, ["g"] = amt, ["b"] = amt})
-	end
-end
-
 function module:UpdateComboPoints(event, arg1)
-	self:Debug(3, "UpdateComboPoints("..tostring(event)..", "..tostring(arg1)..")")
+	--self:Debug(3, "UpdateComboPoints("..tostring(event)..", "..tostring(arg1)..")")
 	if ((event == "UNIT_COMBO_POINTS" and arg1 == self.unit) or
 		(event == "PLAYER_TARGET_CHANGED" and GetComboPoints(self.unit) > 0 and
 			UnitExists("target") and not UnitIsDead("target"))) then
 		
 		if (self.RemoveOldCP_started) then
-			self.parent:StopMetro(self.name .. "RemoveOldCP")
+			self:StopTimer("RemoveOldCP")
 			self.RemoveOldCP_started = false
 		end
 		
 		self.oldPoints = GetComboPoints(self.unit)
 		self.f:SetValue(self.oldPoints)
 		if(self.oldPoints < 5 and self.oldPoints >= 0) then
-			self.f.pulse = false
-			self.f.alphaPulse = 0
-			self.f:UpdateColor(self.db.profile.Color)
+			self.f:StopPulse()
 		else
 			if(self.Flash) then
-				self.f.pulse = true
+				self.f:StartPulse()
 			else
-				self.f.pulse = false
+				self.f:StopPulse()
 			end
 		end
 		if(self.oldPoints > 0) then
@@ -109,7 +98,7 @@ function module:UpdateComboPoints(event, arg1)
 			if (not self.RemoveOldCP_started and self.oldPoints > 0) then
 				-- we have still some points on previous target
 				self.f:UpdateColor(self.db.profile.ColorOldPoints)
-				self.parent:StartMetro(self.name .. "RemoveOldCP")
+				self:StartTimer("RemoveOldCP")
 				self.RemoveOldCP_started = true
 			end
 		else
@@ -120,8 +109,8 @@ function module:UpdateComboPoints(event, arg1)
 end
 
 function module:RemoveOldCP()
-	self.parent:StopMetro(self.name .. "RemoveOldCP")
 	self.RemoveOldCP_started = false
 	self.oldPoints = 0
+	self.f:StopPulse()
 	self.f:SetRingAlpha(0)
 end

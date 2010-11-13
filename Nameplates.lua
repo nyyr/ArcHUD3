@@ -71,8 +71,6 @@ function ArcHUD:InitNameplate(this, unit)
 		if ((InCombatLockdown() and not ArcHUD.db.profile.NameplateCombat) or self.state or self.disabled or self.lock) then return end
 		
 		if(self.unit == "player" or self.unit == "pet") then
-			ArcHUD:StopMetro("Enable_"..self.unit)
-			
 			if (not MouseIsOver(ArcHUD.Nameplates[self.unit])) then
 				-- happens after leaving combat or when pet happiness changes
 				return
@@ -121,22 +119,20 @@ function ArcHUD:RestartNamePlateTimers()
 		local this = self.Nameplates[unit]
 
 		if(not this.disabled) then
-			self:UnregisterMetro("Enable_"..unit)
-			self:RegisterMetro("Enable_"..unit, this.Enable, self.db.profile.HoverDelay, this)
+			self:RegisterTimer("Enable_"..unit, this.Enable, self.db.profile.HoverDelay, this)
 
 			this.started = true
 
 			this.fadeIn = 0.25
 			this.fadeOut = 0.25
-			if(not self:MetroStatus(unit.."Alpha")) then
-				self:RegisterMetro(unit.."Alpha", ArcHUDRingTemplate.AlphaUpdate, 0.01, this)
-			end
-			self:StartMetro(unit.."Alpha")
+			--if(not self:MetroStatus(unit.."Alpha")) then
+			--	self:RegisterMetro(unit.."Alpha", ArcHUDRingTemplate.AlphaUpdate, 0.01, this)
+			--end
+			--self:StartMetro(unit.."Alpha")
 			ArcHUDRingTemplate.SetRingAlpha(this, self.db.profile.FadeFull)
 
 			metrostarted = true
 		else
-			self:UnregisterMetro("Enable_"..unit)
 			this:Disable()
 			this:SetAlpha(0)
 		end
@@ -144,8 +140,8 @@ function ArcHUD:RestartNamePlateTimers()
 
 	if(metrostarted) then
 		self:LevelDebug(3, "Nameplates enabled. Showing frames and starting update timers")
-		self:StartMetro("UpdatePetNamePlate")
-		self:StartMetro("CheckNamePlateMouseOver")
+		self:StartTimer("UpdatePetNamePlate")
+		self:StartTimer("CheckNamePlateMouseOver")
 	else
 		self:LevelDebug(3, "Player and pet nameplates not enabled.")
 	end
@@ -156,12 +152,12 @@ function ArcHUD:CheckNamePlateMouseOver()
 	if(MouseIsOver(self.Nameplates.player) and not self.Nameplates.player.disabled) then
 		if(not self.Nameplates.player.started) then
 			self.Nameplates.player.started = true
-			self:StartMetro("Enable_player")
+			self:StartTimer("Enable_player")
 		end
 	else
 		if(self.Nameplates.player.started) then
 			ArcHUDRingTemplate.SetRingAlpha(self.Nameplates.player, self.db.profile.FadeFull)
-			self:StopMetro("Enable_player")
+			self:StopTimer("Enable_player")
 			self.Nameplates.player.started = false
 			self.Nameplates.player:Disable()
 		end
@@ -172,7 +168,7 @@ function ArcHUD:CheckNamePlateMouseOver()
 	if(MouseIsOver(self.Nameplates.pet) and not self.Nameplates.pet.disabled) then
 		if(not self.Nameplates.pet.started) then
 			self.Nameplates.pet.started = true
-			self:StartMetro("Enable_pet")
+			self:StartTimer("Enable_pet")
 		end
 	else
 		if(self.Nameplates.pet.started) then
@@ -181,7 +177,7 @@ function ArcHUD:CheckNamePlateMouseOver()
 			else
 				ArcHUDRingTemplate.SetRingAlpha(self.Nameplates.pet, self.db.profile.FadeFull)
 			end
-			self:StopMetro("Enable_pet")
+			self:StopTimer("Enable_pet")
 			self.Nameplates.pet.started = false
 			self.Nameplates.pet:Disable()
 		end

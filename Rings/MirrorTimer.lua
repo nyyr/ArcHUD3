@@ -41,14 +41,11 @@ function module:Initialize()
 	self.Text[1] = self:CreateFontString(self.f, "BACKGROUND", {140, 16}, 14, "CENTER", {1.0, 1.0, 1.0}, {"BOTTOM", "ArcHUDFrameCombo", "TOP", 0, 96})
 	self.Text[2] = self:CreateFontString(self.f, "BACKGROUND", {140, 16}, 14, "CENTER", {1.0, 1.0, 1.0}, {"TOPLEFT", self.Text[1], "BOTTOMLEFT", 0, 0})
 	self.Text[3] = self:CreateFontString(self.f, "BACKGROUND", {140, 16}, 14, "CENTER", {1.0, 1.0, 1.0}, {"TOPLEFT", self.Text[2], "BOTTOMLEFT", 0, 0})
-
-	-- Override Update timer
-	--self.parent:RegisterMetro(self.name .. "Update", self.UpdateTimers, 0.05, self)
 	
 	self:CreateStandardModuleOptions(50)
 end
 
-function module:Update()
+function module:OnModuleUpdate()
 	if(self.db.profile.ShowSpell) then
 		for i=1,3 do
 			self.Text[i]:Show()

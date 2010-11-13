@@ -41,7 +41,7 @@ function module:Initialize()
 
 	self.MPText = self:CreateFontString(self.f, "BACKGROUND", {150, 15}, 14, "LEFT", {1.0, 1.0, 0.0}, {"TOPLEFT", ArcHUDFrameCombo, "TOPRIGHT", 0, 0})
 	self.MPPerc = self:CreateFontString(self.f, "BACKGROUND", {40, 14}, 12, "LEFT", {1.0, 1.0, 1.0}, {"TOPLEFT", self.MPText, "BOTTOMLEFT", 0, 0})
-	self.parent:RegisterMetro(self.name .. "UpdatePowerBar", self.UpdatePowerBar, 0.1, self, self.unit)
+	self:RegisterTimer("UpdatePowerBar", self.UpdatePowerBar, 0.1, self, true)
 	
 	self:CreateStandardModuleOptions(10)
 end
@@ -49,7 +49,7 @@ end
 ----------------------------------------------
 -- Update
 ----------------------------------------------
-function module:Update()
+function module:OnModuleUpdate()
 	if(self.db.profile.ShowText) then
 		self.MPText:Show()
 	else
@@ -107,7 +107,7 @@ function module:PLAYER_LEVEL_UP()
 end
 
 ----------------------------------------------
--- Update Power (metronome)
+-- Update Power (timer)
 ----------------------------------------------
 function module:UpdatePowerBar()
 	if (not UnitIsGhost(self.unit)) then
@@ -126,7 +126,7 @@ function module:UpdatePowerBar()
 		self.f:SetValue(power)
 			
 		if (power == maxPower or power == 0) then
-			self.parent:StopMetro(self.name .. "UpdatePowerBar")
+			self:StopTimer("UpdatePowerBar")
 		end
 	end
 end
@@ -157,9 +157,9 @@ function module:UpdatePowerEvent(event, arg1)
 		end
 		
 		if (power == maxPower or power == 0) then
-			self.parent:StopMetro(self.name .. "UpdatePowerBar")
+			self:StopTimer("UpdatePowerBar")
 		else
-			self.parent:StartMetro(self.name .. "UpdatePowerBar")
+			self:StartTimer("UpdatePowerBar")
 		end
 	end
 end

@@ -11,7 +11,7 @@ local d_info = 2
 local d_notice = 3
 
 -- Set libraries
-ArcHUD:SetDefaultModuleLibraries("AceEvent-3.0", "AceHook-3.0")
+ArcHUD:SetDefaultModuleLibraries("AceEvent-3.0")
 ArcHUD.modulePrototype = {
 	parent = ArcHUD
 }
@@ -25,6 +25,9 @@ function ArcHUD.modulePrototype:Debug(level, msg, ...)
 	end
 end
 
+----------------------------------------------
+-- Initialize config options
+----------------------------------------------
 function ArcHUD.modulePrototype:InitConfigOptions()
 	if(self.defaults and type(self.defaults) == "table") then
 		-- Add defaults to ArcHUD defaults table
@@ -41,293 +44,6 @@ function ArcHUD.modulePrototype:InitConfigOptions()
 	end
 
 end
-
---[[
-function ArcHUD.modulePrototype:RegisterDewdropSettings()
-	local t = {}
-
-	table.insert(self.parent.dewdrop_menu.L1, {"text", self.L[self.name] or self.name, "hasArrow", true, "value", "L2_"..self.name})
-
-	self.parent.dewdrop_menu["L2_"..self.name] = {
-		{
-			"text", self.L[self.name] or self.name,
-			"isTitle", true
-		},
-		{
-			"text", self.L["Version: "]..self.version,
-			"notClickable", true
-		},
-		{
-			"text", self.L["Author: "]..self.author,
-			"notClickable", true
-		},
-		{},
-		{
-			"text", self.L["TEXT"]["ENABLED"],
-			"tooltipTitle", self.L["TEXT"]["ENABLED"],
-			"tooltipText", self.L["TOOLTIP"]["ENABLED"],
-			"checked", false,
-			"func", ArcHUD.modDB,
-			"arg1", "toggle",
-			"arg2", "Enabled",
-			"arg3", self.name
-		},
-	}
-	if(self.f) then
-		table.insert(self.parent.dewdrop_menu["L2_"..self.name], {
-			"text", self.L["TEXT"]["OUTLINE"],
-			"tooltipTitle", self.L["TEXT"]["OUTLINE"],
-			"tooltipText", self.L["TOOLTIP"]["OUTLINE"],
-			"checked", false,
-			"func", ArcHUD.modDB,
-			"arg1", "toggle",
-			"arg2", "Outline",
-			"arg3", self.name
-		})
-
-		if(not self.options.nocolor) then
-			t = {
-				"text", self.L["TEXT"]["COLOR"],
-				"tooltipTitle", self.L["TEXT"]["COLOR"],
-				"tooltipText", self.L["TOOLTIP"]["COLOR"],
-				"hasArrow", true,
-				"value", "L3_"..self.name.."_color"
-			}
-			table.insert(self.parent.dewdrop_menu["L2_"..self.name], t)
-
-			self.parent.dewdrop_menu["L3_"..self.name.."_color"] = { }
-			if(self.options.hascolorfade) then
-				t = {
-					"text", self.L["TEXT"]["COLORFADE"],
-					"tooltipTitle", self.L["TEXT"]["COLORFADE"],
-					"tooltipText", self.L["TOOLTIP"]["COLORFADE"],
-					"checked", false,
-					"isRadio", true,
-					"func", ArcHUD.modDB,
-					"arg1", "set",
-					"arg2", "ColorMode",
-					"arg3", self.name,
-					"arg4", "fade"
-				}
-				table.insert(self.parent.dewdrop_menu["L3_"..self.name.."_color"], t)
-			end
-
-			t = {
-				"text", self.L["TEXT"]["COLORDEF"],
-				"tooltipTitle", self.L["TEXT"]["COLORDEF"],
-				"tooltipText", self.L["TOOLTIP"]["COLORDEF"],
-				"checked", false,
-				"isRadio", true,
-				"func", ArcHUD.modDB,
-				"arg1", "set",
-				"arg2", "ColorMode",
-				"arg3", self.name,
-				"arg4", "default"
-			}
-			table.insert(self.parent.dewdrop_menu["L3_"..self.name.."_color"], t)
-
-			t = {
-				"text", self.L["TEXT"]["COLORCUST"],
-				"tooltipTitle", self.L["TEXT"]["COLORCUST"],
-				"tooltipText", self.L["TOOLTIP"]["COLORCUST"],
-				"checked", false,
-				"isRadio", true,
-				"func", ArcHUD.modDB,
-				"arg1", "set",
-				"arg2", "ColorMode",
-				"arg3", self.name,
-				"arg4", "custom"
-			}
-			table.insert(self.parent.dewdrop_menu["L3_"..self.name.."_color"], t)
-
-			table.insert(self.parent.dewdrop_menu["L3_"..self.name.."_color"], {})
-
-			if(self.options.hasfriendfoe) then
-				t = {
-					"text", self.L["TEXT"]["COLORFRIEND"],
-					"tooltipTitle", self.L["TEXT"]["COLORFRIEND"],
-					"tooltipText", self.L["TOOLTIP"]["COLORFRIEND"],
-					"hasColorSwatch", true,
-					"r", 1,
-					"g", 1,
-					"b", 1,
-					"colorFunc", function(val, mod, r, g, b, a) ArcHUD.modDB("set", val, mod, {r = r, g = g, b = b}) end,
-					"colorArg1", "ColorFriend",
-					"colorArg2", self.name
-				}
-				table.insert(self.parent.dewdrop_menu["L3_"..self.name.."_color"], t)
-
-				t = {
-					"text", self.L["TEXT"]["COLORFOE"],
-					"tooltipTitle", self.L["TEXT"]["COLORFOE"],
-					"tooltipText", self.L["TOOLTIP"]["COLORFOE"],
-					"hasColorSwatch", true,
-					"r", 1,
-					"g", 1,
-					"b", 1,
-					"colorFunc", function(val, mod, r, g, b, a) ArcHUD.modDB("set", val, mod, {r = r, g = g, b = b}) end,
-					"colorArg1", "ColorFoe",
-					"colorArg2", self.name
-				}
-				table.insert(self.parent.dewdrop_menu["L3_"..self.name.."_color"], t)
-			elseif(self.options.hasmanabar) then
-				t = {
-					"text", self.L["TEXT"]["COLORMANA"],
-					"tooltipTitle", self.L["TEXT"]["COLORMANA"],
-					"tooltipText", self.L["TOOLTIP"]["COLORMANA"],
-					"hasColorSwatch", true,
-					"r", 1,
-					"g", 1,
-					"b", 1,
-					"colorFunc", function(val, mod, r, g, b, a) ArcHUD.modDB("set", val, mod, {r = r, g = g, b = b}) end,
-					"colorArg1", "ColorMana",
-					"colorArg2", self.name
-				}
-				table.insert(self.parent.dewdrop_menu["L3_"..self.name.."_color"], t)
-
-				t = {
-					"text", self.L["TEXT"]["COLORRAGE"],
-					"tooltipTitle", self.L["TEXT"]["COLORRAGE"],
-					"tooltipText", self.L["TOOLTIP"]["COLORRAGE"],
-					"hasColorSwatch", true,
-					"r", 1,
-					"g", 1,
-					"b", 1,
-					"colorFunc", function(val, mod, r, g, b, a) ArcHUD.modDB("set", val, mod, {r = r, g = g, b = b}) end,
-					"colorArg1", "ColorRage",
-					"colorArg2", self.name
-				}
-				table.insert(self.parent.dewdrop_menu["L3_"..self.name.."_color"], t)
-
-				t = {
-					"text", self.L["TEXT"]["COLORFOCUS"],
-					"tooltipTitle", self.L["TEXT"]["COLORFOCUS"],
-					"tooltipText", self.L["TOOLTIP"]["COLORFOCUS"],
-					"hasColorSwatch", true,
-					"r", 1,
-					"g", 1,
-					"b", 1,
-					"colorFunc", function(val, mod, r, g, b, a) ArcHUD.modDB("set", val, mod, {r = r, g = g, b = b}) end,
-					"colorArg1", "ColorFocus",
-					"colorArg2", self.name
-				}
-				table.insert(self.parent.dewdrop_menu["L3_"..self.name.."_color"], t)
-
-				t = {
-					"text", self.L["TEXT"]["COLORENERGY"],
-					"tooltipTitle", self.L["TEXT"]["COLORENERGY"],
-					"tooltipText", self.L["TOOLTIP"]["COLORENERGY"],
-					"hasColorSwatch", true,
-					"r", 1,
-					"g", 1,
-					"b", 1,
-					"colorFunc", function(val, mod, r, g, b, a) ArcHUD.modDB("set", val, mod, {r = r, g = g, b = b}) end,
-					"colorArg1", "ColorEnergy",
-					"colorArg2", self.name
-				}
-				table.insert(self.parent.dewdrop_menu["L3_"..self.name.."_color"], t)
-			else
-				t = {
-					"text", self.L["TEXT"]["COLORSET"],
-					"tooltipTitle", self.L["TEXT"]["COLORSET"],
-					"tooltipText", self.L["TOOLTIP"]["COLORSET"],
-					"hasColorSwatch", true,
-					"r", 1,
-					"g", 1,
-					"b", 1,
-					"colorFunc", function(val, mod, r, g, b, a) ArcHUD.modDB("set", val, mod, {r = r, g = g, b = b}) end,
-					"colorArg1", "Color",
-					"colorArg2", self.name
-				}
-				table.insert(self.parent.dewdrop_menu["L3_"..self.name.."_color"], t)
-			end
-		end
-	end
-
-	for k,v in ipairs(self.options) do
-		if(self.customlocals) then
-			if(type(v) == "table") then
-				t = {
-					"text", v.text,
-					"tooltipTitle", v.text,
-					"tooltipText", v.tooltip,
-					"checked", false,
-					"func", ArcHUD.modDB,
-					"arg1", "toggle",
-					"arg2", v.name,
-					"arg3", self.name
-				}
-				table.insert(self.parent.dewdrop_menu["L2_"..self.name], t)
-			end
-		else
-			if(type(v) == "table") then
-				t = {
-					"text", self.L["TEXT"][v.text],
-					"tooltipTitle", self.L["TEXT"][v.text],
-					"tooltipText", self.L["TOOLTIP"][v.tooltip],
-					"checked", false,
-					"func", ArcHUD.modDB,
-					"arg1", "toggle",
-					"arg2", v.name,
-					"arg3", self.name
-				}
-				table.insert(self.parent.dewdrop_menu["L2_"..self.name], t)
-			end
-		end
-	end
-
-	t = {
-		"text", self.L["TEXT"]["SIDE"],
-		"tooltipTitle", self.L["TEXT"]["SIDE"],
-		"tooltipText", self.L["TOOLTIP"]["SIDE"],
-		"disabled", (not self.options.attach),
-		"hasArrow", true,
-		"value", "L3_"..self.name
-	}
-	table.insert(self.parent.dewdrop_menu["L2_"..self.name], t)
-	self.parent.dewdrop_menu["L3_"..self.name] = {
-		{
-			"text", self.L["SIDE"]["LEFT"],
-			"isRadio", true,
-			"checked", true,
-			"func", ArcHUD.modDB,
-			"arg1", "set",
-			"arg2", "Side",
-			"arg3", self.name,
-			"arg4", 1
-		},
-		{
-			"text", self.L["SIDE"]["RIGHT"],
-			"isRadio", true,
-			"checked", false,
-			"func", ArcHUD.modDB,
-			"arg1", "set",
-			"arg2", "Side",
-			"arg3", self.name,
-			"arg4", 2
-		},
-	}
-	t = {
-		"text", self.L["TEXT"]["LEVEL"],
-		"tooltipTitle", self.L["TEXT"]["LEVEL"],
-		"tooltipText", self.L["TOOLTIP"]["LEVEL"],
-		"disabled", (not self.options.attach),
-		"hasArrow", true,
-		"hasSlider", true,
-		"sliderMin", -5,
-		"sliderMax", 5,
-		"sliderStep", 1,
-		"sliderValue", 0,
-		"sliderFunc", ArcHUD.modDB,
-		"sliderArg1", "set",
-		"sliderArg2", "Level",
-		"sliderArg3", self.name
-	}
-	table.insert(self.parent.dewdrop_menu["L2_"..self.name], t)
-
-
-end
-]]--
 
 ----------------------------------------------
 -- Enabling/Disabling
@@ -356,10 +72,9 @@ function ArcHUD.modulePrototype:OnInitialize()
 		self.date = self.parent.date
 	end
 	
-	-- Check for necessary alpha updates (e.g. on entering combat)
-	-- TODO: maybe change to event-based triggers
-	if(not self.parent:MetroStatus(self.name .. "CheckAlpha") and not self.noAutoAlpha) then
-		self.parent:RegisterMetro(self.name .. "CheckAlpha", ArcHUDRingTemplate.CheckAlpha, 0.1, self)
+	-- Check for necessary alpha updates
+	if (not self.noAutoAlpha) then
+		self:RegisterTimer("CheckAlpha", ArcHUDRingTemplate.CheckAlpha, 0.1, self, true)
 	end
 	self:Debug(d_info, "Ring loaded")
 end
@@ -504,9 +219,9 @@ function ArcHUD.modulePrototype:ARCHUD_MODULE_UPDATE(message, module)
 				end
 			end
 
-			if(self.Update) then
+			if(self.OnModuleUpdate) then
 				self:Debug(d_info, "Updating ring")
-				self:Update()
+				self:OnModuleUpdate()
 			end
 		end
 	end
@@ -573,7 +288,7 @@ function ArcHUD.modulePrototype:StartRingTimers()
 		self.f.fillUpdate:Play()
 	end
 	if (not self.noAutoAlpha) then
-		self.parent:StartMetro(self.name .. "CheckAlpha")
+		self:StartTimer("CheckAlpha")
 	end
 end
 
@@ -635,7 +350,33 @@ function ArcHUD.modulePrototype:GetPowerBarColorText(powerType)
 	end
 end
 
+----------------------------------------------
+-- Register a timer
+----------------------------------------------
+function ArcHUD.modulePrototype:RegisterTimer(name, callback, delay, arg, repeating)
+	self.parent:RegisterTimer(self.name..name, callback, delay, arg, repeating)
+end
+
+----------------------------------------------
+-- Start a registered timer
+----------------------------------------------
+function ArcHUD.modulePrototype:StartTimer(name)
+	self.parent:StartTimer(self.name..name)
+end
+
+----------------------------------------------
+-- Stop a registered timer
+----------------------------------------------
+function ArcHUD.modulePrototype:StopTimer(name)
+	self.parent:StopTimer(self.name..name)
+end
+
+----------------------------------------------
+-- Create standard module options
+----------------------------------------------
 function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
+	local t
+	
 	self.optionsTable = {
 		type		= "group",
 		name		= LM[self:GetName()],

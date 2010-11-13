@@ -44,7 +44,7 @@ function module:Initialize()
 	self:CreateStandardModuleOptions(40)
 end
 
-function module:Update()
+function module:OnModuleUpdate()
 	if(self.db.profile.ShowPerc) then
 		self.MPPerc:Show()
 	else

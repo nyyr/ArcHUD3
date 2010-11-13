@@ -50,7 +50,7 @@ end
 ----------------------------------------------
 -- Update
 ----------------------------------------------
-function module:Update()
+function module:OnModuleUpdate()
 	-- Get options and setup accordingly
 	if(self.db.profile.ShowText) then
 		self.HPText:Show()

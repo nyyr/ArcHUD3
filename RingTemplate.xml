@@ -69,14 +69,32 @@
 					if (not self.ring.fillUpdate:IsPlaying()) then
 						self.ring.fillUpdate:Play();
 					end
+					self.destAlpha = self.ring:GetAlpha() + self.alphaAnim:GetChange()
 				</OnPlay>
 				<OnFinished>
-					self.ring:SetAlpha(self.ring.destAlpha);
-					if (self.ring.destAlpha == 0 and self.ring.fillUpdate:IsPlaying()) then
-						self.ring.fillUpdate:Stop();
-					end
+					self.ring:SetAlpha(self.destAlpha);
+					self.ring:applyAlpha_OnFinished();
 				</OnFinished>
 			</Scripts>
+		</AnimationGroup>
+		
+		<!-- (more or less) synchronized pulse -->
+		<AnimationGroup parentKey="syncPulse" looping="REPEAT">
+			<Animation change="0" duration="1" order="1">
+				<Scripts>
+					<OnLoad>
+						self.ring = self:GetParent():GetParent();
+					</OnLoad>
+					<OnUpdate>
+						self.ring:SetAlpha(0.6 + math.cos(GetTime() * 3.14159265) * 0.3);
+					</OnUpdate>
+					<OnFinished>
+						local destAlpha = self.ring.destAlpha;
+						self.ring.destAlpha = -1;
+						self.ring:SetRingAlpha(destAlpha);
+					</OnFinished>
+				</Scripts>
+			</Animation>
 		</AnimationGroup>
 	</Animations>
 	

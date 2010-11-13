@@ -5,7 +5,7 @@ ArcHUD = LibStub("AceAddon-3.0"):NewAddon("ArcHUD",
 	"AceConsole-3.0",
 	"AceEvent-3.0",
 	"AceHook-3.0",
-	"LibShefkiTimer-1.0")
+	"AceTimer-3.0")
 
 -- Version
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
@@ -29,7 +29,7 @@ local d_notice = 3
 -- Set up tables
 ArcHUD.movableFrames = {}
 ArcHUD.Nameplates = {}
-ArcHUD.metroHandlers = {}
+ArcHUD.timers = {}
 
 -- Set up default configuration
 local cfgDefaults = {
@@ -140,15 +140,11 @@ function ArcHUD:OnInitialize()
 	--self:SetDebugging(true)
 	self:SetDebugLevel(self.db.profile.Debug)
 
-	self.metroFrame = CreateFrame("Frame")
-	self.metroFrame:Hide()
-	self.metroFrame:SetScript("OnUpdate", self.OnMetroUpdate)
-
-	self:LevelDebug(d_notice, "Registering Metrognome timers")
-	self:RegisterMetro("UpdatePetNamePlate", self.UpdatePetNamePlate, 2, self)
-	self:RegisterMetro("UpdateTargetTarget", self.UpdateTargetTarget, 1, self)
-	self:RegisterMetro("CheckNamePlateMouseOver", self.CheckNamePlateMouseOver, 0.1, self)
-	self:RegisterMetro("UpdateTargetPower", self.UpdateTargetPower, 0.1, self)
+	self:LevelDebug(d_notice, "Registering timers")
+	self:RegisterTimer("UpdatePetNamePlate", self.UpdatePetNamePlate, 2, self, true)
+	self:RegisterTimer("UpdateTargetTarget", self.UpdateTargetTarget, 1, self, true)
+	self:RegisterTimer("CheckNamePlateMouseOver", self.CheckNamePlateMouseOver, 0.1, self, true)
+	self:RegisterTimer("UpdateTargetPower", self.UpdateTargetPower, 0.1, self, true)
 
 	self:LevelDebug(d_info, "Creating HUD frame elements")
 	self.TargetHUD = self:CreateHUDFrames()
@@ -263,7 +259,7 @@ function ArcHUD:OnProfileEnable()
 
 		self:LevelDebug(d_notice, "Enabling TargetTarget updates")
 		-- Enable Target's Target('s Target) updates
-		self:StartMetro("UpdateTargetTarget")
+		self:StartTimer("UpdateTargetTarget")
 
 		if(self.db.profile.AttachTop) then
 			self:LevelDebug(d_notice, "Attaching targetframe to top")
@@ -283,8 +279,8 @@ function ArcHUD:OnProfileEnable()
 			end
 		end
 	else
-		self:StopMetro("UpdateTargetTarget")
-		self:StopMetro("UpdateTargetPower")
+		self:StopTimer("UpdateTargetTarget")
+		self:StopTimer("UpdateTargetPower")
 		self.TargetHUD:SetAlpha(0)
 		self.TargetHUD:Lock()
 	end
@@ -337,12 +333,12 @@ function ArcHUD:OnProfileDisable()
 	self:UnregisterEvent("PLAYER_FOCUS_CHANGED") 
 
 	self:LevelDebug(d_notice, "Disabling timers")
-	self:StopMetro("UpdateTargetTarget")
-	self:StopMetro("UpdatePetNamePlate")
-	self:StopMetro("CheckNamePlateMouseOver")
-	self:StopMetro("UpdateTargetPower")
-	self:UnregisterMetro("Enable_player")
-	self:UnregisterMetro("Enable_pet")
+	self:StopTimer("UpdateTargetTarget")
+	self:StopTimer("UpdatePetNamePlate")
+	self:StopTimer("CheckNamePlateMouseOver")
+	self:StopTimer("UpdateTargetPower")
+	--self:UnregisterMetro("Enable_player")
+	--self:UnregisterMetro("Enable_pet")
 
 	self:LevelDebug(d_notice, "Hiding frames")
 	for i=1,16 do
@@ -421,10 +417,10 @@ function ArcHUD:TargetUpdate(event, arg1)
 		-- Does the unit have mana? If so we want to show it
 		if (UnitPowerMax("target") > 0) then
 			self.TargetHUD.MPText:SetText(UnitPower("target").."/"..UnitPowerMax("target"))
-			self:StartMetro("UpdateTargetPower")
+			self:StartTimer("UpdateTargetPower")
 		else
 			self.TargetHUD.MPText:SetText(" ")
-			self:StopMetro("UpdateTargetPower")
+			self:StopTimer("UpdateTargetPower")
 		end
 
 		local addtolevel = ""
@@ -564,7 +560,7 @@ function ArcHUD:TargetUpdate(event, arg1)
 		
 		self.TargetHUD.Model:Hide()
 
-		self:StopMetro("UpdateTargetPower")
+		self:StopTimer("UpdateTargetPower")
 		self.Nameplates.target:Disable()
 	end
 end
@@ -1067,154 +1063,62 @@ function ArcHUD:HideBlizzardFocus(show)
 end
 
 ----------------------------------------------
--- Register callback for metronome
--- From Metrognome-2.0
+-- Register a timer
 ----------------------------------------------
--- Sets up a new OnUpdate handler
--- name - A unique name, if you only need one handler then your addon's name will suffice here
--- func - Function to be called
--- rate (optional but highly reccomended) - The rate (in seconds) at which your function should be called
--- a1-4 (optional) - A args to be passed to func, this is a great place to pass self
---                   if a2 is defined then the elapsed time will not be passed to your function!
--- Returns true if you've been registered
-----------------------------------------------
-function ArcHUD:RegisterMetro(name, func, rate, a1, a2, a3, a4, a5, a6)
-	self:LevelDebug(d_notice, "Registering metronome on "..name)
-
-	if self.metroHandlers[name] then
-		self:LevelDebug(d_warn, "A timer with the name "..name.." is already registered")
-	end
-
-	if func == nil then
-		self:LevelDebug(d_warn, "*** Attempt to register "..name.." without a function")
-		return
-	end
-
-	local t = {}
-	t.name, t.func, t.rate = name, func, rate or 0
-	t.a1, t.a2, t.a3, t.a4, t.a5, t.a6 = a1, a2, a3, a4, a5, a6
-	self.metroHandlers[name] = t
-	return true
+function ArcHUD:RegisterTimer(name, callback, delay, arg, repeating)
+	self.timers[name] = {func = callback, delay = delay, arg = arg, repeating = repeating}
 end
 
 ----------------------------------------------
--- Unregister callback for metronome
--- From Metrognome-2.0
+-- Start a registered timer
 ----------------------------------------------
--- Removes an OnUpdate handler
--- name - the hander you want to remove
--- Returns true if successful
-----------------------------------------------
-function ArcHUD:UnregisterMetro(a1,a2,a3,a4,a5,a6,a7,a8,a9,a10)
-	self:LevelDebug(d_notice, "Unregistering metronome on "..a1)
-
-	if not self.metroHandlers[a1] then return end
-
-	--reclaimtable(self.metroHandlers[a1])
-	self.metroHandlers[a1] = nil
-
-	if a2 then self:UnregisterMetro(a2,a3,a4,a5,a6,a7,a8,a9,a10)
-	elseif not next(self.metroHandlers) then self.metroFrame:Hide() end
-	return true
-end
-
-----------------------------------------------
--- Unregister callback for metronome
--- From Metrognome-2.0
-----------------------------------------------
--- Query a timer's status
--- Args: name - the schedule you wish to look up
--- Returns: registered - true if a schedule exists with this name
---          rate - the registered rate, if defined
---          running - true if this schedule is currently running
---          limit - limit of times to repeat this timer
---          elapsed - time elapsed this cycle of the timer
-----------------------------------------------
-function ArcHUD:MetroStatus(name)
-	if not ArcHUD.metroHandlers[name] then return false end
-	return true, ArcHUD.metroHandlers[name].rate, ArcHUD.metroHandlers[name].running, ArcHUD.metroHandlers[name].limit, ArcHUD.metroHandlers[name].elapsed
-end
-
-----------------------------------------------
--- Metronome tick
--- From Metrognome-2.0
-----------------------------------------------
-function ArcHUD:OnMetroUpdate(elapsed)
-	if (ArcHUD.metroHandlers == nil) then
-		ArcHUD:LevelDebug(d_warn, "metroHandlers not initialized")
-		return
-	end
-	for i,v in pairs(ArcHUD.metroHandlers) do
-		if v.running then
-			v.elapsed = v.elapsed + elapsed
-			if v.elapsed >= v.rate then
-				local mem, time = gcinfo(), GetTime()
-				-- ArcHUD:LevelDebug(d_notice, "Metronome is calling "..i.." ("..elapsed.."s)")
-				v.func(v.a1 or v.arg, v.a2 or v.elapsed, v.a3, v.a4, v.a5, v.a6)
-				mem, time = gcinfo() - mem, GetTime() - time
-				if mem >= 0 then v.mem, v.time, v.count = (v.mem or 0) + mem, (v.time or 0) + time, (v.count or 0) + 1 end
-				v.elapsed = 0
-				if v.limit then v.limit = v.limit - 1 end
-				if v.limit and v.limit <= 0 then ArcHUD:StopMetro(i) end
+function ArcHUD:StartTimer(name)
+	local t = self.timers[name]
+	if (t) then
+		if not (t.active and (t.repeating or GetTime()-t.startTime < t.delay)) then
+			if (t.repeating) then
+				self.timers[name].handle = self:ScheduleRepeatingTimer(t.func, t.delay, t.arg)
+				self.timers[name].active = true
+				self:LevelDebug(d_warn, "Started repeating timer "..name..", handle "..tostring(self.timers[name].handle))
+			else
+				self.timers[name].handle = self:ScheduleTimer(t.func, t.delay, t.arg)
+				self.timers[name].active = true
+				self.timers[name].startTime = GetTime()
+				self:LevelDebug(d_warn, "Started single-shot timer "..name..", handle "..tostring(self.timers[name].handle))
 			end
 		end
+	else
+		self:LevelDebug(d_warn, "WARN: Tried to start unregistered timer (name "..name..")")
 	end
 end
 
 ----------------------------------------------
--- Add callback into metronome
--- From Metrognome-2.0
+-- Stop a registered timer
 ----------------------------------------------
--- Begins triggering updates
--- name - the hander you want to start
--- numexec (optional) - Limit the number of times the timer runs
--- Returns true if successful
-----------------------------------------------
-function ArcHUD:StartMetro(name, numexec)
-	-- self:LevelDebug(d_notice, "Starting metronome on "..name)
-
-	if not self.metroHandlers[name] then
-		self:LevelDebug(d_warn, "Attempt to start unregistered metronome callback "..name)
-		return
+function ArcHUD:StopTimer(name)
+	local t = self.timers[name]
+	if (t) then
+		if (t.active) then
+			if (not self:CancelTimer(t.handle, true)) then
+				self:LevelDebug(d_warn, "WARN: Tried to cancel invalid timer handle (name "..name..")")
+			else
+				self:LevelDebug(d_warn, "Stopped "..name..", handle "..tostring(t.handle))
+			end
+			self.timers[name].handle = nil
+			self.timers[name].active = nil
+		end
+	else
+		self:LevelDebug(d_warn, "WARN: Tried to cancel unregistered timer (name "..name..")")
 	end
-
-	self.metroHandlers[name].limit = numexec
-	self.metroHandlers[name].elapsed = 0
-	self.metroHandlers[name].running = true
-	self.metroFrame:Show()
-	return true
 end
 
 ----------------------------------------------
--- Remove callback into metronome
--- From Metrognome-2.0
+-- List timers
 ----------------------------------------------
--- Stops triggering updates
--- name - the hander you want to stop
--- Returns true if successful
-----------------------------------------------
-function ArcHUD:StopMetro(name)
-	-- self:LevelDebug(d_notice, "Stopping metronome on "..name)
-
-	if not self.metroHandlers[name] then return end
-
-	self.metroHandlers[name].running = nil
-	self.metroHandlers[name].limit = nil
-	if not next(self.metroHandlers) then self.metroFrame:Hide() end
-	return true
-end
-
-
-function ArcHUD:MetroPrintPerf()
-	local n = 0
-	local count, mem, time = 0, 0, 0
-	for i,v in pairs(ArcHUD.metroHandlers) do
-		self:Print(tostring(i)..": "..tostring(v.count).."x "..tostring(v.mem).."bytes "..tostring(v.time).."s")
-		n = n + 1
-		if (v.count) then count = count + v.count end
-		if (v.mem) then mem = mem + v.mem end
-		if (v.time) then time = time + v.time end
+function ArcHUD:TimersPrintPerf()
+	for n,t in pairs(self.timers) do
+		self:LevelDebug(d_warn, n..": delay "..t.delay..
+			", repeat "..tostring(t.repeating)..
+			", active "..tostring((t.repeating and t.active) or (t.active and GetTime()-t.startTime <= t.delay)))
 	end
-	self:Print(tostring(n).." registered")
-	self:Print("Totals: "..tostring(count).."x "..tostring(mem).."bytes "..tostring(time).."s")
 end

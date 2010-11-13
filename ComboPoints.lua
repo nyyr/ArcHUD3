@@ -8,7 +8,7 @@ local RemoveOldComboPoints_started = false
 
 function ArcHUD:InitComboPointsFrame()
 	self:RegisterEvent("UNIT_COMBO_POINTS", "UpdateComboPoints")
-	self:RegisterMetro("RemoveOldComboPoints", self.RemoveOldComboPoints, self.db.profile.OldComboPointsDecay, self)
+	self:RegisterTimer("RemoveOldComboPoints", self.RemoveOldComboPoints, self.db.profile.OldComboPointsDecay, self)
 	
 	_, class = UnitClass("player")
 	
@@ -48,7 +48,7 @@ function ArcHUD:UpdateComboPoints(event, arg1)
 			UnitExists("target") and not UnitIsDead("target"))) then
 		
 		if (RemoveOldComboPoints_started) then
-			self:StopMetro("RemoveOldComboPoints")
+			self:StopTimer("RemoveOldComboPoints")
 			RemoveOldComboPoints_started = false
 		end
 		
@@ -69,7 +69,7 @@ function ArcHUD:UpdateComboPoints(event, arg1)
 					self.db.profile.ColorOldComboPoints.r, 
 					self.db.profile.ColorOldComboPoints.g, 
 					self.db.profile.ColorOldComboPoints.b)
-				self:StartMetro("RemoveOldComboPoints")
+				self:StartTimer("RemoveOldComboPoints")
 				RemoveOldComboPoints_started = true
 			end
 		else
@@ -79,8 +79,7 @@ function ArcHUD:UpdateComboPoints(event, arg1)
 	end
 end
 
-function ArcHUD:RemoveOldComboPoints(elapsed)
-	self:StopMetro("RemoveOldComboPoints")
+function ArcHUD:RemoveOldComboPoints()
 	RemoveOldComboPoints_started = false
 	oldComboPoints = 0
 	self:SetComboPoints(0)

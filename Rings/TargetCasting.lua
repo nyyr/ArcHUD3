@@ -41,7 +41,7 @@ function module:Initialize()
 	self.channeling = 0
 end
 
-function module:Update()
+function module:OnModuleUpdate()
 	if(self.db.profile.ShowSpell) then
 		self.Text:Show()
 	else

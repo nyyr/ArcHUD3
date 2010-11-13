@@ -439,18 +439,71 @@ function ArcHUDRingTemplate:SetRingAlpha(destAlpha, instant)
 
 	if (instant or not self.applyAlpha) then
 		self:SetAlpha(destAlpha)
-		self.destAlpha = nil
+		self.destAlpha = destAlpha
 		return
 		
 	elseif (self.destAlpha ~= destAlpha) then
-		ArcHUD:LevelDebug(1, "ArcHUDRingTemplate:SetRingAlpha("..tostring(destAlpha).."), current "..tostring(self.destAlpha)..", name "..tostring(self:GetName()))
+		--ArcHUD:LevelDebug(1, "ArcHUDRingTemplate:SetRingAlpha("..tostring(destAlpha).."), current "..tostring(self.destAlpha)..", name "..tostring(self:GetName()))
 		self.destAlpha = destAlpha
 		if (self.applyAlpha:IsPlaying()) then
-			self.applyAlpha:Pause()
+			self.applyAlpha:Stop()
 		end
 		self.applyAlpha.alphaAnim:SetChange(destAlpha - self:GetAlpha())
 		self.applyAlpha:Play()
 	end
+end
+
+-----------------------------------------------------------
+-- Pulsing if necessary
+-----------------------------------------------------------
+function ArcHUDRingTemplate:applyAlpha_OnFinished()
+	local curAlpha = math.floor(self:GetAlpha()*100 + 0.5)/100
+	if (self.pulse) then
+		local pulseMax = 1.0
+		local pulseMin = 0.25
+		if (curAlpha < pulseMax) then
+			self.applyAlpha.alphaAnim:SetChange(pulseMax - curAlpha)
+		else
+			self.applyAlpha.alphaAnim:SetChange(pulseMin - pulseMax)
+		end
+		self.applyAlpha:Play()
+	else
+		--ArcHUD:LevelDebug(1, "curAlpha "..curAlpha..", destAlpha "..self.destAlpha)
+		if (curAlpha ~= self.destAlpha) then
+			self.applyAlpha.alphaAnim:SetChange(self.destAlpha - curAlpha)
+			self.applyAlpha:Play()
+		else
+			self:SetAlpha(self.destAlpha)
+			if (self.destAlpha == 0 and self.fillUpdate:IsPlaying()) then
+				self.fillUpdate:Stop();
+			end
+		end
+	end
+end
+
+-----------------------------------------------------------
+-- Start pulsing of ring
+-----------------------------------------------------------
+function ArcHUDRingTemplate:StartPulse()
+	self.pulse = true
+	if (not self.applyAlpha:IsPlaying()) then
+		local pulseMax = 1.0
+		local pulseMin = 0.25
+		local curAlpha = math.floor(self:GetAlpha()*100 + 0.5)/100
+		if (curAlpha < pulseMax) then
+			self.applyAlpha.alphaAnim:SetChange(pulseMax - curAlpha)
+		else
+			self.applyAlpha.alphaAnim:SetChange(pulseMin - pulseMax)
+		end
+		self.applyAlpha:Play()
+	end
+end
+
+-----------------------------------------------------------
+-- Stop pulsing of ring
+-----------------------------------------------------------
+function ArcHUDRingTemplate:StopPulse()
+	self.pulse = false
 end
 
 -----------------------------------------------------------
@@ -467,9 +520,9 @@ end
 
 -----------------------------------------------------------
 -- Trigger update of alpha value (e.g. on entering combat)
--- TODO: maybe change to event-based triggers
+-- Note: self is the module, not the ring
 -----------------------------------------------------------
-function ArcHUDRingTemplate:CheckAlpha(elapsed)
+function ArcHUDRingTemplate:CheckAlpha()
 	if (self.noAutoAlpha) then
 		self:Debug(1, "WARN: noAutoAlpha, but CheckAlpha timer started!")
 		return
@@ -485,62 +538,56 @@ function ArcHUDRingTemplate:CheckAlpha(elapsed)
 		isInCombat = self.parent.PlayerIsInCombat
 	end
 
-	if(self.f.pulse) then
-		self.f.alphaPulse = self.f.alphaPulse + (elapsed/2)
-		local camt = math.cos(self.f.alphaPulse * self.f.twoPi) * 0.3
-		self.f:SetAlpha(0.5-camt)
-	else
-		-- 1: Fade out when rings are full, regardless of combat status
-		-- 2: Always fade out when out of combat, regardless of ring status
-		-- 3: Fade out when out of combat or rings are full (default)
-		if(self.parent.db.profile.RingVisibility == 1 or self.parent.db.profile.RingVisibility == 3) then
-			if(self.parent.db.profile.RingVisibility == 3 and isInCombat) then
+	-- 1: Fade out when rings are full, regardless of combat status
+	-- 2: Always fade out when out of combat, regardless of ring status
+	-- 3: Fade out when out of combat or rings are full (default)
+	if(self.parent.db.profile.RingVisibility == 1 or self.parent.db.profile.RingVisibility == 3) then
+		if(self.parent.db.profile.RingVisibility == 3 and isInCombat) then
+			if (not UnitExists(unit)) or (self.isPower and (UnitIsDead(unit) or self.f.maxValue == 0)) then
+				self.f:SetRingAlpha(0)
+			elseif (self.isHealth and UnitIsDead(unit)) then
+				self.f:SetRingAlpha(self.parent.db.profile.FadeFull)
+			else
+				self.f:SetRingAlpha(self.parent.db.profile.FadeIC)
+			end
+		else
+			local powerTypeId, _ = UnitPowerType(unit)
+			-- powerTypeId: 1 = rage, 6 = runic_power
+			if (self.isPower and unit ~= "pet" and (powerTypeId == 1 or powerTypeId == 6) and self.f.maxValue > 0) then
+				if(math.floor(self.f.startValue) > 0 or math.floor(self.f.startValue) ~= math.floor(self.f.endValue)) then
+					self.f:SetRingAlpha(self.parent.db.profile.FadeOOC)
+				elseif(math.floor(self.f.startValue) == 0) then
+					self.f:SetRingAlpha(self.parent.db.profile.FadeFull)
+				end
+			else
 				if (not UnitExists(unit)) or (self.isPower and (UnitIsDead(unit) or self.f.maxValue == 0)) then
 					self.f:SetRingAlpha(0)
 				elseif (self.isHealth and UnitIsDead(unit)) then
 					self.f:SetRingAlpha(self.parent.db.profile.FadeFull)
 				else
-					self.f:SetRingAlpha(self.parent.db.profile.FadeIC)
-				end
-			else
-				local powerTypeId, _ = UnitPowerType(unit)
-				-- powerTypeId: 1 = rage, 6 = runic_power
-				if (self.isPower and unit ~= "pet" and (powerTypeId == 1 or powerTypeId == 6) and self.f.maxValue > 0) then
-					if(math.floor(self.f.startValue) > 0 or math.floor(self.f.startValue) ~= math.floor(self.f.endValue)) then
+					if(self.f.startValue < self.f.maxValue or math.floor(self.f.startValue) ~= math.floor(self.f.endValue)) then
 						self.f:SetRingAlpha(self.parent.db.profile.FadeOOC)
-					elseif(math.floor(self.f.startValue) == 0) then
+					elseif(self.f.startValue == self.f.maxValue) then
 						self.f:SetRingAlpha(self.parent.db.profile.FadeFull)
-					end
-				else
-					if (not UnitExists(unit)) or (self.isPower and (UnitIsDead(unit) or self.f.maxValue == 0)) then
-						self.f:SetRingAlpha(0)
-					elseif (self.isHealth and UnitIsDead(unit)) then
-						self.f:SetRingAlpha(self.parent.db.profile.FadeFull)
-					else
-						if(self.f.startValue < self.f.maxValue or math.floor(self.f.startValue) ~= math.floor(self.f.endValue)) then
-							self.f:SetRingAlpha(self.parent.db.profile.FadeOOC)
-						elseif(self.f.startValue == self.f.maxValue) then
-							self.f:SetRingAlpha(self.parent.db.profile.FadeFull)
-						end
 					end
 				end
 			end
-
-		elseif(self.parent.db.profile.RingVisibility == 2) then
-		
-			if ((not UnitExists(unit)) or (self.isPower and (UnitIsDead(unit) or self.f.maxValue == 0))) then
-				self.f:SetRingAlpha(0)
-			elseif (self.isHealth and UnitIsDead(unit)) then
-				self.f:SetRingAlpha(self.parent.db.profile.FadeFull)
-			else
-				if(isInCombat) then
-					self.f:SetRingAlpha(self.parent.db.profile.FadeIC)
-				else
-					self.f:SetRingAlpha(self.parent.db.profile.FadeFull)
-				end
-			end
-			
 		end
+
+	elseif(self.parent.db.profile.RingVisibility == 2) then
+	
+		if ((not UnitExists(unit)) or (self.isPower and (UnitIsDead(unit) or self.f.maxValue == 0))) then
+			self.f:SetRingAlpha(0)
+		elseif (self.isHealth and UnitIsDead(unit)) then
+			self.f:SetRingAlpha(self.parent.db.profile.FadeFull)
+		else
+			if(isInCombat) then
+				self.f:SetRingAlpha(self.parent.db.profile.FadeIC)
+			else
+				self.f:SetRingAlpha(self.parent.db.profile.FadeFull)
+			end
+		end
+		
 	end
 end
 
@@ -564,7 +611,6 @@ function ArcHUDRingTemplate:GhostMode(state, unit)
 		-- Prepare health ring
 		if(fh and not fh.f.pulse) then
 			fh.f:UpdateColor(color)
-			fh.f.alphaPulse = 0
 			fh.f:SetMax(1)
 			fh.f:SetValue(1)
 			if(unit == "player") then
@@ -575,28 +621,27 @@ function ArcHUDRingTemplate:GhostMode(state, unit)
 				fh.HPPerc:SetText(DEAD)
 			end
 			-- Enable pulsing
-			fh.f.pulse = true
+			fh.f.syncPulse:Play()
 		end
 
 		-- Prepare mana ring
 		if(fm and unit == "player" and not fm.f.pulse) then
 			fm.f:UpdateColor(color)
-			fm.f.alphaPulse = 0
 			fm.f:SetMax(1)
 			fm.f:SetValue(1)
 			fm.MPText:SetText("")
 			fm.MPPerc:SetText("")
 			-- Enable pulsing
-			fm.f.pulse = true
+			fm.f.syncPulse:Play()
 		end
 	else
-		if(fh and fh.f.pulse) then
-			fh.f.pulse = false
+		if(fh and fh.f.syncPulse:IsPlaying()) then
+			fh.f.syncPulse:Stop()
 			fh.f:SetMax(UnitHealthMax(unit))
 			fh.f:SetValue(UnitHealth(unit))
 		end
-		if(fm and fm.f.pulse) then
-			fm.f.pulse = false
+		if(fm and fm.f.syncPulse:IsPlaying()) then
+			fm.f.syncPulse:Stop()
 			fm.f:SetMax(UnitPowerMax(unit))
 			fm.f:SetValue(UnitPower(unit))
 			fm.f:UpdateColor(PowerBarColor[UnitPowerType(unit)])
@@ -607,23 +652,9 @@ end
 -- The OnLoad method, call self for each template object to set it up and
 -- get things going
 function ArcHUDRingTemplate:OnLoad(frame)
-
 	frame.quadrants = {}
 	frame.quadrants[1] = frame.ringQuadrant1
 	frame.quadrants[2] = frame.ringQuadrant2
-
-	--  Just do global self resolution once.
-	--local self = self
-
-	-- Grab texture references and frame name
-	--frame.name = frame
-	-- if(not frame.quadrants) then
-		-- frame.quadrants = {}
-		-- frame.quadrants[1] = getglobal(frame.name .. "TQ1")
-		-- frame.quadrants[2] = getglobal(frame.name .. "TQ2")
-		-- frame.chip         = getglobal(frame.name .. "TC")
-		-- frame.slice        = getglobal(frame.name .. "TS")
-	-- end
 
 	-- Initialize size and default texture ringFactor
 	frame.radius = (frame:GetWidth() * 0.5)
@@ -644,6 +675,9 @@ function ArcHUDRingTemplate:OnLoad(frame)
 	frame.SetReversed				= self.SetReversed
 	frame.SetRingAlpha				= self.SetRingAlpha
 	frame.GhostMode					= self.GhostMode
+	frame.StartPulse				= self.StartPulse
+	frame.StopPulse					= self.StopPulse
+	frame.applyAlpha_OnFinished		= self.applyAlpha_OnFinished
 
 	frame.startValue = 0
 	frame.endValue = 0
@@ -664,21 +698,9 @@ function ArcHUDRingTemplate:OnLoad(frame)
 end
 
 function ArcHUDRingTemplate:OnLoadBG(frame)
-
 	frame.quadrants = {}
 	frame.quadrants[1] = frame.ringQuadrant1
 	frame.quadrants[2] = frame.ringQuadrant2
-
-	-- Grab texture references and frame name
-	--frame.name = frame
---	frame.name = frame
-	-- if(not frame.quadrants) then
-		-- frame.quadrants = {}
-		-- frame.quadrants[1] = getglobal(frame.name .. "TQ1")
-		-- frame.quadrants[2] = getglobal(frame.name .. "TQ2")
-		-- frame.chip         = getglobal(frame.name .. "TC")
-		-- frame.slice        = getglobal(frame.name .. "TS")
-	-- end
 
 	-- Initialize size and default texture ringFactor
 	frame.radius = (frame:GetWidth() * 0.5)

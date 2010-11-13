@@ -17,7 +17,7 @@ module.defaults = {
 }
 module.options = {
 	{name = "Flash", text = "FLASH", tooltip = "FLASH"},
-	nocolor = true,
+	hascolor = true,
 	attach = true,
 }
 module.localized = true
@@ -33,7 +33,7 @@ function module:Initialize()
 	self:CreateStandardModuleOptions(45)
 end
 
-function module:Update()
+function module:OnModuleUpdate()
 	self.Flash = self.db.profile.Flash
 end
 
@@ -63,14 +63,13 @@ function module:UpdateShards()
 	self.f:SetValue(num)
 	
 	if(num < SHARD_BAR_NUM_SHARDS and num >= 0) then
-		self.f.pulse = false
-		self.f.alphaPulse = 0
+		self.f:StopPulse()
 		self.f:UpdateColor(self.db.profile.Color)
 	else
 		if(self.Flash) then
-			self.f.pulse = true
+			self.f:StartPulse()
 		else
-			self.f.pulse = false
+			self.f:StopPulse()
 		end
 	end
 	
