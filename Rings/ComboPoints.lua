@@ -76,6 +76,7 @@ function module:UpdateComboPoints(event, arg1)
 		self.f:SetValue(self.oldPoints)
 		if(self.oldPoints < 5 and self.oldPoints >= 0) then
 			self.f:StopPulse()
+			self.f:UpdateColor(self.db.profile.Color)
 		else
 			if(self.Flash) then
 				self.f:StartPulse()

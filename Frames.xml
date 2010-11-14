@@ -15,7 +15,7 @@
 			<Size x="300" y="100"/>
 			<Anchors>
 				<Anchor point="TOP" relativeTo="$parent" relativePoint="BOTTOM">
-					<Offset><AbsDimension x="0" y="50"/></Offset>
+					<Offset><AbsDimension x="0" y="60"/></Offset>
 				</Anchor>
 			</Anchors>
 		</Frame>

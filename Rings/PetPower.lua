@@ -41,7 +41,7 @@ function module:Initialize()
 
 	self.MPPerc = self:CreateFontString(self.f, "BACKGROUND", {100, 17}, 16, "LEFT", {1.0, 1.0, 1.0}, {"BOTTOMLEFT", self.f, "BOTTOMLEFT", 65, -125})
 	
-	self:CreateStandardModuleOptions(40)
+	self:CreateStandardModuleOptions(35)
 end
 
 function module:OnModuleUpdate()

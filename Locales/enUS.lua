@@ -15,34 +15,25 @@ L["TEXT_RESET_CONFIRM"]	= "All settings have been reset to their defaults"
 
 L["FONT"]				= "FRIZQT__.TTF"
 
-L["Version: "]		= true
-L["Author: "]		= true
+L["Version"]		= true
+L["Authors"]		= true
 
 --	Options
 L["TEXT"] = {
 	TITLE		= "ArcHUD3 Options",
-
+	GENERAL		= "General settings",
+	
 	DISPLAY		= "Display options",
-	PLAYERFRAME	= "Show player frame",
+	PLAYERFRAME	= "Player frame",
 	TARGETFRAME	= "Target frame",
 	PLAYERMODEL	= "3D model for players",
 	MOBMODEL	= "3D model for mobs",
 	SHOWGUILD	= "Show player guild",
 	SHOWCLASS	= "Show target class",
 	SHOWBUFFS 	= "Show buffs/debuffs",
-	SHOWPVP		= "Show player PVP status flag",
-	ATTACHTOP	= "Attach target frame to top",
+	SHOWPVP		= "Show player PvP status flag",
 	TOT			= "Enable target's target",
 	TOTOT		= "Enable target's target's target",
-	BLIZZPLAYER = "Blizzard player frame visible",
-	BLIZZTARGET = "Blizzard target frame visible",
-	BLIZZFOCUS  = "Blizzard focus frame visible",
-
-	COMBOPOINTS = "Combo points options",
-	SHOWCOMBO	= "Show combo point text",
-	COMBODECAY	= "Decay delay",
-	HOLYPOWERCOMBO = "Show Holy Power as combo points",
-	SOULSHARDCOMBO = "Show Soul Shards as combo points",
 
 	NAMEPLATES	= "Nameplate options",
 	NPPLAYEROPT = "Player",
@@ -50,33 +41,41 @@ L["TEXT"] = {
 	NPPET		= "Pet",
 	HOVERMSG	= "Nameplate hover message",
 	HOVERDELAY	= "Nameplate hover delay",
-	
 	NPTARGETOPT = "Targets",
 	NPTARGET	= "Target",
 	NPTOT		= "Target's target",
 	NPTOTOT		= "Target's target's target",
 	NPCOMBAT	= "Enable nameplates in combat",
 	PETNPFADE	= "Adjust pet nameplate alpha",
-
-	MOVEFRAMES	= "Movable Frames",
-	MFUNLOCK	= "Unlock movable frames",
-	MFRESET		= "Reset positions",
+	
+	COMBOPOINTS = "Combo points options",
+	SHOWCOMBO	= "Show combo point text",
+	COMBODECAY	= "Decay delay",
+	HOLYPOWERCOMBO = "Show Holy Power as combo points",
+	SOULSHARDCOMBO = "Show Soul Shards as combo points",
 
 	FADE		= "Fade options",
 	FADE_FULL	= "When full",
 	FADE_OOC	= "Out of combat",
 	FADE_IC		= "In combat",
-
 	RINGVIS		= "Fade behaviour",
 	RINGVIS_1	= "Fade Full: Fade when full",
 	RINGVIS_2	= "Fade OOC: Fade when out of combat",
-	RINGVIS_3	= "Fade Both: Fade when full or out of combat",
-
-	MISC		= "Miscellanous options",
+	RINGVIS_3	= "Fade Both: Fade when full or out of combat (default)",
+	
+	POSITIONING	= "Positioning",
 	WIDTH		= "HUD width",
 	YLOC		= "Vertical alignment",
 	XLOC		= "Horizontal alignment",
 	SCALE		= "Scale",
+	ATTACHTOP	= "Attach target frame to top",
+	MFUNLOCK	= "Unlock movable frames",
+	MFRESET		= "Reset positions",
+	
+	MISC		= "Miscellanous options",
+	BLIZZPLAYER = "Blizzard player frame visible",
+	BLIZZTARGET = "Blizzard target frame visible",
+	BLIZZFOCUS  = "Blizzard focus frame visible",
 
 	RINGS		= "Ring options",
 	RING		= "Ring",
@@ -93,15 +92,6 @@ L["TOOLTIP"] = {
 	SHOWPVP		= "Toggle display of PVP status flag on the player nameplate",
 	TOT			= "Enable displaying of target's target",
 	TOTOT		= "Enable displaying of target's target's target",
-	ATTACHTOP	= "Attach target frame to the top of the rings instead of the bottom",
-	BLIZZPLAYER = "Toggles visibility of the Blizzard player frame",
-	BLIZZTARGET = "Toggles visibility of the Blizzard target frame",
-	BLIZZFOCUS  = "Toggles visibility of the Blizzard focus frame",
-
-	SHOWCOMBO	= "Toggle display of combo points in the center of the HUD",
-	COMBODECAY	= "Set delay in seconds before combo points on previous target disappear (set to 0 to disable this feature)",
-	HOLYPOWERCOMBO = "Toggle display of Holy Power points as combo points (combo points must be turned on)",
-	SOULSHARDCOMBO = "Toggle display of Soul Shards as combo points (combo points must be turned on)",
 
 	NPPLAYER	= "Toggle clickable player's nameplate",
 	NPPET		= "Toggle clickable pet's nameplate",
@@ -112,23 +102,35 @@ L["TOOLTIP"] = {
 	PETNPFADE	= "Automatically adjust the pet nameplate alpha based on pet happiness",
 	HOVERMSG	= "Toggle displaying of a chat message when mouse input is enabled",
 	HOVERDELAY	= "Amount of seconds needed to hover above the player/pet nameplate to activate it",
-
-	MFUNLOCK	= "Allows you to move frames around freely",
-	MFRESET		= "Reset positions of movable frames",
+	
+	SHOWCOMBO	= "Toggle display of combo points in the center of the HUD",
+	COMBODECAY	= "Set delay in seconds before combo points on previous target disappear (set to 0 to disable this feature)",
+	HOLYPOWERCOMBO = "Toggle display of Holy Power points as combo points (combo points must be turned on)",
+	SOULSHARDCOMBO = "Toggle display of Soul Shards as combo points (combo points must be turned on)",
 
 	FADE_FULL	= "Alpha to fade to when out of combat and ring at 100%",
 	FADE_OOC	= "Alpha to fade to when out of combat or ring not at 100%",
 	FADE_IC		= "Alpha to fade to when in combat (only used if behaviour is set to FadeBoth or FadeOOC)",
+	RINGVIS		= "Sets when the rings fade out:\n" ..
+				  "Fade Full: Fade out when rings are full, regardless of combat status\n" ..
+				  "Fade OOC: Always fade out when out of combat, regardless of ring status\n" ..
+				  "Fade both: Fade out when out of combat or rings are full (default)",
+	RINGVIS_1	= "Fade out when rings are full, regardless of combat status",
+	RINGVIS_2	= "Always fade out when out of combat, regardless of ring status",
+	RINGVIS_3	= "Fade out when out of combat or rings are full (default)",
 
 	WIDTH		= "Sets how much the rings should be separated from the center",
 	YLOC		= "Positions ArcHUD along the Y-axis. Positive values brings it up, negative values brings it down",
 	XLOC		= "Positions ArcHUD along the X-axis. Positive values brings it right, negative values brings it left",
 	SCALE		= "Set the Scale Factor",
-
-	RINGVIS		= "Sets when the rings fade out",
-	RINGVIS_1	= "Fade out when rings are full, regardless of combat status",
-	RINGVIS_2	= "Always fade out when out of combat, regardless of ring status",
-	RINGVIS_3	= "Fade out when out of combat or rings are full (default)",
+	ATTACHTOP	= "Attach target frame to the top of the rings instead of the bottom",
+	MFUNLOCK	= "Allows you to move target frames around freely",
+	MFRESET		= "Reset positions of movable frames",
+	
+	BLIZZPLAYER = "Toggles visibility of the Blizzard player frame",
+	BLIZZTARGET = "Toggles visibility of the Blizzard target frame",
+	BLIZZFOCUS  = "Toggles visibility of the Blizzard focus frame",
+	
 }
 
 
@@ -137,8 +139,8 @@ local LM = LibStub("AceLocale-3.0"):NewLocale("ArcHUD_Module", "enUS", true)
 
 LM["FONT"]			= "FRIZQT__.TTF"
 
-LM["Version: "]	= true
-LM["Author: "]	= true
+LM["Version"]	= true
+LM["Authors"]	= true
 
 LM["Health"]		= "Player Health"
 LM["Power"]			= "Player Power"
@@ -156,6 +158,7 @@ LM["ComboPoints"]	= "Combo Points"
 LM["EnergyTick"]	= "Energy Tick"
 LM["HolyPower"]		= "Holy Power"
 LM["SoulShards"]	= "Soul Shards"
+LM["CustomBuff"]	= "Custom Buff" -- TODO: to be removed
 
 LM["TEXT"] = {
 	TITLE		= "Arcs Options",
@@ -164,7 +167,7 @@ LM["TEXT"] = {
 	OUTLINE		= "Ring outline",
 	SHOWTEXT	= "Show text",
 	SHOWPERC	= "Show percentage",
-	FLASH		= "Flash at max combo points",
+	FLASH		= "Flash when ring is full",
 	SHOWSPELL	= "Show spell being cast",
 	SHOWTIME	= "Show spell timer",
 	HIDEBLIZZ	= "Hide default Blizzard frame",
@@ -188,6 +191,18 @@ LM["TEXT"] = {
 	COLORFOCUS 	= "Focus ring color",
 	COLORENERGY	= "Energy ring color",
 	ATTACHRING	= "Detach ring",
+	
+	CUSTOM		= "Custom Buff Arcs",
+	CUSTNEW		= "New custom arc",
+	CUSTRING	= "Arc options",
+	
+	CUSTDEBUFF	= "Debuff",
+	CUSTUNIT	= "Unit",
+	CUSTNAME	= "(De)Buff Name",
+	CUSTSTACKS	= "Use appliances",
+	CUSTTEXTSTACKS = "Display appliances",
+	CUSTMAX		= "Stack size",
+	CUSTDEL		= "Delete",
 }
 
 LM["TOOLTIP"] = {
@@ -197,7 +212,7 @@ LM["TOOLTIP"] = {
 	SHOWPERC	= "Toggle showing percentage",
 	SHOWSPELL	= "Toggle displaying of current spell being casted",
 	SHOWTIME	= "Toggle showing spell timer",
-	FLASH		= "Toggle flashing when at 5 combo points",
+	FLASH		= "Toggle flashing when ring is full",
 	HIDEBLIZZ	= "Toggle showing of default Blizzard frame",
 	ENABLEMENU	= "Toggle right-click menu on and off",
 	DEFICIT		= "Toggle health deficit (Max health - current health)",
@@ -218,6 +233,15 @@ LM["TOOLTIP"] = {
 	COLORFOCUS	= "Set custom focus ring color (only effective when colormode set to custom)",
 	COLORENERGY	= "Set custom energy ring color (only effective when colormode set to custom)",
 	ATTACHRING	= "Toggle attachment of the ring to the normal frame anchors (will behave like a normal ring when active)",
+	
+	CUSTNEW		= "Create a new custom arc for a specific buff or debuff",
+	CUSTDEBUFF	= "Look for debuffs instead of buffs",
+	CUSTUNIT	= "Unit on which the (de)buff is applied",
+	CUSTNAME	= "Name of the (de)buff",
+	CUSTSTACKS	= "Use appliances instead of remaining time for the arc",
+	CUSTTEXTSTACKS = "Display appliances as text instead of remaining time",
+	CUSTMAX		= "Maximum stack size of the (de)buff",
+	CUSTDEL		= "Delete this custom arc",
 }
 
 LM["SIDE"] = {

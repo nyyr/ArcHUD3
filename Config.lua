@@ -6,6 +6,7 @@ local LM = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Module")
 -- Ace config libs
 local AceConfig = LibStub("AceConfig-3.0")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+local AceConfigRegistry = LibStub("AceConfigRegistry-3.0")
 
 -- Debugging levels
 --   1 Warning
@@ -113,17 +114,17 @@ ArcHUD.configOptionsTableCore = {
 	args = {
 		info1 = {
 			type		= "description",
-			name		= "Version "..ArcHUD.version..", code name "..ArcHUD.codename,
+			name		= L["Version"].." "..ArcHUD.version..", code name "..ArcHUD.codename,
 			order		= 0,
 		},
 		info2 = {
 			type		= "description",
-			name		= "Authors: "..ArcHUD.authors,
+			name		= L["Authors"]..": "..ArcHUD.authors,
 			order		= 1,
 		},
 		header = {
 			type		= "header",
-			name		= "General settings",
+			name		= L["TEXT"]["GENERAL"],
 			order		= 2,
 		},
 		display = {
@@ -286,124 +287,13 @@ ArcHUD.configOptionsTableCore = {
 						ArcHUD:UpdateTargetHUD()
 					end,
 				},
-				-- Blizzard player frame
-				blizzPlayer = {
-					type		= "toggle",
-					name		= L["TEXT"]["BLIZZPLAYER"],
-					desc		= L["TOOLTIP"]["BLIZZPLAYER"],
-					order		= 10,
-					get			= function ()
-						return ArcHUD.db.profile.BlizzPlayer
-					end,
-					set			= function (info, v)
-						ArcHUD.db.profile.BlizzPlayer = v
-						ArcHUD:HideBlizzardPlayer(v)
-					end,
-				},
-				-- Blizzard target frame
-				blizzTarget = {
-					type		= "toggle",
-					name		= L["TEXT"]["BLIZZTARGET"],
-					desc		= L["TOOLTIP"]["BLIZZTARGET"],
-					order		= 11,
-					get			= function ()
-						return ArcHUD.db.profile.BlizzTarget
-					end,
-					set			= function (info, v)
-						ArcHUD.db.profile.BlizzTarget = v
-						ArcHUD:HideBlizzardTarget(v)
-					end,
-				},
-				-- Blizzard focus frame
-				blizzFocus = {
-					type		= "toggle",
-					name		= L["TEXT"]["BLIZZFOCUS"],
-					desc		= L["TOOLTIP"]["BLIZZFOCUS"],
-					order		= 12,
-					get			= function ()
-						return ArcHUD.db.profile.BlizzFocus
-					end,
-					set			= function (info, v)
-						ArcHUD.db.profile.BlizzFocus = v
-						ArcHUD:HideBlizzardFocus(v)
-					end,
-				},
 			},
 		}, -- display
-		
-		comboPoints = {
-			type		= "group",
-			name		= L["TEXT"]["COMBOPOINTS"],
-			order		= 11,
-			args		= {
-				-- Show Combo Points
-				showComboPoints = {
-					type		= "toggle",
-					name		= L["TEXT"]["SHOWCOMBO"],
-					desc		= L["TOOLTIP"]["SHOWCOMBO"],
-					order		= 0,
-					get			= function ()
-						return ArcHUD.db.profile.ShowComboPoints
-					end,
-					set			= function (info, v)
-						ArcHUD.db.profile.ShowComboPoints = v
-						ArcHUD:UpdateTargetHUD()
-					end,
-				},
-				comboPointsDecay = {
-					type		= "range",
-					name		= L["TEXT"]["COMBODECAY"],
-					desc		= L["TOOLTIP"]["COMBODECAY"],
-					min			= 0.0,
-					max			= 10.0,
-					step		= 0.1,
-					order		= 1,
-					get			= function ()
-						return ArcHUD.db.profile.OldComboPointsDecay
-					end,
-					set			= function (info, v)
-						ArcHUD.db.profile.OldComboPointsDecay = v
-						ArcHUD:UnregisterMetro("RemoveOldComboPoints")
-						ArcHUD:RegisterMetro("RemoveOldComboPoints", ArcHUD.RemoveOldComboPoints, ArcHUD.db.profile.OldComboPointsDecay, ArcHUD)
-						ArcHUD:SendMessage("ARCHUD_MODULE_UPDATE", "ComboPoints")
-					end,
-				},
-				-- Holy Power as Combo Points
-				ShowHolyPowerPoints = {
-					type		= "toggle",
-					name		= L["TEXT"]["HOLYPOWERCOMBO"],
-					desc		= L["TOOLTIP"]["HOLYPOWERCOMBO"],
-					order		= 10,
-					get			= function ()
-						return ArcHUD.db.profile.ShowHolyPowerPoints
-					end,
-					set			= function (info, v)
-						ArcHUD.db.profile.ShowHolyPowerPoints = v
-						ArcHUD:UpdateTargetHUD()
-					end,
-				},
-				-- Soul Shards as Combo Points
-				ShowSoulShardPoints = {
-					type		= "toggle",
-					name		= L["TEXT"]["SOULSHARDCOMBO"],
-					desc		= L["TOOLTIP"]["SOULSHARDCOMBO"],
-					order		= 11,
-					get			= function ()
-						return ArcHUD.db.profile.ShowSoulShardPoints
-					end,
-					set			= function (info, v)
-						ArcHUD.db.profile.ShowSoulShardPoints = v
-						ArcHUD:UpdateTargetHUD()
-					end,
-				},
-			},
-			
-		}, -- comboPoints
 		
 		nameplates = {
 			type		= "group",
 			name		= L["TEXT"]["NAMEPLATES"],
-			order		= 12,
+			order		= 11,
 			args		= {
 				-- Nameplates in combat
 				NameplateCombat = {
@@ -548,8 +438,22 @@ ArcHUD.configOptionsTableCore = {
 		fade = {
 			type		= "group",
 			name		= L["TEXT"]["FADE"],
-			order		= 13,
+			order		= 12,
 			args		= {
+				-- Fade behaviour
+				ringvis = {
+					type		= "select",
+					name		= L["TEXT"]["RINGVIS"],
+					desc		= L["TOOLTIP"]["RINGVIS"],
+					values		= {L["TEXT"]["RINGVIS_1"], L["TEXT"]["RINGVIS_2"], L["TEXT"]["RINGVIS_3"]},
+					order		= 0,
+					get			= function ()
+						return ArcHUD.db.profile.RingVisibility
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.RingVisibility = v
+					end,
+				},
 				-- FadeIC
 				FadeIC = {
 					type		= "range",
@@ -558,7 +462,7 @@ ArcHUD.configOptionsTableCore = {
 					step		= 0.05,
 					name		= L["TEXT"]["FADE_IC"],
 					desc		= L["TOOLTIP"]["FADE_IC"],
-					order		= 0,
+					order		= 1,
 					get			= function ()
 						return ArcHUD.db.profile.FadeIC
 					end,
@@ -575,7 +479,7 @@ ArcHUD.configOptionsTableCore = {
 					step		= 0.05,
 					name		= L["TEXT"]["FADE_OOC"],
 					desc		= L["TOOLTIP"]["FADE_OOC"],
-					order		= 1,
+					order		= 2,
 					get			= function ()
 						return ArcHUD.db.profile.FadeOOC
 					end,
@@ -592,7 +496,7 @@ ArcHUD.configOptionsTableCore = {
 					step		= 0.05,
 					name		= L["TEXT"]["FADE_FULL"],
 					desc		= L["TOOLTIP"]["FADE_FULL"],
-					order		= 2,
+					order		= 3,
 					get			= function ()
 						return ArcHUD.db.profile.FadeFull
 					end,
@@ -604,51 +508,10 @@ ArcHUD.configOptionsTableCore = {
 			},
 		}, -- fade
 		
-		movableFrames = {
+		positioning = {
 			type		= "group",
-			name		= L["TEXT"]["MOVEFRAMES"],
-			order		= 14,
-			args		= {
-				-- Unlock frames
-				unlock = {
-					type		= "toggle",
-					name		= L["TEXT"]["MFUNLOCK"],
-					desc		= L["TOOLTIP"]["MFUNLOCK"],
-					order		= 0,
-					get			= function ()
-						return not ArcHUD.TargetHUD.locked
-					end,
-					set			= function (info, v)
-						if (v) then
-							ArcHUD.TargetHUD:Unlock()
-							ArcHUD.TargetHUD.Target:Unlock()
-							ArcHUD.TargetHUD.TargetTarget:Unlock()
-						else
-							ArcHUD.TargetHUD:Lock()
-							ArcHUD.TargetHUD.Target:Lock()
-							ArcHUD.TargetHUD.TargetTarget:Lock()
-						end
-					end,
-				},
-				-- Reset frames
-				reset = {
-					type		= "execute",
-					name		= L["TEXT"]["MFRESET"],
-					desc		= L["TOOLTIP"]["MFRESET"],
-					order		= 1,
-					func		= function ()
-						ArcHUD.TargetHUD:ResetPos()
-						ArcHUD.TargetHUD.Target:ResetPos()
-						ArcHUD.TargetHUD.TargetTarget:ResetPos()
-					end,
-				},
-			},
-		}, -- movable frames
-		
-		misc = {
-			type		= "group",
-			name		= L["TEXT"]["MISC"],
-			order		= 20,
+			name		= L["TEXT"]["POSITIONING"],
+			order		= 13,
 			args		= {
 				-- Scaling
 				Scale = {
@@ -727,6 +590,183 @@ ArcHUD.configOptionsTableCore = {
 						end
 					end,
 				},
+				header1 = {
+					type		= "header",
+					name		= L["TEXT"]["TARGETFRAME"],
+					order		= 10,
+				},
+				-- Attach to top
+				attachTop = {
+					type		= "toggle",
+					name		= L["TEXT"]["ATTACHTOP"],
+					desc		= L["TOOLTIP"]["ATTACHTOP"],
+					order		= 11,
+					get			= function ()
+						return ArcHUD.db.profile.AttachTop
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.AttachTop = v
+						if (v) then
+							ArcHUD.TargetHUD:ClearAllPoints()
+							ArcHUD.TargetHUD:SetPoint("BOTTOM", ArcHUD.TargetHUD:GetParent(), "TOP", 0, -100)
+						else
+							ArcHUD.TargetHUD:ClearAllPoints()
+							ArcHUD.TargetHUD:SetPoint("TOP", ArcHUD.TargetHUD:GetParent(), "BOTTOM", 0, -60)
+						end
+					end,
+				},
+				-- Unlock frames
+				unlock = {
+					type		= "toggle",
+					name		= L["TEXT"]["MFUNLOCK"],
+					desc		= L["TOOLTIP"]["MFUNLOCK"],
+					order		= 12,
+					get			= function ()
+						return not ArcHUD.TargetHUD.locked
+					end,
+					set			= function (info, v)
+						if (v) then
+							ArcHUD.TargetHUD:Unlock()
+							ArcHUD.TargetHUD.Target:Unlock()
+							ArcHUD.TargetHUD.TargetTarget:Unlock()
+						else
+							ArcHUD.TargetHUD:Lock()
+							ArcHUD.TargetHUD.Target:Lock()
+							ArcHUD.TargetHUD.TargetTarget:Lock()
+						end
+					end,
+				},
+				-- Reset frames
+				reset = {
+					type		= "execute",
+					name		= L["TEXT"]["MFRESET"],
+					desc		= L["TOOLTIP"]["MFRESET"],
+					order		= 13,
+					func		= function ()
+						ArcHUD.TargetHUD:ResetPos()
+						ArcHUD.TargetHUD.Target:ResetPos()
+						ArcHUD.TargetHUD.TargetTarget:ResetPos()
+					end,
+				},
+			},
+		}, -- positioning
+		
+		comboPoints = {
+			type		= "group",
+			name		= L["TEXT"]["COMBOPOINTS"],
+			order		= 14,
+			args		= {
+				-- Show Combo Points
+				showComboPoints = {
+					type		= "toggle",
+					name		= L["TEXT"]["SHOWCOMBO"],
+					desc		= L["TOOLTIP"]["SHOWCOMBO"],
+					order		= 0,
+					get			= function ()
+						return ArcHUD.db.profile.ShowComboPoints
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.ShowComboPoints = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
+				comboPointsDecay = {
+					type		= "range",
+					name		= L["TEXT"]["COMBODECAY"],
+					desc		= L["TOOLTIP"]["COMBODECAY"],
+					min			= 0.0,
+					max			= 10.0,
+					step		= 0.1,
+					order		= 1,
+					get			= function ()
+						return ArcHUD.db.profile.OldComboPointsDecay
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.OldComboPointsDecay = v
+						ArcHUD:UnregisterMetro("RemoveOldComboPoints")
+						ArcHUD:RegisterMetro("RemoveOldComboPoints", ArcHUD.RemoveOldComboPoints, ArcHUD.db.profile.OldComboPointsDecay, ArcHUD)
+						ArcHUD:SendMessage("ARCHUD_MODULE_UPDATE", "ComboPoints")
+					end,
+				},
+				-- Holy Power as Combo Points
+				ShowHolyPowerPoints = {
+					type		= "toggle",
+					name		= L["TEXT"]["HOLYPOWERCOMBO"],
+					desc		= L["TOOLTIP"]["HOLYPOWERCOMBO"],
+					order		= 10,
+					get			= function ()
+						return ArcHUD.db.profile.ShowHolyPowerPoints
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.ShowHolyPowerPoints = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
+				-- Soul Shards as Combo Points
+				ShowSoulShardPoints = {
+					type		= "toggle",
+					name		= L["TEXT"]["SOULSHARDCOMBO"],
+					desc		= L["TOOLTIP"]["SOULSHARDCOMBO"],
+					order		= 11,
+					get			= function ()
+						return ArcHUD.db.profile.ShowSoulShardPoints
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.ShowSoulShardPoints = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
+			},
+			
+		}, -- comboPoints
+		
+		misc = {
+			type		= "group",
+			name		= L["TEXT"]["MISC"],
+			order		= 20,
+			args		= {
+				-- Blizzard player frame
+				blizzPlayer = {
+					type		= "toggle",
+					name		= L["TEXT"]["BLIZZPLAYER"],
+					desc		= L["TOOLTIP"]["BLIZZPLAYER"],
+					order		= 0,
+					get			= function ()
+						return ArcHUD.db.profile.BlizzPlayer
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.BlizzPlayer = v
+						ArcHUD:HideBlizzardPlayer(v)
+					end,
+				},
+				-- Blizzard target frame
+				blizzTarget = {
+					type		= "toggle",
+					name		= L["TEXT"]["BLIZZTARGET"],
+					desc		= L["TOOLTIP"]["BLIZZTARGET"],
+					order		= 1,
+					get			= function ()
+						return ArcHUD.db.profile.BlizzTarget
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.BlizzTarget = v
+						ArcHUD:HideBlizzardTarget(v)
+					end,
+				},
+				-- Blizzard focus frame
+				blizzFocus = {
+					type		= "toggle",
+					name		= L["TEXT"]["BLIZZFOCUS"],
+					desc		= L["TOOLTIP"]["BLIZZFOCUS"],
+					order		= 2,
+					get			= function ()
+						return ArcHUD.db.profile.BlizzFocus
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.BlizzFocus = v
+						ArcHUD:HideBlizzardFocus(v)
+					end,
+				},
 			},
 		}, -- misc
 	},
@@ -739,6 +779,31 @@ ArcHUD.configOptionsTableModules = {
 	type = "group",
 	name = LM["TEXT"]["TITLE"],
 	args = {},
+}
+
+----------------------------------------------
+-- Custom modules options
+----------------------------------------------
+ArcHUD.configOptionsTableCustomModules = {
+	type = "group",
+	name = LM["TEXT"]["CUSTOM"],
+	args = {
+		header = {
+			type		= "description",
+			name		= "NOTE: Custom arcs are experimental not yet saved",
+			order		= 0,
+		},
+		-- new custom arc
+		new = {
+			type		= "execute",
+			name		= LM["TEXT"]["CUSTNEW"],
+			desc		= LM["TOOLTIP"]["CUSTNEW"],
+			order		= 1,
+			func		= function ()
+				ArcHUD:CreateCustomBuffModule()
+			end,
+		},
+	},
 }
 
 ----------------------------------------------
@@ -755,6 +820,10 @@ function ArcHUD:InitConfig()
 	-- Set up modules config options
 	AceConfig:RegisterOptionsTable("ArcHUD_Modules", self.configOptionsTableModules)
 	self.configFrameModules = AceConfigDialog:AddToBlizOptions("ArcHUD_Modules", LM["TEXT"]["TITLE"], "ArcHUD_Core")
+	
+	-- Set up custom ring options
+	AceConfig:RegisterOptionsTable("ArcHUD_CustomModules", self.configOptionsTableCustomModules)
+	self.configFrameModules = AceConfigDialog:AddToBlizOptions("ArcHUD_CustomModules", LM["TEXT"]["CUSTOM"], "ArcHUD_Core")
 end
 
 ----------------------------------------------
@@ -763,4 +832,24 @@ end
 function ArcHUD:AddModuleOptionsTable(moduleName, optionsTable)
 	self:LevelDebug(d_notice, "Inserting config options for "..moduleName)
 	ArcHUD.configOptionsTableModules.args[moduleName] = optionsTable
+end
+
+----------------------------------------------
+-- Add options for a custom module
+----------------------------------------------
+function ArcHUD:AddCustomModuleOptionsTable(moduleName, optionsTable)
+	self:LevelDebug(d_notice, "Inserting config options for custom module "..moduleName)
+	ArcHUD.configOptionsTableCustomModules.args[moduleName] = optionsTable
+	
+	AceConfigRegistry:NotifyChange("ArcHUD_CustomModules")
+end
+
+----------------------------------------------
+-- Add options for a custom module
+----------------------------------------------
+function ArcHUD:RemoveCustomModuleOptionsTable(moduleName)
+	self:LevelDebug(d_notice, "Removing config options for custom module "..moduleName)
+	ArcHUD.configOptionsTableCustomModules.args[moduleName] = nil
+	
+	AceConfigRegistry:NotifyChange("ArcHUD_CustomModules")
 end

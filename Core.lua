@@ -268,7 +268,7 @@ function ArcHUD:OnProfileEnable()
 		else
 			self:LevelDebug(d_notice, "Attaching targetframe to bottom")
 			self.TargetHUD:ClearAllPoints()
-			self.TargetHUD:SetPoint("TOP", self.TargetHUD:GetParent(), "BOTTOM", 0, -50)
+			self.TargetHUD:SetPoint("TOP", self.TargetHUD:GetParent(), "BOTTOM", 0, -60)
 		end
 
 		-- Check for custom frame placements

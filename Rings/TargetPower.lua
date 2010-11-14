@@ -32,7 +32,8 @@ function module:Initialize()
 	self.f = self:CreateRing(true, ArcHUDFrame)
 	self.f:SetAlpha(0)
 
-	self.MPPerc = self:CreateFontString(self.f, "BACKGROUND", {40, 12}, 11, "RIGHT", {1.0, 1.0, 1.0}, {"TOPLEFT", self.f, "BOTTOMLEFT", -100, -115})
+	self.MPPerc = self:CreateFontString(self.f, "BACKGROUND", {40, 12}, 10, "CENTER", {1.0, 1.0, 1.0}, {"TOP", self.f, "BOTTOMLEFT", 20, -130})
+	--{"TOPLEFT", self.f, "BOTTOMLEFT", -100, -115})
 	self:RegisterTimer("UpdatePowerBar", self.UpdatePower, 0.1, self, true)
 	
 	self:CreateStandardModuleOptions(25)
@@ -49,10 +50,10 @@ function module:OnModuleUpdate()
 	self.MPPerc:ClearAllPoints()
 	if(self.db.profile.Side == 1) then
 		-- Attach to left side
-		self.MPPerc:SetPoint("TOPLEFT", self.f, "BOTTOMLEFT", -100, -115)
+		self.MPPerc:SetPoint("TOP", self.f, "BOTTOMLEFT", -20, -130)
 	else
 		-- Attach to right side
-		self.MPPerc:SetPoint("TOPLEFT", self.f, "BOTTOMLEFT", 50, -115)
+		self.MPPerc:SetPoint("TOP", self.f, "BOTTOMLEFT", 20, -130)
 	end
 	if(UnitExists(self.unit)) then
 		self.f:SetValue(UnitPower(self.unit))

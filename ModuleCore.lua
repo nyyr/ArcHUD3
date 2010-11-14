@@ -41,8 +41,17 @@ function ArcHUD.modulePrototype:InitConfigOptions()
 		if (self.optionsTable and type(self.optionsTable) == "table") then
 			self.parent:AddModuleOptionsTable(self.name, self.optionsTable)
 		end
+		
+	elseif (self.isCustom) then
+		-- Custom buff module
+		self:Debug(d_info, "Initializing custom buff module options")
+		
+		-- Register options
+		if (self.optionsTable and type(self.optionsTable) == "table") then
+			self.parent:AddCustomModuleOptionsTable(self.name, self.optionsTable)
+		end
+		
 	end
-
 end
 
 ----------------------------------------------
@@ -141,11 +150,14 @@ function ArcHUD.modulePrototype:OnDisable()
 	if(self.f) then
 		self.f:Hide()
 	end
-	if(self.Disable) then
-		self:Disable()
+	self:StopRingTimers()
+	if(self.OnModuleDisable) then
+		self:OnModuleDisable()
 	end
-	self:RegisterMessage("ARCHUD_MODULE_ENABLE")
-	self:RegisterMessage("ARCHUD_MODULE_UPDATE")
+	if (not self.deleted) then
+		self:RegisterMessage("ARCHUD_MODULE_ENABLE")
+		self:RegisterMessage("ARCHUD_MODULE_UPDATE")
+	end
 	self:Debug(d_info, "Ring disabled")
 end
 
@@ -293,6 +305,14 @@ function ArcHUD.modulePrototype:StartRingTimers()
 end
 
 ----------------------------------------------
+-- Stop ring timers
+----------------------------------------------
+function ArcHUD.modulePrototype:StopRingTimers()
+	self.f.fillUpdate:Stop()
+	self:StopTimer("CheckAlpha")
+end
+
+----------------------------------------------
 -- color_switch
 ----------------------------------------------
 local color_switch = {
@@ -376,22 +396,29 @@ end
 ----------------------------------------------
 function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 	local t
+	local name
+	
+	if (self.isCustom) then
+		name = self.db.profile.BuffName .. " (" .. self.db.profile.Unit .. ")"
+	else
+		name = LM[self:GetName()]
+	end
 	
 	self.optionsTable = {
 		type		= "group",
-		name		= LM[self:GetName()],
+		name		= name,
 		order		= order or 100,
 		args 		= {
 			header = {
 				type		= "header",
-				name		= LM[self:GetName()] .. " v" .. self.version,
+				name		= "v" .. self.version,
 				order		= 0,
 			},
 			enabled = {
 				type		= "toggle",
 				name		= LM["TEXT"]["ENABLED"],
 				desc		= LM["TOOLTIP"]["ENABLED"],
-				order		= 1,
+				order		= 21,
 				get			= function ()
 					return self.db.profile.Enabled
 				end,
@@ -408,7 +435,7 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 				type		= "toggle",
 				name		= LM["TEXT"]["OUTLINE"],
 				desc		= LM["TOOLTIP"]["OUTLINE"],
-				order		= 2,
+				order		= 22,
 				get			= function ()
 					return self.db.profile.Outline
 				end,
@@ -422,7 +449,7 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 				name		= LM["TEXT"]["SIDE"],
 				desc		= LM["TOOLTIP"]["SIDE"],
 				values		= {LM["SIDE"]["LEFT"], LM["SIDE"]["RIGHT"]},
-				order		= 3,
+				order		= 23,
 				get			= function ()
 					return self.db.profile.Side
 				end,
@@ -438,7 +465,7 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 				min			= -5,
 				max			= 5,
 				step		= 1,
-				order		= 4,
+				order		= 24,
 				get			= function ()
 					return self.db.profile.Level
 				end,
@@ -457,7 +484,7 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 				type		= "toggle",
 				name		= LM["TEXT"][v.text],
 				desc		= LM["TOOLTIP"][v.tooltip],
-				order		= 20,
+				order		= 40,
 				get			= function ()
 					return self.db.profile[v.name]
 				end,
@@ -477,7 +504,7 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 			type		= "color",
 			name		= LM["TEXT"]["COLOR"],
 			desc		= LM["TOOLTIP"]["COLOR"],
-			order		= 21,
+			order		= 41,
 			get			= function ()
 				return self.db.profile.Color.r, self.db.profile.Color.g, self.db.profile.Color.b
 			end,
@@ -494,7 +521,7 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 			type		= "execute",
 			name		= LM["TEXT"]["COLORRESET"],
 			desc		= LM["TOOLTIP"]["COLORRESET"],
-			order		= 22,
+			order		= 42,
 			func		= function ()
 				self.db.profile.Color.r, self.db.profile.Color.g, self.db.profile.Color.b = 
 					self.defaults.profile.Color.r, self.defaults.profile.Color.g, self.defaults.profile.Color.b

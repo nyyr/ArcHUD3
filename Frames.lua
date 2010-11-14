@@ -197,7 +197,7 @@ function ArcHUD:CreateHUDFrames()
 	local main = ArcHUDFrame
 	local targethud = ArcHUDFrame.TargetHUD
 	
-	AH_CreateMoverFrame(targethud, "targethud", {320, 120}, {"TOPLEFT", -10, 10}, {"TOP", main, "BOTTOM", 0, -50})
+	AH_CreateMoverFrame(targethud, "targethud", {320, 120}, {"TOPLEFT", -10, 10}, {"TOP", main, "BOTTOM", 0, -60})
 
 	-- Set up font strings
 	targethud.Combo = AH_CreateFontString(main, "BACKGROUND", {40, 30}, 30, "CENTER", {1, 1, 0}, {"BOTTOM", main, "BOTTOM"}, "ArcHUDFrameCombo")
