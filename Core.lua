@@ -151,6 +151,11 @@ function ArcHUD:OnInitialize()
 	self.TargetHUD = self:CreateHUDFrames()
 
 	self:InitConfig()
+
+	-- Custom modules (is quite buggy when called in OnEnable())
+	--if (self.customModuleCount == 0) then
+		--self:LoadCustomBuffModules()
+	--end
 	
 	self:SendMessage("ARCHUD_LOADED")
 	self:LevelDebug(d_info, "ArcHUD has been initialized.")
@@ -194,6 +199,8 @@ function ArcHUD:OnEnable()
 	self:LevelDebug(d_notice, "Triggering ring enable event")
 	self:SendMessage("ARCHUD_MODULE_ENABLE")
 	self:LevelDebug(d_info, "ArcHUD is now enabled")
+	
+	self:ScheduleTimer(self.LoadCustomBuffModules, 1, self)
 end
 
 ----------------------------------------------
@@ -201,7 +208,7 @@ end
 ----------------------------------------------
 function ArcHUD:OnDisable()
 	self:LevelDebug(d_notice, "Triggering ring disable event")
-	self:TriggerEvent("ARCHUD_MODULE_DISABLE")
+	self:SendMessage("ARCHUD_MODULE_DISABLE")
 
 	self:HideBlizzardPlayer(true)
 	self:HideBlizzardTarget(true)
@@ -961,11 +968,6 @@ function ArcHUD:EventHandler(event, arg1)
 		self.PlayerIsInCombat = false
 		self.PlayerIsRegenOn = true
 		self:SetComboPoints(0)
-		
-		-- Custom modules (is quite buggy when called in OnEnable())
-		if (self.customModuleCount == 0) then
-			self:LoadCustomBuffModules()
-		end
 
 	else
 		if (arg1 == "target") then

@@ -29,7 +29,16 @@ end
 -- Initialize config options
 ----------------------------------------------
 function ArcHUD.modulePrototype:InitConfigOptions()
-	if(self.defaults and type(self.defaults) == "table") then
+	if (self.isCustom) then
+		-- Custom buff module
+		self:Debug(d_info, "Initializing custom buff module options")
+		
+		-- Register options
+		if (self.optionsTable and type(self.optionsTable) == "table") then
+			self.parent:AddCustomModuleOptionsTable(self.name, self.optionsTable)
+		end
+		
+	elseif (self.defaults and type(self.defaults) == "table") then
 		-- Add defaults to ArcHUD defaults table
 		self:Debug(d_notice, "Acquiring ring DB namespace")
 		self.db = self.parent.db:RegisterNamespace(self.name, self.defaults)
@@ -40,15 +49,6 @@ function ArcHUD.modulePrototype:InitConfigOptions()
 		-- Register options
 		if (self.optionsTable and type(self.optionsTable) == "table") then
 			self.parent:AddModuleOptionsTable(self.name, self.optionsTable)
-		end
-		
-	elseif (self.isCustom) then
-		-- Custom buff module
-		self:Debug(d_info, "Initializing custom buff module options")
-		
-		-- Register options
-		if (self.optionsTable and type(self.optionsTable) == "table") then
-			self.parent:AddCustomModuleOptionsTable(self.name, self.optionsTable)
 		end
 		
 	end
@@ -92,7 +92,7 @@ end
 -- OnEnable
 ----------------------------------------------
 function ArcHUD.modulePrototype:OnEnable()
-	self:Debug(d_warn, "Received enable event")
+	--self:Debug(d_warn, "Received enable event")
 	if(self.db.profile.Enabled) then
 		self:Debug(d_info, "Enabling ring")
 		if(self.disableEvents and (not self.disableEvents.option or self.disableEvents.option and self.db.profile[self.disableEvents.option])) then
@@ -179,7 +179,7 @@ end
 -- ARCHUD_MODULE_UPDATE
 ----------------------------------------------
 function ArcHUD.modulePrototype:ARCHUD_MODULE_UPDATE(message, module)
-	self:Debug(1, "ARCHUD_MODULE_UPDATE("..tostring(message)..", "..tostring(module))
+	--self:Debug(1, "ARCHUD_MODULE_UPDATE("..tostring(message)..", "..tostring(module))
 	if(module == self:GetName()) then
 		if(self.db.profile.Enabled and not self:IsEnabled()) then
 			self:Enable()
@@ -233,7 +233,7 @@ function ArcHUD.modulePrototype:ARCHUD_MODULE_UPDATE(message, module)
 			end
 
 			if(self.OnModuleUpdate) then
-				self:Debug(d_info, "Updating ring")
+				self:Debug(d_notice, "Updating ring")
 				self:OnModuleUpdate()
 			end
 		end

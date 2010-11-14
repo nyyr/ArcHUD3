@@ -1,5 +1,6 @@
 -- localization
 local LM = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Module")
+local AceAddon = LibStub("AceAddon-3.0")
 
 local AceConfigRegistry = LibStub("AceConfigRegistry-3.0")
 
@@ -328,6 +329,7 @@ function ArcHUD:CreateCustomBuffModule(config)
 	module.version 		= CustomBuffRingTemplate.version
 	module.unit 		= CustomBuffRingTemplate.unit
 	module.noAutoAlpha 	= CustomBuffRingTemplate.noAutoAlpha
+	module.defaults 	= CustomBuffRingTemplate.defaults
 	module.options 		= CustomBuffRingTemplate.options
 	module.localized 	= CustomBuffRingTemplate.localized
 	
@@ -342,7 +344,9 @@ function ArcHUD:CreateCustomBuffModule(config)
 	module.db = { profile = {} }
 	
 	if (config == nil) then
+		-- copy by value
 		config = CustomBuffRingTemplate.defaults.profile
+		config.Color = {r = config.Color.r, g = config.Color.g, b = config.Color.b}
 		for k,v in pairs(config) do
 			module.db.profile[k] = v
 		end
@@ -353,9 +357,13 @@ function ArcHUD:CreateCustomBuffModule(config)
 	table.insert(self.customModules, module)
 	self:LevelDebug(1, "Created new custom buff module: "..module.db.profile.BuffName..", "..module.db.profile.Unit)
 	
-	module:OnInitialize()
-	module:Enable()
-	--self:SendMessage("ARCHUD_MODULE_ENABLE", name)
+	-- this is a dirty hack...
+	local aceOnEvent = AceAddon.frame:GetScript("OnEvent")
+	if (aceOnEvent ~= nil) then
+		aceOnEvent(AceAddon, "ADDON_LOADED", name)
+	else
+		ArcHUD:Print("WARN: Module initialization delayed")
+	end
 end
 
 ----------------------------------------------
@@ -391,8 +399,10 @@ end
 -- Load saved custom modules
 ----------------------------------------------
 function ArcHUD:LoadCustomBuffModules()
-	for i,config in ipairs(self.db.profile.CustomModules) do
-		self:CreateCustomBuffModule(config)
+	if (self.customModuleCount == 0) then
+		for i,config in ipairs(self.db.profile.CustomModules) do
+			self:CreateCustomBuffModule(config)
+		end
+		--self:SendMessage("ARCHUD_MODULE_ENABLE")
 	end
-	self:SendMessage("ARCHUD_MODULE_ENABLE")
 end

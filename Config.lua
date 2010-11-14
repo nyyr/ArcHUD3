@@ -104,16 +104,11 @@ ArcHUD.configOptionsTableCmd = {
 			desc		= "Internal testing of some functions (developers only!)",
 			order		= 11,
 			func		= function()
-				local mh = ArcHUD:GetModule("Health")
-				local mp = ArcHUD:GetModule("Power")
-				if (not testSwitch) then
-					mh.f:GhostMode(true, mh.unit)
-					mp.f:GhostMode(true, mp.unit)
-				else
-					mh:UpdateHealth(nil, mh.unit)
-					mp:UpdatePowerEvent(nil, mp.unit)
-				end
-				testSwitch = not testSwitch
+				ArcHUD:LoadCustomBuffModules()
+				-- if (not testSwitch) then
+				-- else
+				-- end
+				-- testSwitch = not testSwitch
 			end,
 		},
 	},
