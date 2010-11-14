@@ -92,8 +92,8 @@ end
 -- OnEnable
 ----------------------------------------------
 function ArcHUD.modulePrototype:OnEnable()
-	self:Debug(d_notice, "Received enable event")
-	if(self.Enable and self.db.profile.Enabled) then
+	self:Debug(d_warn, "Received enable event")
+	if(self.db.profile.Enabled) then
 		self:Debug(d_info, "Enabling ring")
 		if(self.disableEvents and (not self.disableEvents.option or self.disableEvents.option and self.db.profile[self.disableEvents.option])) then
 			self:Debug(d_notice, "Disabling events:")
@@ -179,6 +179,7 @@ end
 -- ARCHUD_MODULE_UPDATE
 ----------------------------------------------
 function ArcHUD.modulePrototype:ARCHUD_MODULE_UPDATE(message, module)
+	self:Debug(1, "ARCHUD_MODULE_UPDATE("..tostring(message)..", "..tostring(module))
 	if(module == self:GetName()) then
 		if(self.db.profile.Enabled and not self:IsEnabled()) then
 			self:Enable()

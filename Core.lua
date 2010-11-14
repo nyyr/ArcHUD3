@@ -75,6 +75,7 @@ local cfgDefaults = {
 		ColorComboPoints = {r = 1, g = 1, b = 0},
 		ColorOldComboPoints = {r = 0.5, g = 0.5, b = 0.5},
 		OldComboPointsDecay = 10.0,
+		CustomModules = {},
 	}
 }
 
@@ -150,7 +151,7 @@ function ArcHUD:OnInitialize()
 	self.TargetHUD = self:CreateHUDFrames()
 
 	self:InitConfig()
-
+	
 	self:SendMessage("ARCHUD_LOADED")
 	self:LevelDebug(d_info, "ArcHUD has been initialized.")
 end
@@ -187,8 +188,9 @@ function ArcHUD:OnEnable()
 	self:OnProfileEnable()
 
 	self.Enabled = true
-
+	
 	ArcHUDFrame:Show()
+	
 	self:LevelDebug(d_notice, "Triggering ring enable event")
 	self:SendMessage("ARCHUD_MODULE_ENABLE")
 	self:LevelDebug(d_info, "ArcHUD is now enabled")
@@ -959,6 +961,11 @@ function ArcHUD:EventHandler(event, arg1)
 		self.PlayerIsInCombat = false
 		self.PlayerIsRegenOn = true
 		self:SetComboPoints(0)
+		
+		-- Custom modules (is quite buggy when called in OnEnable())
+		if (self.customModuleCount == 0) then
+			self:LoadCustomBuffModules()
+		end
 
 	else
 		if (arg1 == "target") then

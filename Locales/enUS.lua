@@ -5,6 +5,7 @@ local L = LibStub("AceLocale-3.0"):NewLocale("ArcHUD_Core", "enUS", true)
 -- Core stuff
 L["CMD_OPTS_FRAME"]		= "Open options window"
 L["CMD_OPTS_MODULES"]	= "Open module options window"
+L["CMD_OPTS_CUSTOM"]	= "Open custom module options window"
 L["CMD_OPTS_DEBUG"]		= "Set debugging level"
 L["CMD_OPTS_DEBUG_SET"]	= "Setting debugging level to '%s'"
 L["CMD_RESET"]			= "Reset settings for this character to the defaults"

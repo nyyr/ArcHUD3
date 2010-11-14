@@ -27,10 +27,38 @@ ArcHUD.configOptionsTableCmd = {
 	type = "group",
 	name = "ArcHUD",
 	args = {
+		config = {
+			type		= "execute",
+			name		= "config",
+			desc		= L["CMD_OPTS_FRAME"],
+			order		= 0,
+			func		= function()
+				AceConfigDialog:Open("ArcHUD_Core")
+			end,
+		},
+		modules = {
+			type		= "execute",
+			name		= "modules",
+			desc		= L["CMD_OPTS_MODULES"],
+			order		= 1,
+			func		= function()
+				AceConfigDialog:Open("ArcHUD_Modules")
+			end,
+		},
+		custom = {
+			type		= "execute",
+			name		= "custom",
+			desc		= L["CMD_OPTS_CUSTOM"],
+			order		= 2,
+			func		= function()
+				AceConfigDialog:Open("ArcHUD_CustomModules")
+			end,
+		},
 		reset = {
 			type 		= "group",
 			name		= "reset",
 			desc		= L["CMD_RESET"],
+			order		= 3,
 			args		= {
 				confirm = {
 					type	= "execute",
@@ -42,26 +70,11 @@ ArcHUD.configOptionsTableCmd = {
 				}
 			}
 		},
-		config = {
-			type		= "execute",
-			name		= "config",
-			desc		= L["CMD_OPTS_FRAME"],
-			func		= function()
-				AceConfigDialog:Open("ArcHUD_Core")
-			end,
-		},
-		modules = {
-			type		= "execute",
-			name		= "config",
-			desc		= L["CMD_OPTS_MODULES"],
-			func		= function()
-				AceConfigDialog:Open("ArcHUD_Modules")
-			end,
-		},
 		debug = {
 			type		= "select",
 			name		= "debug",
 			desc		= L["CMD_OPTS_DEBUG"],
+			order		= 4,
 			values		= {"off", "warn", "info", "notice"},
 			get			= function()
 				return debugLevels[ArcHUD:GetDebugLevel() or 4]
@@ -75,12 +88,12 @@ ArcHUD.configOptionsTableCmd = {
 					ArcHUD.db.profile.Debug = v
 				end
 			end,
-			order 		= -2,
 		},
 		perf = {
 			type		= "execute",
 			name		= "config",
 			desc		= "Show performance infos on timers (developers only!)",
+			order		= 10,
 			func		= function()
 				ArcHUD:TimersPrintPerf()
 			end,
@@ -89,6 +102,7 @@ ArcHUD.configOptionsTableCmd = {
 			type		= "execute",
 			name		= "test",
 			desc		= "Internal testing of some functions (developers only!)",
+			order		= 11,
 			func		= function()
 				local mh = ArcHUD:GetModule("Health")
 				local mp = ArcHUD:GetModule("Power")
@@ -790,7 +804,7 @@ ArcHUD.configOptionsTableCustomModules = {
 	args = {
 		header = {
 			type		= "description",
-			name		= "NOTE: Custom arcs are experimental not yet saved",
+			name		= "NOTE: Custom arcs are still experimental",
 			order		= 0,
 		},
 		-- new custom arc
@@ -801,6 +815,7 @@ ArcHUD.configOptionsTableCustomModules = {
 			order		= 1,
 			func		= function ()
 				ArcHUD:CreateCustomBuffModule()
+				ArcHUD:SyncCustomModuleSettings()
 			end,
 		},
 	},

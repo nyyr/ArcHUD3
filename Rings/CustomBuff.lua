@@ -19,7 +19,7 @@ CustomBuffRingTemplate.defaults = {
 		Enabled = true,
 		Outline = true,
 		ShowText = true,
-		Flash = true,
+		Flash = false,
 		Side = 2,
 		Level = 2,
 		Color = {r = 1, g = 1, b = 0.5},
@@ -27,9 +27,9 @@ CustomBuffRingTemplate.defaults = {
 		Debuff = false,
 		Unit = "player",
 		BuffName = "<new>",			-- buff name
-		UseStacks = true,			-- display either stacks or remaining time
+		UseStacks = false,			-- display either stacks or remaining time
 		TextUseStacks = false,		-- display either stacks or remaining time
-		MaxCount = 5,				-- maximum possible appliances of buff
+		MaxCount = 1,				-- maximum possible appliances of buff
 	}
 }
 
@@ -92,6 +92,8 @@ function CustomBuffRingTemplate:OnModuleEnable()
 	self:StartRingTimers()
 
 	self.f:Show()
+	
+	self:Debug(1, "CustomBuffRingTemplate:OnModuleEnable()")
 end
 
 function CustomBuffRingTemplate:OnModuleDisable()
@@ -160,6 +162,9 @@ function CustomBuffRingTemplate:UpdateBuff()
 		end
 	
 	end
+	
+	--self:Debug(1, "Visible "..tostring(visible)..", Timer "..tostring(timer)..", alpha "..tostring(self.f:GetAlpha()))
+	self.f:Show()
 	
 	if (visible) then
 		if(ArcHUD.db.profile.FadeIC > ArcHUD.db.profile.FadeOOC) then
@@ -307,10 +312,17 @@ end
 -- Create a new custom buff module
 ----------------------------------------------
 function ArcHUD:CreateCustomBuffModule(config)
-	ArcHUD.customModuleCount = ArcHUD.customModuleCount + 1
-	local name = "Custom_"..ArcHUD.customModuleCount
+	if (self.customModuleCount >= 32) then
+		-- TODO: reuse deleted modules
+		self:Print("Too many instances ("..self.customModuleCount..") of custom buff module. "..
+			"If you have deleted some during this session, relog and try again.")
+		return
+	end
+
+	self.customModuleCount = self.customModuleCount + 1
+	local name = "Custom_"..self.customModuleCount
 	
-	local module = ArcHUD:NewModule(name)
+	local module = self:NewModule(name)
 	
 	module.isCustom		= true
 	module.version 		= CustomBuffRingTemplate.version
@@ -331,9 +343,11 @@ function ArcHUD:CreateCustomBuffModule(config)
 	
 	if (config == nil) then
 		config = CustomBuffRingTemplate.defaults.profile
-	end
-	for k,v in pairs(config) do
-		module.db.profile[k] = v
+		for k,v in pairs(config) do
+			module.db.profile[k] = v
+		end
+	else
+		module.db.profile = config
 	end
 	
 	table.insert(self.customModules, module)
@@ -341,6 +355,7 @@ function ArcHUD:CreateCustomBuffModule(config)
 	
 	module:OnInitialize()
 	module:Enable()
+	--self:SendMessage("ARCHUD_MODULE_ENABLE", name)
 end
 
 ----------------------------------------------
@@ -352,4 +367,32 @@ function ArcHUD:DeleteCustomBuffModule(module)
 	ArcHUD:RemoveCustomModuleOptionsTable("ArcHUD_"..module:GetName())
 	module.deleted = true
 	module:Disable()
+	
+	self:SyncCustomModuleSettings()
+end
+
+----------------------------------------------
+-- Save settings for custom modules
+-- Note: Do not call within :CreateCustomBuffModule()!
+----------------------------------------------
+function ArcHUD:SyncCustomModuleSettings()
+	-- clear settings
+	self.db.profile.CustomModules = {}
+	
+	-- synchronize settings
+	for i,m in ipairs(self.customModules) do
+		if not m.deleted then
+			table.insert(self.db.profile.CustomModules, m.db.profile)
+		end
+	end
+end
+
+----------------------------------------------
+-- Load saved custom modules
+----------------------------------------------
+function ArcHUD:LoadCustomBuffModules()
+	for i,config in ipairs(self.db.profile.CustomModules) do
+		self:CreateCustomBuffModule(config)
+	end
+	self:SendMessage("ARCHUD_MODULE_ENABLE")
 end
