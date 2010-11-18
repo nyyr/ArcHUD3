@@ -28,6 +28,7 @@ CustomBuffRingTemplate.defaults = {
 		Debuff = false,
 		Unit = "player",
 		BuffName = "<new>",			-- buff name
+		CastByPlayer = true,		-- only show if (de)buff is cast by player
 		UseStacks = false,			-- display either stacks or remaining time
 		TextUseStacks = false,		-- display either stacks or remaining time
 		MaxCount = 1,				-- maximum possible appliances of buff
@@ -74,7 +75,8 @@ end
 
 function CustomBuffRingTemplate:OnModuleEnable()
 	self.f.dirty = true
-	self.f.fadeIn = 0.25
+	--self.f.fadeIn = 0.25
+	self.f.maxFadeTime = 0.25
 	
 	self.unit = self.db.profile.Unit
 	self.f:SetMax(self.db.profile.MaxCount)
@@ -107,27 +109,34 @@ function CustomBuffRingTemplate:OnModuleDisable()
 	self:StopTimer("UpdateBuff")
 end
 
+local function CustomBuff_UpdateBuff(frame, elapsed)
+	frame.module:UpdateBuff()
+end
+
 function CustomBuffRingTemplate:UpdateBuff()
-	local name, count, duration, expirationTime
+	local name, count, duration, expirationTime, unitCaster
 	local visible = false
 	local timer = false
 	
 	if (self.db.profile.Debuff) then
-		name, _, _, count, _, duration, expirationTime = 
+		name, _, _, count, _, duration, expirationTime, unitCaster = 
 			UnitDebuff(self.unit, self.db.profile.BuffName) 
 	else
-		name, _, _, count, _, duration, expirationTime = 
+		name, _, _, count, _, duration, expirationTime, unitCaster = 
 			UnitBuff(self.unit, self.db.profile.BuffName) 
 	end
 	
-	if (name) then
-		
+	if (name and ((not self.db.profile.CastByPlayer) or unitCaster == "player")) then
+	
 		-- ring
 		if (self.db.profile.UseStacks) then
+			if (self.f.casting) then self.f.casting = 0 end
 			self.f:SetValue(count)
 			visible = true
+			
 		elseif (duration) then
-			if (self.f.maxValue ~= duration*1000) then
+			if (not self.f.casting) then self.f.casting = 1 end
+			if (math.floor(self.f.maxValue) ~= math.floor(duration*1000)) then
 				self.f:SetMax(duration*1000)
 			end
 			local t = GetTime()
@@ -136,6 +145,7 @@ function CustomBuffRingTemplate:UpdateBuff()
 				visible = true
 				timer = true
 			end
+			
 		end
 		
 		-- text
@@ -161,11 +171,11 @@ function CustomBuffRingTemplate:UpdateBuff()
 				self.f:StopPulse()
 			end
 		end
-	
+		
+		--self:Debug(1, "Visible "..tostring(visible)..", Timer "..tostring(timer)..", alpha "..tostring(self.f:GetAlpha())..
+		--	", unit "..self.unit..", buff "..name)
+
 	end
-	
-	--self:Debug(1, "Visible "..tostring(visible)..", Timer "..tostring(timer)..", alpha "..tostring(self.f:GetAlpha()))
-	self.f:Show()
 	
 	if (visible) then
 		if(ArcHUD.db.profile.FadeIC > ArcHUD.db.profile.FadeOOC) then
@@ -174,16 +184,35 @@ function CustomBuffRingTemplate:UpdateBuff()
 			self.f:SetRingAlpha(ArcHUD.db.profile.FadeOOC)
 		end
 	else
-		self.f:StopPulse()
-		self.f:SetRingAlpha(0)
-		self.f:SetValue(0)
-		self.Text:SetText("")
+		if (self.f.endValue > 0) then
+			self.f.casting = 0
+			self.f:StopPulse()
+			self.f:SetRingAlpha(0)
+			self.f:SetValue(0)
+			self.Text:SetText("")
+		end
 	end
 	
 	if (timer) then
-		self:StartTimer("UpdateBuff")
+		if (self.f.casting) then
+			if (self.f.UpdateHook == nil) then
+				self.f.UpdateHook = CustomBuff_UpdateBuff
+			end
+			-- we do not need a timer if we have an update hook
+		else
+			self:StartTimer("UpdateBuff")
+			self.timerStarted = true
+		end
+		
 	else
-		self:StopTimer("UpdateBuff")
+		if (self.timerStarted) then
+			self:StopTimer("UpdateBuff")
+			self.timerStarted = false
+		end
+		if (self.f.UpdateHook ~= nil) then
+			self.f.UpdateHook = nil
+		end
+		
 	end
 end
 
@@ -245,11 +274,25 @@ function CustomBuffRingTemplate:AppendCustomModuleOptions()
 		end,
 	}
 	
+	self.optionsTable.args.CastByPlayer = {
+		type		= "toggle",
+		name		= LM["TEXT"]["CUSTCASTBYPLAYER"],
+		desc		= LM["TOOLTIP"]["CUSTCASTBYPLAYER"],
+		order		= 4,
+		get			= function ()
+			return self.db.profile.CastByPlayer
+		end,
+		set			= function (info, v)
+			self.db.profile.CastByPlayer = v
+			self:UpdateBuff()
+		end,
+	}
+	
 	self.optionsTable.args.UseStacks = {
 		type		= "toggle",
 		name		= LM["TEXT"]["CUSTSTACKS"],
 		desc		= LM["TOOLTIP"]["CUSTSTACKS"],
-		order		= 4,
+		order		= 5,
 		get			= function ()
 			return self.db.profile.UseStacks
 		end,
@@ -263,7 +306,7 @@ function CustomBuffRingTemplate:AppendCustomModuleOptions()
 		type		= "toggle",
 		name		= LM["TEXT"]["CUSTTEXTSTACKS"],
 		desc		= LM["TOOLTIP"]["CUSTTEXTSTACKS"],
-		order		= 5,
+		order		= 6,
 		get			= function ()
 			return self.db.profile.TextUseStacks
 		end,
@@ -280,7 +323,7 @@ function CustomBuffRingTemplate:AppendCustomModuleOptions()
 		min			= 1,
 		max			= 40,
 		step		= 1,
-		order		= 6,
+		order		= 7,
 		get			= function ()
 			return self.db.profile.MaxCount
 		end,
@@ -313,36 +356,51 @@ end
 -- Create a new custom buff module
 ----------------------------------------------
 function ArcHUD:CreateCustomBuffModule(config)
+	local name, module
+	local recycled = false
+	
+	-- Limit the number of custom modules
 	if (self.customModuleCount >= 32) then
-		-- TODO: reuse deleted modules
-		self:Print("Too many instances ("..self.customModuleCount..") of custom buff module. "..
-			"If you have deleted some during this session, relog and try again.")
+		self:Print("Too many instances ("..self.customModuleCount..") of custom buff module.")
 		return
 	end
+	
+	-- Check if we can reuse a deleted module
+	for i,m in ipairs(self.customModules) do
+		if m.deleted then
+			module = m
+			name = module:GetName()
+			module.deleted = false
+			recycled = true
+			break
+		end
+	end
 
-	self.customModuleCount = self.customModuleCount + 1
-	local name = "Custom_"..self.customModuleCount
+	-- Create a new module if necessary
+	if (module == nil) then
+		self.customModuleCount = self.customModuleCount + 1
+		name = "Custom_"..self.customModuleCount
+		module = self:NewModule(name)
 	
-	local module = self:NewModule(name)
+		module.isCustom		= true
+		module.version 		= CustomBuffRingTemplate.version
+		module.unit 		= CustomBuffRingTemplate.unit
+		module.noAutoAlpha 	= CustomBuffRingTemplate.noAutoAlpha
+		module.defaults 	= CustomBuffRingTemplate.defaults
+		module.options 		= CustomBuffRingTemplate.options
+		module.localized 	= CustomBuffRingTemplate.localized
+		
+		module.Initialize 		= CustomBuffRingTemplate.Initialize
+		module.OnModuleUpdate 	= CustomBuffRingTemplate.OnModuleUpdate
+		module.OnModuleEnable 	= CustomBuffRingTemplate.OnModuleEnable
+		module.OnModuleDisable 	= CustomBuffRingTemplate.OnModuleDisable
+		module.UpdateBuff 		= CustomBuffRingTemplate.UpdateBuff
+		module.EventHandler 	= CustomBuffRingTemplate.EventHandler
+		module.AppendCustomModuleOptions = CustomBuffRingTemplate.AppendCustomModuleOptions
+	end
 	
-	module.isCustom		= true
-	module.version 		= CustomBuffRingTemplate.version
-	module.unit 		= CustomBuffRingTemplate.unit
-	module.noAutoAlpha 	= CustomBuffRingTemplate.noAutoAlpha
-	module.defaults 	= CustomBuffRingTemplate.defaults
-	module.options 		= CustomBuffRingTemplate.options
-	module.localized 	= CustomBuffRingTemplate.localized
-	
-	module.Initialize 		= CustomBuffRingTemplate.Initialize
-	module.OnModuleUpdate 	= CustomBuffRingTemplate.OnModuleUpdate
-	module.OnModuleEnable 	= CustomBuffRingTemplate.OnModuleEnable
-	module.OnModuleDisable 	= CustomBuffRingTemplate.OnModuleDisable
-	module.UpdateBuff 		= CustomBuffRingTemplate.UpdateBuff
-	module.EventHandler 	= CustomBuffRingTemplate.EventHandler
-	module.AppendCustomModuleOptions = CustomBuffRingTemplate.AppendCustomModuleOptions
-	
+	-- Initialize settings
 	module.db = { profile = {} }
-	
 	if (config == nil) then
 		-- copy by value
 		config = CustomBuffRingTemplate.defaults.profile
@@ -357,12 +415,23 @@ function ArcHUD:CreateCustomBuffModule(config)
 	table.insert(self.customModules, module)
 	self:LevelDebug(1, "Created new custom buff module: "..module.db.profile.BuffName..", "..module.db.profile.Unit)
 	
-	-- this is a dirty hack...
-	local aceOnEvent = AceAddon.frame:GetScript("OnEvent")
-	if (aceOnEvent ~= nil) then
-		aceOnEvent(AceAddon, "ADDON_LOADED", name)
+	if (recycled) then
+		module:Initialize()
+		module:InitConfigOptions()
+		module:Enable()
 	else
-		ArcHUD:Print("WARN: Module initialization delayed")
+		-- this is a dirty hack...
+		-- local aceOnEvent = AceAddon.frame:GetScript("OnEvent")
+		-- if (aceOnEvent ~= nil) then
+			-- aceOnEvent(AceAddon, "ADDON_LOADED", name)
+		-- else
+			-- ArcHUD:Print("WARN: Module initialization delayed")
+		-- end
+		
+		-- Needed for dynamically created modules
+		-- (i.e. modules created after the ADDON_LOADED event)
+		AceAddon:InitializeAddon(module)
+		AceAddon:EnableAddon(module)
 	end
 end
 
@@ -403,6 +472,5 @@ function ArcHUD:LoadCustomBuffModules()
 		for i,config in ipairs(self.db.profile.CustomModules) do
 			self:CreateCustomBuffModule(config)
 		end
-		--self:SendMessage("ARCHUD_MODULE_ENABLE")
 	end
 end

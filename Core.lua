@@ -200,7 +200,9 @@ function ArcHUD:OnEnable()
 	self:SendMessage("ARCHUD_MODULE_ENABLE")
 	self:LevelDebug(d_info, "ArcHUD is now enabled")
 	
-	self:ScheduleTimer(self.LoadCustomBuffModules, 1, self)
+	-- load custom buff modules
+	self:LoadCustomBuffModules()
+	--self:ScheduleTimer(self.LoadCustomBuffModules, 1, self)
 end
 
 ----------------------------------------------

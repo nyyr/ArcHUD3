@@ -58,6 +58,11 @@ end
 -- Enabling/Disabling
 ----------------------------------------------
 function ArcHUD.modulePrototype:OnInitialize()
+	-- Prevent double-initialization
+	-- This might happen for custom modules loaded after the ADDON_LOADED event
+	if (self.isInitialized) then return end
+	self.isInitialized = true
+	
 	if(self.Initialize) then
 		self:Initialize()
 		self:Debug(d_info, "Ring initialized")
@@ -85,6 +90,7 @@ function ArcHUD.modulePrototype:OnInitialize()
 	if (not self.noAutoAlpha) then
 		self:RegisterTimer("CheckAlpha", ArcHUDRingTemplate.CheckAlpha, 0.1, self, true)
 	end
+	
 	self:Debug(d_info, "Ring loaded")
 end
 
