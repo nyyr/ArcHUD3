@@ -16,6 +16,7 @@ module.defaults = {
 		ColorRage = PowerBarColor[1],
 		ColorFocus = PowerBarColor[2],
 		ColorEnergy = PowerBarColor[3],
+		ColorRunic = PowerBarColor[6],
 		Side = 2,
 		Level = 1,
 	}

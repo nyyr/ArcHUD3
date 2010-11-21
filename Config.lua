@@ -89,7 +89,7 @@ ArcHUD.configOptionsTableCmd = {
 				end
 			end,
 		},
-		perf = {
+--[[		perf = {
 			type		= "execute",
 			name		= "config",
 			desc		= "Show performance infos on timers (developers only!)",
@@ -111,6 +111,7 @@ ArcHUD.configOptionsTableCmd = {
 				-- testSwitch = not testSwitch
 			end,
 		},
+]]
 	},
 }
 
@@ -254,12 +255,38 @@ ArcHUD.configOptionsTableCore = {
 						ArcHUD:UpdateTargetHUD()
 					end,
 				},
+				-- Show Buff tooltips
+				showBuffTooltips = {
+					type		= "toggle",
+					name		= L["TEXT"]["SHOWBUFFTT"],
+					desc		= L["TOOLTIP"]["SHOWBUFFTT"],
+					order		= 7,
+					get			= function ()
+						return ArcHUD.db.profile.ShowBuffTooltips
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.ShowBuffTooltips = v
+					end,
+				},
+				-- Hide Buff tooltips in combat
+				hideBuffTooltipsIC = {
+					type		= "toggle",
+					name		= L["TEXT"]["HIDEBUFFTTIC"],
+					desc		= L["TOOLTIP"]["HIDEBUFFTTIC"],
+					order		= 8,
+					get			= function ()
+						return ArcHUD.db.profile.HideBuffTooltipsIC
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.HideBuffTooltipsIC = v
+					end,
+				},
 				-- Show PvP flag
 				showPVP = {
 					type		= "toggle",
 					name		= L["TEXT"]["SHOWPVP"],
 					desc		= L["TOOLTIP"]["SHOWPVP"],
-					order		= 7,
+					order		= 9,
 					get			= function ()
 						return ArcHUD.db.profile.ShowPVP
 					end,
@@ -273,7 +300,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["TOT"],
 					desc		= L["TOOLTIP"]["TOT"],
-					order		= 8,
+					order		= 10,
 					get			= function ()
 						return ArcHUD.db.profile.TargetTarget
 					end,
@@ -287,7 +314,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["TOTOT"],
 					desc		= L["TOOLTIP"]["TOTOT"],
-					order		= 9,
+					order		= 11,
 					get			= function ()
 						return ArcHUD.db.profile.TargetTargetTarget
 					end,
@@ -725,6 +752,49 @@ ArcHUD.configOptionsTableCore = {
 						ArcHUD:UpdateTargetHUD()
 					end,
 				},
+				ColorComboPoints = {
+					type		= "color",
+					name		= L["TEXT"]["CPCOLOR"],
+					desc		= L["TOOLTIP"]["CPCOLOR"],
+					order		= 12,
+					get			= function ()
+						return ArcHUD.db.profile.ColorComboPoints.r, ArcHUD.db.profile.ColorComboPoints.g, ArcHUD.db.profile.ColorComboPoints.b
+					end,
+					set			= function (info, r, g, b, a)
+						ArcHUD.db.profile.ColorComboPoints.r, ArcHUD.db.profile.ColorComboPoints.g, ArcHUD.db.profile.ColorComboPoints.b = r, g, b
+						ArcHUD.TargetHUD.Combo:SetTextColor(r, g, b)
+					end,
+				},
+				ColorOldComboPoints = {
+					type		= "color",
+					name		= L["TEXT"]["CPCOLORDECAY"],
+					desc		= L["TOOLTIP"]["CPCOLORDECAY"],
+					order		= 13,
+					get			= function ()
+						return ArcHUD.db.profile.ColorOldComboPoints.r, ArcHUD.db.profile.ColorOldComboPoints.g, ArcHUD.db.profile.ColorOldComboPoints.b
+					end,
+					set			= function (info, r, g, b, a)
+						ArcHUD.db.profile.ColorOldComboPoints.r, ArcHUD.db.profile.ColorOldComboPoints.g, ArcHUD.db.profile.ColorOldComboPoints.b = r, g, b
+						-- will change on next target change
+					end,
+				},
+				ResetColors = {
+					type		= "execute",
+					name		= L["TEXT"]["RESETCOLORS"],
+					desc		= L["TOOLTIP"]["RESETCOLORS"],
+					order		= 14,
+					func		= function ()
+						local defaults = ArcHUD.defaults.profile.ColorComboPoints
+						local defaultsold = ArcHUD.defaults.profile.ColorOldComboPoints
+						local color = ArcHUD.db.profile.ColorComboPoints
+						local colorold = ArcHUD.db.profile.ColorOldComboPoints
+						
+						color.r, color.g, color.b = defaults.r, defaults.g, defaults.b
+						colorold.r, colorold.g, colorold.b = defaultsold.r, defaultsold.g, defaultsold.b
+						ArcHUD.TargetHUD.Combo:SetTextColor(color.r, color.g, color.b)
+						AceConfigRegistry:NotifyChange("ArcHUD_Core")
+					end,
+				}
 			},
 			
 		}, -- comboPoints
@@ -797,11 +867,6 @@ ArcHUD.configOptionsTableCustomModules = {
 	type = "group",
 	name = LM["TEXT"]["CUSTOM"],
 	args = {
-		header = {
-			type		= "description",
-			name		= "NOTE: Custom arcs are still experimental",
-			order		= 0,
-		},
 		-- new custom arc
 		new = {
 			type		= "execute",
@@ -825,15 +890,15 @@ function ArcHUD:InitConfig()
 	
 	-- Set up core config options
 	AceConfig:RegisterOptionsTable("ArcHUD_Core", self.configOptionsTableCore)
-	self.configFrameCore = AceConfigDialog:AddToBlizOptions("ArcHUD_Core", "ArcHUD ("..ArcHUD.codename..")")
+	self.configFrameCore = AceConfigDialog:AddToBlizOptions("ArcHUD_Core", "ArcHUD")
 	
 	-- Set up modules config options
 	AceConfig:RegisterOptionsTable("ArcHUD_Modules", self.configOptionsTableModules)
-	self.configFrameModules = AceConfigDialog:AddToBlizOptions("ArcHUD_Modules", LM["TEXT"]["TITLE"], "ArcHUD_Core")
+	self.configFrameModules = AceConfigDialog:AddToBlizOptions("ArcHUD_Modules", LM["TEXT"]["TITLE"], "ArcHUD")
 	
 	-- Set up custom ring options
 	AceConfig:RegisterOptionsTable("ArcHUD_CustomModules", self.configOptionsTableCustomModules)
-	self.configFrameModules = AceConfigDialog:AddToBlizOptions("ArcHUD_CustomModules", LM["TEXT"]["CUSTOM"], "ArcHUD_Core")
+	self.configFrameModules = AceConfigDialog:AddToBlizOptions("ArcHUD_CustomModules", LM["TEXT"]["CUSTOM"], "ArcHUD")
 end
 
 ----------------------------------------------

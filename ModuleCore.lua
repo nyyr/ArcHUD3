@@ -504,35 +504,98 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 		end
 	end
 	
-	-- doesn't work if color mode is "fade"
-	if (self.options.hascolor) then
-		-- Color
-		t = {
+	local colorOption = function(self, caption, colorName)
+		return {
 			type		= "color",
-			name		= LM["TEXT"]["COLOR"],
-			desc		= LM["TOOLTIP"]["COLOR"],
+			name		= LM["TEXT"][caption],
+			desc		= LM["TOOLTIP"][caption],
 			order		= 41,
 			get			= function ()
-				return self.db.profile.Color.r, self.db.profile.Color.g, self.db.profile.Color.b
+				return self.db.profile[colorName].r, self.db.profile[colorName].g, self.db.profile[colorName].b
 			end,
 			set			= function (info, r, g, b, a)
-				self.db.profile.Color.r, self.db.profile.Color.g, self.db.profile.Color.b = r, g, b
-				self:UpdateColor(self.db.profile.Color)
+				self.db.profile[colorName].r, self.db.profile[colorName].g, self.db.profile[colorName].b = r, g, b
 				self:SendMessage("ARCHUD_MODULE_UPDATE", self:GetName())
 			end,
 		}
-		self.optionsTable.args.color = t
+	end
+	
+	if (not self.options.nocolor) then
+	
+		if (self.options.hasmanabar) then
+			
+			self.optionsTable.args.colorMana = colorOption(self, "COLORMANA", "ColorMana")
+			self.optionsTable.args.colorRage = colorOption(self, "COLORRAGE", "ColorRage")
+			self.optionsTable.args.colorFocus = colorOption(self, "COLORFOCUS", "ColorFocus")
+			self.optionsTable.args.colorEnergy = colorOption(self, "COLORENERGY", "ColorEnergy")
+			self.optionsTable.args.colorRunic = colorOption(self, "COLORRUNIC", "ColorRunic")
+		
+		elseif (self.options.hasfriendfoe) then
+		
+			self.optionsTable.args.colorFriend = colorOption(self, "COLORFRIEND", "ColorFriend")
+			self.optionsTable.args.colorFoe = colorOption(self, "COLORFOE", "ColorFoe")
+		
+		elseif (self.options.hascolorfade) then
+		
+			-- Color mode
+			t = {
+				type		= "select",
+				name		= LM["TEXT"]["COLOR"],
+				desc		= LM["TOOLTIP"]["COLOR"],
+				order		= 41,
+				values		= {["fade"] = LM["TEXT"]["COLORFADE"], ["custom"] = LM["TEXT"]["COLORCUST"]},
+				get			= function ()
+					return self.db.profile.ColorMode or "custom"
+				end,
+				set			= function (info, v)
+					self.db.profile.ColorMode = v
+					if (self.db.profile.ColorMode == "custom") then
+						self:UpdateColor(self.db.profile.Color)
+					end
+					self:SendMessage("ARCHUD_MODULE_UPDATE", self:GetName())
+				end,
+			}
+			self.optionsTable.args.colormode = t
+		
+			-- Color
+			self.optionsTable.args.color = colorOption(self, "COLORSET", "Color")
+			
+		else
+			
+			-- Color
+			self.optionsTable.args.color = colorOption(self, "COLORSET", "Color")
+			
+		end
 		
 		-- Reset to default
 		t = {
 			type		= "execute",
 			name		= LM["TEXT"]["COLORRESET"],
 			desc		= LM["TOOLTIP"]["COLORRESET"],
-			order		= 42,
+			order		= 45,
 			func		= function ()
-				self.db.profile.Color.r, self.db.profile.Color.g, self.db.profile.Color.b = 
-					self.defaults.profile.Color.r, self.defaults.profile.Color.g, self.defaults.profile.Color.b
-				self:UpdateColor(self.db.profile.Color)
+				local resetColor = function(color, default)
+					if (color) then
+						color.r, color.g, color.b = default.r, default.g, default.b
+					end
+				end
+				resetColor(self.db.profile.Color, self.defaults.profile.Color)
+				resetColor(self.db.profile.ColorFriend, self.defaults.profile.ColorFriend)
+				resetColor(self.db.profile.ColorFoe, self.defaults.profile.ColorFoe)
+				resetColor(self.db.profile.ColorMana, self.defaults.profile.ColorMana)
+				resetColor(self.db.profile.ColorRage, self.defaults.profile.ColorRage)
+				resetColor(self.db.profile.ColorFocus, self.defaults.profile.ColorFocus)
+				resetColor(self.db.profile.ColorEnergy, self.defaults.profile.ColorEnergy)
+				resetColor(self.db.profile.ColorRunic, self.defaults.profile.ColorRunic)
+				
+				if (self.db.profile.ColorMode) then
+					self.db.profile.ColorMode = self.defaults.profile.ColorMode
+				end
+				
+				if (self.db.profile.ColorMode == "custom") then
+					self:UpdateColor(self.db.profile.Color)
+				end
+				
 				self:SendMessage("ARCHUD_MODULE_UPDATE", self:GetName())
 				AceConfigRegistry:NotifyChange("ArcHUD_Modules")
 			end,

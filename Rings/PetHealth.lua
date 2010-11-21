@@ -34,7 +34,7 @@ function module:Initialize()
 
 	self.HPPerc = self:CreateFontString(self.f, "BACKGROUND", {100, 17}, 16, "RIGHT", {1.0, 1.0, 1.0}, {"BOTTOMLEFT", self.f, "BOTTOMLEFT", -165, -125})
 	
-	self:CreateStandardModuleOptions(30)
+	self:CreateStandardModuleOptions(35)
 end
 
 function module:OnModuleUpdate()

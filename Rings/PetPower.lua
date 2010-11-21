@@ -16,6 +16,7 @@ module.defaults = {
 		ColorRage = PowerBarColor[1],
 		ColorFocus = PowerBarColor[2],
 		ColorEnergy = PowerBarColor[3],
+		ColorRunic = PowerBarColor[6],
 		Attach = false,
 		Side = 2,
 		Level = -2,
@@ -41,7 +42,7 @@ function module:Initialize()
 
 	self.MPPerc = self:CreateFontString(self.f, "BACKGROUND", {100, 17}, 16, "LEFT", {1.0, 1.0, 1.0}, {"BOTTOMLEFT", self.f, "BOTTOMLEFT", 65, -125})
 	
-	self:CreateStandardModuleOptions(35)
+	self:CreateStandardModuleOptions(36)
 end
 
 function module:OnModuleUpdate()

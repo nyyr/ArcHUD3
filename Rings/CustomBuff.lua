@@ -75,7 +75,6 @@ end
 
 function CustomBuffRingTemplate:OnModuleEnable()
 	self.f.dirty = true
-	--self.f.fadeIn = 0.25
 	self.f.maxFadeTime = 0.25
 	
 	self.unit = self.db.profile.Unit
@@ -420,14 +419,6 @@ function ArcHUD:CreateCustomBuffModule(config)
 		module:InitConfigOptions()
 		module:Enable()
 	else
-		-- this is a dirty hack...
-		-- local aceOnEvent = AceAddon.frame:GetScript("OnEvent")
-		-- if (aceOnEvent ~= nil) then
-			-- aceOnEvent(AceAddon, "ADDON_LOADED", name)
-		-- else
-			-- ArcHUD:Print("WARN: Module initialization delayed")
-		-- end
-		
 		-- Needed for dynamically created modules
 		-- (i.e. modules created after the ADDON_LOADED event)
 		AceAddon:InitializeAddon(module)

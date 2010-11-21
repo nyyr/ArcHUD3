@@ -32,7 +32,7 @@ ArcHUD.Nameplates = {}
 ArcHUD.timers = {}
 
 -- Set up default configuration
-local cfgDefaults = {
+ArcHUD.defaults = {
 	profile = {
 		Debug = nil,
 		TargetFrame = true,
@@ -63,6 +63,8 @@ local cfgDefaults = {
 		Scale = 1.0,
 		AttachTop = false,
 		ShowBuffs = true,
+		ShowBuffTooltips = true,
+		HideBuffTooltipsIC = false,
 		BlizzPlayer = true,
 		BlizzTarget = true,
 		BlizzFocus = true,
@@ -135,7 +137,7 @@ end
 ----------------------------------------------
 function ArcHUD:OnInitialize()
 	-- Set up database
-	self.db = LibStub("AceDB-3.0"):New("ArcHUD3DB", cfgDefaults, "profile")
+	self.db = LibStub("AceDB-3.0"):New("ArcHUD3DB", ArcHUD.defaults, "profile")
 
 	-- Set debug level
 	--self:SetDebugging(true)
@@ -151,13 +153,12 @@ function ArcHUD:OnInitialize()
 	self.TargetHUD = self:CreateHUDFrames()
 
 	self:InitConfig()
-
-	-- Custom modules (is quite buggy when called in OnEnable())
-	--if (self.customModuleCount == 0) then
-		--self:LoadCustomBuffModules()
-	--end
 	
 	self:SendMessage("ARCHUD_LOADED")
+	
+	-- load custom buff modules
+	self:LoadCustomBuffModules()
+	
 	self:LevelDebug(d_info, "ArcHUD has been initialized.")
 end
 
@@ -201,8 +202,7 @@ function ArcHUD:OnEnable()
 	self:LevelDebug(d_info, "ArcHUD is now enabled")
 	
 	-- load custom buff modules
-	self:LoadCustomBuffModules()
-	--self:ScheduleTimer(self.LoadCustomBuffModules, 1, self)
+	--self:LoadCustomBuffModules()
 end
 
 ----------------------------------------------
@@ -665,8 +665,9 @@ end
 -- SetAuraTooltip()
 ----------------------------------------------
 function ArcHUD:SetAuraTooltip(this)
-	-- self:LevelDebug(d_notice, "NYI: SetAuraTooltip()")
-	if (not this:IsVisible()) then return end
+	if (not this:IsVisible() or (self.db.profile.ShowBuffTooltips == false)) then return end
+	if (self.db.profile.HideBuffTooltipsIC and self.PlayerIsInCombat) then return end
+
 	GameTooltip:SetOwner(this, "ANCHOR_BOTTOMRIGHT")
 	local unit = this.unit
 	if (this.isdebuff == 1) then

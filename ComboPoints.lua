@@ -12,6 +12,8 @@ function ArcHUD:InitComboPointsFrame()
 	
 	_, class = UnitClass("player")
 	
+	self.TargetHUD.Combo:SetTextColor(self.db.profile.ColorComboPoints.r, self.db.profile.ColorComboPoints.g, self.db.profile.ColorComboPoints.b)
+	
 	-- Show/Hide combopoints display
 	if(self.db.profile.ShowComboPoints) then
 		self.TargetHUD.Combo:Show()

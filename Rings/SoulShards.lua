@@ -17,7 +17,6 @@ module.defaults = {
 }
 module.options = {
 	{name = "Flash", text = "FLASH", tooltip = "FLASH"},
-	hascolor = true,
 	attach = true,
 }
 module.localized = true

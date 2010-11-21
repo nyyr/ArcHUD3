@@ -13,12 +13,10 @@ module.defaults = {
 		Side = 2,
 		Level = 2,
 		Color = {r = 1, g = 0, b = 0},
-		ColorOldPoints = {r = 0.5, g = 0.5, b = 0.5},
 	}
 }
 module.options = {
 	{name = "Flash", text = "FLASH", tooltip = "FLASH"},
-	hascolor = true,
 	attach = true,
 }
 module.localized = true
@@ -98,7 +96,7 @@ function module:UpdateComboPoints(event, arg1)
 		if (ArcHUD.db.profile.OldComboPointsDecay > 0.0) then
 			if (not self.RemoveOldCP_started and self.oldPoints > 0) then
 				-- we have still some points on previous target
-				self.f:UpdateColor(self.db.profile.ColorOldPoints)
+				self.f:UpdateColor(ArcHUD.db.profile.ColorOldComboPoints)
 				self:StartTimer("RemoveOldCP")
 				self.RemoveOldCP_started = true
 			end
