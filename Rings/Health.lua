@@ -70,8 +70,7 @@ function module:OnModuleUpdate()
 		self.DefText:Hide()
 	end
 
-	self.f:SetValue(UnitHealth(self.unit))
-	self:UpdateColor()
+	self:UpdateHealth(nil, self.unit)
 end
 
 ----------------------------------------------
@@ -79,7 +78,7 @@ end
 ----------------------------------------------
 function module:OnModuleEnable()
 	-- Initial setup
-	self:UpdateColor(self.db.profile.Color)
+	self:UpdateColor()
 	self.f:SetMax(UnitHealthMax(self.unit))
 
 	self.f.pulse = false

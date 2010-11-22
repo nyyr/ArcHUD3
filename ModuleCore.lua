@@ -205,8 +205,8 @@ function ArcHUD.modulePrototype:ARCHUD_MODULE_UPDATE(message, module)
 				end
 			end
 
-			if(not self.nocolor) then
-				self.ColorMode = self.db.profile.ColorMode
+			if(not self.options.nocolor) then
+				self.ColorMode = self.db.profile.ColorMode or "custom"
 			end
 
 			-- Special treatment for Pet rings
@@ -215,9 +215,10 @@ function ArcHUD.modulePrototype:ARCHUD_MODULE_UPDATE(message, module)
 			end
 
 			if(self.options.attach) then
+				local oldValue = self.f.endValue
+				self.f:SetValue(0)
 				-- Clear all points for the ring
 				self.f:ClearAllPoints()
-				self.f:SetValue(0)
 				if(self.db.profile.Side == 1) then
 					-- Attach to left side
 					self.f:SetPoint("TOPLEFT", self.parent:GetModule("Anchors").Left, "TOPLEFT", self.db.profile.Level * -15, 0)
@@ -236,6 +237,7 @@ function ArcHUD.modulePrototype:ARCHUD_MODULE_UPDATE(message, module)
 				if(self.f.BG) then
 					self.f.BG:SetAngle(180)
 				end
+				self.f:SetValue(oldValue)
 			end
 
 			if(self.OnModuleUpdate) then
@@ -323,17 +325,30 @@ end
 -- color_switch
 ----------------------------------------------
 local color_switch = {
+	-- friendfoe = {
+		-- [1] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.ColorFriend or self.db.profile.ColorFriend) end,
+		-- [2] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.ColorFoe or self.db.profile.ColorFoe) end,
+	-- },
+	-- manabar = {
+		-- [0] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.ColorMana or self.db.profile.ColorMana) end,
+		-- [1] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.ColorRage or self.db.profile.ColorRage) end,
+		-- [2] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.ColorFocus or self.db.profile.ColorFocus) end,
+		-- [3] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.ColorEnergy or self.db.profile.ColorEnergy) end,
+	-- }
 	friendfoe = {
-		[1] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.ColorFriend or self.db.profile.ColorFriend) end,
-		[2] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.ColorFoe or self.db.profile.ColorFoe) end,
+		[1] = function(self) return self.db.profile.ColorFriend end,
+		[2] = function(self) return self.db.profile.ColorFoe end,
 	},
 	manabar = {
-		[0] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.ColorMana or self.db.profile.ColorMana) end,
-		[1] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.ColorRage or self.db.profile.ColorRage) end,
-		[2] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.ColorFocus or self.db.profile.ColorFocus) end,
-		[3] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.ColorEnergy or self.db.profile.ColorEnergy) end,
+		[0] = function(self) return self.db.profile.ColorMana end,
+		[1] = function(self) return self.db.profile.ColorRage end,
+		[2] = function(self) return self.db.profile.ColorFocus end,
+		[3] = function(self) return self.db.profile.ColorEnergy end,
+		[6] = function(self) return self.db.profile.ColorRunic end,
 	}
 }
+
+
 
 ----------------------------------------------
 -- UpdateColor
@@ -345,17 +360,17 @@ function ArcHUD.modulePrototype:UpdateColor(color)
 		if(self.options.hasfriendfoe) then
 			-- Friend / Foe = 1 / 2
 			if(color_switch.friendfoe[color]) then
-				color_switch.friendfoe[color](self)
+				self.f:UpdateColor(color_switch.friendfoe[color](self))
 			end
 		elseif(self.options.hasmanabar) then
-			-- Mana / Rage / Focus / Energy = 0 / 1 / 2 / 3
+			-- Mana / Rage / Focus / Energy / Runic = 0 / 1 / 2 / 3 / 6
 			if(color_switch.manabar[color]) then
-				color_switch.manabar[color](self)
+				self.f:UpdateColor(color_switch.manabar[color](self))
 			end
 		end
 	else
-		if(self.ColorMode == "fade") then return end
-		self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.Color or self.db.profile.Color)
+		if (self.ColorMode == "fade") then return end
+		self.f:UpdateColor(self.db.profile.Color)
 	end
 end
 
@@ -363,7 +378,7 @@ end
 -- Return power bar color
 ----------------------------------------------
 function ArcHUD.modulePrototype:GetPowerBarColor(powerType)
-	return PowerBarColor[powerType]
+	return color_switch.manabar[powerType](self)
 end
 
 ----------------------------------------------
@@ -373,7 +388,7 @@ function ArcHUD.modulePrototype:GetPowerBarColorText(powerType)
 	if (powerType == 0) then
 		return { r = 0.00, g = 1.00, b = 1.00 }
 	else
-		return PowerBarColor[powerType]
+		return color_switch.manabar[powerType](self)
 	end
 end
 
@@ -514,7 +529,7 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 				return self.db.profile[colorName].r, self.db.profile[colorName].g, self.db.profile[colorName].b
 			end,
 			set			= function (info, r, g, b, a)
-				self.db.profile[colorName].r, self.db.profile[colorName].g, self.db.profile[colorName].b = r, g, b
+				self.db.profile[colorName] = {["r"] = r, ["g"] = g, ["b"] = b}
 				self:SendMessage("ARCHUD_MODULE_UPDATE", self:GetName())
 			end,
 		}
@@ -558,7 +573,7 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 			self.optionsTable.args.colormode = t
 		
 			-- Color
-			self.optionsTable.args.color = colorOption(self, "COLORSET", "Color")
+			self.optionsTable.args.color = colorOption(self, "COLORSETFADE", "Color")
 			
 		else
 			
@@ -590,10 +605,6 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 				
 				if (self.db.profile.ColorMode) then
 					self.db.profile.ColorMode = self.defaults.profile.ColorMode
-				end
-				
-				if (self.db.profile.ColorMode == "custom") then
-					self:UpdateColor(self.db.profile.Color)
 				end
 				
 				self:SendMessage("ARCHUD_MODULE_UPDATE", self:GetName())

@@ -13,7 +13,6 @@ module.defaults = {
 		Outline = true,
 		ShowText = true,
 		ShowPerc = true,
-		ColorMode = "default",
 		ColorMana = PowerBarColor[0],
 		ColorRage = PowerBarColor[1],
 		ColorFocus = PowerBarColor[2],
@@ -64,7 +63,7 @@ function module:OnModuleUpdate()
 	end
 
 	self.f:SetValue(UnitPower(self.unit))
-	self:UpdateColor(PowerBarColor[UnitPowerType(self.unit)])
+	self:UpdateColor(UnitPowerType(self.unit))
 end
 
 ----------------------------------------------
@@ -168,7 +167,7 @@ end
 function module:UpdatePowerType(event, arg1)
 	if (arg1 == self.unit) then
 		if(event == "UNIT_DISPLAYPOWER") then
-			self:UpdateColor(self:GetPowerBarColor(UnitPowerType(self.unit)))
+			self:UpdateColor(UnitPowerType(self.unit))
 			
 			info = self:GetPowerBarColorText(UnitPowerType(self.unit))
 			self.MPText:SetVertexColor(info.r, info.g, info.b)

@@ -11,7 +11,6 @@ module.defaults = {
 		Enabled = true,
 		Outline = true,
 		ShowPerc = true,
-		ColorMode = "default",
 		ColorMana = PowerBarColor[0],
 		ColorRage = PowerBarColor[1],
 		ColorFocus = PowerBarColor[2],

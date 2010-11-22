@@ -11,7 +11,6 @@ module.defaults = {
 		Enabled = true,
 		Outline = true,
 		ShowPerc = true,
-		ColorMode = "default",
 		ColorMana = PowerBarColor[0],
 		ColorRage = PowerBarColor[1],
 		ColorFocus = PowerBarColor[2],
@@ -58,7 +57,7 @@ function module:OnModuleUpdate()
 	end
 	if(UnitExists(self.unit)) then
 		self.f:SetValue(UnitPower(self.unit))
-		self:UpdateColor(PowerBarColor[UnitPowerType(self.unit)])
+		self:UpdateColor(UnitPowerType(self.unit))
 	end
 end
 
@@ -97,7 +96,7 @@ function module:PLAYER_TARGET_CHANGED()
 		
 		self.f.pulse = false
 		self.f:SetMax(maxPower)
-		self:UpdateColor(PowerBarColor[UnitPowerType(self.unit)])
+		self:UpdateColor(UnitPowerType(self.unit))
 		if(UnitIsDead(self.unit) or UnitIsGhost(self.unit) or maxPower == 0) then
 			self.f:SetValue(0)
 			self.MPPerc:SetText("")
@@ -114,7 +113,7 @@ function module:UNIT_DISPLAYPOWER(event, arg1)
 	local power = UnitPower(self.unit)
 	local maxPower = UnitPowerMax(self.unit)
 
-	self:UpdateColor(PowerBarColor[UnitPowerType(self.unit)])
+	self:UpdateColor(UnitPowerType(self.unit))
 	self.f:SetValue(power)
 	self.f:SetMax(maxPower)
 

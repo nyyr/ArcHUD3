@@ -11,7 +11,6 @@ module.defaults = {
 		Enabled = true,
 		Outline = true,
 		ShowPerc = true,
-		ColorMode = "default",
 		ColorFriend = {r = 0, g = 0.5, b = 1},
 		ColorFoe = {r = 1, g = 0, b = 0},
 		Side = 1,

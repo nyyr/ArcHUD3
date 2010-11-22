@@ -37,6 +37,8 @@ end
 
 function module:OnModuleUpdate()
 	self.Flash = self.db.profile.Flash
+	self:UpdateColor()
+	self:StopTimer("RemoveOldCP")
 	--self.parent:UnregisterMetro(self.name .. "RemoveOldCP")
 	self:RegisterTimer("RemoveOldCP", self.RemoveOldCP, self.parent.db.profile.OldComboPointsDecay, self)
 end

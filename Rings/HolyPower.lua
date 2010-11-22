@@ -34,6 +34,7 @@ end
 
 function module:OnModuleUpdate()
 	self.Flash = self.db.profile.Flash
+	self:UpdateColor()
 end
 
 function module:OnModuleEnable()

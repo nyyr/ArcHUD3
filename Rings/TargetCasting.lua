@@ -12,7 +12,6 @@ module.defaults = {
 		Outline = true,
 		ShowSpell = true,
 		ShowTime = true,
-		ColorMode = "default",
 		ColorFriend = {r = 0, g = 1, b = 0},
 		ColorFoe = {r = 1, g = 0, b = 0},
 		Side = 1,

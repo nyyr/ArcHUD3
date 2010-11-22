@@ -14,7 +14,6 @@ module.defaults = {
 		Enabled = true,
 		Outline = true,
 		ShowSpell = true,
-		ColorMode = "default",
 		Side = 1,
 		Level = -1,
 	}

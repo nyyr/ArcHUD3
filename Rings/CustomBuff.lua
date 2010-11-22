@@ -59,6 +59,7 @@ end
 
 function CustomBuffRingTemplate:OnModuleUpdate()
 	self.Flash = self.db.profile.Flash
+	self:UpdateColor()
 	
 	self.Text:ClearAllPoints()
 	if(self.db.profile.Side == 1) then
@@ -81,7 +82,7 @@ function CustomBuffRingTemplate:OnModuleEnable()
 	self.f:SetMax(self.db.profile.MaxCount)
 	self.f:SetValue(0)
 
-	self.f:UpdateColor(self.db.profile.Color)
+	self:UpdateColor()
 	self:UpdateBuff()
 
 	-- Register the events we will use

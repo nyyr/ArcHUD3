@@ -155,10 +155,6 @@ function ArcHUD:OnInitialize()
 	self:InitConfig()
 	
 	self:SendMessage("ARCHUD_LOADED")
-	
-	-- load custom buff modules
-	self:LoadCustomBuffModules()
-	
 	self:LevelDebug(d_info, "ArcHUD has been initialized.")
 end
 
@@ -201,8 +197,8 @@ function ArcHUD:OnEnable()
 	self:SendMessage("ARCHUD_MODULE_ENABLE")
 	self:LevelDebug(d_info, "ArcHUD is now enabled")
 	
-	-- load custom buff modules
-	--self:LoadCustomBuffModules()
+	-- load custom buff modules (OnInitialize() is too early)
+	self:LoadCustomBuffModules()
 end
 
 ----------------------------------------------
