@@ -70,6 +70,13 @@ function CustomBuffRingTemplate:OnModuleUpdate()
 		self.Text:SetPoint("TOP", self.f, "BOTTOMLEFT", 20, -130)
 	end
 	
+	if (self.db.profile.ShowText) then
+		self.Text:Show()
+	else
+		self.Text:SetText("")
+		self.Text:Hide()
+	end
+	
 	self.f:SetMax(self.db.profile.MaxCount)
 	self:UpdateBuff()
 end
@@ -149,16 +156,18 @@ function CustomBuffRingTemplate:UpdateBuff()
 		end
 		
 		-- text
-		if (self.db.profile.TextUseStacks) then
-			self.Text:SetText(count)
-		elseif (duration) then
-			local t = GetTime()
-			if (expirationTime > t) then
-				self.Text:SetText(math.floor(expirationTime - t))
-				timer = true
+		if (self.db.profile.ShowText) then
+			if (self.db.profile.TextUseStacks) then
+				self.Text:SetText(count)
+			elseif (duration) then
+				local t = GetTime()
+				if (expirationTime > t) then
+					self.Text:SetText(math.floor(expirationTime - t))
+					timer = true
+				end
+			else
+				self.Text:SetText("")
 			end
-		else
-			self.Text:SetText("")
 		end
 		
 		-- flashing
