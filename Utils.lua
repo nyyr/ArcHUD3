@@ -25,7 +25,7 @@ function ArcHUD:fint(i)
 		if (i >= 1000000) then
 			return string.format("%.1fM", i/1000000)
 		elseif (i >= 100000) then
-			return string.format("%.1fk", i/100000)
+			return string.format("%.1fk", i/1000)
 		else
 			return i
 		end
