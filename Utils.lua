@@ -18,3 +18,18 @@ end
 function ArcHUD:strcap(str)
    return strupper(strsub(str, 1, 1)) .. strlower(strsub(str, 2))
 end
+
+-- Friendly/formatted int
+function ArcHUD:fint(i)
+	if (type(i) == "number") then 
+		if (i >= 1000000) then
+			return string.format("%.1fM", i/1000000)
+		elseif (i >= 100000) then
+			return string.format("%.1fk", i/100000)
+		else
+			return i
+		end
+	else
+		return i 
+	end
+end

@@ -418,12 +418,12 @@ function ArcHUD:TargetUpdate(event, arg1)
 		if(UnitIsDead("target") or UnitIsGhost("target")) then
 			self.TargetHUD.HPText:SetText("Dead")
 		else
-			self.TargetHUD.HPText:SetText(UnitHealth("target").."/"..UnitHealthMax("target"))
+			self.TargetHUD.HPText:SetText(self:fint(UnitHealth("target")).."/"..self:fint(UnitHealthMax("target")))
 		end
 
 		-- Does the unit have mana? If so we want to show it
 		if (UnitPowerMax("target") > 0) then
-			self.TargetHUD.MPText:SetText(UnitPower("target").."/"..UnitPowerMax("target"))
+			self.TargetHUD.MPText:SetText(self:fint(UnitPower("target")).."/"..self:fint(UnitPowerMax("target")))
 			self:StartTimer("UpdateTargetPower")
 		else
 			self.TargetHUD.MPText:SetText(" ")
@@ -677,7 +677,7 @@ end
 -- UpdateTargetPower()
 ----------------------------------------------
 function ArcHUD:UpdateTargetPower()
-	self.TargetHUD.MPText:SetText(UnitPower("target").."/"..UnitPowerMax("target"))
+	self.TargetHUD.MPText:SetText(self:fint(UnitPower("target")).."/"..self:fint(UnitPowerMax("target")))
 end
 
 ----------------------------------------------
@@ -960,7 +960,7 @@ function ArcHUD:EventHandler(event, arg1)
 
 	elseif (event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH") then
 		if (arg1 == "target") then
-			self.TargetHUD.HPText:SetText(UnitHealth(arg1).."/"..UnitHealthMax(arg1))
+			self.TargetHUD.HPText:SetText(self:fint(UnitHealth(arg1)).."/"..self:fint(UnitHealthMax(arg1)))
 		end
 
 	elseif(event == "PLAYER_ENTERING_WORLD") then
@@ -970,7 +970,7 @@ function ArcHUD:EventHandler(event, arg1)
 
 	else
 		if (arg1 == "target") then
-			self.TargetHUD.MPText:SetText(UnitPower(arg1).."/"..UnitPowerMax(arg1))
+			self.TargetHUD.MPText:SetText(self:fint(UnitPower(arg1)).."/"..self:fint(UnitPowerMax(arg1)))
 		end
 	end
 end

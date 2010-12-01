@@ -88,7 +88,7 @@ function module:OnModuleEnable()
 	else
 		self.f:GhostMode(false, self.unit)
 		self.f:SetValue(UnitHealth(self.unit))
-		self.HPText:SetText(UnitHealth(self.unit).."/"..UnitHealthMax(self.unit))
+		self.HPText:SetText(self.parent:fint(UnitHealth(self.unit)).."/"..self.parent:fint(UnitHealthMax(self.unit)))
 		self.HPText:SetTextColor(0, 1, 0)
 		self.HPPerc:SetText(floor((UnitHealth(self.unit)/UnitHealthMax(self.unit))*100).."%")
 		self.DefText:SetText("0")
@@ -117,7 +117,8 @@ end
 ----------------------------------------------
 function module:UpdateHealth(event, arg1)
 	if(arg1 == self.unit) then
-		local p=UnitHealth(self.unit)/UnitHealthMax(self.unit)
+		local health, maxHealth = UnitHealth(self.unit), UnitHealthMax(self.unit)
+		local p = health/maxHealth
 		local r, g = 1, 1
 		if ( p > 0.5 ) then
 			r = (1.0 - p) * 2
@@ -141,19 +142,19 @@ function module:UpdateHealth(event, arg1)
 				self.HPText:SetTextColor(0, 1, 0)
 				self:UpdateColor()
 			end
-			self.HPText:SetText(UnitHealth(self.unit).."/"..UnitHealthMax(self.unit))
-			self.HPPerc:SetText(floor((UnitHealth(self.unit)/UnitHealthMax(self.unit))*100).."%")
+			self.HPText:SetText(self.parent:fint(health).."/"..self.parent:fint(maxHealth))
+			self.HPPerc:SetText(floor((health/maxHealth)*100).."%")
 
-			local deficit = UnitHealthMax(self.unit) - UnitHealth(self.unit)
+			local deficit = maxHealth - health
 			if deficit <= 0 then
 				deficit = ""
 			else
-				deficit = "-" .. deficit
+				deficit = "-" .. self.parent:fint(deficit)
 			end
 			self.DefText:SetText(deficit)
 
-			self.f:SetMax(UnitHealthMax(self.unit))
-			self.f:SetValue(UnitHealth(self.unit))
+			self.f:SetMax(maxHealth)
+			self.f:SetValue(health)
 		end
 	end
 end

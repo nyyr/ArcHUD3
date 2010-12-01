@@ -82,7 +82,7 @@ function module:OnModuleEnable()
 
 		self.f:SetMax(UnitPowerMax(self.unit))
 		self.f:SetValue(UnitPower(self.unit))
-		self.MPText:SetText(UnitPower(self.unit).."/"..UnitPowerMax(self.unit))
+		self.MPText:SetText(self.parent:fint(UnitPower(self.unit)).."/"..self.parent:fint(UnitPowerMax(self.unit)))
 		self.MPPerc:SetText(floor((UnitPower(self.unit)/UnitPowerMax(self.unit))*100).."%")
 	end
 
@@ -115,7 +115,7 @@ function module:UpdatePowerBar()
 		local maxPower = UnitPowerMax(self.unit)
 		
 		if (maxPower > 0) then
-			self.MPText:SetText(power.."/"..maxPower)
+			self.MPText:SetText(self.parent:fint(power).."/"..self.parent:fint(maxPower))
 			self.MPPerc:SetText(floor((power/maxPower)*100).."%")
 		else
 			self.MPText:SetText("")
@@ -145,7 +145,7 @@ function module:UpdatePowerEvent(event, arg1)
 			self.f:GhostMode(false, self.unit)
 			
 			if (maxPower > 0) then
-				self.MPText:SetText(power.."/"..maxPower)
+				self.MPText:SetText(self.parent:fint(power).."/"..self.parent:fint(maxPower))
 				self.MPPerc:SetText(floor((power/maxPower)*100).."%")
 			else
 				self.MPText:SetText("")
