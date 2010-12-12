@@ -9,7 +9,7 @@ ArcHUD = LibStub("AceAddon-3.0"):NewAddon("ArcHUD",
 
 -- Version
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-ArcHUD.version = "1.0 beta (r"..rev..")"
+ArcHUD.version = "1.0 (r"..rev..")"
 ArcHUD.codename = "Plainsrunner"
 ArcHUD.authors = "nyyr, Nenie"
 
