@@ -101,8 +101,12 @@ L["TOOLTIP"] = {
 	TOT			= "Enable displaying of target's target",
 	TOTOT		= "Enable displaying of target's target's target",
 
-	NPPLAYER	= "Toggle clickable player's nameplate",
-	NPPET		= "Toggle clickable pet's nameplate",
+	NPPLAYER	= "Toggle clickable player's nameplate. "..
+		"The player nameplate's state cannot be changed in combat due to UI restrictions. "..
+		"Thus, it cannot be activated in combat by hovering over them, or it will remain activated if active upon entering combat.",
+	NPPET		= "Toggle clickable pet's nameplate. "..
+		"The pet nameplate's state cannot be changed in combat due to UI restrictions. "..
+		"Thus, it cannot be activated in combat by hovering over them, or it will remain activated if active upon entering combat.",
 	NPTARGET	= "Toggle clickable target's nameplate",
 	NPTOT		= "Toggle clickable target's target nameplate",
 	NPTOTOT		= "Toggle clickable target's target's target nameplate",

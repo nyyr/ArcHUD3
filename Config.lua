@@ -331,20 +331,6 @@ ArcHUD.configOptionsTableCore = {
 			name		= L["TEXT"]["NAMEPLATES"],
 			order		= 11,
 			args		= {
-				-- Nameplates in combat
-				NameplateCombat = {
-					type		= "toggle",
-					name		= L["TEXT"]["NPCOMBAT"],
-					desc		= L["TOOLTIP"]["NPCOMBAT"],
-					order		= 10,
-					get			= function ()
-						return ArcHUD.db.profile.NameplateCombat
-					end,
-					set			= function (info, v)
-						ArcHUD.db.profile.NameplateCombat = v
-						ArcHUD:UpdateTargetHUD()
-					end,
-				},
 				-- Separator
 				NameplatePlayerSep = {
 					type		= "header",

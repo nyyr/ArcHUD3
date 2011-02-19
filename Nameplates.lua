@@ -68,7 +68,7 @@ function ArcHUD:InitNameplate(this, unit)
 	this.Enable = function(self)
 		-- ArcHUD:LevelDebug(3, "Enable: unit "..self.unit..", state "..tostring(self.state)..", disabled "..tostring(self.disabled)..", lock "..tostring(self.lock)..", lockdown "..tostring(InCombatLockdown())..", npcombat "..tostring(ArcHUD.db.profile.NameplateCombat))
 	
-		if ((InCombatLockdown() and not ArcHUD.db.profile.NameplateCombat) or self.state or self.disabled or self.lock) then return end
+		if (InCombatLockdown() or self.state or self.disabled or self.lock) then return end
 		
 		if(self.unit == "player" or self.unit == "pet") then
 			if (not MouseIsOver(ArcHUD.Nameplates[self.unit])) then
@@ -89,7 +89,7 @@ function ArcHUD:InitNameplate(this, unit)
 	end
 	
 	this.Disable = function(self)
-		if ((not self.state) or self.lock) then return end
+		if (InCombatLockdown() or (not self.state) or self.lock) then return end
 		
 		-- ArcHUD:LevelDebug(3, "Disable: unit "..self.unit..", state "..tostring(self.state)..", disabled "..tostring(self.disabled)..", lock "..tostring(self.lock))
 
