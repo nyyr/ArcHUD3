@@ -10,7 +10,7 @@ ArcHUD.customModules = {}
 local CustomBuffRingTemplate = {}
 
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-CustomBuffRingTemplate.version = "1.0 (r" .. rev .. ")"
+CustomBuffRingTemplate.version = "1.1 (r" .. rev .. ")"
 
 CustomBuffRingTemplate.unit = "player"
 CustomBuffRingTemplate.noAutoAlpha = true
@@ -49,7 +49,23 @@ function CustomBuffRingTemplate:Initialize()
 	self.f = self:CreateRing(true, ArcHUDFrame)
 	self.f:SetAlpha(0)
 	
-	self.Text = self:CreateFontString(self.f, "BACKGROUND", {40, 12}, 10, "CENTER", {1.0, 1.0, 1.0}, {"TOP", self.f, "BOTTOMLEFT", 20, -130})
+	self.BuffButton = CreateFrame("Button", nil, self.f)
+	self.BuffButton:SetWidth(15)
+	self.BuffButton:SetHeight(15)
+	self.BuffButton:SetPoint("TOP", self.f)
+	self.BuffButton:EnableMouse(false);
+
+	self.BuffButton.Icon = self.BuffButton:CreateTexture(nil, "ARTWORK")
+	self.BuffButton.Icon:SetWidth(15)
+	self.BuffButton.Icon:SetHeight(15)
+	self.BuffButton.Icon:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
+	self.BuffButton.Icon:SetPoint("CENTER", self.BuffButton, "CENTER")
+	self.BuffButton.Icon:Show()
+
+	self.BuffButton:Show()
+	
+	self.Text = self:CreateFontString(self.BuffButton, "OVERLAY", {40, 12}, 10, "CENTER", {1.0, 1.0, 1.0}, {"TOP", self.BuffButton, "TOP", 0, -2})
+	self.Text:Show()
 	
 	self:RegisterTimer("UpdateBuff", self.UpdateBuff, 0.1, self, true)
 	
@@ -61,13 +77,16 @@ function CustomBuffRingTemplate:OnModuleUpdate()
 	self.Flash = self.db.profile.Flash
 	self:UpdateColor()
 	
-	self.Text:ClearAllPoints()
+	--self.Text:ClearAllPoints()
+	self.BuffButton:ClearAllPoints()
 	if(self.db.profile.Side == 1) then
 		-- Attach to left side
-		self.Text:SetPoint("TOP", self.f, "BOTTOMLEFT", -20, -130)
+		--self.Text:SetPoint("TOP", self.f, "BOTTOMLEFT", -20, -130)
+		self.BuffButton:SetPoint("TOP", self.f, "BOTTOMLEFT", -20, -130)
 	else
 		-- Attach to right side
-		self.Text:SetPoint("TOP", self.f, "BOTTOMLEFT", 20, -130)
+		--self.Text:SetPoint("TOP", self.f, "BOTTOMLEFT", 20, -130)
+		self.BuffButton:SetPoint("TOP", self.f, "BOTTOMLEFT", 20, -130)
 	end
 	
 	if (self.db.profile.ShowText) then
@@ -76,6 +95,8 @@ function CustomBuffRingTemplate:OnModuleUpdate()
 		self.Text:SetText("")
 		self.Text:Hide()
 	end
+	
+	self.BuffButton:Show()
 	
 	self.f:SetMax(self.db.profile.MaxCount)
 	self:UpdateBuff()
@@ -126,10 +147,10 @@ function CustomBuffRingTemplate:UpdateBuff()
 	local timer = false
 	
 	if (self.db.profile.Debuff) then
-		name, _, _, count, _, duration, expirationTime, unitCaster = 
+		name, _, iconTex, count, _, duration, expirationTime, unitCaster = 
 			UnitDebuff(self.unit, self.db.profile.BuffName) 
 	else
-		name, _, _, count, _, duration, expirationTime, unitCaster = 
+		name, _, iconTex, count, _, duration, expirationTime, unitCaster = 
 			UnitBuff(self.unit, self.db.profile.BuffName) 
 	end
 	
@@ -169,6 +190,9 @@ function CustomBuffRingTemplate:UpdateBuff()
 				self.Text:SetText("")
 			end
 		end
+		
+		-- buff icon
+		self.BuffButton.Icon:SetTexture(iconTex)
 		
 		-- flashing
 		if(count < self.db.profile.MaxCount and count >= 0) then
