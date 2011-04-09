@@ -1,7 +1,7 @@
 local moduleName = "TargetCasting"
 local module = ArcHUD:NewModule(moduleName)
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "1.0 (r"..rev..")"
+module.version = "1.1 (r"..rev..")"
 
 module.unit = "target"
 module.noAutoAlpha = true
@@ -16,11 +16,13 @@ module.defaults = {
 		ColorFoe = {r = 1, g = 0, b = 0},
 		Side = 1,
 		Level = -1,
+		IndicateNonInterruptible = true,
 	}
 }
 module.options = {
 	{name = "ShowSpell", text = "SHOWSPELL", tooltip = "SHOWSPELL"},
 	{name = "ShowTime", text = "SHOWTIME", tooltip = "SHOWTIME"},
+	{name = "IndicateNonInterruptible", text = "INDINTERRUPT", tooltip = "INDINTERRUPT"},
 	hasfriendfoe = true,
 	attach = true,
 }
@@ -31,8 +33,8 @@ function module:Initialize()
 	self.f = self:CreateRing(true, ArcHUDFrame)
 	self.f:SetAlpha(0)
 
-	self.Text = self:CreateFontString(self.f, "BACKGROUND", {175, 14}, 10, "LEFT", {1.0, 1.0, 1.0}, {"TOP", "ArcHUDFrameCombo", "BOTTOM", -28, -14})
-	self.Time = self:CreateFontString(self.f, "BACKGROUND", {40, 14}, 10, "RIGHT", {1.0, 1.0, 1.0}, {"TOPLEFT", self.Text, "TOPRIGHT", 0, 0})
+	self.Text = self:CreateFontString(self.f, "BACKGROUND", {175, 14}, 12, "LEFT", {1.0, 1.0, 1.0}, {"TOP", "ArcHUDFrameCombo", "BOTTOM", -28, 0})
+	self.Time = self:CreateFontString(self.f, "BACKGROUND", {40, 14}, 12, "RIGHT", {1.0, 1.0, 1.0}, {"TOPLEFT", self.Text, "TOPRIGHT", 0, 0})
 	
 	self:CreateStandardModuleOptions(30)
 	
@@ -141,7 +143,7 @@ end
 
 function module:UNIT_SPELLCAST_START(event, arg1)
 	if(arg1 == self.unit) then
-		local spell, rank, displayName, icon, startTime, endTime = UnitCastingInfo(self.unit)
+		local spell, rank, displayName, icon, startTime, endTime, _, _, notInterruptible = UnitCastingInfo(self.unit)
 		if (spell) then 
 			if(UnitIsFriend("player", self.unit)) then
 				self:UpdateColor(1)
@@ -149,6 +151,9 @@ function module:UNIT_SPELLCAST_START(event, arg1)
 				self.Time:SetTextColor(1, 1, 1)
 			else
 				self:UpdateColor(2)
+				if (self.db.IndicateNonInterruptible and notInterruptible) then
+					self.f.BG:UpdateColor({r = 1, g = 1, b = 1})
+				end
 				self.Text:SetTextColor(1, 0, 0)
 				self.Time:SetTextColor(1, 0, 0)
 			end
@@ -169,7 +174,7 @@ end
 
 function module:UNIT_SPELLCAST_CHANNEL_START(event, arg1)
 	if(arg1 == self.unit) then
-		local spell, rank, displayName, icon, startTime, endTime = UnitChannelInfo(self.unit)
+		local spell, rank, displayName, icon, startTime, endTime, _, notInterruptible = UnitChannelInfo(self.unit)
 		if (spell) then 
 			if(UnitIsFriend("player", self.unit)) then
 				self:UpdateColor(1)
@@ -177,6 +182,9 @@ function module:UNIT_SPELLCAST_CHANNEL_START(event, arg1)
 				self.Time:SetTextColor(1, 1, 1)
 			else
 				self:UpdateColor(2)
+				if (self.db.IndicateNonInterruptible and notInterruptible) then
+					self.f.BG:UpdateColor({r = 1, g = 1, b = 1})
+				end
 				self.Text:SetTextColor(1, 0, 0)
 				self.Time:SetTextColor(1, 0, 0)
 			end
@@ -229,6 +237,7 @@ function module:SpellcastStop(event, arg1, force)
 		self.f.casting = 0
 		self.Time:SetText("")
 		self.f:SetRingAlpha(0)
+		self.f.BG:UpdateColor({r = 0, g = 0, b = 0})
 	end
 end
 
@@ -238,8 +247,8 @@ function module:SpellcastChannelStop(event, arg1, force)
 		self.channeling = 0
 		self.Text:SetText("")
 		self.f:SetValue(0)
-
 		self.Time:SetText("")
 		self.f:SetRingAlpha(0)
+		self.f.BG:UpdateColor({r = 0, g = 0, b = 0})
 	end
 end

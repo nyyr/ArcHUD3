@@ -9,8 +9,8 @@ ArcHUD = LibStub("AceAddon-3.0"):NewAddon("ArcHUD",
 
 -- Version
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-ArcHUD.version = "1.0 (r"..rev..")"
-ArcHUD.codename = "Plainsrunner"
+ArcHUD.version = "1.1 (r"..rev..")"
+ArcHUD.codename = "Happy Plainsrunner"
 ArcHUD.authors = "nyyr, Nenie"
 
 -- Locale object
@@ -51,15 +51,15 @@ ArcHUD.defaults = {
 		PartyLock = true,
 		TargetTarget = true,
 		TargetTargetTarget = true,
-		Nameplate_player = true,
-		Nameplate_pet = true,
+		Nameplate_player = false,
+		Nameplate_pet = false,
 		Nameplate_target = true,
 		Nameplate_targettarget = true,
 		Nameplate_targettargettarget = true,
-		NameplateCombat = false, -- deprecated
+		NameplateCombat = false, -- deprecated (functionality removed, causes taint)
 		HoverMsg = false,
 		HoverDelay = 1.5,
-		PetNameplateFade = true,
+		PetNameplateFade = true, -- deprecated (pet happiness removed in WoW 4.1)
 		Scale = 1.0,
 		AttachTop = false,
 		ShowBuffs = true,
@@ -759,31 +759,13 @@ end
 ----------------------------------------------
 function ArcHUD:UpdatePetNamePlate()
 	if(UnitExists("pet")) then
-		local happiness, _, _ = GetPetHappiness()
-		local color = "ffffff"
-		local alpha = 0.0
-		if(happiness) then
-			if(happiness == 1) then
-				color = "ff0000"
-				happiness = " :("
-				alpha = self.db.profile.FadeIC
-			elseif(happiness == 2) then
-				color = "ffff00"
-				happiness = " :||"
-				alpha = self.db.profile.FadeOOC
-			elseif(happiness == 3) then
-				color = "00ff00"
-				happiness = " :)"
-				alpha = self.db.profile.FadeFull
-			end
-		else
-			happiness = ""
-		end
+		local color = "00ff00"
+		local alpha = self.db.profile.FadeFull
 		self.Nameplates.pet.alpha = alpha
-		if ((not self.Nameplates.pet.state) and ArcHUD.db.profile.PetNameplateFade) then
+		if ((not self.Nameplates.pet.state)) then
 			ArcHUDRingTemplate.SetRingAlpha(self.Nameplates.pet, alpha)
 		end
-		self.Nameplates.pet.Text:SetText("|cff"..color..UnitName("pet").." "..happiness.."|r")
+		self.Nameplates.pet.Text:SetText("|cff"..color..UnitName("pet").."|r")
 		self.Nameplates.pet.disabled = false
 	else
 		self.Nameplates.pet:Disable()

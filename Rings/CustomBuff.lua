@@ -64,7 +64,7 @@ function CustomBuffRingTemplate:Initialize()
 
 	self.BuffButton:Show()
 	
-	self.Text = self:CreateFontString(self.BuffButton, "OVERLAY", {40, 12}, 10, "CENTER", {1.0, 1.0, 1.0}, {"TOP", self.BuffButton, "TOP", 0, -2})
+	self.Text = self:CreateFontString(self.BuffButton, "OVERLAY", {40, 12}, 10, "CENTER", {1.0, 1.0, 1.0}, {"TOP", self.BuffButton, "TOP", 1, -2})
 	self.Text:Show()
 	
 	self:RegisterTimer("UpdateBuff", self.UpdateBuff, 0.1, self, true)

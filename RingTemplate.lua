@@ -717,8 +717,6 @@ function ArcHUDRingTemplate:OnLoadBG(frame)
 	-- Set angle to 180 degrees (initializes texture visibility)
 	frame:SetAngle(180)
 
-	-- Set color and then remove the method again
+	-- Set color
 	frame:UpdateColor({r = 0, g = 0, b = 0})
-	frame.UpdateColor = nil
-	frame.CallTextureMethod = nil
 end

@@ -363,22 +363,6 @@ ArcHUD.configOptionsTableCore = {
 						ArcHUD:UpdateNameplateSetting("pet", v)
 					end,
 				},
-				-- Pet nameplate
-				PetNameplateFade = {
-					type		= "toggle",
-					name		= L["TEXT"]["PETNPFADE"],
-					desc		= L["TOOLTIP"]["PETNPFADE"],
-					order		= 14,
-					get			= function ()
-						return ArcHUD.db.profile.PetNameplateFade
-					end,
-					set			= function (info, v)
-						ArcHUD.db.profile.PetNameplateFade = v
-						if ((not ArcHUD.Nameplates.pet.state) and ArcHUD.db.profile.PetNameplateFade and (self.Nameplates.pet.alpha > 0)) then
-							ArcHUDRingTemplate.SetRingAlpha(self.Nameplates.pet, alpha)
-						end
-					end,
-				},
 				-- Player/pet nameplates hover delay
 				NameplateHoverMsg = {
 					type		= "toggle",
