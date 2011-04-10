@@ -277,9 +277,9 @@ function module:UNIT_SPELLCAST_CHANNEL_START(event, arg1)
 			
 			if (self.db.profile.IndLatency) then
 				local _, _, _, latencyWorld = GetNetStats()
-				local sparkval = self.f.maxValue - latencyWorld
+				local sparkval = latencyWorld
 				-- consider GCD?
-				if (sparkval > 0) then
+				if (sparkval < self.f.maxValue) then
 					self.f:SetSpark(sparkval, true, 1.5)
 				end
 			end
