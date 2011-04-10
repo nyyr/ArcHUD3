@@ -1,7 +1,7 @@
 local moduleName = "Casting"
 local module = ArcHUD:NewModule(moduleName)
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "1.0 (r"..rev..")"
+module.version = "1.1 (r"..rev..")"
 
 module.unit = "player"
 module.noAutoAlpha = true
@@ -12,6 +12,7 @@ module.defaults = {
 		Outline = true,
 		ShowSpell = true,
 		ShowTime = true,
+		IndLatency = true,
 		Side = 2,
 		Level = -1,
 	}
@@ -19,6 +20,7 @@ module.defaults = {
 module.options = {
 	{name = "ShowSpell", text = "SHOWSPELL", tooltip = "SHOWSPELL"},
 	{name = "ShowTime", text = "SHOWTIME", tooltip = "SHOWTIME"},
+	{name = "IndLatency", text = "INDLATENCY", tooltip = "INDLATENCY"},
 	nocolor = true,
 	attach = true,
 }
@@ -80,6 +82,11 @@ local function Player_Casting(frame, elapsed)
 		end
 
 		self.f:SetValue(status)
+		self.f:SetSpark(status)
+		if (self.db.profile.IndLatency) then
+			_, _, _, latencyWorld = GetNetStats()
+			self.f:SetSpark(self.f.maxValue - latencyWorld*2, true, 1.5)
+		end
 
 		if ( time_remaining < 0 ) then
 			time_remaining = 0

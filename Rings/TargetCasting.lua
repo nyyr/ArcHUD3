@@ -17,6 +17,7 @@ module.defaults = {
 		Side = 1,
 		Level = -1,
 		IndicateNonInterruptible = true,
+		ColorNonInt = {r = 1, g = 0, b = 0},
 	}
 }
 module.options = {
@@ -75,6 +76,7 @@ local function Target_Casting(frame, elapsed)
 		end
 
 		self.f:SetValue(status)
+		self.f:SetSpark(status)
 
 		if ( time_remaining < 0 ) then
 			time_remaining = 0
@@ -152,7 +154,7 @@ function module:UNIT_SPELLCAST_START(event, arg1)
 			else
 				self:UpdateColor(2)
 				if (self.db.IndicateNonInterruptible and notInterruptible) then
-					self.f.BG:UpdateColor({r = 1, g = 1, b = 1})
+					self.f.BG:UpdateColor(self.db.profile.ColorNonInt)
 				end
 				self.Text:SetTextColor(1, 0, 0)
 				self.Time:SetTextColor(1, 0, 0)
@@ -183,7 +185,7 @@ function module:UNIT_SPELLCAST_CHANNEL_START(event, arg1)
 			else
 				self:UpdateColor(2)
 				if (self.db.IndicateNonInterruptible and notInterruptible) then
-					self.f.BG:UpdateColor({r = 1, g = 1, b = 1})
+					self.f.BG:UpdateColor(self.db.profile.ColorNonInt)
 				end
 				self.Text:SetTextColor(1, 0, 0)
 				self.Time:SetTextColor(1, 0, 0)

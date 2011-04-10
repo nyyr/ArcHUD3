@@ -13,6 +13,10 @@
 			<Texture name="$parentChip"  parentKey="chip"          file="Interface\Addons\ArcHUD3\Icons\Ring.tga"></Texture>
 			<Texture name="$parentSlice" parentKey="slice"         file="Interface\Addons\ArcHUD3\Icons\Slice.tga"></Texture>
 		</Layer>
+		<Layer level="OVERLAY">
+			<Texture name="$parentSpark" parentKey="spark"         file="Interface\CastingBar\UI-CastingBar-Spark.blp" alphaMode="ADD"></Texture>
+			<Texture name="$parentSparkRed" parentKey="sparkRed"   file="Interface\CastingBar\UI-CastingBar-SparkRed.blp" alphaMode="ADD"></Texture>
+		</Layer>
 	</Layers>
 	
 	<Frames>

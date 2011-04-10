@@ -402,6 +402,56 @@ function ArcHUDRingTemplate:SetValue(value)
 end
 
 -----------------------------------------------------------
+-- Set position of spark (can be used as an indicator)
+--   value - value on arc
+--   red   - true: set red spark, false: set yellow spark
+--   scale - scaling factor for size of spark
+-----------------------------------------------------------
+function ArcHUDRingTemplate:SetSpark(value, red, scale)
+	local spark = self.spark
+	if (red) then
+		spark = self.sparkRed
+	end
+	
+	if (value <= 0 or value >= self.maxValue) then
+		spark:Hide()
+		return
+	end
+	
+	local angle = value / self.maxValue * 180
+	local ringFactor = 0.9
+	if angle <= 90 then
+		ringFactor = 0.9 + ((90 - angle) / (90/0.1))
+	elseif angle <= 180 then
+		ringFactor = 0.9 + ((angle - 90) / (90/0.1))
+	end
+	local angleR = math.rad(angle)
+	local R = self.radius
+	
+	local Ox = self.radius * math.sin(angleR)
+	local Oy = self.radius * math.cos(angleR) * -1
+	local Ix = Ox * ringFactor
+	local Iy = Oy * ringFactor
+	
+	local offset = 16
+	if (scale) then
+		offset = offset * scale
+	end
+	
+	spark:ClearAllPoints()
+	if (self.reversed) then
+		spark:SetPoint("TOPLEFT", self, "BOTTOMLEFT", Ix-offset, Iy+offset)
+		spark:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", Ox+offset, Oy-offset)
+		spark:SetRotation(angleR)
+	else
+		spark:SetPoint("TOPLEFT", self, "BOTTOMLEFT", -Ox-offset, Oy+offset)
+		spark:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", -Ix+offset, Iy-offset)
+		spark:SetRotation(2*self.PI - angleR)
+	end
+	spark:Show()
+end
+
+-----------------------------------------------------------
 -- Update ring filling towards set value
 -- Should be called at least every 40ms for smooth animation
 -----------------------------------------------------------
@@ -423,7 +473,7 @@ function ArcHUDRingTemplate:DoFadeUpdate(tdelta)
 		elseif angle <= 180 then
 			self.ringFactor = 0.9 + ((angle - 90) / (90/0.1))
 		end
-		self:SetAngle((self.startValue / self.maxValue) * 180)
+		self:SetAngle(angle)
 	end
 end
 
@@ -669,8 +719,8 @@ function ArcHUDRingTemplate:OnLoad(frame)
 	frame.SetMax					= self.SetMax
 	frame.SetValue					= self.SetValue
 	frame.Update					= self.Update
-	frame.AddUpdateFunction			= self.AddUpdateFunction
-	frame.RemoveUpdateFunction		= self.RemoveUpdateFunction
+	--frame.AddUpdateFunction			= self.AddUpdateFunction
+	--frame.RemoveUpdateFunction		= self.RemoveUpdateFunction
 	frame.UpdateColor				= self.UpdateColor
 	frame.SetReversed				= self.SetReversed
 	frame.SetRingAlpha				= self.SetRingAlpha
@@ -678,6 +728,7 @@ function ArcHUDRingTemplate:OnLoad(frame)
 	frame.StartPulse				= self.StartPulse
 	frame.StopPulse					= self.StopPulse
 	frame.applyAlpha_OnFinished		= self.applyAlpha_OnFinished
+	frame.SetSpark					= self.SetSpark
 
 	frame.startValue = 0
 	frame.endValue = 0
@@ -695,6 +746,8 @@ function ArcHUDRingTemplate:OnLoad(frame)
 
 	-- Set angle to zero (initializes texture visibility)
 	frame:SetAngle(0)
+	frame:SetSpark(-1)
+	frame:SetSpark(-1, true)
 end
 
 function ArcHUDRingTemplate:OnLoadBG(frame)
