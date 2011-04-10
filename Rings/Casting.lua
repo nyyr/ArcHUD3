@@ -61,6 +61,9 @@ function module:OnModuleUpdate()
 	else
 		self.Time:Hide()
 	end
+	
+	-- rest latency indicator
+	self.f:SetSpark(-1, true)
 end
 
 local function Player_Casting(frame, elapsed)
@@ -83,10 +86,6 @@ local function Player_Casting(frame, elapsed)
 
 		self.f:SetValue(status)
 		self.f:SetSpark(status)
-		if (self.db.profile.IndLatency) then
-			_, _, _, latencyWorld = GetNetStats()
-			self.f:SetSpark(self.f.maxValue - latencyWorld*2, true, 1.5)
-		end
 
 		if ( time_remaining < 0 ) then
 			time_remaining = 0
@@ -243,6 +242,17 @@ function module:UNIT_SPELLCAST_START(event, arg1)
 			else
 				self.f:SetRingAlpha(ArcHUD.db.profile.FadeOOC)
 			end
+			
+			if (self.db.profile.IndLatency) then
+				local _, _, _, latencyWorld = GetNetStats()
+				local spellQueueTime = GetMaxSpellStartRecoveryOffset()
+				local sparkval = self.f.maxValue - spellQueueTime - latencyWorld
+				-- consider GCD?
+				if (sparkval > 0) then
+					self.f:SetSpark(sparkval, true, 1.5)
+				end
+				--ArcHUD:LevelDebug(1, "spellQueueTime: " .. spellQueueTime)
+			end
 		end
 	end
 end
@@ -263,6 +273,15 @@ function module:UNIT_SPELLCAST_CHANNEL_START(event, arg1)
 				self.f:SetRingAlpha(ArcHUD.db.profile.FadeIC)
 			else
 				self.f:SetRingAlpha(ArcHUD.db.profile.FadeOOC)
+			end
+			
+			if (self.db.profile.IndLatency) then
+				local _, _, _, latencyWorld = GetNetStats()
+				local sparkval = self.f.maxValue - latencyWorld
+				-- consider GCD?
+				if (sparkval > 0) then
+					self.f:SetSpark(sparkval, true, 1.5)
+				end
 			end
 		end
 	end
