@@ -1,3 +1,28 @@
+ArcHUD3 1.1
+-------------
+
+* Fixed a taint (disabled dynamic nameplates IC)
+* Added buff icons to custom buff arcs
+* Removed indication of pet happiness (removed in WoW 4.1)
+* Changed defaults: player/pet unit frames off by default
+* Casting arcs:
+  * Fixed text positions to avoid overlap
+  * Swapped text fields of target casting arc and player casting arc (target casting more prominent now)
+  * Added indication of non-interruptable spells (target casts)
+  * Added indication of network latency/spell queue time (player casts)
+  * Added sparks for casts
+
+nyyr
+
+
+ArcHUD3 1.0
+-------------
+
+First complete release with some new features such as custom buff arcs.
+
+nyyr
+
+
 ArcHUD3 0.9
 -------------
 
