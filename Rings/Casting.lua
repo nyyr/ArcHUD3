@@ -12,7 +12,8 @@ module.defaults = {
 		Outline = true,
 		ShowSpell = true,
 		ShowTime = true,
-		IndLatency = true,
+		IndLatency = false,
+		IndSpellQueue = true,
 		Side = 2,
 		Level = -1,
 	}
@@ -21,6 +22,7 @@ module.options = {
 	{name = "ShowSpell", text = "SHOWSPELL", tooltip = "SHOWSPELL"},
 	{name = "ShowTime", text = "SHOWTIME", tooltip = "SHOWTIME"},
 	{name = "IndLatency", text = "INDLATENCY", tooltip = "INDLATENCY"},
+	{name = "IndSpellQueue", text = "INDSPELLQ", tooltip = "INDSPELLQ"},
 	nocolor = true,
 	attach = true,
 }
@@ -243,15 +245,19 @@ function module:UNIT_SPELLCAST_START(event, arg1)
 				self.f:SetRingAlpha(ArcHUD.db.profile.FadeOOC)
 			end
 			
+			-- latency indicator
+			local sparkoffset = 0
 			if (self.db.profile.IndLatency) then
 				local _, _, _, latencyWorld = GetNetStats()
-				local spellQueueTime = GetMaxSpellStartRecoveryOffset()
-				local sparkval = self.f.maxValue - spellQueueTime - latencyWorld
-				-- consider GCD?
-				if (sparkval > 0) then
-					self.f:SetSpark(sparkval, true, 1.5)
-				end
-				--ArcHUD:LevelDebug(1, "spellQueueTime: " .. spellQueueTime)
+				sparkoffset = sparkoffset + latencyWorld
+			end
+			if (self.db.profile.IndSpellQueue) then
+				sparkoffset = sparkoffset + GetMaxSpellStartRecoveryOffset()
+			end
+			-- consider GCD?
+			local sparkval = self.f.maxValue - sparkoffset
+			if (sparkoffset > 0 and sparkval > 0) then
+				self.f:SetSpark(sparkval, true, 1.5)
 			end
 		end
 	end

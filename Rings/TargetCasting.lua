@@ -16,14 +16,14 @@ module.defaults = {
 		ColorFoe = {r = 1, g = 0, b = 0},
 		Side = 1,
 		Level = -1,
-		IndicateNonInterruptible = true,
-		ColorNonInt = {r = 1, g = 0, b = 0},
+		IndicateInterruptible = true,
+		ColorInterruptible = {r = 1, g = 1, b = 0},
 	}
 }
 module.options = {
 	{name = "ShowSpell", text = "SHOWSPELL", tooltip = "SHOWSPELL"},
 	{name = "ShowTime", text = "SHOWTIME", tooltip = "SHOWTIME"},
-	{name = "IndicateNonInterruptible", text = "INDINTERRUPT", tooltip = "INDINTERRUPT"},
+	{name = "IndicateInterruptible", text = "INDINTERRUPT", tooltip = "INDINTERRUPT"},
 	hasfriendfoe = true,
 	attach = true,
 }
@@ -115,6 +115,8 @@ function module:OnModuleEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_DELAYED")
 	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
 	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_UPDATE")
+	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTIBLE")
+	self:RegisterEvent("UNIT_SPELLCAST_NOT_INTERRUPTIBLE")
 
 	self:RegisterEvent("UNIT_SPELLCAST_STOP", 			"SpellcastStop")
 	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP", 	"SpellcastChannelStop")
@@ -153,11 +155,15 @@ function module:UNIT_SPELLCAST_START(event, arg1)
 				self.Time:SetTextColor(1, 1, 1)
 			else
 				self:UpdateColor(2)
-				if (self.db.IndicateNonInterruptible and notInterruptible) then
-					self.f.BG:UpdateColor(self.db.profile.ColorNonInt)
+				if (self.db.profile.IndicateInterruptible and not notInterruptible) then
+					self.f:UpdateColor(self.db.profile.ColorInterruptible)
+					self.f.BG:UpdateColor(self.db.profile.ColorInterruptible)
+					self.Text:SetTextColor(1, 1, 0)
+					self.Time:SetTextColor(1, 1, 0)
+				else
+					self.Text:SetTextColor(1, 0, 0)
+					self.Time:SetTextColor(1, 0, 0)
 				end
-				self.Text:SetTextColor(1, 0, 0)
-				self.Time:SetTextColor(1, 0, 0)
 			end
 			self.Text:SetText(displayName)
 			self.startValue = 0
@@ -184,11 +190,15 @@ function module:UNIT_SPELLCAST_CHANNEL_START(event, arg1)
 				self.Time:SetTextColor(1, 1, 1)
 			else
 				self:UpdateColor(2)
-				if (self.db.IndicateNonInterruptible and notInterruptible) then
-					self.f.BG:UpdateColor(self.db.profile.ColorNonInt)
+				if (self.db.profile.IndicateInterruptible and not notInterruptible) then
+					self.f:UpdateColor(self.db.profile.ColorInterruptible)
+					self.f.BG:UpdateColor(self.db.profile.ColorInterruptible)
+					self.Text:SetTextColor(1, 1, 0)
+					self.Time:SetTextColor(1, 1, 0)
+				else
+					self.Text:SetTextColor(1, 0, 0)
+					self.Time:SetTextColor(1, 0, 0)
 				end
-				self.Text:SetTextColor(1, 0, 0)
-				self.Time:SetTextColor(1, 0, 0)
 			end
 			self.Text:SetText(displayName)
 			self.startValue = 0
@@ -233,13 +243,29 @@ function module:UNIT_SPELLCAST_DELAYED(event, arg1)
 	end
 end
 
+function module:UNIT_SPELLCAST_INTERRUPTIBLE(event, arg1)
+	if (arg1 == self.unit and self.db.profile.IndicateInterruptible) then
+		self.f.BG:UpdateColor(self.db.profile.ColorInterruptible)
+		self.Text:SetTextColor(1, 1, 0)
+		self.Time:SetTextColor(1, 1, 0)
+	end
+end
+
+function module:UNIT_SPELLCAST_NOT_INTERRUPTIBLE(event, arg1)
+	if (arg1 == self.unit and self.db.profile.IndicateInterruptible) then
+		self.f.BG:UpdateColor({r = 0, g = 0, b = 0})
+		self.Text:SetTextColor(1, 0, 0)
+		self.Time:SetTextColor(1, 0, 0)
+	end
+end
+
 function module:SpellcastStop(event, arg1, force)
 	if(arg1 == self.unit and self.f.casting == 1 and self.channeling == 0 or force) then
 		self.f:SetValue(self.f.maxValue)
 		self.f.casting = 0
-		self.Time:SetText("")
 		self.f:SetRingAlpha(0)
 		self.f.BG:UpdateColor({r = 0, g = 0, b = 0})
+		self.Time:SetText("")
 	end
 end
 
@@ -248,8 +274,8 @@ function module:SpellcastChannelStop(event, arg1, force)
 		self.f.casting = 0
 		self.channeling = 0
 		self.Text:SetText("")
-		self.f:SetValue(0)
 		self.Time:SetText("")
+		self.f:SetValue(0)
 		self.f:SetRingAlpha(0)
 		self.f.BG:UpdateColor({r = 0, g = 0, b = 0})
 	end

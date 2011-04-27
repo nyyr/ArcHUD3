@@ -8,7 +8,7 @@ ArcHUD3 1.1
 * Casting arcs:
   * Fixed text positions to avoid overlap
   * Swapped text fields of target casting arc and player casting arc (target casting more prominent now)
-  * Added indication of non-interruptable spells (target casts)
+  * Added indication of interruptable spells (target casts)
   * Added indication of network latency/spell queue time (player casts)
   * Added sparks for casts
 

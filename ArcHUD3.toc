@@ -1,4 +1,4 @@
-## Interface: 40000
+## Interface: 40100
 ## Title: ArcHUD3
 ## Notes: Smooth combat HUD based on ArcHUD2
 ## Author: nyyr, Nenie
