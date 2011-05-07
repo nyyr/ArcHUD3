@@ -3,7 +3,7 @@
 ## Notes: Smooth combat HUD based on ArcHUD2
 ## Author: nyyr, Nenie
 ## SavedVariables: ArcHUD3DB
-## Version: 1.1
+## Version: 1.1.1
 ## X-Date: $Date$
 ## X-Category: HUDs
 

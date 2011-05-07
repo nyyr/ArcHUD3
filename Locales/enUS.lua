@@ -109,7 +109,7 @@ L["TOOLTIP"] = {
 	NPTARGET	= "Toggle clickable target's nameplate",
 	NPTOT		= "Toggle clickable target's target nameplate",
 	NPTOTOT		= "Toggle clickable target's target's target nameplate",
-	NPCOMBAT	= "Toggle always enabling clickable nameplates when entering combat",
+	NPCOMBAT	= "Toggle always enabling clickable nameplates when entering combat", -- TODO: obsolete
 	HOVERMSG	= "Toggle displaying of a chat message when mouse input is enabled",
 	HOVERDELAY	= "Amount of seconds needed to hover above the player/pet nameplate to activate it",
 	
