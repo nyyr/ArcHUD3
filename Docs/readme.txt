@@ -1,3 +1,12 @@
+ArcHUD3 1.2
+-------------
+
+* added deDE locale
+* added ruRU locale (thanks to StingerSoft)
+
+nyyr
+
+
 ArcHUD3 1.1
 -------------
 
