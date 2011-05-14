@@ -3,6 +3,7 @@
 ----- based upon ArcHUD2 translations from Gamefaq and cy.raptor
 ------------------------------
 local L = LibStub("AceLocale-3.0"):NewLocale("ArcHUD_Core", "deDE")
+if not L then return end
 
 -- Core stuff
 L["CMD_OPTS_FRAME"]		= "Optionsfenster öffnen"

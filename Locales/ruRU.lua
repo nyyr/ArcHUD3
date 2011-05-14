@@ -1,6 +1,7 @@
 ------------------------------
 ----- Translation for ruRU by StingerSoft
 local L = LibStub("AceLocale-3.0"):NewLocale("ArcHUD_Core", "ruRU")
+if not L then return end
 
 -- Core stuff
 L["CMD_OPTS_FRAME"]		= "Открывает окно настроек"
