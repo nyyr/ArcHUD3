@@ -3,6 +3,7 @@ ArcHUD3 1.2
 
 * added deDE locale
 * added ruRU locale (thanks to StingerSoft)
+* fixed a display issue of the soul shards arc
 
 nyyr
 

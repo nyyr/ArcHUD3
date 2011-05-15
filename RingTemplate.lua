@@ -591,8 +591,12 @@ function ArcHUDRingTemplate:CheckAlpha()
 	-- 1: Fade out when rings are full, regardless of combat status
 	-- 2: Always fade out when out of combat, regardless of ring status
 	-- 3: Fade out when out of combat or rings are full (default)
-	if(self.parent.db.profile.RingVisibility == 1 or self.parent.db.profile.RingVisibility == 3) then
-		if(self.parent.db.profile.RingVisibility == 3 and isInCombat) then
+	local RingVisibility = self.db.profile.RingVisibility -- ring config
+	if (RingVisibility == nil) then
+		RingVisibility = self.parent.db.profile.RingVisibility -- global config
+	end
+	if (RingVisibility == 1 or RingVisibility == 3) then
+		if (RingVisibility == 3 and isInCombat) then
 			if (not UnitExists(unit)) or (self.isPower and (UnitIsDead(unit) or self.f.maxValue == 0)) then
 				self.f:SetRingAlpha(0)
 			elseif (self.isHealth and UnitIsDead(unit)) then
@@ -624,7 +628,7 @@ function ArcHUDRingTemplate:CheckAlpha()
 			end
 		end
 
-	elseif(self.parent.db.profile.RingVisibility == 2) then
+	elseif (RingVisibility == 2) then
 	
 		if ((not UnitExists(unit)) or (self.isPower and (UnitIsDead(unit) or self.f.maxValue == 0))) then
 			self.f:SetRingAlpha(0)

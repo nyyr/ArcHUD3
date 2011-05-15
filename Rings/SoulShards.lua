@@ -1,22 +1,22 @@
 local module = ArcHUD:NewModule("SoulShards")
 local _, _, rev = string.find("$Rev: 24 $", "([0-9]+)")
-module.version = "1.0 (r" .. rev .. ")"
+module.version = "1.2 (r" .. rev .. ")"
 
 module.unit = "player"
-module.noAutoAlpha = true
+module.noAutoAlpha = false
 
 module.defaults = {
 	profile = {
 		Enabled = true,
 		Outline = true,
-		Flash = true,
+		Flash = false,
 		Side = 2,
 		Level = 2,
 		Color = {r = 0.5, g = 0, b = 0.5},
+		RingVisibility = 2, -- always fade out when out of combat, regardless of ring status
 	}
 }
 module.options = {
-	{name = "Flash", text = "FLASH", tooltip = "FLASH"},
 	attach = true,
 }
 module.localized = true
@@ -34,7 +34,7 @@ end
 
 function module:OnModuleUpdate()
 	self.Flash = self.db.profile.Flash
-	self:UpdateColor()
+	self:UpdateShards()
 end
 
 function module:OnModuleEnable()
@@ -55,12 +55,19 @@ function module:OnModuleEnable()
 	-- Activate ring timers
 	self:StartRingTimers()
 
-	self.f:Show()
+	if UnitLevel("player") < SHARDBAR_SHOW_LEVEL then
+		self:RegisterEvent("PLAYER_LEVEL_UP");
+		self.f:Hide()
+	else
+		self.f:Show()
+	end
 end
 
 function module:UpdateShards()
 	local num = UnitPower(self.unit, SPELL_POWER_SOUL_SHARDS)
 	self.f:SetValue(num)
+	
+	ArcHUD:LevelDebug(3, "Soul shards: "..num.."/"..SHARD_BAR_NUM_SHARDS)
 	
 	if(num < SHARD_BAR_NUM_SHARDS and num >= 0) then
 		self.f:StopPulse()
@@ -91,5 +98,12 @@ function module:UpdatePower(event, arg1, arg2)
 		end
 	else
 		self:UpdateShards()
+	end
+end
+
+function module:PLAYER_LEVEL_UP()
+	if UnitLevel("player") >= SHARDBAR_SHOW_LEVEL then
+		self:UnregisterEvent("PLAYER_LEVEL_UP");
+		self.f:Show()
 	end
 end
