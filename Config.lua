@@ -255,12 +255,26 @@ ArcHUD.configOptionsTableCore = {
 						ArcHUD:UpdateTargetHUD()
 					end,
 				},
+				-- Show only buffs cast by player
+				showOnlyBuffsCastByPlayer = {
+					type		= "toggle",
+					name		= L["TEXT"]["SHOWONLYBUFFSCASTBYPLAYER"],
+					desc		= L["TOOLTIP"]["SHOWONLYBUFFSCASTBYPLAYER"],
+					order		= 7,
+					get			= function ()
+						return ArcHUD.db.profile.ShowOnlyBuffsCastByPlayer
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.ShowOnlyBuffsCastByPlayer = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
 				-- Show Buff tooltips
 				showBuffTooltips = {
 					type		= "toggle",
 					name		= L["TEXT"]["SHOWBUFFTT"],
 					desc		= L["TOOLTIP"]["SHOWBUFFTT"],
-					order		= 7,
+					order		= 8,
 					get			= function ()
 						return ArcHUD.db.profile.ShowBuffTooltips
 					end,
@@ -273,7 +287,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["HIDEBUFFTTIC"],
 					desc		= L["TOOLTIP"]["HIDEBUFFTTIC"],
-					order		= 8,
+					order		= 9,
 					get			= function ()
 						return ArcHUD.db.profile.HideBuffTooltipsIC
 					end,
@@ -286,7 +300,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["SHOWPVP"],
 					desc		= L["TOOLTIP"]["SHOWPVP"],
-					order		= 9,
+					order		= 10,
 					get			= function ()
 						return ArcHUD.db.profile.ShowPVP
 					end,
@@ -300,7 +314,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["TOT"],
 					desc		= L["TOOLTIP"]["TOT"],
-					order		= 10,
+					order		= 11,
 					get			= function ()
 						return ArcHUD.db.profile.TargetTarget
 					end,
@@ -314,7 +328,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["TOTOT"],
 					desc		= L["TOOLTIP"]["TOTOT"],
-					order		= 11,
+					order		= 12,
 					get			= function ()
 						return ArcHUD.db.profile.TargetTargetTarget
 					end,

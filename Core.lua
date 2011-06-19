@@ -10,7 +10,7 @@ ArcHUD = LibStub("AceAddon-3.0"):NewAddon("ArcHUD",
 -- Version
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
 ArcHUD.version = "1.2 (r"..rev..")"
-ArcHUD.codename = "Happy Plainsrunner"
+ArcHUD.codename = "Fiery Babel Fish"
 ArcHUD.authors = "nyyr, Nenie"
 
 -- Locale object
@@ -63,6 +63,7 @@ ArcHUD.defaults = {
 		Scale = 1.0,
 		AttachTop = false,
 		ShowBuffs = true,
+		ShowOnlyBuffsCastByPlayer = false,
 		ShowBuffTooltips = true,
 		HideBuffTooltipsIC = false,
 		BlizzPlayer = true,
@@ -579,10 +580,15 @@ function ArcHUD:TargetAuras(event, arg1)
 	if(not arg1 == "target") then return end
 	local unit = "target"
 	local i, icon, buff, count, buffType, color, duration, expirationTime
+	local filter = ""
+	
+	if (self.db.profile.ShowOnlyBuffsCastByPlayer) then
+		filter = "PLAYER"
+	end
 	
 	-- buffs
 	for i = 1, 16 do
-		_, _, buff, count, buffType, duration, expirationTime, _, _ = UnitBuff(unit, i)
+		_, _, buff, count, buffType, duration, expirationTime = UnitBuff(unit, i, filter)
 		button = self.TargetHUD["Buff"..i]
 		if (buff) then
 			button.Icon:SetTexture(buff)
@@ -615,7 +621,7 @@ function ArcHUD:TargetAuras(event, arg1)
 
 	-- debuffs
 	for i = 1, 16 do
-		_, _, buff, count, buffType, duration, expirationTime, _, _ = UnitDebuff(unit, i)
+		_, _, buff, count, buffType, duration, expirationTime = UnitDebuff(unit, i, filter)
 		button = self.TargetHUD["Debuff"..i]
 		if (buff) then
 			button.Icon:SetTexture(buff)
