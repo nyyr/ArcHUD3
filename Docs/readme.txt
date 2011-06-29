@@ -3,6 +3,7 @@ ArcHUD3 1.2
 
 * added deDE locale
 * added ruRU locale (thanks to StingerSoft)
+* added option to only show target (de)buffs cast by player
 * fixed a display issue of the soul shards arc
 
 nyyr
