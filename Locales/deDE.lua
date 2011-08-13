@@ -264,7 +264,7 @@ LM["TOOLTIP"] = {
 	CUSTNEW		= "Erstellt einen neuen benutzerdefinierten Ring für einen bestimmten Buff oder Debuff",
 	CUSTDEBUFF	= "Überwachter Buff ist ein Debuff",
 	CUSTUNIT	= "Einheit, auf dem dieser (De)Buff angewendet wird",
-	CUSTNAME	= "Name des (De)Buff",
+	CUSTNAME	= "Name des (De)Buff. Mehrere (De)Buffs können durch Semikolon (;) getrennt angegeben werden. Priorisierung erfolgt in der hier gegebenen Reihenfolge.",
 	CUSTCASTBYPLAYER = "Nur anzeigen, wenn (De)Buff vom Spieler gewirkt wird",
 	CUSTSTACKS	= "Benutze Stapelgröße für den Ring anstelle der verbleibenden Zeit",
 	CUSTTEXTSTACKS = "Zeige Stapelgröße als Text an anstelle der verbleibenden Zeit",
@@ -276,10 +276,3 @@ LM["SIDE"] = {
 	LEFT		= "Linker Anker",
 	RIGHT		= "Rechter Anker",
 }
-
--- TODO: obsolete?
-LM["You gain Prowl."] = true
-LM["Prowl fades from you."] = true
-LM["You gain Stealth."] = true
-LM["Stealth fades from you."] = true
-

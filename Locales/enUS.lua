@@ -219,8 +219,8 @@ LM["TEXT"] = {
 	CUSTUNIT	= "Unit",
 	CUSTNAME	= "(De)Buff Name",
 	CUSTCASTBYPLAYER = "Show only your (de)buff",
-	CUSTSTACKS	= "Use appliances",
-	CUSTTEXTSTACKS = "Display appliances",
+	CUSTSTACKS	= "Use stack applications",
+	CUSTTEXTSTACKS = "Display stack applications",
 	CUSTMAX		= "Stack size",
 	CUSTDEL		= "Delete",
 }
@@ -263,10 +263,10 @@ LM["TOOLTIP"] = {
 	CUSTNEW		= "Create a new custom arc for a specific buff or debuff",
 	CUSTDEBUFF	= "Look for debuffs instead of buffs",
 	CUSTUNIT	= "Unit on which the (de)buff is applied",
-	CUSTNAME	= "Name of the (de)buff",
+	CUSTNAME	= "Name of the (de)buff. Multiple (de)buffs can be named by separating them with semicolon (;). Priorities are given according to their order here.",
 	CUSTCASTBYPLAYER = "Show only if (de)buff is cast by you",
-	CUSTSTACKS	= "Use appliances instead of remaining time for the arc",
-	CUSTTEXTSTACKS = "Display appliances as text instead of remaining time",
+	CUSTSTACKS	= "Use stack applications instead of remaining time for the arc",
+	CUSTTEXTSTACKS = "Display stack applications as text instead of remaining time",
 	CUSTMAX		= "Maximum stack size of the (de)buff",
 	CUSTDEL		= "Delete this custom arc",
 }
@@ -275,9 +275,3 @@ LM["SIDE"] = {
 	LEFT		= "Left anchor",
 	RIGHT		= "Right anchor",
 }
-
-LM["You gain Prowl."] = true
-LM["Prowl fades from you."] = true
-LM["You gain Stealth."] = true
-LM["Stealth fades from you."] = true
-

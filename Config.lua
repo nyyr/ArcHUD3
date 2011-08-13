@@ -865,6 +865,17 @@ ArcHUD.configOptionsTableCustomModules = {
 	},
 }
 
+local function ArcHUD_adjustConfig(group)
+	if group.args == nil then return end
+	-- adjust controls to full width	
+	for k,v in pairs(group.args) do
+		v["width"] = "full"
+		if not (v.args == nil) then
+			ArcHUD_adjustConfig(v)
+		end
+	end
+end
+
 ----------------------------------------------
 -- Initialize config tools
 ----------------------------------------------
@@ -873,14 +884,17 @@ function ArcHUD:InitConfig()
 	AceConfig:RegisterOptionsTable("ArcHUD", self.configOptionsTableCmd, {"archud", "ah"})
 	
 	-- Set up core config options
+	ArcHUD_adjustConfig(self.configOptionsTableCore)
 	AceConfig:RegisterOptionsTable("ArcHUD_Core", self.configOptionsTableCore)
 	self.configFrameCore = AceConfigDialog:AddToBlizOptions("ArcHUD_Core", "ArcHUD")
 	
 	-- Set up modules config options
+	ArcHUD_adjustConfig(self.configOptionsTableModules)
 	AceConfig:RegisterOptionsTable("ArcHUD_Modules", self.configOptionsTableModules)
 	self.configFrameModules = AceConfigDialog:AddToBlizOptions("ArcHUD_Modules", LM["TEXT"]["TITLE"], "ArcHUD")
 	
 	-- Set up custom ring options
+	--ArcHUD_adjustConfig(self.configOptionsTableCustomModules)
 	AceConfig:RegisterOptionsTable("ArcHUD_CustomModules", self.configOptionsTableCustomModules)
 	self.configFrameModules = AceConfigDialog:AddToBlizOptions("ArcHUD_CustomModules", LM["TEXT"]["CUSTOM"], "ArcHUD")
 end
@@ -890,6 +904,7 @@ end
 ----------------------------------------------
 function ArcHUD:AddModuleOptionsTable(moduleName, optionsTable)
 	self:LevelDebug(d_notice, "Inserting config options for "..moduleName)
+	ArcHUD_adjustConfig(optionsTable)
 	ArcHUD.configOptionsTableModules.args[moduleName] = optionsTable
 end
 
@@ -898,6 +913,7 @@ end
 ----------------------------------------------
 function ArcHUD:AddCustomModuleOptionsTable(moduleName, optionsTable)
 	self:LevelDebug(d_notice, "Inserting config options for custom module "..moduleName)
+	ArcHUD_adjustConfig(optionsTable)
 	ArcHUD.configOptionsTableCustomModules.args[moduleName] = optionsTable
 	
 	AceConfigRegistry:NotifyChange("ArcHUD_CustomModules")

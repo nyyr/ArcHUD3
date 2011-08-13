@@ -264,10 +264,10 @@ LM["TOOLTIP"] = {
 	CUSTNEW		= "Создать новую пользовательскую дугу для специфических баффов или дебаффов",
 	CUSTDEBUFF	= "Поиск дебаффов вместо баффов",
 	CUSTUNIT	= "Объект наблюдения (де)баффов",
-	CUSTNAME	= "Название (де)баффа",
+	CUSTNAME	= "Название (де)баффа. Multiple (de)buffs can be named by separating them with semicolon (;). Priorities are given according to their order here.",
 	CUSTCASTBYPLAYER = "Показать только если (де)бафф произнесен вами",
-	CUSTSTACKS	= "Use appliances instead of remaining time for the arc",
-	CUSTTEXTSTACKS = "Display appliances as text instead of remaining time",
+	CUSTSTACKS	= "Use stack applications instead of remaining time for the arc",
+	CUSTTEXTSTACKS = "Display stack applications as text instead of remaining time",
 	CUSTMAX		= "Максимальный размер суммы (де)бафа",
 	CUSTDEL		= "Удалить эту пользовательскую дугу",
 }
@@ -276,9 +276,3 @@ LM["SIDE"] = {
 	LEFT		= "Якорь слево",
 	RIGHT		= "Якорь справо",
 }
-
-LM["You gain Prowl."] = "Вы применили: Крадущийся зверь."
-LM["Prowl fades from you."] = "Эффект: Крадущийся зверь, закончился."
-LM["You gain Stealth."] = "Вы применили: Незаметность."
-LM["Stealth fades from you."] = "Эффект: Незаметность, закончился."
-

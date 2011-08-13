@@ -77,15 +77,12 @@ function CustomBuffRingTemplate:OnModuleUpdate()
 	self.Flash = self.db.profile.Flash
 	self:UpdateColor()
 	
-	--self.Text:ClearAllPoints()
 	self.BuffButton:ClearAllPoints()
 	if(self.db.profile.Side == 1) then
 		-- Attach to left side
-		--self.Text:SetPoint("TOP", self.f, "BOTTOMLEFT", -20, -130)
 		self.BuffButton:SetPoint("TOP", self.f, "BOTTOMLEFT", -20, -130)
 	else
 		-- Attach to right side
-		--self.Text:SetPoint("TOP", self.f, "BOTTOMLEFT", 20, -130)
 		self.BuffButton:SetPoint("TOP", self.f, "BOTTOMLEFT", 20, -130)
 	end
 	
@@ -98,6 +95,11 @@ function CustomBuffRingTemplate:OnModuleUpdate()
 	
 	self.BuffButton:Show()
 	
+	self.BuffNames = { strsplit(";", self.db.profile.BuffName) }
+	for i,n in ipairs(self.BuffNames) do
+		self.BuffNames[i] = strtrim(n)
+	end
+	
 	self.f:SetMax(self.db.profile.MaxCount)
 	self:UpdateBuff()
 end
@@ -109,6 +111,11 @@ function CustomBuffRingTemplate:OnModuleEnable()
 	self.unit = self.db.profile.Unit
 	self.f:SetMax(self.db.profile.MaxCount)
 	self.f:SetValue(0)
+	
+	self.BuffNames = { strsplit(";", self.db.profile.BuffName) }
+	for i,n in ipairs(self.BuffNames) do
+		self.BuffNames[i] = strtrim(n)
+	end
 
 	self:UpdateColor()
 	self:UpdateBuff()
@@ -142,16 +149,26 @@ local function CustomBuff_UpdateBuff(frame, elapsed)
 end
 
 function CustomBuffRingTemplate:UpdateBuff()
-	local name, count, duration, expirationTime, unitCaster
+	local name, iconTex, count, duration, expirationTime, unitCaster
 	local visible = false
 	local timer = false
 	
 	if (self.db.profile.Debuff) then
-		name, _, iconTex, count, _, duration, expirationTime, unitCaster = 
-			UnitDebuff(self.unit, self.db.profile.BuffName) 
+		for i,n in ipairs(self.BuffNames) do
+			name, _, iconTex, count, _, duration, expirationTime, unitCaster = 
+				UnitDebuff(self.unit, n)
+			if (name and ((not self.db.profile.CastByPlayer) or unitCaster == "player")) then
+				break -- prioritize buffs in their given order
+			end
+		end
 	else
-		name, _, iconTex, count, _, duration, expirationTime, unitCaster = 
-			UnitBuff(self.unit, self.db.profile.BuffName) 
+		for i,n in ipairs(self.BuffNames) do
+			name, _, iconTex, count, _, duration, expirationTime, unitCaster = 
+				UnitBuff(self.unit, n)
+			if (name and ((not self.db.profile.CastByPlayer) or unitCaster == "player")) then
+				break -- prioritize buffs in their given order
+			end
+		end
 	end
 	
 	if (name and ((not self.db.profile.CastByPlayer) or unitCaster == "player")) then
@@ -269,7 +286,7 @@ function CustomBuffRingTemplate:AppendCustomModuleOptions()
 		end,
 		set			= function (info, v)
 			self.db.profile.Debuff = v
-			self:UpdateBuff()
+			self:OnModuleUpdate()
 		end,
 	}
 	
@@ -285,7 +302,7 @@ function CustomBuffRingTemplate:AppendCustomModuleOptions()
 		set			= function (info, v)
 			self.db.profile.Unit = v
 			self.unit = v
-			self:UpdateBuff()
+			self:OnModuleUpdate()
 			self.optionsTable.name = self.db.profile.BuffName .. " (" .. self.db.profile.Unit .. ")"
 			AceConfigRegistry:NotifyChange("ArcHUD_CustomModules")
 		end,
@@ -301,7 +318,7 @@ function CustomBuffRingTemplate:AppendCustomModuleOptions()
 		end,
 		set			= function (info, v)
 			self.db.profile.BuffName = v
-			self:UpdateBuff()
+			self:OnModuleUpdate()
 			self.optionsTable.name = self.db.profile.BuffName .. " (" .. self.db.profile.Unit .. ")"
 			AceConfigRegistry:NotifyChange("ArcHUD_CustomModules")
 		end,
@@ -317,7 +334,7 @@ function CustomBuffRingTemplate:AppendCustomModuleOptions()
 		end,
 		set			= function (info, v)
 			self.db.profile.CastByPlayer = v
-			self:UpdateBuff()
+			self:OnModuleUpdate()
 		end,
 	}
 	
@@ -331,7 +348,7 @@ function CustomBuffRingTemplate:AppendCustomModuleOptions()
 		end,
 		set			= function (info, v)
 			self.db.profile.UseStacks = v
-			self:UpdateBuff()
+			self:OnModuleUpdate()
 		end,
 	}
 	
@@ -345,7 +362,7 @@ function CustomBuffRingTemplate:AppendCustomModuleOptions()
 		end,
 		set			= function (info, v)
 			self.db.profile.TextUseStacks = v
-			self:UpdateBuff()
+			self:OnModuleUpdate()
 		end,
 	}
 	
@@ -363,7 +380,7 @@ function CustomBuffRingTemplate:AppendCustomModuleOptions()
 		set			= function (info, v)
 			self.db.profile.MaxCount = v
 			self.f:SetMax(v)
-			self:UpdateBuff()
+			self:OnModuleUpdate()
 		end,
 	}
 	
