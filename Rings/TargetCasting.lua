@@ -260,7 +260,7 @@ function module:UNIT_SPELLCAST_NOT_INTERRUPTIBLE(event, arg1)
 end
 
 function module:SpellcastStop(event, arg1, force)
-	if(arg1 == self.unit and self.f.casting == 1 and self.channeling == 0 or force) then
+	if (arg1 == self.unit and (self.f.casting == 1 and self.channeling == 0 or force == true)) then
 		self.f:SetValue(self.f.maxValue)
 		self.f.casting = 0
 		self.f:SetRingAlpha(0)
@@ -270,7 +270,7 @@ function module:SpellcastStop(event, arg1, force)
 end
 
 function module:SpellcastChannelStop(event, arg1, force)
-	if(arg1 == self.unit and self.f.casting == 1 or force) then
+	if (arg1 == self.unit and (self.f.casting == 1 or force == true)) then
 		self.f.casting = 0
 		self.channeling = 0
 		self.Text:SetText("")

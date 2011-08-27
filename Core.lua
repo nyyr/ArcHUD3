@@ -9,8 +9,8 @@ ArcHUD = LibStub("AceAddon-3.0"):NewAddon("ArcHUD",
 
 -- Version
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-ArcHUD.version = "1.2 (r"..rev..")"
-ArcHUD.codename = "Fiery Babel Fish"
+ArcHUD.version = "1.3 (r"..rev..")"
+ArcHUD.codename = "Hidden Chimera"
 ArcHUD.authors = "nyyr, Nenie"
 
 -- Locale object
