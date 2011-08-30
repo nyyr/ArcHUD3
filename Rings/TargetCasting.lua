@@ -103,8 +103,6 @@ local function Target_Casting(frame, elapsed)
 end
 
 function module:OnModuleEnable()
-	self.OnTaxi = nil
-	self.flying = nil
 	self.f.fadeIn = 0.25
 	self.f.fadeOut = 2
 
@@ -146,7 +144,8 @@ function module:PLAYER_TARGET_CHANGED()
 end
 
 function module:UNIT_SPELLCAST_START(event, arg1)
-	if(arg1 == self.unit) then
+	if (arg1 == self.unit) then
+		self:Debug(3, "TargetCasting:UNIT_SPELLCAST_START("..tostring(arg1)..")")
 		local spell, rank, displayName, icon, startTime, endTime, _, _, notInterruptible = UnitCastingInfo(self.unit)
 		if (spell) then 
 			if(UnitIsFriend("player", self.unit)) then
@@ -181,7 +180,8 @@ function module:UNIT_SPELLCAST_START(event, arg1)
 end
 
 function module:UNIT_SPELLCAST_CHANNEL_START(event, arg1)
-	if(arg1 == self.unit) then
+	if (arg1 == self.unit) then
+		self:Debug(3, "TargetCasting:UNIT_SPELLCAST_CHANNEL_START("..tostring(arg1)..")")
 		local spell, rank, displayName, icon, startTime, endTime, _, notInterruptible = UnitChannelInfo(self.unit)
 		if (spell) then 
 			if(UnitIsFriend("player", self.unit)) then
@@ -217,7 +217,8 @@ function module:UNIT_SPELLCAST_CHANNEL_START(event, arg1)
 end
 
 function module:UNIT_SPELLCAST_CHANNEL_UPDATE(event, arg1)
-	if(arg1 == self.unit) then
+	if (arg1 == self.unit) then
+		self:Debug(3, "TargetCasting:UNIT_SPELLCAST_CHANNEL_UPDATE("..tostring(arg1)..")")
 		local spell, rank, displayName, icon, startTime, endTime = UnitChannelInfo(arg1)
 		if (spell == nil) then
 			-- might be due to lag
@@ -231,7 +232,8 @@ function module:UNIT_SPELLCAST_CHANNEL_UPDATE(event, arg1)
 end
 
 function module:UNIT_SPELLCAST_DELAYED(event, arg1)
-	if(arg1 == self.unit) then
+	if (arg1 == self.unit) then
+		self:Debug(3, "TargetCasting:UNIT_SPELLCAST_DELAYED("..tostring(arg1)..")")
 		local spell, rank, displayName, icon, startTime, endTime = UnitCastingInfo(arg1)
 		if (spell == nil) then
 			-- might be due to lag
@@ -244,7 +246,8 @@ function module:UNIT_SPELLCAST_DELAYED(event, arg1)
 end
 
 function module:UNIT_SPELLCAST_INTERRUPTIBLE(event, arg1)
-	if (arg1 == self.unit and self.db.profile.IndicateInterruptible) then
+	if ((arg1 == self.unit) and self.db.profile.IndicateInterruptible) then
+		self:Debug(3, "TargetCasting:UNIT_SPELLCAST_INTERRUPTIBLE("..tostring(arg1)..")")
 		self.f.BG:UpdateColor(self.db.profile.ColorInterruptible)
 		self.Text:SetTextColor(1, 1, 0)
 		self.Time:SetTextColor(1, 1, 0)
@@ -252,7 +255,8 @@ function module:UNIT_SPELLCAST_INTERRUPTIBLE(event, arg1)
 end
 
 function module:UNIT_SPELLCAST_NOT_INTERRUPTIBLE(event, arg1)
-	if (arg1 == self.unit and self.db.profile.IndicateInterruptible) then
+	if ((arg1 == self.unit) and self.db.profile.IndicateInterruptible) then
+		self:Debug(3, "TargetCasting:UNIT_SPELLCAST_NOT_INTERRUPTIBLE("..tostring(arg1)..")")
 		self.f.BG:UpdateColor({r = 0, g = 0, b = 0})
 		self.Text:SetTextColor(1, 0, 0)
 		self.Time:SetTextColor(1, 0, 0)
@@ -260,7 +264,8 @@ function module:UNIT_SPELLCAST_NOT_INTERRUPTIBLE(event, arg1)
 end
 
 function module:SpellcastStop(event, arg1, force)
-	if (arg1 == self.unit and (self.f.casting == 1 and self.channeling == 0 or force == true)) then
+	if ((arg1 == self.unit) and ((self.f.casting == 1 and self.channeling == 0) or (force == true))) then
+		self:Debug(3, "TargetCasting:SpellcastStop("..tostring(arg1)..", "..tostring(force)..")")
 		self.f:SetValue(self.f.maxValue)
 		self.f.casting = 0
 		self.f:SetRingAlpha(0)
@@ -270,7 +275,8 @@ function module:SpellcastStop(event, arg1, force)
 end
 
 function module:SpellcastChannelStop(event, arg1, force)
-	if (arg1 == self.unit and (self.f.casting == 1 or force == true)) then
+	if ((arg1 == self.unit) and ((self.f.casting == 1) or (force == true))) then
+		self:Debug(3, "TargetCasting:SpellcastChannelStop("..tostring(arg1)..", "..tostring(force)..")")
 		self.f.casting = 0
 		self.channeling = 0
 		self.Text:SetText("")

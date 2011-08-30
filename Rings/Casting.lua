@@ -128,28 +128,6 @@ function module:OnModuleEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP", 	"SpellcastChannelStop")
 
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", 		"SpellcastSuccess")
-
-	-- Do hooks for flight timers
---[[
-	if(FlightMapTimes_BeginFlight and FlightMapTimes_EndFlight) then
-		self:Debug(2, "Hooking FlightMap")
-		self:Hook("FlightMapTimes_BeginFlight", "BeginFlight", true)
-		self:Hook("FlightMapTimes_EndFlight", "EndFlight", true)
-		self.using = "FlightMap"
-	elseif(ToFu) then
-		self:Debug(2, "Hooking ToFu")
-		self:Hook("TakeTaxiNode", "BeginFlight", true)
-		self.parent:StartMetro(self.name .. "CheckTaxi")
-		self.using = "ToFu"
--- [ [	elseif(InFlight) then
-		self:Debug(2, "Hooking InFlight")
-		self:Hook(InFlight, "StartTimer", "BeginFlight", true)
-		self:StartMetro(self.name .. "CheckTaxi")
-		self.using = "InFlight" ] ]
-	else
-		self.using = "none"
-	end
-]]
 	
 	-- Add update hook
 	self.f.UpdateHook = Player_Casting
@@ -159,73 +137,6 @@ function module:OnModuleEnable()
 
 	self.f:Show()
 end
-
---[[
-function module:BeginFlight(duration, destination)
-	local slot = duration
-	if(self.using == "ToFu") then
-		_, duration = ToFu:GetFlightData(ToFu.start, TaxiNodeName(slot))
-		destination = ToFu:LessName(TaxiNodeName(slot))
-	elseif(self.using == "Inflight") then
-		-- hack to get flight data from InFlight
-		local source
-		for i = 1, NumTaxiNodes(), 1 do
-			if TaxiNodeGetType(i) == "CURRENT" then
-				source = ShortenName(TaxiNodeName(i))
-				break
-			end
-		end
-		destination = ShortenName(TaxiNodeName(slot))
-		if(InFlightVars[UnitFactionGroup("player")][source][destination] > 0) then
-			duration = InFlightVars[UnitFactionGroup("player")][source][destination]
-		else
-			duration = nil
-		end
-	end
-
-	-- Set up casting bar for flight
-	if(duration and duration > 0) then
-		self.Text:SetText(destination)
-	else
-		self.Text:SetText(destination.. " - Timing")
-	end
-
-	self.InFlight = true
-	self.channeling = 1
-	self.f.casting = 1
-	self.spellstart = GetTime()*1000
-	self.f:SetMax(duration and duration > 0 and duration*1000 or 1)
-	self.f:SetValue(duration and duration > 0  and duration*1000 or 1)
-	self.f:UpdateColor({["r"] = 0.3, ["g"] = 0.3, ["b"] = 1.0})
-	if(ArcHUD.db.profile.FadeIC > ArcHUD.db.profile.FadeOOC) then
-		self.f:SetRingAlpha(ArcHUD.db.profile.FadeIC)
-	else
-		self.f:SetRingAlpha(ArcHUD.db.profile.FadeOOC)
-	end
-
-	if(self.using == "ToFu" or self.using == "InFlight" and self.hooks.TakeTaxiNode) then
-		return self.hooks.TakeTaxiNode(slot)
-	end
-end
-
-function module:EndFlight()
-	self.InFlight = false
-	self.channeling = 0
-	self.f:SetRingAlpha(0)
-	self.f:SetValue(0)
-	self.f.casting = 0
-	self.Text:SetText("")
-	self.Time:SetText("")
-end
-
-function module:CheckTaxi()
-	if(self.InFlight) then
-		if(not UnitOnTaxi("player") and (self.spellstart+5000) < (GetTime()*1000)) then
-			self:EndFlight()
-		end
-	end
-end
-]]
 
 function module:UNIT_SPELLCAST_START(event, arg1)
 	if(arg1 == self.unit) then
@@ -366,15 +277,4 @@ end
 
 function module:SpellcastInterrupt()
 	self.spellStatus = "interrupted"
-end
-
-
--- InFlight function
--- shorten name to lighten saved vars
-local function ShortenName(name)
-	local found = string.find(name, ", ")
-	if found then
-		name = string.sub(name, 1, found - 1)
-	end
-	return name
 end
