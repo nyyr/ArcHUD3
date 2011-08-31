@@ -1,7 +1,5 @@
 local L = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Core")
 
---ArcHUDFrame = nil
-
 ---------------------------------------------------------------------------------------------------
 -- Local functions to assist with widget creation
 local function AH_CreateFrame(type, name, parent, size, point, strata)
@@ -70,14 +68,15 @@ local function AH_CreateBuffButton(parent, id, point)
 	f:SetPoint(unpack(point))
 	f:SetID(id)
 
-	f:SetWidth(16)
-	f:SetHeight(16)
+	local buffIconSize = ArcHUD.db.profile.BuffIconSize
+	f:SetWidth(buffIconSize)
+	f:SetHeight(buffIconSize)
 
 	f.Icon = AH_CreateTexture(f, "ARTWORK", nil, "Interface\\Icons\\INV_Misc_Ear_Human_02")
 	f.Icon:SetAllPoints(true)
 	f.Icon:Show()
 
-	f.Border = AH_CreateTexture(f, "OVERLAY", {17, 17}, "Interface\\Buttons\\UI-Debuff-Overlays", {"CENTER", f, "CENTER"})
+	f.Border = AH_CreateTexture(f, "OVERLAY", {buffIconSize+1, buffIconSize+1}, "Interface\\Buttons\\UI-Debuff-Overlays", {"CENTER", f, "CENTER"})
 	f.Border:SetTexCoord(0.296875, 0.5703125, 0, 0.515625)
 	f.Border:Hide()
 
@@ -134,7 +133,7 @@ local function AH_CreateMoverFrame(parent, name, size, point, origpoint)
 	f:SetScript("OnDragStop", function(self)
 		self:GetParent():StopMovingOrSizing()
 		self:GetParent().moved = true
-		ArcHUD:LevelDebug(1, "Sending ARCHUD_FRAME_MOVED")
+		--ArcHUD:LevelDebug(1, "Sending ARCHUD_FRAME_MOVED")
 		ArcHUD:SendMessage("ARCHUD_FRAME_MOVED")
 	end)
 
@@ -277,10 +276,10 @@ function ArcHUD:CreateHUDFrames()
 end
 
 function ArcHUD:CheckFrames()
-	ArcHUD:LevelDebug(1, "CheckFrames")
+	--ArcHUD:LevelDebug(1, "CheckFrames")
 	for id, frame in pairs(self.movableFrames) do
 		if(frame.moved) then
-			ArcHUD:LevelDebug(1, "Update of "..id)
+			--ArcHUD:LevelDebug(1, "Update of "..id)
 			self.db.profile.Positions[id] = {
 				x = frame:GetLeft(),
 				y = frame:GetBottom(),
@@ -294,7 +293,7 @@ function ArcHUD:CheckFrames()
 end
 
 function ArcHUD:Refresh3dUnitModel(event, arg1)
-	ArcHUD:LevelDebug(3, "ArcHUD:Refresh3dUnitModel("..tostring(event)..", "..tostring(arg1)..")")
+	--ArcHUD:LevelDebug(3, "ArcHUD:Refresh3dUnitModel("..tostring(event)..", "..tostring(arg1)..")")
 	if (ArcHUD.db.profile.TargetFrame) then
 		if ((event ~= "UNIT_MODEL_CHANGED" and UnitExists("target")) or
 			(event == "UNIT_MODEL_CHANGED" and arg1 == "target")) then

@@ -31,7 +31,7 @@ end
 function ArcHUD.modulePrototype:InitConfigOptions()
 	if (self.isCustom) then
 		-- Custom buff module
-		self:Debug(d_info, "Initializing custom buff module options")
+		self:Debug(d_notice, "Initializing custom buff module options")
 		
 		-- Register options
 		if (self.optionsTable and type(self.optionsTable) == "table") then
@@ -65,7 +65,7 @@ function ArcHUD.modulePrototype:OnInitialize()
 	
 	if(self.Initialize) then
 		self:Initialize()
-		self:Debug(d_info, "Ring initialized")
+		self:Debug(d_notice, "Ring initialized")
 		self:RegisterMessage("ARCHUD_MODULE_ENABLE")
 		self:RegisterMessage("ARCHUD_MODULE_UPDATE")
 	else
@@ -100,7 +100,7 @@ end
 function ArcHUD.modulePrototype:OnEnable()
 	--self:Debug(d_warn, "Received enable event")
 	if(self.db.profile.Enabled) then
-		self:Debug(d_info, "Enabling ring")
+		--self:Debug(d_info, "Enabling ring")
 		if(self.disableEvents and (not self.disableEvents.option or self.disableEvents.option and self.db.profile[self.disableEvents.option])) then
 			self:Debug(d_notice, "Disabling events:")
 			for k,v in ipairs(self.disableEvents) do
@@ -138,13 +138,13 @@ end
 -- OnDisable
 ----------------------------------------------
 function ArcHUD.modulePrototype:OnDisable()
-	self:Debug(d_info, "Disabling ring")
+	--self:Debug(d_info, "Disabling ring")
 	if(self.disableEvents and self.eventsDisabled) then
 		self:Debug(d_notice, "Re-enabling events:")
 		for k,v in ipairs(self.disableEvents) do
 			local f = getglobal(v.frame)
 			if(f) then
-				self:Debug(d_notice, "- Frame '"..f:GetName().."':")
+				--self:Debug(d_notice, "- Frame '"..f:GetName().."':")
 				for _, event in pairs(v.events) do
 					self:Debug(d_notice, "  * "..event)
 					f:RegisterEvent(event)
@@ -241,7 +241,7 @@ function ArcHUD.modulePrototype:ARCHUD_MODULE_UPDATE(message, module)
 			end
 
 			if(self.OnModuleUpdate) then
-				self:Debug(d_notice, "Updating ring")
+				--self:Debug(d_notice, "Updating ring")
 				self:OnModuleUpdate()
 			end
 		end

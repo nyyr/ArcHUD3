@@ -66,6 +66,7 @@ ArcHUD.defaults = {
 		ShowOnlyBuffsCastByPlayer = false,
 		ShowBuffTooltips = true,
 		HideBuffTooltipsIC = false,
+		BuffIconSize = 20,
 		BlizzPlayer = true,
 		BlizzTarget = true,
 		BlizzFocus = true,
@@ -144,7 +145,7 @@ function ArcHUD:OnInitialize()
 	--self:SetDebugging(true)
 	self:SetDebugLevel(self.db.profile.Debug)
 
-	self:LevelDebug(d_notice, "Registering timers")
+	self:LevelDebug(d_info, "Registering timers")
 	self:RegisterTimer("UpdatePetNamePlate", self.UpdatePetNamePlate, 2, self, true)
 	self:RegisterTimer("UpdateTargetTarget", self.UpdateTargetTarget, 1, self, true)
 	self:RegisterTimer("CheckNamePlateMouseOver", self.CheckNamePlateMouseOver, 0.1, self, true)
@@ -303,15 +304,14 @@ function ArcHUD:OnProfileEnable()
 		self:GetModule("Anchors").Right:SetPoint("TOPLEFT", ArcHUDFrame, "TOPRIGHT", self.db.profile.Width, 0)
 	end
 
-	self:LevelDebug(d_notice, "Position frame. YLoc: "..self.db.profile.YLoc.." XLoc: "..self.db.profile.XLoc)
+	--self:LevelDebug(d_notice, "Position frame. YLoc: "..self.db.profile.YLoc.." XLoc: "..self.db.profile.XLoc)
 	ArcHUDFrame:ClearAllPoints()
 	ArcHUDFrame:SetPoint("CENTER", WorldFrame, "CENTER", self.db.profile.XLoc, self.db.profile.YLoc)
 
-	self:LevelDebug(d_notice, "Setting scale. Scale: "..self.db.profile.Scale)
+	--self:LevelDebug(d_notice, "Setting scale. Scale: "..self.db.profile.Scale)
 	-- Scale the HUD according to user settings.
 	ArcHUDFrame:SetScale(self.db.profile.Scale)
 
-	self:LevelDebug(d_notice, "Setting player name to nameplate")
 	-- Set playername
 	self:UpdateFaction()
 	self:PLAYER_UPDATE_RESTING()
@@ -394,24 +394,22 @@ end
 -- TargetUpdate()
 ----------------------------------------------
 function ArcHUD:TargetUpdate(event, arg1)
-	self:LevelDebug(d_info, "TargetUpdate called")
-	
 	if (event == "PLAYER_TARGET_CHANGED") then
 		ArcHUD:UpdateComboPoints(event, arg1)
 	end
 	
 	-- Make sure we are targeting someone and that ArcHUD is enabled
 	if (UnitExists("target") and self.db.profile.TargetFrame) then
-		self:LevelDebug(d_info, "TargetUpdate: Updating target frame...")
+		--self:LevelDebug(d_info, "TargetUpdate: Updating target frame...")
 
 		-- 3D target model
 		if((self.db.profile.PlayerModel and UnitIsPlayer("target")) or (self.db.profile.MobModel and not UnitIsPlayer("target"))) then
 			self.TargetHUD.Model:Show()
 			self.TargetHUD.Model:SetUnit("target")
-			self:LevelDebug(d_notice, "TargetUpdate: Enabling 3D model. Player - "..((self.db.profile.PlayerModel and UnitIsPlayer("target")) and "yes" or "no")..", Mob - "..((self.db.profile.MobModel and not UnitIsPlayer("target")) and "yes" or "no"))
+			--self:LevelDebug(d_notice, "TargetUpdate: Enabling 3D model. Player - "..((self.db.profile.PlayerModel and UnitIsPlayer("target")) and "yes" or "no")..", Mob - "..((self.db.profile.MobModel and not UnitIsPlayer("target")) and "yes" or "no"))
 		else
 			self.TargetHUD.Model:Hide()
-			self:LevelDebug(d_notice, "TargetUpdate: Disabling 3D model")
+			--self:LevelDebug(d_notice, "TargetUpdate: Disabling 3D model")
 		end
 
 		self.TargetHUD:SetAlpha(1)
@@ -422,7 +420,7 @@ function ArcHUD:TargetUpdate(event, arg1)
 			self.TargetHUD.HPText:SetText(self:fint(UnitHealth("target")).."/"..self:fint(UnitHealthMax("target")))
 		end
 
-		-- Does the unit have mana? If so we want to show it
+		-- Does the unit have power? If so we want to show it
 		if (UnitPowerMax("target") > 0) then
 			self.TargetHUD.MPText:SetText(self:fint(UnitPower("target")).."/"..self:fint(UnitPowerMax("target")))
 			self:StartTimer("UpdateTargetPower")
@@ -690,7 +688,7 @@ end
 -- UpdateFaction()
 ----------------------------------------------
 function ArcHUD:UpdateFaction(unit)
-	self:LevelDebug(d_info, "UpdateFaction: arg1 = %s, unit = %s", arg1 or "nil", unit or "nil")
+	--self:LevelDebug(d_info, "UpdateFaction: arg1 = %s, unit = %s", arg1 or "nil", unit or "nil")
 
 	if(not unit and arg1 and arg1 ~= "player") then return end
 	if(arg1 and not unit) then unit = arg1 end
@@ -899,7 +897,7 @@ function ArcHUD:UpdateFonts(tbl)
 			if(v.GetFont) then
 				local fontName, fontSize, fontFlags = v:GetFont()
 				if(fontName) then
-					self:LevelDebug(d_info, "UpdateFonts: fontName = %s, localeFont = %s", fontName, L["FONT"])
+					self:LevelDebug(d_notice, "UpdateFonts: fontName = %s, localeFont = %s", fontName, L["FONT"])
 				end
 				if(fontName and not string.find(fontName, L["FONT"])) then
 					v:SetFont("Fonts\\"..L["FONT"], fontSize, fontFlags)
@@ -978,7 +976,7 @@ end
 -- CombatStatus()
 ----------------------------------------------
 function ArcHUD:CombatStatus(event)
-	self:LevelDebug(d_info, "CombatStatus: event = " .. event)
+	--self:LevelDebug(d_info, "CombatStatus: event = " .. event)
 
 	if(event == "PLAYER_ENTER_COMBAT" or event == "PLAYER_REGEN_DISABLED") then
 		self.PlayerIsInCombat = true
@@ -1075,12 +1073,12 @@ function ArcHUD:StartTimer(name)
 			if (t.repeating) then
 				self.timers[name].handle = self:ScheduleRepeatingTimer(t.func, t.delay, t.arg)
 				self.timers[name].active = true
-				self:LevelDebug(d_warn, "Started repeating timer "..name..", handle "..tostring(self.timers[name].handle))
+				--self:LevelDebug(d_warn, "Started repeating timer "..name..", handle "..tostring(self.timers[name].handle))
 			else
 				self.timers[name].handle = self:ScheduleTimer(t.func, t.delay, t.arg)
 				self.timers[name].active = true
 				self.timers[name].startTime = GetTime()
-				self:LevelDebug(d_warn, "Started single-shot timer "..name..", handle "..tostring(self.timers[name].handle))
+				--self:LevelDebug(d_warn, "Started single-shot timer "..name..", handle "..tostring(self.timers[name].handle))
 			end
 		end
 	else
@@ -1097,8 +1095,8 @@ function ArcHUD:StopTimer(name)
 		if (t.active) then
 			if (not self:CancelTimer(t.handle, true)) then
 				self:LevelDebug(d_warn, "WARN: Tried to cancel invalid timer handle (name "..name..")")
-			else
-				self:LevelDebug(d_warn, "Stopped "..name..", handle "..tostring(t.handle))
+			--else
+				--self:LevelDebug(d_warn, "Stopped "..name..", handle "..tostring(t.handle))
 			end
 			self.timers[name].handle = nil
 			self.timers[name].active = nil

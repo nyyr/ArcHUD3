@@ -295,12 +295,37 @@ ArcHUD.configOptionsTableCore = {
 						ArcHUD.db.profile.HideBuffTooltipsIC = v
 					end,
 				},
+				-- Buff icon size
+				buffIconSize = {
+					type		= "range",
+					name		= L["TEXT"]["BUFFICONSIZE"],
+					desc		= L["TOOLTIP"]["BUFFICONSIZE"],
+					min			= 16,
+					max			= 40,
+					step		= 4,
+					order		= 10,
+					get			= function ()
+						return ArcHUD.db.profile.BuffIconSize
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.BuffIconSize = v
+						-- update buff icons
+						for i=1,16 do
+							ArcHUDFrame.TargetHUD["Buff"..i]:SetWidth(v)
+							ArcHUDFrame.TargetHUD["Buff"..i]:SetHeight(v)
+						end
+						for i=1,16 do
+							ArcHUDFrame.TargetHUD["Debuff"..i]:SetWidth(v)
+							ArcHUDFrame.TargetHUD["Debuff"..i]:SetHeight(v)
+						end
+					end,
+				},
 				-- Show PvP flag
 				showPVP = {
 					type		= "toggle",
 					name		= L["TEXT"]["SHOWPVP"],
 					desc		= L["TOOLTIP"]["SHOWPVP"],
-					order		= 10,
+					order		= 11,
 					get			= function ()
 						return ArcHUD.db.profile.ShowPVP
 					end,
@@ -314,7 +339,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["TOT"],
 					desc		= L["TOOLTIP"]["TOT"],
-					order		= 11,
+					order		= 12,
 					get			= function ()
 						return ArcHUD.db.profile.TargetTarget
 					end,
@@ -328,7 +353,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["TOTOT"],
 					desc		= L["TOOLTIP"]["TOTOT"],
-					order		= 12,
+					order		= 13,
 					get			= function ()
 						return ArcHUD.db.profile.TargetTargetTarget
 					end,
