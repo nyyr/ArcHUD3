@@ -16,6 +16,7 @@ module.defaults = {
 		ShowText = true,
 		ShowPerc = true,
 		ShowDef = false,
+		ShowIncoming = false,
 		ColorMode = "fade",
 		Color = {r = 0, g = 1, b = 0},
 		Side = 1,
@@ -26,11 +27,14 @@ module.options = {
 	{name = "ShowText", text = "SHOWTEXT", tooltip = "SHOWTEXT"},
 	{name = "ShowPerc", text = "SHOWPERC", tooltip = "SHOWPERC"},
 	{name = "ShowDef", text = "DEFICIT", tooltip = "DEFICIT"},
+	{name = "ShowIncoming", text = "INCOMINGHEALS", tooltip = "INCOMINGHEALS"},
 	hascolorfade = true,
 	attach = true,
 }
 
 module.localized = true
+
+module.healPrediction = 0
 
 ----------------------------------------------
 -- Initialize
@@ -97,6 +101,7 @@ function module:OnModuleEnable()
 	-- Register the events we will use
 	self:RegisterEvent("UNIT_HEALTH", 		"UpdateHealth")
 	self:RegisterEvent("UNIT_MAXHEALTH", 	"UpdateHealth")
+	self:RegisterEvent("UNIT_HEAL_PREDICTION")
 	self:RegisterEvent("PLAYER_LEVEL_UP")
 
 	-- Activate ring timers
@@ -155,6 +160,36 @@ function module:UpdateHealth(event, arg1)
 
 			self.f:SetMax(maxHealth)
 			self.f:SetValue(health)
+		end
+		
+		if self.healPrediction > 0 then
+			local ih = self.healPrediction
+			if health + ih >= maxHealth then
+				ih = maxHealth - health - 1 -- spark will be hidden if <= 0 or >= max
+			end
+			self.f:SetSpark(health + ih)
+		end
+	end
+end
+
+----------------------------------------------
+-- UNIT_HEALTH_PREDICTION
+----------------------------------------------
+function module:UNIT_HEAL_PREDICTION(event, arg1)
+	if self.db.profile.ShowIncoming and (arg1 == self.unit) then
+		local ih = UnitGetIncomingHeals(self.unit)
+		--self:Debug(1, "ih: %s", tostring(ih))
+		if (not ih) or (ih == 0) then
+			self.healPrediction = 0
+			self.f:SetSpark(0) -- hide
+		else
+			self.healPrediction = ih
+			local health, maxHealth = self.f.endValue, self.f.maxValue
+			if health + ih >= maxHealth then
+				ih = maxHealth - health - 1 -- spark will be hidden if <= 0 or >= max
+			end
+			--self:Debug(1, "spark: %s", tostring(health+ih))
+			self.f:SetSpark(health + ih)
 		end
 	end
 end
