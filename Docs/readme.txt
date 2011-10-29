@@ -1,3 +1,16 @@
+ArcHUD3 1.3
+-------------
+
+* added profile management
+* added option to show incoming heal for health bars
+* buff icons are now resizable
+* multiple buffs per custom buff arc (separated with semicolon, precedence in order of their listing)
+* configuration sheets now stretched to full width
+* bug fix in target casting ring
+
+nyyr
+
+
 ArcHUD3 1.2
 -------------
 

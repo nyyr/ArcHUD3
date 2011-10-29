@@ -157,6 +157,9 @@ function ArcHUD:OnInitialize()
 	self:InitConfig()
 	
 	self:SendMessage("ARCHUD_LOADED")
+	
+	self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
+	
 	self:LevelDebug(d_info, "ArcHUD has been initialized.")
 end
 
@@ -189,7 +192,7 @@ function ArcHUD:OnEnable()
 	self.PlayerIsRegenOn = true
 	self.PetIsInCombat = false
 
-	self:OnProfileEnable()
+	self:OnProfileChanged()
 
 	self.Enabled = true
 	
@@ -222,9 +225,13 @@ function ArcHUD:OnDisable()
 end
 
 ----------------------------------------------
--- OnProfileEnable()
+-- OnProfileChanged()
 ----------------------------------------------
-function ArcHUD:OnProfileEnable()
+function ArcHUD:OnProfileChanged(db, profile)
+	self.updating = true
+
+	self:UnregisterAll()
+	
 	if(self.db.profile.BlizzPlayer and self.BlizzPlayerHidden or not self.db.profile.BlizzPlayer and not self.BlizzPlayerHidden) then
 		self:HideBlizzardPlayer(self.db.profile.BlizzPlayer)
 	end
@@ -321,12 +328,20 @@ function ArcHUD:OnProfileEnable()
 
 	-- Combo points frame
 	self:InitComboPointsFrame()
+	
+	-- Update target HUD
+	self:UpdateTargetHUD()
+	
+	-- Modules
+	self:SendMessage("ARCHUD_MODULE_UPDATE")
+	
+	self.updating = false
 end
 
 ----------------------------------------------
--- OnProfileDisable()
+-- UnregisterAll()
 ----------------------------------------------
-function ArcHUD:OnProfileDisable()
+function ArcHUD:UnregisterAll()
 	self:LevelDebug(d_notice, "Unregistering events")
 
 	self:UnregisterEvent("UNIT_HEALTH")
@@ -345,8 +360,6 @@ function ArcHUD:OnProfileDisable()
 	self:StopTimer("UpdatePetNamePlate")
 	self:StopTimer("CheckNamePlateMouseOver")
 	self:StopTimer("UpdateTargetPower")
-	--self:UnregisterMetro("Enable_player")
-	--self:UnregisterMetro("Enable_pet")
 
 	self:LevelDebug(d_notice, "Hiding frames")
 	for i=1,16 do
@@ -361,11 +374,7 @@ end
 ----------------------------------------------
 function ArcHUD:ResetOptionsConfirm()
 	self.db:ResetDB()
-	self.updating = true
-	self:OnProfileDisable()
-	self:OnProfileEnable()
-	self:SendMessage("ARCHUD_MODULE_UPDATE")
-	self.updating = false
+	self:OnProfileChanged()
 	self:Print(L["TEXT_RESET_CONFIRM"])
 end
 

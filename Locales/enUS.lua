@@ -24,6 +24,14 @@ L["TEXT"] = {
 	TITLE		= "ArcHUD3 Options",
 	GENERAL		= "General settings",
 	
+	PROFILES	= "Profiles",
+	PROFILES_SELECT= "Select profile",
+	PROFILES_CREATE= "Create new profile",
+	PROFILES_DELETE= "Delete profile",
+	PROFILES_CANNOTDELETE= "Cannot delete default profile.",
+	PROFILES_DEFAULT= "Default profile",
+	PROFILES_EXISTS= "Profile already exists.",
+	
 	DISPLAY		= "Display options",
 	PLAYERFRAME	= "Player frame",
 	TARGETFRAME	= "Target frame",
@@ -89,6 +97,10 @@ L["TEXT"] = {
 }
 
 L["TOOLTIP"] = {
+	PROFILES_SELECT = "Select a profile for this character.",
+	PROFILES_CREATE = "Create a new profile based on the current profile and activate it.",
+	PROFILES_DELETE = "Delete current profile and set default profile as active one.",
+
 	PLAYERFRAME	= "Toggle display of player and pet nameplates",
 	TARGETFRAME = "Toggle display of entire target frame",
 	PLAYERMODEL = "Toggle display of 3D target model of players",

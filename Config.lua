@@ -8,6 +8,20 @@ local AceConfig = LibStub("AceConfig-3.0")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 local AceConfigRegistry = LibStub("AceConfigRegistry-3.0")
 
+-- List of profiles
+local profilesTable = {}
+local function ArcHUD_updateProfilesTable()
+	while #profilesTable > 1 do
+		table.remove(profilesTable)
+	end
+	local pt = ArcHUD.db:GetProfiles()
+	for i,p in ipairs(pt) do
+		if not (p == "profile") then
+			table.insert(profilesTable, p)
+		end
+	end
+end
+
 -- Debugging levels
 --   1 Warning
 --   2 Info
@@ -136,6 +150,82 @@ ArcHUD.configOptionsTableCore = {
 			type		= "header",
 			name		= L["TEXT"]["GENERAL"],
 			order		= 2,
+		},
+		profiles = {
+			type		= "group",
+			name		= L["TEXT"]["PROFILES"],
+			order		= 9,
+			args		= {
+				selectProfile = {
+					type	= "select",
+					name	= L["TEXT"]["PROFILES_SELECT"],
+					desc	= L["TOOLTIP"]["PROFILES_SELECT"],
+					order	= 1,
+					values	= profilesTable,
+					get		= function (info)
+						local p = ArcHUD.db:GetCurrentProfile()
+						if p == "profile" then
+							return 1
+						else
+							for i,v in ipairs(profilesTable) do
+								if v == p then
+									return i
+								end
+							end
+						end
+					end,
+					set		= function (info, value)
+						if value == 1 then
+							ArcHUD.db:SetProfile("profile")
+						else
+							ArcHUD.db:SetProfile(profilesTable[value])
+						end
+					end,
+				},
+				createProfile = {
+					type	= "input",
+					name	= L["TEXT"]["PROFILES_CREATE"],
+					desc	= L["TOOLTIP"]["PROFILES_CREATE"],
+					order	= 2,
+					get		= function ()
+						return ""
+					end,
+					set		= function (info, value)
+						if value and not (value == "") then
+							if value == "profile" then -- default profile
+								ArcHUD:Print(L["TEXT"]["PROFILES_EXISTS"])
+								return
+							end
+							for i,v in ipairs(profilesTable) do
+								if v == value then
+									ArcHUD:Print(L["TEXT"]["PROFILES_EXISTS"])
+									return
+								end
+							end
+							local oldprofile = ArcHUD.db:GetCurrentProfile()
+							ArcHUD.db:SetProfile(value)
+							ArcHUD.db:CopyProfile(oldprofile)
+							ArcHUD_updateProfilesTable()
+						end
+					end,
+				},
+				deleteProfile = {
+					type	= "execute",
+					name	= L["TEXT"]["PROFILES_DELETE"],
+					desc	= L["TOOLTIP"]["PROFILES_DELETE"],
+					order	= 3,
+					func	= function ()
+						local oldprofile = ArcHUD.db:GetCurrentProfile()
+						if (oldprofile == "profile") then
+							ArcHUD:Print(L["TEXT"]["PROFILES_CANNOTDELETE"])
+						else
+							ArcHUD.db:SetProfile("profile") -- default profile
+							ArcHUD.db:DeleteProfile(oldprofile)
+							ArcHUD_updateProfilesTable()
+						end
+					end,
+				},
+			},
 		},
 		display = {
 			type		= "group",
@@ -905,6 +995,10 @@ end
 -- Initialize config tools
 ----------------------------------------------
 function ArcHUD:InitConfig()
+	-- Get profiles
+	profilesTable[1] = L["TEXT"]["PROFILES_DEFAULT"]
+	ArcHUD_updateProfilesTable()
+
 	-- Set up chat commands
 	AceConfig:RegisterOptionsTable("ArcHUD", self.configOptionsTableCmd, {"archud", "ah"})
 	
