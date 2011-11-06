@@ -18,6 +18,7 @@ Core.lua
 Frames.xml
 ComboPoints.lua
 Nameplates.lua
+BlizzardFrames.lua
 Utils.lua
 
 # Module core

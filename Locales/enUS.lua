@@ -91,6 +91,7 @@ L["TEXT"] = {
 	BLIZZPLAYER = "Blizzard player frame visible",
 	BLIZZTARGET = "Blizzard target frame visible",
 	BLIZZFOCUS  = "Blizzard focus frame visible",
+	BLIZZSPELLACT= "Opacity of spell activation overlays",
 
 	RINGS		= "Ring options",
 	RING		= "Ring",
@@ -159,6 +160,7 @@ L["TOOLTIP"] = {
 	BLIZZPLAYER = "Toggles visibility of the Blizzard player frame",
 	BLIZZTARGET = "Toggles visibility of the Blizzard target frame",
 	BLIZZFOCUS  = "Toggles visibility of the Blizzard focus frame",
+	BLIZZSPELLACT= "Sets opacity of Blizzard's spell activation overlays.",
 	
 }
 

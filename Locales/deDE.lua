@@ -27,6 +27,14 @@ L["TEXT"] = {
 	TITLE		= "ArcHUD3 Optionen",
 	GENERAL		= "Allgemeine Einstellungen",
 	
+	PROFILES	= "Profile",
+	PROFILES_SELECT= "Profilauswahl",
+	PROFILES_CREATE= "Erstelle neues Profil",
+	PROFILES_DELETE= "Lösche Profil",
+	PROFILES_CANNOTDELETE= "Das Hauptprofil kann nicht gelöscht werden.",
+	PROFILES_DEFAULT= "Hauptprofil",
+	PROFILES_EXISTS= "Ein Profil mit diesem Namen existiert bereits.",
+	
 	DISPLAY		= "Anzeige",
 	PLAYERFRAME	= "Spielernamensplakette",
 	TARGETFRAME	= "Zieleinheitenfenster",
@@ -86,12 +94,17 @@ L["TEXT"] = {
 	BLIZZPLAYER = "Blizzard Spielereinheitenfenster sichtbar",
 	BLIZZTARGET = "Blizzard Zieleinheitenfenster sichtbar",
 	BLIZZFOCUS  = "Blizzard Fokuszieleinheitenfenster sichtbar",
+	BLIZZSPELLACT= "Deckkraft der Zauberspruchaktivierungsanzeige",
 
 	RINGS		= "Ringoptionen",
 	RING		= "Ring",
 }
 
 L["TOOLTIP"] = {
+	PROFILES_SELECT = "Wählt ein Profil für diesen Charakter.",
+	PROFILES_CREATE = "Erstellt ein neues Profil basierend auf dem aktuellen und aktiviert es.",
+	PROFILES_DELETE = "Löscht das aktuelle Profil und aktiviert das Hauptprofil.",
+
 	PLAYERFRAME	= "Schaltet Anzeige der Spieler/Begleiter-Namensschilder ein/aus",
 	TARGETFRAME = "Schaltet Anzeige der Zieleinheitenfenster ein/aus",
 	PLAYERMODEL = "Schaltet Anzeige von 3D-Spielermodellen ein/aus",
@@ -148,6 +161,7 @@ L["TOOLTIP"] = {
 	BLIZZPLAYER = "Schaltet die Sichtbarkeit des Blizzard-Spieler-Einheitenfensters ein/aus",
 	BLIZZTARGET = "Schaltet die Sichtbarkeit des Blizzard-Ziel-Einheitenfensters ein/aus",
 	BLIZZFOCUS  = "Schaltet die Sichtbarkeit des Blizzard-Fokusziel-Einheitenfensters ein/aus",
+	BLIZZSPELLACT= "Setzt die Deckkraft von Blizzards Zauberspruchaktivierungssymbole.",
 	
 }
 
@@ -160,23 +174,22 @@ LM["FONT"]			= "FRIZQT__.TTF"
 LM["Version"]	= true
 LM["Authors"]	= "Autoren"
 
-LM["Health"]		= "Spieler-Gesundheit"
-LM["Power"]			= "Spieler-Ressource"
-LM["PetHealth"]		= "Begleiter-Gesundheit"
-LM["PetPower"]		= "Begleiter-Ressource"
-LM["TargetCasting"]	= "Ziel-Zauberwirken"
-LM["TargetHealth"]	= "Ziel-Gesundheit"
-LM["TargetPower"]	= "Ziel-Ressource"
-LM["FocusHealth"]	= "Fokusziel-Gesundheit"
-LM["FocusPower"]	= "Fokusziel-Ressource"
-LM["Casting"]		= "Spieler-Zauberwirken"
-LM["DruidMana"]		= "Druiden-Mana"
-LM["MirrorTimer"]	= "Spiegel-Timer"
+LM["Health"]		= "Spieler Gesundheit"
+LM["Power"]			= "Spieler Ressource"
+LM["PetHealth"]		= "Begleiter Gesundheit"
+LM["PetPower"]		= "Begleiter Ressource"
+LM["TargetCasting"]	= "Ziel Zauberwirken"
+LM["TargetHealth"]	= "Ziel Gesundheit"
+LM["TargetPower"]	= "Ziel Ressource"
+LM["FocusHealth"]	= "Fokusziel Gesundheit"
+LM["FocusPower"]	= "Fokusziel Ressource"
+LM["Casting"]		= "Spieler Zauberwirken"
+LM["DruidMana"]		= "Druiden Mana"
+LM["MirrorTimer"]	= "Spiegel Timer"
 LM["ComboPoints"]	= "Kombopunkte"
-LM["EnergyTick"]	= "Energie-Ticks"
+LM["EnergyTick"]	= "Energie Ticks"
 LM["HolyPower"]		= "Heilige Kraft"
 LM["SoulShards"]	= "Seelensplitter"
-LM["CustomBuff"]	= "Custom Buff" -- TODO: to be removed
 
 LM["TEXT"] = {
 	TITLE		= "Ringoptionen",

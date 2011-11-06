@@ -70,6 +70,7 @@ ArcHUD.defaults = {
 		BlizzPlayer = true,
 		BlizzTarget = true,
 		BlizzFocus = true,
+		BlizzSpellActOpacity = 1.0,
 		ShowPVP = true,
 		ShowComboPoints = true,
 		Positions = {},
@@ -241,6 +242,8 @@ function ArcHUD:OnProfileChanged(db, profile)
 	if(self.db.profile.BlizzFocus and self.BlizzFocusHidden or not self.db.profile.BlizzFocus and not self.BlizzFocusHidden) then
 		self:HideBlizzardFocus(self.db.profile.BlizzFocus)
 	end
+	
+	self:HookBlizzardSpellActivation((self.db.profile.BlizzSpellActOpacity < 1.0))
 	
 	if (self.db.profile.PlayerFrame) then
 		self.Nameplates.player:Show()
@@ -1003,65 +1006,6 @@ function ArcHUD:CombatStatus(event)
 		self.PetIsInCombat = true
 	elseif(event == "PET_ATTACK_STOP") then
 		self.PetIsInCombat = false
-	end
-end
-
-
-----------------------------------------------
--- Blizzard Frame functions
--- Hide/show player & pet frame
-----------------------------------------------
-function ArcHUD:HideBlizzardPlayer(show)
-	self.BlizzPlayerHidden = not show
-	if not show then
-		PlayerFrame:UnregisterAllEvents()
-		PlayerFrame:Hide();
-
-		PetFrame:UnregisterAllEvents()
-		PetFrame:Hide();
-	else
-		PlayerFrame:RegisterAllEvents()
-		PlayerFrame:Show()
-		PlayerFrame_Update()
-		
-		PetFrame:RegisterAllEvents()
-		PetFrame_Update(PetFrame, true)
-	end
-end
-
-----------------------------------------------
--- Blizzard Frame functions
--- Hide/show target frame
-----------------------------------------------
-function ArcHUD:HideBlizzardTarget(show)
-	self.BlizzTargetHidden = not show
-	if not show then
-		TargetFrame:UnregisterAllEvents()
-		TargetFrame:Hide()
-		
-		ComboFrame:UnregisterAllEvents()
-		ComboFrame:Hide()
-	else
-		TargetFrame:RegisterAllEvents()
-		TargetFrame_Update(TargetFrame)
-		
-		ComboFrame:RegisterAllEvents()
-		ComboFrame_Update()
-	end
-end
-
-----------------------------------------------
--- Blizzard Frame functions
--- Hide/show focus frame
-----------------------------------------------
-function ArcHUD:HideBlizzardFocus(show)
-	self.BlizzFocusHidden = not show
-	if not show then
-		FocusFrame:UnregisterAllEvents()
-		FocusFrame:Hide()
-	else
-		FocusFrame:RegisterAllEvents()
-		-- TODO: need to refresh focus frame
 	end
 end
 

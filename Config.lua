@@ -945,6 +945,23 @@ ArcHUD.configOptionsTableCore = {
 						ArcHUD:HideBlizzardFocus(v)
 					end,
 				},
+				-- Buff icon size
+				blizzSpellActOpacity = {
+					type		= "range",
+					name		= L["TEXT"]["BLIZZSPELLACT"],
+					desc		= L["TOOLTIP"]["BLIZZSPELLACT"],
+					min			= 0.2,
+					max			= 1.0,
+					step		= 0.1,
+					order		= 3,
+					get			= function ()
+						return ArcHUD.db.profile.BlizzSpellActOpacity
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.BlizzSpellActOpacity = v
+						ArcHUD:HookBlizzardSpellActivation((ArcHUD.db.profile.BlizzSpellActOpacity < 1.0))
+					end,
+				},
 			},
 		}, -- misc
 	},
