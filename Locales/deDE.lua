@@ -9,6 +9,7 @@ if not L then return end
 L["CMD_OPTS_FRAME"]		= "Optionsfenster öffnen"
 L["CMD_OPTS_MODULES"]	= "Moduloptionsfenster öffnen"
 L["CMD_OPTS_CUSTOM"]	= "Optionsfenster für benutzerdefinierte Ringe öffnen"
+L["CMD_OPTS_TOGGLE"]	= "Zeige/verstecke ArcHUD"
 L["CMD_OPTS_DEBUG"]		= "Setze Debug-Level"
 L["CMD_OPTS_DEBUG_SET"]	= "Setze Debug-Level auf '%s'"
 L["CMD_RESET"]			= "Einstellungen auf Grundeinstellung zurücksetzen"
@@ -16,6 +17,8 @@ L["CMD_RESET_HELP"]		= "Diese Option wird dir erlauben, deine Einstellungen auf 
 L["CMD_RESET_CONFIRM"]	= "Diese Option wird alle Einstellunegn auf die Grundeinstellung zurücksetzen."
 L["TEXT_RESET"]			= "Bitte Tippe CONFIRM hinter diesem Befehl ein, um zu bestätigen, dass du wirklich die Einstellungen zurücksetzen willst."
 L["TEXT_RESET_CONFIRM"]	= "Alle Einstellungen wurden auf die Grundeinstellung zurückgesetzt."
+L["TEXT_ENABLED"]       = "ArcHUD wurde aktiviert."
+L["TEXT_DISABLED"]      = "ArcHUD wurde deaktiviert."
 
 L["FONT"]				= "FRIZQT__.TTF"
 

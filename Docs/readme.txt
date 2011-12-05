@@ -5,6 +5,8 @@ ArcHUD3 1.3
 * added option to show incoming heal for health bars
 * buff icons are now resizable
 * multiple buffs per custom buff arc (separated with semicolon, precedence in order of their listing)
+* added option to change opacity of Blizzard's spell activation overlays 
+* added a toggle command (/archud toggle)
 * configuration sheets now stretched to full width
 * bug fix in target casting ring
 

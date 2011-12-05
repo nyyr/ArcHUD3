@@ -8,6 +8,7 @@ module.version = "1.0 (r"..rev..")"
 
 module.unit = "player"
 module.isHealth = true
+module.healPrediction = 0
 
 module.defaults = {
 	profile = {
@@ -33,8 +34,6 @@ module.options = {
 }
 
 module.localized = true
-
-module.healPrediction = 0
 
 ----------------------------------------------
 -- Initialize

@@ -161,7 +161,7 @@ function ArcHUD:OnInitialize()
 	
 	self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
 	
-	self:LevelDebug(d_info, "ArcHUD has been initialized.")
+	self:LevelDebug(d_notice, "ArcHUD has been initialized.")
 end
 
 ----------------------------------------------
@@ -169,6 +169,8 @@ end
 ----------------------------------------------
 function ArcHUD:OnEnable()
 	self:LevelDebug(d_notice, "Registering events")
+	
+	-- basic events
 	self:RegisterEvent("PLAYER_ENTERING_WORLD",	"EventHandler")
 
 	self:RegisterEvent("PLAYER_ENTER_COMBAT",	"CombatStatus")
@@ -201,7 +203,7 @@ function ArcHUD:OnEnable()
 	
 	self:LevelDebug(d_notice, "Triggering ring enable event")
 	self:SendMessage("ARCHUD_MODULE_ENABLE")
-	self:LevelDebug(d_info, "ArcHUD is now enabled")
+	self:LevelDebug(d_info, L["TEXT_ENABLED"])
 	
 	-- load custom buff modules (OnInitialize() is too early)
 	self:LoadCustomBuffModules()
@@ -217,12 +219,32 @@ function ArcHUD:OnDisable()
 	self:HideBlizzardPlayer(true)
 	self:HideBlizzardTarget(true)
 	self:HideBlizzardFocus(true)
+	
+	-- basic events
+	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 
+	self:UnregisterEvent("PLAYER_ENTER_COMBAT")
+	self:UnregisterEvent("PLAYER_LEAVE_COMBAT")
+	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
+	self:UnregisterEvent("PLAYER_REGEN_DISABLED")
+	self:UnregisterEvent("PET_ATTACK_START")
+	self:UnregisterEvent("PET_ATTACK_STOP")
+
+	self:UnregisterEvent("UNIT_FACTION")
+	self:UnregisterEvent("PARTY_MEMBERS_CHANGED")
+
+	self:UnregisterEvent("RAID_TARGET_UPDATE")
+
+	self:UnregisterEvent("PLAYER_FLAGS_CHANGED")
+	self:UnregisterEvent("PLAYER_UPDATE_RESTING")
+
+	self:UnregisterMessage("ARCHUD_FRAME_MOVED")
+	
 	-- Hide frame
 	ArcHUDFrame:Hide()
 
 	self.Enabled = false
-	self:LevelDebug(d_info, "ArcHUD is now disabled")
+	self:LevelDebug(d_info, L["TEXT_DISABLED"])
 end
 
 ----------------------------------------------

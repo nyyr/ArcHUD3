@@ -68,11 +68,24 @@ ArcHUD.configOptionsTableCmd = {
 				AceConfigDialog:Open("ArcHUD_CustomModules")
 			end,
 		},
+		toggle = {
+			type		= "execute",
+			name		= "toggle",
+			desc		= L["CMD_OPTS_TOGGLE"],
+			order		= 3,
+			func		= function()
+				if ArcHUDFrame:IsVisible() then
+					ArcHUDFrame:Hide()
+				else
+					ArcHUDFrame:Show()
+				end
+			end,
+		},
 		reset = {
 			type 		= "group",
 			name		= "reset",
 			desc		= L["CMD_RESET"],
-			order		= 3,
+			order		= 4,
 			args		= {
 				confirm = {
 					type	= "execute",
@@ -88,7 +101,7 @@ ArcHUD.configOptionsTableCmd = {
 			type		= "select",
 			name		= "debug",
 			desc		= L["CMD_OPTS_DEBUG"],
-			order		= 4,
+			order		= 5,
 			values		= {"off", "warn", "info", "notice"},
 			get			= function()
 				return debugLevels[ArcHUD:GetDebugLevel() or 4]

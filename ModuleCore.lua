@@ -98,9 +98,9 @@ end
 -- OnEnable
 ----------------------------------------------
 function ArcHUD.modulePrototype:OnEnable()
-	--self:Debug(d_warn, "Received enable event")
+	self:Debug(d_warn, "Received enable event")
 	if(self.db.profile.Enabled) then
-		--self:Debug(d_info, "Enabling ring")
+		self:Debug(d_info, "Enabling ring")
 		if(self.disableEvents and (not self.disableEvents.option or self.disableEvents.option and self.db.profile[self.disableEvents.option])) then
 			self:Debug(d_notice, "Disabling events:")
 			for k,v in ipairs(self.disableEvents) do
@@ -317,7 +317,9 @@ end
 -- Stop ring timers
 ----------------------------------------------
 function ArcHUD.modulePrototype:StopRingTimers()
-	self.f.fillUpdate:Stop()
+	if self.f then
+		self.f.fillUpdate:Stop()
+	end
 	self:StopTimer("CheckAlpha")
 end
 

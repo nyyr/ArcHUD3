@@ -5,6 +5,7 @@ module.version = "1.0 (r" .. rev .. ")"
 
 module.unit = "focus"
 module.isHealth = true
+module.healPrediction = 0
 
 module.defaults = {
 	profile = {
@@ -19,6 +20,7 @@ module.defaults = {
 }
 module.options = {
 	{name = "ShowPerc", text = "SHOWPERC", tooltip = "SHOWPERC"},
+	{name = "ShowIncoming", text = "INCOMINGHEALS", tooltip = "INCOMINGHEALS"},
 	hasfriendfoe = true,
 	attach = true,
 }
@@ -76,6 +78,7 @@ function module:OnModuleEnable()
 	-- Register the events we will use
 	self:RegisterEvent("UNIT_HEALTH",		"UpdateHealth")
 	self:RegisterEvent("UNIT_MAXHEALTH",	"UpdateHealth")
+	self:RegisterEvent("UNIT_HEAL_PREDICTION")
 	self:RegisterEvent("PLAYER_FOCUS_CHANGED")
 
 	-- Activate ring timers
@@ -116,6 +119,8 @@ function module:PLAYER_FOCUS_CHANGED()
 			end
 			self.f:SetValue(UnitHealth(self.unit))
 			self.HPPerc:SetText(floor((UnitHealth(self.unit) / UnitHealthMax(self.unit)) * 100).."%")
+			
+			self:UNIT_HEAL_PREDICTION(nil, self.unit)
 		end
 	end
 end
@@ -143,12 +148,43 @@ function module:UpdateHealth(event, arg1)
 				self.friend = false
 			end
 
-			self.HPPerc:SetText(floor((UnitHealth(self.unit) / UnitHealthMax(self.unit)) * 100).."%")
+			local health, maxHealth = UnitHealth(self.unit), UnitHealthMax(self.unit)
+			self.HPPerc:SetText(floor((health / maxHealth) * 100).."%")
 			if (event == "UNIT_MAXHEALTH") then
-				self.f:SetMax(UnitHealthMax(self.unit))
+				self.f:SetMax(maxHealth)
 			else
-				self.f:SetValue(UnitHealth(self.unit))
+				self.f:SetValue(health)
 			end
+			
+			if self.healPrediction > 0 then
+				local ih = self.healPrediction
+				if health + ih >= maxHealth then
+					ih = maxHealth - health - 1 -- spark will be hidden if <= 0 or >= max
+				end
+				self.f:SetSpark(health + ih)
+			end
+		end
+	end
+end
+
+----------------------------------------------
+-- UNIT_HEALTH_PREDICTION
+----------------------------------------------
+function module:UNIT_HEAL_PREDICTION(event, arg1)
+	if self.db.profile.ShowIncoming and (arg1 == self.unit) then
+		local ih = UnitGetIncomingHeals(self.unit)
+		--self:Debug(1, "ih: %s", tostring(ih))
+		if (not ih) or (ih == 0) then
+			self.healPrediction = 0
+			self.f:SetSpark(0) -- hide
+		else
+			self.healPrediction = ih
+			local health, maxHealth = self.f.endValue, self.f.maxValue
+			if health + ih >= maxHealth then
+				ih = maxHealth - health - 1 -- spark will be hidden if <= 0 or >= max
+			end
+			--self:Debug(1, "spark: %s", tostring(health+ih))
+			self.f:SetSpark(health + ih)
 		end
 	end
 end

@@ -6,6 +6,7 @@ local L = LibStub("AceLocale-3.0"):NewLocale("ArcHUD_Core", "enUS", true)
 L["CMD_OPTS_FRAME"]		= "Open options window"
 L["CMD_OPTS_MODULES"]	= "Open module options window"
 L["CMD_OPTS_CUSTOM"]	= "Open custom module options window"
+L["CMD_OPTS_TOGGLE"]	= "Toggle visibility of ArcHUD"
 L["CMD_OPTS_DEBUG"]		= "Set debugging level"
 L["CMD_OPTS_DEBUG_SET"]	= "Setting debugging level to '%s'"
 L["CMD_RESET"]			= "Reset settings for this character to the defaults"
@@ -13,6 +14,8 @@ L["CMD_RESET_HELP"]		= "This option will allow you to do two things, firstly you
 L["CMD_RESET_CONFIRM"]	= "This option will reset all of your options to the default values they had when the AddOn was installed"
 L["TEXT_RESET"]			= "Please type CONFIRM after this command to confirm you really do wish to reset your settings"
 L["TEXT_RESET_CONFIRM"]	= "All settings have been reset to their defaults"
+L["TEXT_ENABLED"]       = "ArcHUD is now enabled."
+L["TEXT_DISABLED"]      = "ArcHUD is now disabled."
 
 L["FONT"]				= "FRIZQT__.TTF"
 
