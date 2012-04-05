@@ -16,11 +16,13 @@ module.defaults = {
 		ColorFoe = {r = 1, g = 0, b = 0},
 		Side = 1,
 		Level = 1,
+		Attach = true, -- if false, do not attach to default anchors, attach to UF instead
 	}
 }
 module.options = {
 	{name = "ShowPerc", text = "SHOWPERC", tooltip = "SHOWPERC"},
 	{name = "ShowIncoming", text = "INCOMINGHEALS", tooltip = "INCOMINGHEALS"},
+	--{name = "Attach", text = "ATTACHRING", tooltip = "ATTACHRING"},
 	hasfriendfoe = true,
 	attach = true,
 }
@@ -44,6 +46,40 @@ function module:OnModuleUpdate()
 		self.HPPerc:Hide()
 	end
 
+	if (self.db.profile.Attach) then
+		self.f:SetScale(1)
+		--fontName, _, fontFlags = self.HPPerc:GetFont()
+		--self.HPPerc:SetFont(fontName, 11, fontFlags)
+
+		--self.HPPerc:SetWidth(40)
+		--self.HPPerc:SetHeight(12)
+
+		--self.HPPerc:ClearAllPoints()
+		--if (self.db.profile.Side == 1) then
+			-- Attach to left side
+			--self.HPPerc:SetPoint("TOPLEFT", self.f, "BOTTOMLEFT", -100, -115)
+		--else
+			-- Attach to right side
+			--self.HPPerc:SetPoint("TOPLEFT", self.f, "BOTTOMLEFT", 50, -115)
+		--end
+	else
+		self.f:SetScale(0.4)
+		self.f.BG:SetReversed(false)
+		self.f.BG:SetAngle(180)
+
+		self.f:SetReversed(false)
+		self.f:ClearAllPoints()
+		self.f:SetPoint("TOPLEFT", self.parent.UnitFrames[self.unit], "TOPLEFT", 120, 80)
+
+		--self.HPPerc:SetWidth(100)
+		--self.HPPerc:SetHeight(17)
+
+		--self.HPPerc:ClearAllPoints()
+		--self.HPPerc:SetPoint("BOTTOMLEFT", self.f, "BOTTOMLEFT", -165, -125)
+		--fontName, _, fontFlags = self.HPPerc:GetFont()
+		--self.HPPerc:SetFont(fontName, 16, fontFlags)
+	end
+	
 	-- Clear all points for the percentage display
 	self.HPPerc:ClearAllPoints()
 	if(self.db.profile.Side == 1) then

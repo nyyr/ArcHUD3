@@ -124,21 +124,30 @@ ArcHUD.configOptionsTableCmd = {
 			func		= function()
 				ArcHUD:TimersPrintPerf()
 			end,
-		},
+		},]]
 		test = {
 			type		= "execute",
 			name		= "test",
 			desc		= "Internal testing of some functions (developers only!)",
 			order		= 11,
 			func		= function()
-				ArcHUD:LoadCustomBuffModules()
-				-- if (not testSwitch) then
-				-- else
-				-- end
-				-- testSwitch = not testSwitch
+				if ArcHUD.UnitFrames then
+					if (not testSwitch) then
+						if not (ArcHUD.UnitFrames["target"]) then
+							ArcHUD:UF_Create("target")
+						end
+						for k,v in pairs(ArcHUD.UnitFrames) do
+							v:Show()
+						end
+					else
+						for k,v in pairs(ArcHUD.UnitFrames) do
+							v:Hide()
+						end
+					end
+					testSwitch = not testSwitch
+				end
 			end,
 		},
-]]
 	},
 }
 
