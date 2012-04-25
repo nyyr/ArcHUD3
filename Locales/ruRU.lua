@@ -83,6 +83,7 @@ L["TEXT"] = {
 	BLIZZPLAYER = "Blizzard фрейм игрока",
 	BLIZZTARGET = "Blizzard фрейм цели",
 	BLIZZFOCUS  = "Blizzard фрейм фокуса",
+	BLIZZSPELLACT= "Opacity of spell activation overlays",
 
 	RINGS		= "Опции дуги",
 	RING		= "Дуга",
@@ -146,6 +147,7 @@ L["TOOLTIP"] = {
 	BLIZZPLAYER = "Вкл/Выкл отображение Blizzardского фрейма игрока",
 	BLIZZTARGET = "Вкл/Выкл отображение Blizzardского фрейма цели",
 	BLIZZFOCUS  = "Вкл/Выкл отображение Blizzardского фрейма фокуса",
+	BLIZZSPELLACT= "Sets opacity of Blizzard's spell activation overlays.",
 
 }
 
@@ -165,6 +167,7 @@ LM["PetPower"]		= "Энергия питомца"
 LM["TargetCasting"]	= "Применение цели"
 LM["TargetHealth"]	= "Здоровье цели"
 LM["TargetPower"]	= "Энергия цели"
+LM["FocusCasting"]	= "Focus Casting"
 LM["FocusHealth"]	= "Здоровье фокуса"
 LM["FocusPower"]	= "Энергия фокуса"
 LM["Casting"]		= "Применение"
