@@ -1,7 +1,7 @@
 local moduleName = "Casting"
 local module = ArcHUD:NewModule(moduleName)
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "1.1 (r"..rev..")"
+module.version = "1.4 (r"..rev..")"
 
 module.unit = "player"
 module.noAutoAlpha = true
@@ -41,14 +41,12 @@ function module:Initialize()
 
 	self.Text = self:CreateFontString(self.f, "BACKGROUND", {175, 14}, 10, "LEFT", {1.0, 1.0, 1.0}, {"TOP", "ArcHUDFrameCombo", "BOTTOM", 0, -14})
 	self.Time = self:CreateFontString(self.f, "BACKGROUND", {40, 14}, 10, "RIGHT", {1.0, 1.0, 1.0}, {"TOPLEFT", self.Text, "TOPRIGHT", -56, 0})
-
-	-- Register timers
-	--self.parent:RegisterMetro(self.name .. "CheckTaxi", self.CheckTaxi, 0.1, self)
 	
 	self:CreateStandardModuleOptions(15)
 	
 	self.f.casting = 0
 	self.channeling = 0
+	self.spellstart = GetTime()*1000
 end
 
 function module:OnModuleUpdate()
@@ -64,17 +62,13 @@ function module:OnModuleUpdate()
 		self.Time:Hide()
 	end
 	
-	-- rest latency indicator
+	-- reset latency indicator
 	self.f:SetSpark(-1, true)
 end
 
 local function Player_Casting(frame, elapsed)
 	self = frame.module
-	if ( self.spellstart == nil ) then
-		self.spellstart = GetTime()*1000
-	end
-
-	if ( self.f.casting == 1) then
+	if (self.f.casting == 1) then
 		local status = (GetTime()*1000 - self.spellstart)
 		local time_remaining = self.f.maxValue - status
 
@@ -139,17 +133,15 @@ function module:OnModuleEnable()
 end
 
 function module:UNIT_SPELLCAST_START(event, arg1)
-	if(arg1 == self.unit) then
+	if (arg1 == self.unit) then
 		local spell, rank, displayName, icon, startTime, endTime = UnitCastingInfo(self.unit)
 		if (spell) then
 			self.f:UpdateColor({["r"] = 1.0, ["g"] = 0.7, ["b"] = 0})
 			self.Text:SetText(displayName)
-			self.startValue = 0
-			self.f:SetMax(endTime - startTime)
-			self.f.casting = 1
 			self.channeling = 0
+			self.f.casting = 1
+			self.f:SetMax(endTime - startTime)
 			self.spellstart = startTime
-			self.stopSet = false
 			if(ArcHUD.db.profile.FadeIC > ArcHUD.db.profile.FadeOOC) then
 				self.f:SetRingAlpha(ArcHUD.db.profile.FadeIC)
 			else
@@ -180,11 +172,10 @@ function module:UNIT_SPELLCAST_CHANNEL_START(event, arg1)
 		if (spell) then
 			self.f:UpdateColor({["r"] = 0.3, ["g"] = 0.3, ["b"] = 1.0})
 			self.Text:SetText(displayName)
-			self.startValue = 0
-			self.f:SetMax(endTime - startTime)
-			self.f:SetValue(endTime - startTime)
 			self.channeling = 1
 			self.f.casting = 1
+			self.f:SetMax(endTime - startTime)
+			self.f:SetValue(endTime - startTime)
 			self.spellstart = startTime
 			if(ArcHUD.db.profile.FadeIC > ArcHUD.db.profile.FadeOOC) then
 				self.f:SetRingAlpha(ArcHUD.db.profile.FadeIC)

@@ -217,7 +217,6 @@ end
 --  angle - The angle in degrees (0 <= angle <= 180)
 -----------------------------------------------------------
 function ArcHUDRingTemplate:SetAngle(angle)
-
 	-- Bounds checking on the angle so that it's between 0 and 180 (inclusive)
 	if (angle < 0) then
 		angle = 0
@@ -227,10 +226,10 @@ function ArcHUDRingTemplate:SetAngle(angle)
 	end
 
 	-- Avoid duplicate work
-	if (self.angle == angle and not self.dirty) then
+	if ((self.angle == angle) and not self.dirty) then
 		return
 	end
-
+	
 	-- Determine the quadrant, and angle within the quadrant
 	-- (Quadrant 5 means 'all quadrants filled')
 	local quad = math.floor(angle / 90) + 1
@@ -245,7 +244,7 @@ function ArcHUDRingTemplate:SetAngle(angle)
 
 	-- Check to see if we've changed quandrants since the last time we were
 	-- called. Quadrant changes re-configure some textures.
-	if (quad ~= self.lastQuad or self.dirty) then
+	if ((quad ~= self.lastQuad) or self.dirty) then
 		-- Loop through all quadrants
 		for i=1,2 do
 			T=self.quadrants[i]
@@ -293,7 +292,7 @@ function ArcHUDRingTemplate:SetAngle(angle)
 
 	-- Remember the angle for next time
 	self.angle = angle
-
+	
 	-- Extra bounds check for paranoia (also handles quad 5 case)
 	if ((quad < 1) or (quad > 2)) then
 	   return
@@ -383,6 +382,13 @@ end
 -----------------------------------------------------------
 function ArcHUDRingTemplate:SetMax(max)
 	if max == nil then max = 1 end
+	if max < 0 then max = 0 end
+	if (self.startValue > max) then
+		self.startValue = max
+	end
+	if (self.endValue > max) then
+		self.endValue = max
+	end
 	self.maxValue = max
 end
 
@@ -391,8 +397,11 @@ end
 -----------------------------------------------------------
 function ArcHUDRingTemplate:SetValue(value)
 	if value == nil then value = 0 end
-	if value == 0 then
-		value = self.maxValue / 10000
+	if value > self.maxValue then
+		value = self.maxValue
+	end
+	if value <= 0 then
+		value = self.maxValue / 10000 -- "small", not 0
 	end
 	if self.casting == 1 then
 		self.startValue = value
@@ -736,7 +745,7 @@ function ArcHUDRingTemplate:OnLoad(frame)
 
 	frame.startValue = 0
 	frame.endValue = 0
-	frame.maxValue = 0
+	frame.maxValue = 1
 	frame.fadeTime = 0
 	frame.maxFadeTime = 1
 	frame.alphaState = -1

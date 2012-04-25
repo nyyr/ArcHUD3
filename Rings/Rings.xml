@@ -13,6 +13,7 @@
 <Script file="MirrorTimer.lua" />
 <Script file="FocusHealth.lua" />
 <Script file="FocusPower.lua" />
+<Script file="FocusCasting.lua" />
 <Script file="HolyPower.lua" />
 <Script file="SoulShards.lua" />
 <Script file="CustomBuff.lua" />
