@@ -226,6 +226,7 @@ LM["TEXT"] = {
 	CUSTSTACKS	= "Исп. устройство",
 	CUSTTEXTSTACKS = "Вид устройства",
 	CUSTMAX		= "Сумма",
+	CUSTMAXVALIDATE= "Maximum value must be >= 1.",
 	CUSTDEL		= "Удалить",
 }
 
@@ -271,7 +272,7 @@ LM["TOOLTIP"] = {
 	CUSTCASTBYPLAYER = "Показать только если (де)бафф произнесен вами",
 	CUSTSTACKS	= "Use stack applications instead of remaining time for the arc",
 	CUSTTEXTSTACKS = "Display stack applications as text instead of remaining time",
-	CUSTMAX		= "Максимальный размер суммы (де)бафа",
+	CUSTMAX		= "Максимальный размер суммы (де)бафа. If duration is displayed, a value of '1' means that the initial (de)buff duration is used instead of the value given here.",
 	CUSTDEL		= "Удалить эту пользовательскую дугу",
 }
 

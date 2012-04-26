@@ -242,7 +242,8 @@ LM["TEXT"] = {
 	CUSTCASTBYPLAYER = "Zeige nur eigene (De)Buffs",
 	CUSTSTACKS	= "Benutze Stapelgröße",
 	CUSTTEXTSTACKS = "Zeige Stapelgröße als Text",
-	CUSTMAX		= "Maximale Stapelgröße",
+	CUSTMAX		= "Maximale Größe",
+	CUSTMAXVALIDATE= "Die maximale Größe muss >= 1 sein.",
 	CUSTDEL		= "Löschen",
 }
 
@@ -289,7 +290,7 @@ LM["TOOLTIP"] = {
 	CUSTCASTBYPLAYER = "Nur anzeigen, wenn (De)Buff vom Spieler gewirkt wird",
 	CUSTSTACKS	= "Benutze Stapelgröße für den Ring anstelle der verbleibenden Zeit",
 	CUSTTEXTSTACKS = "Zeige Stapelgröße als Text an anstelle der verbleibenden Zeit",
-	CUSTMAX		= "Maximale Stapelgröße des (De)Buff",
+	CUSTMAX		= "Maximale Stapelgröße bzw. Dauer des (De)Buff. Wenn die (De)Buff-Dauer angezeigt wird, bedeutet ein Wert von '1', dass die initiale (De)Buff-Dauer als Maximalwert verwendet wird.",
 	CUSTDEL		= "Löscht diesen benutzerdefinierten Ring unwiderruflich",
 }
 

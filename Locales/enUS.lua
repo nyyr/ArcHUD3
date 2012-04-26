@@ -242,7 +242,8 @@ LM["TEXT"] = {
 	CUSTCASTBYPLAYER = "Show only your (de)buff",
 	CUSTSTACKS	= "Use stack applications",
 	CUSTTEXTSTACKS = "Display stack applications",
-	CUSTMAX		= "Stack size",
+	CUSTMAX		= "Maximum size",
+	CUSTMAXVALIDATE= "Maximum value must be >= 1.",
 	CUSTDEL		= "Delete",
 }
 
@@ -289,7 +290,7 @@ LM["TOOLTIP"] = {
 	CUSTCASTBYPLAYER = "Show only if (de)buff is cast by you",
 	CUSTSTACKS	= "Use stack applications instead of remaining time for the arc",
 	CUSTTEXTSTACKS = "Display stack applications as text instead of remaining time",
-	CUSTMAX		= "Maximum stack size of the (de)buff",
+	CUSTMAX		= "Maximum stack size or duration of the (de)buff. If duration is displayed, a value of '1' means that the initial (de)buff duration is used instead of the value given here.",
 	CUSTDEL		= "Delete this custom arc",
 }
 

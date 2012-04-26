@@ -181,8 +181,16 @@ function CustomBuffRingTemplate:UpdateBuff()
 			
 		elseif (duration) then
 			if (not self.f.casting) then self.f.casting = 1 end
-			if (math.floor(self.f.maxValue) ~= math.floor(duration*1000)) then
-				self.f:SetMax(duration*1000)
+			if (self.db.profile.MaxCount > 1) then
+				local m = self.db.profile.MaxCount*1000
+				if (self.f.maxValue ~= m) then
+					self.f:SetMax(m)
+				end
+			else
+				local m = duration*1000
+				if (math.floor(self.f.maxValue) ~= math.floor(m)) then
+					self.f:SetMax(m)
+				end
 			end
 			local t = GetTime()
 			if (expirationTime > t) then
@@ -367,20 +375,23 @@ function CustomBuffRingTemplate:AppendCustomModuleOptions()
 	}
 	
 	self.optionsTable.args.MaxCount = {
-		type		= "range",
+		type		= "input",
 		name		= LM["TEXT"]["CUSTMAX"],
 		desc		= LM["TOOLTIP"]["CUSTMAX"],
-		min			= 1,
-		max			= 40,
-		step		= 1,
 		order		= 7,
-		get			= function ()
-			return self.db.profile.MaxCount
+		get			= function (info)
+			return tostring(self.db.profile.MaxCount)
 		end,
 		set			= function (info, v)
-			self.db.profile.MaxCount = v
-			self.f:SetMax(v)
-			self:OnModuleUpdate()
+			v = tonumber(v)
+			if (not v) or v < 1 then
+				return ArcHUD:Printf(LM["TEXT"]["CUSTMAXVALIDATE"])
+			else
+				v = math.floor(v)
+				self.db.profile.MaxCount = v
+				self.f:SetMax(v)
+				self:OnModuleUpdate()
+			end
 		end,
 	}
 	
