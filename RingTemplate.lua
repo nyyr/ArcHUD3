@@ -382,7 +382,7 @@ end
 -----------------------------------------------------------
 function ArcHUDRingTemplate:SetMax(max)
 	if max == nil then max = 1 end
-	if max < 0 then max = 0 end
+	if max <= 0 then max = 1 end
 	if (self.startValue > max) then
 		self.startValue = max
 	end

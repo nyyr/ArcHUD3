@@ -327,16 +327,6 @@ end
 -- color_switch
 ----------------------------------------------
 local color_switch = {
-	-- friendfoe = {
-		-- [1] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.ColorFriend or self.db.profile.ColorFriend) end,
-		-- [2] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.ColorFoe or self.db.profile.ColorFoe) end,
-	-- },
-	-- manabar = {
-		-- [0] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.ColorMana or self.db.profile.ColorMana) end,
-		-- [1] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.ColorRage or self.db.profile.ColorRage) end,
-		-- [2] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.ColorFocus or self.db.profile.ColorFocus) end,
-		-- [3] = function(self) self.f:UpdateColor(self.ColorMode == "default" and self.defaults.profile.ColorEnergy or self.db.profile.ColorEnergy) end,
-	-- }
 	friendfoe = {
 		[1] = function(self) return self.db.profile.ColorFriend end,
 		[2] = function(self) return self.db.profile.ColorFoe end,
@@ -368,6 +358,8 @@ function ArcHUD.modulePrototype:UpdateColor(color)
 			-- Mana / Rage / Focus / Energy / Runic = 0 / 1 / 2 / 3 / 6
 			if(color_switch.manabar[color]) then
 				self.f:UpdateColor(color_switch.manabar[color](self))
+			elseif(PowerBarColor[color]) then
+				self.f:UpdateColor(PowerBarColor[color])
 			end
 		end
 	else
@@ -380,7 +372,11 @@ end
 -- Return power bar color
 ----------------------------------------------
 function ArcHUD.modulePrototype:GetPowerBarColor(powerType)
-	return color_switch.manabar[powerType](self)
+	if (color_switch.manabar[powerType]) then
+		return color_switch.manabar[powerType](self)
+	else
+		return PowerBarColor[powerType]
+	end
 end
 
 ----------------------------------------------
@@ -389,8 +385,10 @@ end
 function ArcHUD.modulePrototype:GetPowerBarColorText(powerType)
 	if (powerType == 0) then
 		return { r = 0.00, g = 1.00, b = 1.00 }
-	else
+	elseif (color_switch.manabar[powerType]) then
 		return color_switch.manabar[powerType](self)
+	else
+		return PowerBarColor[powerType]
 	end
 end
 

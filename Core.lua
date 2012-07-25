@@ -9,8 +9,8 @@ ArcHUD = LibStub("AceAddon-3.0"):NewAddon("ArcHUD",
 
 -- Version
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-ArcHUD.version = "1.4 (r"..rev..")"
-ArcHUD.codename = "Maximum Focus"
+ArcHUD.version = "2.0 (r"..rev..")"
+ArcHUD.codename = "Dizzying Haze"
 ArcHUD.authors = "nyyr, Nenie"
 
 -- Locale object
@@ -95,7 +95,8 @@ ArcHUD.ClassColor = {
 	["ROGUE"] =		"FFF569",
 	["HUNTER"] =	"ABD473",
 	["WARRIOR"] =	"C79C6E",
-	["DEATHKNIGHT"] = "C41F3B"
+	["DEATHKNIGHT"] = "C41F3B",
+	["MONK"] = 		"00FF96"
 }
 
 -- Reputation colors
@@ -181,7 +182,7 @@ function ArcHUD:OnEnable()
 	self:RegisterEvent("PET_ATTACK_STOP",		"CombatStatus")
 
 	self:RegisterEvent("UNIT_FACTION",			"UpdateFaction")
-	self:RegisterEvent("PARTY_MEMBERS_CHANGED",	"UpdateFaction")
+	self:RegisterEvent("GROUP_ROSTER_UPDATE",	"UpdateFaction")
 
 	self:RegisterEvent("RAID_TARGET_UPDATE",	"UpdateRaidTargetIcon")
 
@@ -784,7 +785,7 @@ function ArcHUD:PLAYER_FLAGS_CHANGED(unit)
 	if(not UnitExists("target")) then self.TargetHUD.LeaderIcon:Hide() return end
 
 	if(unit == "target") then
-		if(UnitIsPartyLeader("target")) then
+		if(UnitIsGroupLeader("target")) then
 			self.TargetHUD.LeaderIcon:Show()
 		else
 			self.TargetHUD.LeaderIcon:Hide()

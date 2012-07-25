@@ -26,7 +26,8 @@ function module:Initialize()
 	self.f = self:CreateRing(true, ArcHUDFrame)
 	self.f:SetAlpha(0)
 	
-	self.f:SetMax(SHARD_BAR_NUM_SHARDS)
+	local maxShards = UnitPowerMax(self.unit, SPELL_POWER_SOUL_SHARDS);
+	self.f:SetMax(maxShards)
 	self.f:SetValue(0)
 	
 	self:CreateStandardModuleOptions(45)
@@ -66,10 +67,11 @@ end
 function module:UpdateShards()
 	local num = UnitPower(self.unit, SPELL_POWER_SOUL_SHARDS)
 	self.f:SetValue(num)
+
+	local maxShards = UnitPowerMax(self.unit, SPELL_POWER_SOUL_SHARDS);	
+	self.f:SetMax(maxShards)
 	
-	ArcHUD:LevelDebug(3, "Soul shards: "..num.."/"..SHARD_BAR_NUM_SHARDS)
-	
-	if(num < SHARD_BAR_NUM_SHARDS and num >= 0) then
+	if (num < maxShards and num >= 0) then
 		self.f:StopPulse()
 		self.f:UpdateColor(self.db.profile.Color)
 	else
@@ -80,7 +82,7 @@ function module:UpdateShards()
 		end
 	end
 	
-	if(num > 0) then
+	if (num > 0) then
 		if(ArcHUD.db.profile.FadeIC > ArcHUD.db.profile.FadeOOC) then
 			self.f:SetRingAlpha(ArcHUD.db.profile.FadeIC)
 		else
