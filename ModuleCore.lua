@@ -88,7 +88,7 @@ function ArcHUD.modulePrototype:OnInitialize()
 	
 	-- Check for necessary alpha updates
 	if (not self.noAutoAlpha) then
-		self:RegisterTimer("CheckAlpha", ArcHUDRingTemplate.CheckAlpha, 0.1, self, true)
+		self:RegisterTimer("CheckAlpha", ArcHUD.modulePrototype.CheckAlpha, 0.1, self, true)
 	end
 	
 	self:Debug(d_info, "Ring loaded")
@@ -98,9 +98,7 @@ end
 -- OnEnable
 ----------------------------------------------
 function ArcHUD.modulePrototype:OnEnable()
-	self:Debug(d_warn, "Received enable event")
 	if(self.db.profile.Enabled) then
-		self:Debug(d_info, "Enabling ring")
 		if(self.disableEvents and (not self.disableEvents.option or self.disableEvents.option and self.db.profile[self.disableEvents.option])) then
 			self:Debug(d_notice, "Disabling events:")
 			for k,v in ipairs(self.disableEvents) do
@@ -129,7 +127,7 @@ function ArcHUD.modulePrototype:OnEnable()
 		self:RegisterMessage("ARCHUD_MODULE_UPDATE")
 		self:Debug(d_info, "Ring enabled")
 	else
-		self:Debug(d_info, "Ring disabled as per user setting")
+		self:Debug(d_notice, "Ring disabled as per user setting")
 		self:Disable()
 	end
 end
@@ -299,6 +297,83 @@ function ArcHUD.modulePrototype:CreateTexture(parent, layer, size, texture, poin
 	t:Show()
 
 	return t
+end
+
+-----------------------------------------------------------
+-- Trigger update of alpha value (e.g. on entering combat)
+-----------------------------------------------------------
+function ArcHUD.modulePrototype:CheckAlpha()
+	if (self.noAutoAlpha) then
+		self:Debug(1, "CheckAlpha(): noAutoAlpha, but CheckAlpha timer started!")
+		return
+	end
+
+	local AH_profile = self.parent.db.profile
+	local isInCombat = false
+	local me = self:GetName()
+	local unit = frame.unit or self.unit or "player"
+
+	if (unit == "pet") then
+		isInCombat = self.parent.PetIsInCombat
+	else
+		isInCombat = self.parent.PlayerIsInCombat
+	end
+
+	-- 1: Fade out when rings are full, regardless of combat status
+	-- 2: Always fade out when out of combat, regardless of ring status
+	-- 3: Fade out when out of combat or rings are full (default)
+	local RingVisibility = self.db.profile.RingVisibility -- ring config
+	if (RingVisibility == nil) then
+		RingVisibility = AH_profile.RingVisibility -- global config
+	end
+	if (RingVisibility == 1 or RingVisibility == 3) then
+		if (RingVisibility == 3 and isInCombat) then
+			if (not UnitExists(unit)) or (self.isPower and (UnitIsDead(unit) or self.f.maxValue == 0)) then
+				self.f:SetRingAlpha(0)
+			elseif (self.isHealth and UnitIsDead(unit)) then
+				self.f:SetRingAlpha(AH_profile.FadeFull)
+			else
+				self.f:SetRingAlpha(AH_profile.FadeIC)
+			end
+		else
+			local powerTypeId, _ = UnitPowerType(unit)
+			-- powerTypeId: 1 = rage, 6 = runic_power
+			if (self.isPower and unit ~= "pet" and (powerTypeId == 1 or powerTypeId == 6) and self.f.maxValue > 0) then
+				if(math.floor(self.f.startValue) > 0 or math.floor(self.f.startValue) ~= math.floor(self.f.endValue)) then
+					self.f:SetRingAlpha(AH_profile.FadeOOC)
+				elseif(math.floor(self.f.startValue) == 0) then
+					self.f:SetRingAlpha(AH_profile.FadeFull)
+				end
+			else
+				if (not UnitExists(unit)) or (self.isPower and (UnitIsDead(unit) or self.f.maxValue == 0)) then
+					self.f:SetRingAlpha(0)
+				elseif (self.isHealth and UnitIsDead(unit)) then
+					self.f:SetRingAlpha(AH_profile.FadeFull)
+				else
+					if(self.f.startValue < self.f.maxValue or math.floor(self.f.startValue) ~= math.floor(self.f.endValue)) then
+						self.f:SetRingAlpha(AH_profile.FadeOOC)
+					elseif(self.f.startValue == self.f.maxValue) then
+						self.f:SetRingAlpha(AH_profile.FadeFull)
+					end
+				end
+			end
+		end
+
+	elseif (RingVisibility == 2) then
+	
+		if ((not UnitExists(unit)) or (self.isPower and (UnitIsDead(unit) or self.f.maxValue == 0))) then
+			self.f:SetRingAlpha(0)
+		elseif (self.isHealth and UnitIsDead(unit)) then
+			self.f:SetRingAlpha(AH_profile.FadeFull)
+		else
+			if(isInCombat) then
+				self.f:SetRingAlpha(AH_profile.FadeIC)
+			else
+				self.f:SetRingAlpha(AH_profile.FadeFull)
+			end
+		end
+		
+	end
 end
 
 ----------------------------------------------

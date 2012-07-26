@@ -31,5 +31,8 @@ Config.lua
 # Rings
 Rings\Rings.xml
 
+# Extensions
+#Extensions\Extensions.xml
+
 # Unit frames
 #UnitFrames\UnitFrames.xml

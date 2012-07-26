@@ -206,6 +206,10 @@ function ArcHUD:OnEnable()
 	self:SendMessage("ARCHUD_MODULE_ENABLE")
 	self:LevelDebug(d_info, L["TEXT_ENABLED"])
 	
+	if (AH_RuneFrame) then
+		AH_RuneFrame:Show()
+	end
+	
 	-- load custom buff modules (OnInitialize() is too early)
 	self:LoadCustomBuffModules()
 end
