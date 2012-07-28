@@ -1,4 +1,4 @@
-local module = ArcHUD:NewModule("HolyPower")
+local module = ArcHUD:NewModule("Chi")
 local _, _, rev = string.find("$Rev: 24 $", "([0-9]+)")
 module.version = "2.0 (r" .. rev .. ")"
 
@@ -12,12 +12,12 @@ module.defaults = {
 		Flash = true,
 		Side = 2,
 		Level = 1,
-		Color = {r = 1, g = 1, b = 0.5},
+		Color = {r = 0.7, g = 1, b = 0.9},
 		RingVisibility = 2, -- always fade out when out of combat, regardless of ring status
 	}
 }
 module.options = {
-	{name = "Flash", text = "FLASH_HP", tooltip = "FLASH_HP"},
+	{name = "Flash", text = "FLASH", tooltip = "FLASH"},
 	attach = true,
 }
 module.localized = true
@@ -27,9 +27,8 @@ function module:Initialize()
 	self.f = self:CreateRing(true, ArcHUDFrame)
 	self.f:SetAlpha(0)
 	
-	-- includes "banks"
-	local maxHolyPower = UnitPowerMax(self.unit, SPELL_POWER_HOLY_POWER);
-	self.f:SetMax(maxHolyPower)
+	local maxChi = UnitPowerMax(self.unit, SPELL_POWER_LIGHT_FORCE);
+	self.f:SetMax(maxChi)
 	self.f:SetValue(0)
 	
 	self:CreateStandardModuleOptions(55)
@@ -42,13 +41,13 @@ end
 
 function module:OnModuleEnable()
 	local _, class = UnitClass("player")
-	if (class ~= "PALADIN") then return end
+	if (class ~= "MONK") then return end
 
 	self.f.dirty = true
 	self.f.fadeIn = 0.25
 
 	self.f:UpdateColor(self.db.profile.Color)
-	self.f:SetValue(UnitPower(self.unit, SPELL_POWER_HOLY_POWER))
+	self.f:SetValue(UnitPower(self.unit, SPELL_POWER_LIGHT_FORCE))
 
 	-- Register the events we will use
 	self:RegisterEvent("UNIT_POWER_FREQUENT",	"UpdatePower")
@@ -61,17 +60,17 @@ function module:OnModuleEnable()
 	self.f:Show()
 end
 
-function module:UpdateHolyPower()
-	local maxHolyPower = UnitPowerMax(self.unit, SPELL_POWER_HOLY_POWER);
-	local num = UnitPower(self.unit, SPELL_POWER_HOLY_POWER)
-	self.f:SetMax(maxHolyPower)
+function module:UpdateChi()
+	local maxChi = UnitPowerMax(self.unit, SPELL_POWER_LIGHT_FORCE)
+	local num = UnitPower(self.unit, SPELL_POWER_LIGHT_FORCE)
+	self.f:SetMax(maxChi)
 	self.f:SetValue(num)
 	
-	if(num < HOLY_POWER_FULL and num >= 0) then
+	if(num < maxChi and num >= 0) then
 		self.f:StopPulse()
 		self.f:UpdateColor(self.db.profile.Color)
 	else
-		if(self.Flash and num >= HOLY_POWER_FULL) then
+		if(self.Flash) then
 			self.f:StartPulse()
 		else
 			self.f:StopPulse()
@@ -93,10 +92,10 @@ end
 
 function module:UpdatePower(event, arg1, arg2)
 	if (event == "UNIT_POWER_FREQUENT") then
-		if (arg1 == self.unit and arg2 == "HOLY_POWER") then
-			self:UpdateHolyPower()
+		if (arg1 == self.unit and (arg2 == "LIGHT_FORCE" or arg2 == "DARK_FORCE")) then
+			self:UpdateChi()
 		end
 	else
-		self:UpdateHolyPower()
+		self:UpdateChi()
 	end
 end

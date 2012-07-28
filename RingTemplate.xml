@@ -12,20 +12,6 @@
 			<Texture name="$parentQ2"    parentKey="ringQuadrant2" file="Interface\Addons\ArcHUD3\Icons\Ring.tga"></Texture>
 			<Texture name="$parentChip"  parentKey="chip"          file="Interface\Addons\ArcHUD3\Icons\Ring.tga"></Texture>
 			<Texture name="$parentSlice" parentKey="slice"         file="Interface\Addons\ArcHUD3\Icons\Slice.tga"></Texture>
-<!--
-			<Texture name="$parentHalfRing"    parentKey="HalfRing" file="Interface\Addons\ArcHUD3\Icons\HalfRing.tga">
-				<Size>
-					<AbsDimension x="128" y="256"/>
-				</Size>
-				<Anchors>
-					<Anchor point="CENTER">
-						<Offset>
-							<AbsDimension x="0" y="-128"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Texture>
--->
 		</Layer>
 		<Layer level="OVERLAY">
 			<Texture name="$parentSpark" parentKey="spark"         file="Interface\CastingBar\UI-CastingBar-Spark.blp" alphaMode="ADD"></Texture>

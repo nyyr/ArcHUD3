@@ -41,7 +41,7 @@ function module:Initialize()
 	self.Text[2] = self:CreateFontString(self.f, "BACKGROUND", {140, 16}, 14, "CENTER", {1.0, 1.0, 1.0}, {"TOPLEFT", self.Text[1], "BOTTOMLEFT", 0, 0})
 	self.Text[3] = self:CreateFontString(self.f, "BACKGROUND", {140, 16}, 14, "CENTER", {1.0, 1.0, 1.0}, {"TOPLEFT", self.Text[2], "BOTTOMLEFT", 0, 0})
 	
-	self:CreateStandardModuleOptions(50)
+	self:CreateStandardModuleOptions(45)
 end
 
 function module:OnModuleUpdate()

@@ -311,7 +311,7 @@ function ArcHUD.modulePrototype:CheckAlpha()
 	local AH_profile = self.parent.db.profile
 	local isInCombat = false
 	local me = self:GetName()
-	local unit = frame.unit or self.unit or "player"
+	local unit = self.unit or "player"
 
 	if (unit == "pet") then
 		isInCombat = self.parent.PetIsInCombat

@@ -11,7 +11,7 @@ module.defaults = {
 		Outline = true,
 		Flash = true,
 		Side = 2,
-		Level = 2,
+		Level = 1,
 		Color = {r = 1, g = 0, b = 0},
 	}
 }
@@ -32,7 +32,7 @@ function module:Initialize()
 	-- Override Update timer
 	self:RegisterTimer("RemoveOldCP", self.RemoveOldCP, self.parent.db.profile.OldComboPointsDecay, self)
 	
-	self:CreateStandardModuleOptions(45)
+	self:CreateStandardModuleOptions(50)
 end
 
 function module:OnModuleUpdate()

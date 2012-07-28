@@ -1,4 +1,4 @@
-local module = ArcHUD:NewModule("SoulShards")
+local module = ArcHUD:NewModule("Eclipse")
 local _, _, rev = string.find("$Rev: 24 $", "([0-9]+)")
 module.version = "2.0 (r" .. rev .. ")"
 
@@ -9,14 +9,16 @@ module.defaults = {
 	profile = {
 		Enabled = true,
 		Outline = true,
-		Flash = false,
+		Flash = true,
 		Side = 2,
 		Level = 1,
-		Color = {r = 0.5, g = 0, b = 0.5},
+		ColorLunar = {r = 0.5, g = 0.5, b = 1}, -- lunar
+		ColorSolar = {r = 1, g = 0.5, b = 0.5}, -- solar
 		RingVisibility = 2, -- always fade out when out of combat, regardless of ring status
 	}
 }
 module.options = {
+	{name = "Flash", text = "FLASH", tooltip = "FLASH"},
 	attach = true,
 }
 module.localized = true
@@ -36,52 +38,36 @@ end
 
 function module:OnModuleEnable()
 	local _, class = UnitClass("player")
-	if (class ~= "WARLOCK") then return end
+	if (class ~= "DRUID") then return end
 	
 	self.f.dirty = true
 	self.f.fadeIn = 0.25
 
 	self.f:UpdateColor(self.db.profile.Color)
 
-	-- check which spell power to use
-	self:RegisterEvent("PLAYER_TALENT_UPDATE",	"CheckCurrentPower")
-	self:RegisterEvent("SPELLS_CHANGED",		"CheckCurrentPower")
+	-- check whether we are balanced spec'ed and in caster/moonkin form
+	self:RegisterEvent("PLAYER_TALENT_UPDATE",		"CheckCurrentPower")
+	self:RegisterEvent("UPDATE_SHAPESHIFT_FORM",	"CheckCurrentPower")
 	
 	self:CheckCurrentPower()
 end
 
 function module:CheckCurrentPower()
-	local changed = false
 	local spec = GetSpecialization()
-	if (spec == SPEC_WARLOCK_AFFLICTION and IsPlayerSpell(WARLOCK_SOULBURN) and self.currentSpellPower ~= SPELL_POWER_SOUL_SHARDS) then
-		self.currentSpellPower = SPELL_POWER_SOUL_SHARDS
-		changed = true
-		
-	elseif (spec == SPEC_WARLOCK_DESTRUCTION and IsPlayerSpell(WARLOCK_BURNING_EMBERS) and self.currentSpellPower ~= SPELL_POWER_BURNING_EMBERS) then
-		self.currentSpellPower = SPELL_POWER_BURNING_EMBERS
-		changed = true
-		
-	elseif (spec == SPEC_WARLOCK_DEMONOLOGY and self.currentSpellPower ~= SPELL_POWER_DEMONIC_FURY) then
-		self.currentSpellPower = SPELL_POWER_DEMONIC_FURY
-		changed = true
-		
-	end
-	
-	if (changed) then
+	local form = GetShapeshiftFormID();
+	if (spec == 1 and (form == MOONKIN_FORM or not form)) then
 		if (not self.active) then
+			self.active = true
+		
 			-- Register the events we will use
 			self:RegisterEvent("UNIT_POWER_FREQUENT",	"UpdatePower")
 			self:RegisterEvent("PLAYER_ENTERING_WORLD",	"UpdatePower")
 			self:RegisterEvent("UNIT_DISPLAYPOWER", 	"UpdatePower")
 			
-			-- we'll never need it again
-			self:UnregisterEvent("SPELLS_CHANGED")
-			
 			-- Activate ring timers
 			self:StartRingTimers()
 			
 			self.f:Show()
-			self.active = true
 		end
 		
 		self:UpdatePowerRing()
@@ -99,14 +85,23 @@ function module:CheckCurrentPower()
 end
 
 function module:UpdatePowerRing()
-	local maxPower = UnitPowerMax(self.unit, self.currentSpellPower)
-	local num = UnitPower(self.unit, self.currentSpellPower)
+	local maxPower = UnitPowerMax(self.unit, SPELL_POWER_ECLIPSE)
+	local num = UnitPower(self.unit, SPELL_POWER_ECLIPSE)
 	self.f:SetMax(maxPower)
+	
+	if (num < 0) then
+		-- lunar power
+		num = num * -1
+		self.f:UpdateColor(self.db.profile.ColorLunar)
+	else
+		-- solar power
+		self.f:UpdateColor(self.db.profile.ColorSolar)
+	end
+	
 	self.f:SetValue(num)
 	
 	if (num < maxPower and num >= 0) then
 		self.f:StopPulse()
-		self.f:UpdateColor(self.db.profile.Color)
 	else
 		if (self.Flash) then
 			self.f:StartPulse()
@@ -118,7 +113,7 @@ end
 
 function module:UpdatePower(event, arg1, arg2)
 	if (event == "UNIT_POWER_FREQUENT") then
-		if (arg1 == self.unit and (arg2 == "SOUL_SHARDS" or arg2 == "BURNING_EMBERS" or arg2 == "DEMONIC_FURY")) then
+		if (arg1 == self.unit and arg2 == "ECLIPSE") then
 			self:UpdatePowerRing()
 		end
 	else

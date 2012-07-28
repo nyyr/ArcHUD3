@@ -1,14 +1,14 @@
 local moduleName = "TargetPower"
 local module = ArcHUD:NewModule(moduleName)
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "1.0 (r"..rev..")"
+module.version = "2.0 (r"..rev..")"
 
 module.unit = "target"
 module.isPower = true
 
 module.defaults = {
 	profile = {
-		Enabled = true,
+		Enabled = false,
 		Outline = true,
 		ShowPerc = true,
 		ColorMana = PowerBarColor[0],
@@ -16,8 +16,8 @@ module.defaults = {
 		ColorFocus = PowerBarColor[2],
 		ColorEnergy = PowerBarColor[3],
 		ColorRunic = PowerBarColor[6],
-		Side = 2,
-		Level = 1,
+		Side = 1,
+		Level = 2,
 	}
 }
 module.options = {

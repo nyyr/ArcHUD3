@@ -188,12 +188,11 @@ LM["FocusCasting"]	= "Fokusziel Zauberwirken"
 LM["FocusHealth"]	= "Fokusziel Gesundheit"
 LM["FocusPower"]	= "Fokusziel Ressource"
 LM["Casting"]		= "Spieler Zauberwirken"
-LM["DruidMana"]		= "Druiden Mana"
 LM["MirrorTimer"]	= "Spiegel Timer"
 LM["ComboPoints"]	= "Kombopunkte"
-LM["EnergyTick"]	= "Energie Ticks"
-LM["HolyPower"]		= "Heilige Kraft"
-LM["SoulShards"]	= "Seelensplitter"
+LM["HolyPower"]		= "Paladin: Heilige Kraft"
+--LM["SoulShards"]	= "Hexenmeister: Seelensplitter / Brennende..."
+--LM["Chi"]			= "Mönch: Chi"
 
 LM["TEXT"] = {
 	TITLE		= "Ringoptionen",

@@ -17,7 +17,7 @@
 <Script file="HolyPower.lua" />
 <Script file="SoulShards.lua" />
 <Script file="CustomBuff.lua" />
-<!-- <Script file="DruidMana.lua" /> -->
-<!-- <Script file="EnergyTick.lua" /> -->
+<Script file="Eclipse.lua" />
+<Script file="Chi.lua" />
 
 </Ui>
