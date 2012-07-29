@@ -4,7 +4,7 @@ local LM = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Module")
 local moduleName = "Health"
 local module = ArcHUD:NewModule(moduleName)
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "1.0 (r"..rev..")"
+module.version = "2.0 (r"..rev..")"
 
 module.unit = "player"
 module.isHealth = true
@@ -98,9 +98,9 @@ function module:OnModuleEnable()
 	end
 
 	-- Register the events we will use
-	self:RegisterEvent("UNIT_HEALTH", 		"UpdateHealth")
-	self:RegisterEvent("UNIT_MAXHEALTH", 	"UpdateHealth")
-	self:RegisterEvent("UNIT_HEAL_PREDICTION")
+	self:RegisterUnitEvent("UNIT_HEALTH", "UpdateHealth")
+	self:RegisterUnitEvent("UNIT_MAXHEALTH", "UpdateHealth")
+	self:RegisterUnitEvent("UNIT_HEAL_PREDICTION", "UpdateHealthPrediction")
 	self:RegisterEvent("PLAYER_LEVEL_UP")
 
 	-- Activate ring timers
@@ -172,9 +172,9 @@ function module:UpdateHealth(event, arg1)
 end
 
 ----------------------------------------------
--- UNIT_HEALTH_PREDICTION
+-- UpdateHealthPrediction
 ----------------------------------------------
-function module:UNIT_HEAL_PREDICTION(event, arg1)
+function module:UpdateHealthPrediction(event, arg1)
 	if self.db.profile.ShowIncoming and (arg1 == self.unit) then
 		local ih = UnitGetIncomingHeals(self.unit)
 		--self:Debug(1, "ih: %s", tostring(ih))

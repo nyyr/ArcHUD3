@@ -1,7 +1,7 @@
 local moduleName = "TargetHealth"
 local module = ArcHUD:NewModule(moduleName)
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "1.0 (r"..rev..")"
+module.version = "2.0 (r"..rev..")"
 
 module.unit = "target"
 module.isHealth = true
@@ -113,9 +113,9 @@ function module:OnModuleEnable()
 	end
 
 	-- Register the events we will use
-	self:RegisterEvent("UNIT_HEALTH",			"UpdateHealth")
-	self:RegisterEvent("UNIT_MAXHEALTH",		"UpdateHealth")
-	self:RegisterEvent("UNIT_HEAL_PREDICTION")
+	self:RegisterUnitEvent("UNIT_HEALTH", "UpdateHealth")
+	self:RegisterUnitEvent("UNIT_MAXHEALTH", "UpdateHealth")
+	self:RegisterUnitEvent("UNIT_HEAL_PREDICTION")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
 
 	-- Activate ring timers

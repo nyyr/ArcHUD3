@@ -1,7 +1,7 @@
 local moduleName = "FocusCasting"
 local module = ArcHUD:NewModule(moduleName)
 local _, _, rev = string.find("$Rev: 82 $", "([0-9]+)")
-module.version = "1.4 (r"..rev..")"
+module.version = "2.0 (r"..rev..")"
 
 module.unit = "focus"
 module.noAutoAlpha = true
@@ -106,15 +106,15 @@ function module:OnModuleEnable()
 	self.f.dirty = true
 
 	-- Register the events we will use
-	self:RegisterEvent("UNIT_SPELLCAST_START")
-	self:RegisterEvent("UNIT_SPELLCAST_DELAYED")
-	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
-	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_UPDATE")
-	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTIBLE")
-	self:RegisterEvent("UNIT_SPELLCAST_NOT_INTERRUPTIBLE")
+	self:RegisterUnitEvent("UNIT_SPELLCAST_START")
+	self:RegisterUnitEvent("UNIT_SPELLCAST_DELAYED")
+	self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START")
+	self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_UPDATE")
+	self:RegisterUnitEvent("UNIT_SPELLCAST_INTERRUPTIBLE")
+	self:RegisterUnitEvent("UNIT_SPELLCAST_NOT_INTERRUPTIBLE")
 
-	self:RegisterEvent("UNIT_SPELLCAST_STOP", 			"SpellcastStop")
-	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP", 	"SpellcastChannelStop")
+	self:RegisterUnitEvent("UNIT_SPELLCAST_STOP", 			"SpellcastStop")
+	self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_STOP", 	"SpellcastChannelStop")
 
 	self:RegisterEvent("PLAYER_FOCUS_CHANGED")
 

@@ -73,9 +73,9 @@ function module:OnModuleEnable()
 	end
 
 	-- Register the events we will use
-	self:RegisterEvent("UNIT_POWER",		"UpdatePower")
-	self:RegisterEvent("UNIT_MAXPOWER",		"UpdatePower")
-	self:RegisterEvent("UNIT_DISPLAYPOWER")
+	self:RegisterUnitEvent("UNIT_POWER", "UpdatePower")
+	self:RegisterUnitEvent("UNIT_MAXPOWER", "UpdatePower")
+	self:RegisterUnitEvent("UNIT_DISPLAYPOWER", "UpdateDisplayPower")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
 
 	-- Activate ring timers
@@ -107,7 +107,7 @@ function module:PLAYER_TARGET_CHANGED()
 	end
 end
 
-function module:UNIT_DISPLAYPOWER(event, arg1)
+function module:UpdateDisplayPower(event, arg1)
 	if(arg1 ~= self.unit) then return end
 	
 	local power = UnitPower(self.unit)

@@ -549,7 +549,7 @@ end
 function ArcHUDRingTemplate:StartPulse()
 	self.pulse = true
 	if (not self.applyAlpha:IsPlaying()) then
-		self.module:Debug(1, "StartPulse()")
+		--self.module:Debug(1, "StartPulse()")
 		local pulseMax = 1.0
 		local pulseMin = 0.25
 		local curAlpha = math.floor(self:GetAlpha()*100 + 0.5)/100

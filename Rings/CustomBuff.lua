@@ -124,7 +124,7 @@ function CustomBuffRingTemplate:OnModuleEnable()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD",	"EventHandler")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED", "EventHandler")
 	self:RegisterEvent("PLAYER_FOCUS_CHANGED", 	"EventHandler")
-	self:RegisterEvent("UNIT_AURA",				"EventHandler")
+	self:RegisterUnitEvent("UNIT_AURA",			"EventHandler")
 
 	-- Activate ring timers
 	self:StartRingTimers()
@@ -139,7 +139,7 @@ function CustomBuffRingTemplate:OnModuleDisable()
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("PLAYER_TARGET_CHANGED")
 	self:UnregisterEvent("PLAYER_FOCUS_CHANGED")
-	self:UnregisterEvent("UNIT_AURA")
+	self:UnregisterUnitEvent("UNIT_AURA")
 
 	self:StopTimer("UpdateBuff")
 end

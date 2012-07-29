@@ -493,10 +493,6 @@ end
 -- Requires a module frame (module.f)
 ----------------------------------------------
 function ArcHUD.modulePrototype:RegisterUnitEvent(event, callback, unit)
-	if (not unit) then
-		unit = self.unit
-	end
-	
 	if (not self.f) then
 		self:Debug(1, "No frame to register a unit event on!")
 		return
@@ -511,8 +507,22 @@ function ArcHUD.modulePrototype:RegisterUnitEvent(event, callback, unit)
 		return
 	end
 	
+	if (not callback) then
+		callback = event
+	end
+	
+	if (not unit) then
+		unit = self.unit
+	end
+	
+	local unit2 = nil
+	if (unit == "player") then
+		unit2 = "vehicle"
+	end
+	
 	self.f.unitEvents[event] = { cb = callback, module = self }
-	self.f:RegisterUnitEvent(event, unit)
+	
+	self.f:RegisterUnitEvent(event, unit, unit2)
 end
 
 ----------------------------------------------

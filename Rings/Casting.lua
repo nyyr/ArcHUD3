@@ -1,7 +1,7 @@
 local moduleName = "Casting"
 local module = ArcHUD:NewModule(moduleName)
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "1.4 (r"..rev..")"
+module.version = "2.0 (r"..rev..")"
 
 module.unit = "player"
 module.noAutoAlpha = true
@@ -111,17 +111,17 @@ function module:OnModuleEnable()
 	self.f.dirty = true
 
 	-- Register the events we will use
-	self:RegisterEvent("UNIT_SPELLCAST_START")
-	self:RegisterEvent("UNIT_SPELLCAST_DELAYED")
-	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
-	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_UPDATE")
+	self:RegisterUnitEvent("UNIT_SPELLCAST_START")
+	self:RegisterUnitEvent("UNIT_SPELLCAST_DELAYED")
+	self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START")
+	self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_UPDATE")
 
-	self:RegisterEvent("UNIT_SPELLCAST_STOP", 			"SpellcastStop")
-	self:RegisterEvent("UNIT_SPELLCAST_FAILED", 		"SpellcastFailed")
-	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED", 	"SpellcastInterrupt")
-	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP", 	"SpellcastChannelStop")
+	self:RegisterUnitEvent("UNIT_SPELLCAST_STOP", 			"SpellcastStop")
+	self:RegisterUnitEvent("UNIT_SPELLCAST_FAILED", 		"SpellcastFailed")
+	self:RegisterUnitEvent("UNIT_SPELLCAST_INTERRUPTED", 	"SpellcastInterrupt")
+	self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_STOP", 	"SpellcastChannelStop")
 
-	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", 		"SpellcastSuccess")
+	self:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", 		"SpellcastSuccess")
 	
 	-- Add update hook
 	self.f.UpdateHook = Player_Casting

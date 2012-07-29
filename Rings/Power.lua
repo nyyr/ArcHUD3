@@ -4,7 +4,7 @@ local LM = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Module")
 local moduleName = "Power"
 local module = ArcHUD:NewModule(moduleName)
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "1.0 (r"..rev..")"
+module.version = "2.0 (r"..rev..")"
 module.unit = "player"
 module.isPower = true
 module.defaults = {
@@ -87,10 +87,10 @@ function module:OnModuleEnable()
 	end
 
 	-- Register the events we will use
-	self:RegisterEvent("UNIT_POWER", 		"UpdatePowerEvent")
-	self:RegisterEvent("UNIT_MAXPOWER", 	"UpdatePowerEvent")
-	self:RegisterEvent("UNIT_DISPLAYPOWER", "UpdatePowerType")
-	self:RegisterEvent("PLAYER_ALIVE", 		"UpdatePowerEvent")
+	self:RegisterUnitEvent("UNIT_POWER", "UpdatePowerEvent")
+	self:RegisterUnitEvent("UNIT_MAXPOWER", "UpdatePowerEvent")
+	self:RegisterUnitEvent("UNIT_DISPLAYPOWER", "UpdatePowerType")
+	self:RegisterEvent("PLAYER_ALIVE", "UpdatePowerEvent")
 	self:RegisterEvent("PLAYER_LEVEL_UP")
 
 	-- Activate ring timers

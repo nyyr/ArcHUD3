@@ -1,7 +1,7 @@
 local moduleName = "FocusPower"
 local module = ArcHUD:NewModule(moduleName)
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "1.0 (r" .. rev .. ")"
+module.version = "2.0 (r" .. rev .. ")"
 
 module.unit = "focus"
 module.isPower = true
@@ -71,9 +71,9 @@ function module:OnModuleEnable()
 	end
 
 	-- Register the events we will use
-	self:RegisterEvent("UNIT_POWER",	"UpdatePower")
-	self:RegisterEvent("UNIT_MAXPOWER",	"UpdatePower")
-	self:RegisterEvent("UNIT_DISPLAYPOWER")
+	self:RegisterUnitEvent("UNIT_POWER",	"UpdatePower")
+	self:RegisterUnitEvent("UNIT_MAXPOWER",	"UpdatePower")
+	self:RegisterUnitEvent("UNIT_DISPLAYPOWER")
 	self:RegisterEvent("PLAYER_FOCUS_CHANGED")
 
 	-- Activate ring timers

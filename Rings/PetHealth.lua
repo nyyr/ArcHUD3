@@ -1,7 +1,7 @@
 local moduleName = "PetHealth"
 local module = ArcHUD:NewModule(moduleName)
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "1.0 (r"..rev..")"
+module.version = "2.0 (r"..rev..")"
 
 module.unit = "pet"
 module.isHealth = true
@@ -98,9 +98,9 @@ function module:OnModuleEnable()
 	self:RegisterEvent("PET_UI_UPDATE",			"UpdatePet")
 	self:RegisterEvent("PLAYER_PET_CHANGED",	"UpdatePet")
 	self:RegisterEvent("PET_BAR_CHANGED",		"UpdatePet")
-	self:RegisterEvent("UNIT_PET",				"UpdatePet")
-	self:RegisterEvent("UNIT_HEALTH", 			"UpdateHealth")
-	self:RegisterEvent("UNIT_MAXHEALTH", 		"UpdateHealth")
+	self:RegisterUnitEvent("UNIT_PET",			"UpdatePet")
+	self:RegisterUnitEvent("UNIT_HEALTH", 		"UpdateHealth")
+	self:RegisterUnitEvent("UNIT_MAXHEALTH", 	"UpdateHealth")
 	--f:RegisterEvent("PET_UI_CLOSE")
 
 	-- Activate ring timers

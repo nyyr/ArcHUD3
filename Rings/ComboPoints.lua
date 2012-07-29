@@ -1,6 +1,6 @@
 local module = ArcHUD:NewModule("ComboPoints")
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "1.0 (r" .. rev .. ")"
+module.version = "2.0 (r" .. rev .. ")"
 
 module.unit = "player"
 module.noAutoAlpha = true
@@ -52,7 +52,7 @@ function module:OnModuleEnable()
 	self.f:SetValue(GetComboPoints(self.unit))
 
 	-- Register the events we will use
-	self:RegisterEvent("UNIT_COMBO_POINTS",	"UpdateComboPoints")
+	self:RegisterUnitEvent("UNIT_COMBO_POINTS",	"UpdateComboPoints")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED",	"UpdateComboPoints")
 
 	-- Activate ring timers
