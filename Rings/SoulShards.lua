@@ -3,7 +3,7 @@ local _, _, rev = string.find("$Rev: 24 $", "([0-9]+)")
 module.version = "2.0 (r" .. rev .. ")"
 
 module.unit = "player"
-module.noAutoAlpha = false
+module.noAutoAlpha = nil
 
 module.defaults = {
 	profile = {
@@ -30,8 +30,7 @@ function module:Initialize()
 end
 
 function module:OnModuleUpdate()
-	self.Flash = self.db.profile.Flash
-	self:UpdatePowerRing()
+	self:UpdateColor()
 end
 
 function module:OnModuleEnable()
@@ -41,7 +40,7 @@ function module:OnModuleEnable()
 	self.f.dirty = true
 	self.f.fadeIn = 0.25
 
-	self.f:UpdateColor(self.db.profile.Color)
+	self:UpdateColor()
 
 	-- check which spell power to use
 	self:RegisterEvent("PLAYER_TALENT_UPDATE",	"CheckCurrentPower")
@@ -51,28 +50,28 @@ function module:OnModuleEnable()
 end
 
 function module:CheckCurrentPower()
-	local changed = false
 	local spec = GetSpecialization()
-	if (spec == SPEC_WARLOCK_AFFLICTION and IsPlayerSpell(WARLOCK_SOULBURN) and self.currentSpellPower ~= SPELL_POWER_SOUL_SHARDS) then
+	if (spec == SPEC_WARLOCK_AFFLICTION and IsPlayerSpell(WARLOCK_SOULBURN)) then
 		self.currentSpellPower = SPELL_POWER_SOUL_SHARDS
-		changed = true
 		
-	elseif (spec == SPEC_WARLOCK_DESTRUCTION and IsPlayerSpell(WARLOCK_BURNING_EMBERS) and self.currentSpellPower ~= SPELL_POWER_BURNING_EMBERS) then
+	elseif (spec == SPEC_WARLOCK_DESTRUCTION and IsPlayerSpell(WARLOCK_BURNING_EMBERS)) then
 		self.currentSpellPower = SPELL_POWER_BURNING_EMBERS
-		changed = true
 		
-	elseif (spec == SPEC_WARLOCK_DEMONOLOGY and self.currentSpellPower ~= SPELL_POWER_DEMONIC_FURY) then
+	elseif (spec == SPEC_WARLOCK_DEMONOLOGY) then
 		self.currentSpellPower = SPELL_POWER_DEMONIC_FURY
-		changed = true
 		
+	else
+		self.currentSpellPower = nil
 	end
 	
-	if (changed) then
+	--self:Debug(1, "CheckCurrentPower(): %s", tostring(self.currentSpellPower))
+	
+	if (self.currentSpellPower) then
 		if (not self.active) then
 			-- Register the events we will use
-			self:RegisterEvent("UNIT_POWER_FREQUENT",	"UpdatePower")
 			self:RegisterEvent("PLAYER_ENTERING_WORLD",	"UpdatePower")
-			self:RegisterEvent("UNIT_DISPLAYPOWER", 	"UpdatePower")
+			self:RegisterUnitEvent("UNIT_POWER_FREQUENT", "UpdatePower", self.unit)
+			self:RegisterUnitEvent("UNIT_DISPLAYPOWER", "UpdatePower", self.unit)
 			
 			-- we'll never need it again
 			self:UnregisterEvent("SPELLS_CHANGED")
@@ -87,14 +86,16 @@ function module:CheckCurrentPower()
 		self:UpdatePowerRing()
 		
 	else
-		self.f:Hide()
-		self.active = nil
-		
-		self:UnregisterEvent("UNIT_POWER_FREQUENT")
-		self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-		self:UnregisterEvent("UNIT_DISPLAYPOWER")
-		
-		self:StopRingTimers()
+		if (self.active) then
+			self.f:Hide()
+			self.active = nil
+			
+			self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+			self:UnregisterUnitEvent("UNIT_POWER_FREQUENT")
+			self:UnregisterUnitEvent("UNIT_DISPLAYPOWER")
+			
+			self:StopRingTimers()
+		end
 	end
 end
 
@@ -103,6 +104,8 @@ function module:UpdatePowerRing()
 	local num = UnitPower(self.unit, self.currentSpellPower)
 	self.f:SetMax(maxPower)
 	self.f:SetValue(num)
+	
+	--self:Debug(1, "UpdatePowerRing(): %d/%d", num, maxPower)
 	
 	if (num < maxPower and num >= 0) then
 		self.f:StopPulse()

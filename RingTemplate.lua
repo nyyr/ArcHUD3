@@ -495,6 +495,8 @@ function ArcHUDRingTemplate:SetRingAlpha(destAlpha, instant)
 	elseif (destAlpha > 1) then
 		destAlpha = 1.0
 	end
+	-- cut decimals
+	destAlpha = math.floor(destAlpha*100 + 0.5)/100
 
 	if (instant or not self.applyAlpha) then
 		self:SetAlpha(destAlpha)
@@ -518,6 +520,7 @@ end
 function ArcHUDRingTemplate:applyAlpha_OnFinished()
 	local curAlpha = math.floor(self:GetAlpha()*100 + 0.5)/100
 	if (self.pulse) then
+		--self.module:Debug(1, "%s:applyAlpha pulsing", self.module:GetName())
 		local pulseMax = 1.0
 		local pulseMin = 0.25
 		if (curAlpha < pulseMax) then
@@ -546,6 +549,7 @@ end
 function ArcHUDRingTemplate:StartPulse()
 	self.pulse = true
 	if (not self.applyAlpha:IsPlaying()) then
+		self.module:Debug(1, "StartPulse()")
 		local pulseMax = 1.0
 		local pulseMin = 0.25
 		local curAlpha = math.floor(self:GetAlpha()*100 + 0.5)/100
@@ -635,6 +639,18 @@ function ArcHUDRingTemplate:GhostMode(state, unit)
 	end
 end
 
+-----------------------------------------------------------
+-- Event handler for unit events
+-----------------------------------------------------------
+function ArcHUDRingTemplate:OnEvent(event, ...)
+	if (self.unitEvents) then
+		ue = self.unitEvents[event]
+		if (ue) then
+			ue.module[ue.cb](ue.module, event, ...)
+		end
+	end
+end
+
 -- The OnLoad method, call self for each template object to set it up and
 -- get things going
 function ArcHUDRingTemplate:OnLoad(frame)
@@ -655,8 +671,6 @@ function ArcHUDRingTemplate:OnLoad(frame)
 	frame.SetMax					= self.SetMax
 	frame.SetValue					= self.SetValue
 	frame.Update					= self.Update
-	--frame.AddUpdateFunction			= self.AddUpdateFunction
-	--frame.RemoveUpdateFunction		= self.RemoveUpdateFunction
 	frame.UpdateColor				= self.UpdateColor
 	frame.SetReversed				= self.SetReversed
 	frame.SetRingAlpha				= self.SetRingAlpha
@@ -665,6 +679,7 @@ function ArcHUDRingTemplate:OnLoad(frame)
 	frame.StopPulse					= self.StopPulse
 	frame.applyAlpha_OnFinished		= self.applyAlpha_OnFinished
 	frame.SetSpark					= self.SetSpark
+	frame.OnEvent					= self.OnEvent
 
 	frame.startValue = 0
 	frame.endValue = 0
@@ -676,6 +691,8 @@ function ArcHUDRingTemplate:OnLoad(frame)
 	frame.twoPi = (frame.PI * 2)
 	frame.pulse = false
 	frame.alphaPulse = 0
+	
+	frame:SetScript("OnEvent", frame.OnEvent)
 	
 	-- Animation groups
 	frame.fillUpdate = frame.fillUpdateFrame.fillUpdate

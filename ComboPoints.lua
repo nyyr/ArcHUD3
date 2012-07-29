@@ -44,7 +44,7 @@ function ArcHUD:UpdateComboPointsFrame()
 end
 
 function ArcHUD:UpdateComboPoints(event, arg1)
-	self:LevelDebug(3, "UpdateComboPoints("..tostring(event)..", "..tostring(arg1)..")")
+	--self:LevelDebug(3, "UpdateComboPoints("..tostring(event)..", "..tostring(arg1)..")")
 	if ((event == "UNIT_COMBO_POINTS" and arg1 == "player") or
 		(event == "PLAYER_TARGET_CHANGED" and GetComboPoints("player") > 0 and
 			UnitExists("target") and not UnitIsDead("target"))) then

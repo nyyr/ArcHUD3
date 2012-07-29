@@ -489,6 +489,56 @@ function ArcHUD.modulePrototype:StopTimer(name)
 end
 
 ----------------------------------------------
+-- Register a unit event (not supported by AceEvent)
+-- Requires a module frame (module.f)
+----------------------------------------------
+function ArcHUD.modulePrototype:RegisterUnitEvent(event, callback, unit)
+	if (not unit) then
+		unit = self.unit
+	end
+	
+	if (not self.f) then
+		self:Debug(1, "No frame to register a unit event on!")
+		return
+	end
+	
+	if (not self.f.unitEvents) then
+		self.f.unitEvents = {}
+	end
+	
+	if (self.f.unitEvents[event]) then
+		self:Debug(1, "Unit event %s already registered!", tostring(event))
+		return
+	end
+	
+	self.f.unitEvents[event] = { cb = callback, module = self }
+	self.f:RegisterUnitEvent(event, unit)
+end
+
+----------------------------------------------
+-- Unregister a unit event (not supported by AceEvent)
+----------------------------------------------
+function ArcHUD.modulePrototype:UnregisterUnitEvent(event)
+	if (not self.f) then
+		self:Debug(1, "No frame to unregister a unit event from!")
+		return
+	end
+	
+	if (not self.f.unitEvents) then
+		self:Debug(1, "UnregisterUnitEvent(): No unit events registered yet!")
+		return
+	end
+	
+	if (not self.f.unitEvents[event]) then
+		self:Debug(1, "UnregisterUnitEvent(): Unit event %s not registered!", tostring(event))
+		return
+	end
+	
+	self.f:UnregisterEvent(event)
+	self.f.unitEvents[event] = nil
+end
+
+----------------------------------------------
 -- Create standard module options
 ----------------------------------------------
 function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)

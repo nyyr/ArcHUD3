@@ -3,7 +3,7 @@ local _, _, rev = string.find("$Rev: 24 $", "([0-9]+)")
 module.version = "2.0 (r" .. rev .. ")"
 
 module.unit = "player"
-module.noAutoAlpha = false
+module.noAutoAlpha = nil
 
 module.defaults = {
 	profile = {
@@ -32,18 +32,19 @@ function module:Initialize()
 end
 
 function module:OnModuleUpdate()
-	self.Flash = self.db.profile.Flash
-	self:UpdatePowerRing()
+	self:UpdateColor()
 end
 
 function module:OnModuleEnable()
-	local _, class = UnitClass("player")
+	local _, class = UnitClass(self.unit)
 	if (class ~= "DRUID") then return end
+	
+	self:Debug(1, "Eclipse running!")
 	
 	self.f.dirty = true
 	self.f.fadeIn = 0.25
 
-	self.f:UpdateColor(self.db.profile.Color)
+	self:UpdateColor()
 
 	-- check whether we are balanced spec'ed and in caster/moonkin form
 	self:RegisterEvent("PLAYER_TALENT_UPDATE",		"CheckCurrentPower")
@@ -60,9 +61,9 @@ function module:CheckCurrentPower()
 			self.active = true
 		
 			-- Register the events we will use
-			self:RegisterEvent("UNIT_POWER_FREQUENT",	"UpdatePower")
-			self:RegisterEvent("PLAYER_ENTERING_WORLD",	"UpdatePower")
-			self:RegisterEvent("UNIT_DISPLAYPOWER", 	"UpdatePower")
+			self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdatePower")
+			self:RegisterUnitEvent("UNIT_POWER_FREQUENT", "UpdatePower", self.unit)
+			self:RegisterUnitEvent("UNIT_DISPLAYPOWER", "UpdatePower", self.unit)
 			
 			-- Activate ring timers
 			self:StartRingTimers()
@@ -73,14 +74,16 @@ function module:CheckCurrentPower()
 		self:UpdatePowerRing()
 		
 	else
-		self.f:Hide()
-		self.active = nil
-		
-		self:UnregisterEvent("UNIT_POWER_FREQUENT")
-		self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-		self:UnregisterEvent("UNIT_DISPLAYPOWER")
-		
-		self:StopRingTimers()
+		if (self.active) then
+			self.f:Hide()
+			self.active = nil
+			
+			self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+			self:UnregisterUnitEvent("UNIT_POWER_FREQUENT")
+			self:UnregisterUnitEvent("UNIT_DISPLAYPOWER")
+			
+			self:StopRingTimers()
+		end
 	end
 end
 
@@ -103,7 +106,7 @@ function module:UpdatePowerRing()
 	if (num < maxPower and num >= 0) then
 		self.f:StopPulse()
 	else
-		if (self.Flash) then
+		if (self.db.profile.Flash) then
 			self.f:StartPulse()
 		else
 			self.f:StopPulse()
