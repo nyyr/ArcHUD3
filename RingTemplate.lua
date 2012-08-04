@@ -45,6 +45,10 @@
 --
 local setSubsetFuncs = {}
 local setSliceFuncs = {}
+
+local PI = 3.14159265
+local TWOPI = (PI * 2)
+
 ArcHUDRingTemplate = {}
 
 -- Q3: BOTTOM LEFT
@@ -98,27 +102,42 @@ setSliceFuncs[4] = function(tex) tex:SetTexCoord(0, 1, 0, 1) end
 --  A    - The angle within the quadrant (degrees, 0 <= A < 90)
 --  T    - The main texture for the quadrant
 --  SS   - The texture subset mapping function for the quadrant
+--  A2   - The other angle within the quandrant (degrees, 0 <= A < 90)
 -----------------------------------------------------------
-function ArcHUDRingTemplate:DoQuadrantReversed(A, T, SS)
+function ArcHUDRingTemplate:DoQuadrantReversed(A, T, SS, A2)
 	-- Grab local references to important textures
-	local C = self.chip
-	local S = self.slice
+	local C1 = self.chip1  -- upper or left part
+	local C2 = self.chip2  -- lower or right part
+	local S1 = self.slice1 -- upper slice
+	local S2 = self.slice2 -- lower slice
+	
+	if (not A2) then A2 = 0 end
 
 	-- If no part of self quadrant is visible, just hide all the textures
 	-- and be done.
-	if (A == 0) then
+	if ((A - A2) <= 0) then
 		T:Hide()
-		C:Hide()
-		S:Hide()
+		-- don't hide chips/slices if used by other quadrants
+		if (self.angle == 180 or self.angle == 0) then
+			C1:Hide(); S1:Hide()
+		end
+		if (self.startAngle == 0) then
+			C2:Hide(); S2:Hide()
+		end
 		return
 	end
 
-	-- More local references, grab the ring dimensions, and the frame name.
-	local RF = self.ringFactor
-	local OR = self.radius
-
-	-- Drawing scheme uses three locations
-	--   E (Ex,Ey) - The 'End' position (Nx=1, Ny=0)
+	--        N    O
+	--        |  I \ EO
+	--        |   EI
+	-- W      +------ E
+	-- 
+	-- 
+	--        S
+	
+	-- Ring fills from E to N (N = 90°, E = 0°)
+	-- Drawing scheme uses three/four locations
+	--   E (Ex,Ey) - The start position of the arc (Ex=1, Ey=0 if start angle = 0) (towards East)
 	--   O (Ox,Oy) - Intersection of angle line with Outer edge
 	--   I (Ix,Iy) - Intersection of angle line with Inner edge
 
@@ -126,53 +145,113 @@ function ArcHUDRingTemplate:DoQuadrantReversed(A, T, SS)
 	--   Arad  - Angle in radians
 	--   Ox,Oy - O coordinates
 	--   Ix,Iy - I coordinates
-	local Arad = math.rad(A)
-	local Ox = math.cos(Arad)
-	local Oy = math.sin(Arad)
-	local Ix = Ox * RF
-	local Iy = Oy * RF
-
-	-- Treat first and last halves differently to maximize size of main
-	-- texture subset.
-	if (A <= 45) then
-		-- Main subset is from N to I
-		SS(T, self, OR, Ix, 1,  0, Iy)
-		-- Chip is subset from (Ix,Oy) to (Ox,Ny) (Right edge of main)
-		SS(C, self, OR, Ox, 1, Iy, Oy)
-	else
-		-- Main subset is from N to O
-		SS(T, self, OR, Ox, 1,  0, Oy)
-		-- Chip is subset from (Nx,Iy) to (Ix,Oy) (Bottom edge of main)
-		SS(C, self, OR, Ix, Ox, 0, Iy)
+	local Ox; local Oy
+	local Ix; local Iy
+	if (A < 90) then
+		local RF = self.ringFactor1
+		Arad = math.rad(A)
+		Ox = math.cos(Arad)
+		Oy = math.sin(Arad)
+		Ix = Ox * RF
+		Iy = Oy * RF
+	else -- upper/left end is at North (angle == 90)
+		Ox = 0; Oy = 1
+		Ix = 0; Iy = 1
 	end
-	-- Strech slice between I and O
-	SS(S, self, OR, Ix, Ox, Iy, Oy, 1)
-	-- All three textures are visible
+	
+	-- Same for start of arc
+	local EOx; local EOy
+	local EIx; local EIy
+	if (A2 > 0) then
+		local SRF = self.ringFactor2
+		A2rad = math.rad(A2)
+		EOx = math.cos(A2rad)
+		EOy = math.sin(A2rad)
+		EIx = EOx * SRF
+		EIy = EOy * SRF
+	else -- lower/right end is at East (angle == 0)
+		EOx = 1; EOy = 0
+		EIx = 1; EIy = 0
+	end
+
+	local OR = self.radius
+	
+	-- roughly maximize main texture size
+	if (A <= 45) then
+		-- 'cut' textures horizontally
+		if (A < 90) then
+			-- Chip1 subset is from O to (EOx,Iy)
+			SS(C1, self, OR, Ox, EOx, Iy, Oy)
+		end
+		-- Main subset is from I to EO
+		SS(T, self, OR, Ix, EOx, EOy, Iy)
+		if (A2 > 0) then
+			-- Chip2 subset is from (Ix,EOy) to (EIx,EIy)
+			SS(C2, self, OR, Ix, EIx, EIy, EOy)
+		end
+	else
+		-- 'cut' textures vertically
+		if (A < 90) then
+			-- Chip1 subset is from I to (Ox,EIy)
+			SS(C1, self, OR, Ix, Ox, EIy, Iy)
+		end
+		-- Main subset is from O to EI
+		SS(T, self, OR, Ox, EIx, EIy, Oy)
+		if (A2 > 0) then
+			-- Chip2 subset is from (EIx,Oy) to EO
+			SS(C2, self, OR, EIx, EOx, EOy, Oy)
+		end
+	end
+	
+	-- Strech slices between I and O
+	if (A < 90) then
+		SS(S1, self, OR, Ix, Ox, Iy, Oy, 1)
+	end
+	if (A2 > 0) then
+		SS(S2, self, OR, EIx, EOx, EIy, EOy, 1)
+	end
+	
 	T:Show()
-	C:Show()
-	S:Show()
 end
 
-function ArcHUDRingTemplate:DoQuadrant(A, T, SS)
+-----------------------------------------------------------
+-- Counter-part of DoQuadrantReversed()
+-- also normalized to Q1
+-----------------------------------------------------------
+function ArcHUDRingTemplate:DoQuadrant(A, T, SS, A2)
 	-- Grab local references to important textures
-	local C = self.chip
-	local S = self.slice
+	local C1 = self.chip1  -- lower or right part
+	local C2 = self.chip2  -- upper or left part
+	local S1 = self.slice1 -- lower slice
+	local S2 = self.slice2 -- upper slice
+	
+	if (not A2) then A2 = 0 end
 
 	-- If no part of self quadrant is visible, just hide all the textures
 	-- and be done.
-	if (A == 0) then
+	if ((A - A2) <= 0) then
 		T:Hide()
-		C:Hide()
-		S:Hide()
+		-- don't hide chips/slices if used by other quadrants
+		if (self.angle == 180 or self.angle == 0) then
+			C1:Hide(); S1:Hide()
+		end
+		if (self.startAngle == 0) then
+			C2:Hide(); S2:Hide()
+		end
 		return
 	end
 
-	-- More local references, grab the ring dimensions, and the frame name.
-	local RF = self.ringFactor
-	local OR = self.radius
-
-	-- Drawing scheme uses three locations
-	--   N (Nx,Ny) - The 'Noon' position (Nx=0, Ny=1)
+	--        N    NO
+	--        | NI \ O
+	--        |    I
+	-- W      +------ E
+	-- 
+	-- 
+	--        S
+	
+	-- Ring fills from N to E (N = 0°, E = 90°)
+	-- Drawing scheme uses three/four locations
+	--   N (Nx,Ny) - The start position of the arc (Nx=0, Ny=1 if start angle = 0) (towards North)
 	--   O (Ox,Oy) - Intersection of angle line with Outer edge
 	--   I (Ix,Iy) - Intersection of angle line with Inner edge
 
@@ -180,33 +259,73 @@ function ArcHUDRingTemplate:DoQuadrant(A, T, SS)
 	--   Arad  - Angle in radians
 	--   Ox,Oy - O coordinates
 	--   Ix,Iy - I coordinates
-	local Arad = math.rad(A)
-	local Ox = math.sin(Arad)
-	local Oy = math.cos(Arad)
-	local Ix = Ox * RF
-	local Iy = Oy * RF
-
-	-- Treat first and last halves differently to maximize size of main
-	-- texture subset.
-	if (A <= 45) then
-		-- Main subset is from N to I
-		SS(T, self, OR, 0, Ix, Iy, 1)
-		-- Chip is subset from (Ix,Oy) to (Ox,Ny) (Right edge of main)
-		SS(C, self, OR, Ix, Ox, Oy, 1)
-	else
-		-- Main subset is from N to O
-		SS(T, self, OR, 0, Ox, Oy, 1)
-		-- Chip is subset from (Nx,Iy) to (Ix,Oy) (Bottom edge of main)
-		SS(C, self, OR, 0, Ix, Iy, Oy)
+	local Ox; local Oy
+	local Ix; local Iy
+	if (A < 90) then
+		local RF = self.ringFactor1
+		Arad = math.rad(A)
+		Ox = math.sin(Arad)
+		Oy = math.cos(Arad)
+		Ix = Ox * RF
+		Iy = Oy * RF
+	else -- lower/right end is at East (angle == 90)
+		Ox = 1; Oy = 0
+		Ix = 1; Iy = 0
 	end
 	
-	-- Strech slice between I and O
-	SS(S, self, OR, Ix, Ox, Iy, Oy, 1)
+	-- Same for start of arc
+	local NOx; local NOy
+	local NIx; local NIy
+	if (A2 > 0) then
+		local SRF = self.ringFactor2
+		A2rad = math.rad(A2)
+		NOx = math.sin(A2rad)
+		NOy = math.cos(A2rad)
+		NIx = NOx * SRF
+		NIy = NOy * SRF
+	else -- upper/left end is at North (angle == 0)
+		NOx = 0; NOy = 1
+		NIx = 0; NIy = 1
+	end
+
+	local OR = self.radius
 	
-	-- All three textures are visible
+	-- roughly maximize main texture size
+	if (A > 45) then
+		-- 'cut' textures horizontally
+		if (A < 90) then
+			-- Chip1 subset is from I to (NIx,Oy)
+			SS(C1, self, OR, Ix, NIx, Oy, Iy)
+		end
+		-- Main subset is from O to NI
+		SS(T, self, OR, Ox, NIx, NIy, Oy)
+		if (A2 > 0) then
+			-- Chip2 subset is from NO to (Ox,NIy)
+			SS(C2, self, OR, NOx, Ox, NIy, NOy)
+		end
+	else
+		-- 'cut' textures vertically
+		if (A < 90) then
+			-- Chip1 subset is from (Ix,NOy) to O
+			SS(C1, self, OR, Ox, Ix, NOy, Oy)
+		end
+		-- Main subset is from NO to I
+		SS(T, self, OR, Ix, NOx, NOy, Iy)
+		if (A2 > 0) then
+			-- Chip2 subset is from NI to (NOx,Iy)
+			SS(C2, self, OR, NOx, NIx, NIy, Iy)
+		end
+	end
+	
+	-- Strech slices between I and O
+	if (A < 90) then
+		SS(S1, self, OR, Ix, Ox, Iy, Oy, 1)
+	end
+	if (A2 > 0) then
+		SS(S2, self, OR, NIx, NOx, NIy, NOy, 1)
+	end
+	
 	T:Show()
-	C:Show()
-	S:Show()
 end
 
 -----------------------------------------------------------
@@ -224,16 +343,217 @@ function ArcHUDRingTemplate:SetAngle(angle)
 	if (angle > 180) then
 		angle = 180
 	end
-
+	
 	-- Avoid duplicate work
 	if ((self.angle == angle) and not self.dirty) then
 		return
 	end
 	
+	-- Remember the angle for next time
+	self.angle = angle
+	if angle <= 90 then
+		self.ringFactor = 0.9 + ((90 - angle) / (90/0.1))
+	elseif angle <= 180 then
+		self.ringFactor = 0.9 + ((angle - 90) / (90/0.1))
+	end
+	
+	-- inverse fill?
+	local angle1
+	local angle2
+	if self.inverseFill then
+		angle1 = self.endAngle
+		angle2 = angle
+		self.ringFactor1 = self.endAngleRingFactor
+		self.ringFactor2 = self.ringFactor
+	else
+		angle1 = angle
+		angle2 = self.startAngle
+		self.ringFactor1 = self.ringFactor
+		self.ringFactor2 = self.startAngleRingFactor
+	end
+	
+	-- Hide ring completely if nothing can be shown
+	if ((angle1 - angle2) <= 0) then
+		self.quadrants[1]:Hide()
+		self.quadrants[1]:ClearAllPoints()
+		self.quadrants[2]:Hide()
+		self.quadrants[2]:ClearAllPoints()
+		self.chip1:Hide()
+		self.chip1:ClearAllPoints()
+		self.slice1:Hide()
+		self.slice1:ClearAllPoints()
+		self.chip2:Hide()
+		self.chip2:ClearAllPoints()
+		self.slice2:Hide()
+		self.slice2:ClearAllPoints()
+		return
+	end
+	
 	-- Determine the quadrant, and angle within the quadrant
 	-- (Quadrant 5 means 'all quadrants filled')
+	local quad1 = math.floor(angle1 / 90) + 1
+	local quad2 = math.floor(angle2 / 90) + 1
+	local A1 = math.fmod(angle1, 90)
+	local A2 = math.fmod(angle2, 90)
+	local quadOfs = self.quadOffset or 0
+	local effQuad1
+	local effQuad2
+	if (self.reversed) then
+		effQuad1 = math.fmod((4-quad1)+quadOfs, 4)+1
+		effQuad2 = math.fmod((4-quad2)+quadOfs, 4)+1
+	else
+		effQuad1 = math.fmod(quad1+quadOfs-1, 4)+1
+		effQuad2 = math.fmod(quad2+quadOfs-1, 4)+1
+	end
+	
+	-- Check to see if we've changed quandrants since the last time we were
+	-- called. Quadrant changes re-configure some textures.
+	if ((quad1 ~= self.lastQuad) or self.dirty) then
+	
+		-- Loop through all quadrants
+		for i=1,2 do
+			T=self.quadrants[i]
+			if (self.reversed) then
+				qi = math.fmod((4-i)+quadOfs, 4)+1
+			else
+				qi = math.fmod(i+quadOfs-1, 4)+1
+			end
+			
+			if (i < quad1) then
+				T:ClearAllPoints()
+				if (i < quad2) then
+					-- quadrant is not shown at all, hide it
+					T:Hide()
+				elseif (i == quad2) then
+					-- start angle lies within this quadrant, end angle does not
+					local SS = setSubsetFuncs[effQuad2]
+					if (self.reversed) then
+						self:DoQuadrantReversed(90, T, SS, A2)
+					else
+						self:DoQuadrant(90, T, SS, A2)
+					end
+					T:Show()
+				else
+					-- quadrant is fully shown, show all of the texture
+					setSubsetFuncs[qi](T, self, self.radius, 0.0, 1.0, 0.0, 1.0)
+					T:Show()
+				end
+				
+			elseif (i == quad1) then
+				-- If self quadrant is partially or fully shown, begin by
+				-- showing all of the texture. Also configure the slice
+				-- texture's orientation.
+				T:ClearAllPoints()
+				T:Show()
+				if (self.reversed) then
+					setSliceFuncs[math.fmod(qi+1,4)+1](self.slice1)
+				else
+					setSliceFuncs[qi](self.slice1)
+				end
+
+			else
+				-- If self quadrant is not shown at all, hide it.
+				T:Hide()
+			end
+			
+			if (i == quad2) then
+				if (self.reversed) then
+					setSliceFuncs[effQuad2](self.slice2)
+				else
+					setSliceFuncs[math.fmod(effQuad2+1,4)+1](self.slice2)
+				end
+				self.chip2:Show()
+				self.slice2:Show()
+			end
+		end
+		
+		-- Hide the chip and slice textures, and de-anchor them (They'll be
+		-- re-anchored as necessary later).
+		self.chip1:Hide()
+		self.chip1:ClearAllPoints()
+		self.slice1:Hide()
+		self.slice1:ClearAllPoints()
+		if (angle2 == 0) then
+			self.chip2:Hide()
+			self.chip2:ClearAllPoints()
+			self.slice2:Hide()
+			self.slice2:ClearAllPoints()
+		end
+		
+		-- Remember self for next time
+		self.lastQuad = quad1
+	end
+	
+	-- Extra bounds check for paranoia (also handles quad 5 case)
+	if ((quad1 < 1) or (quad1 > 2)) then
+	   return
+	end
+
+	-- Get quadrant-specific elements
+	local T = self.quadrants[quad1]
+	local SS = setSubsetFuncs[effQuad1]
+	
+	-- Call the quadrant function to do the work
+	if SS ~= nil then
+		if (quad1 == quad2) then
+			-- Start angle and end angle are within the same quadrant.		
+			if (self.reversed) then
+				self:DoQuadrantReversed(A1, T, SS, A2)
+			else
+				self:DoQuadrant(A1, T, SS, A2)
+			end
+		else
+			if (self.reversed) then
+				self:DoQuadrantReversed(A1, T, SS)
+			else
+				self:DoQuadrant(A1, T, SS)
+			end
+		end
+	end
+	
+	if (angle1 == 180 or angle1 == 0) then
+		self.chip1:Hide()
+		self.slice1:Hide()
+	else
+		self.chip1:Show()
+		self.slice1:Show()
+	end
+	
+	if (angle2 == 0) then
+		self.chip2:Hide()
+		self.slice2:Hide()
+	else
+		self.chip2:Show()
+		self.slice2:Show()
+	end
+
+	self.dirty = false
+end
+
+-----------------------------------------------------------
+-- Method function to set the start angle to display
+--
+-- Param:
+--  self  - The ring template instance
+--  angle - The start angle in degrees (0 <= angle <= 180)
+-----------------------------------------------------------
+function ArcHUDRingTemplate:SetStartAngle(angle)
+	-- Bounds checking on the angle so that it's between 0 and 180 (inclusive)
+	if (angle < 0) then
+		angle = 0
+	end
+	if (angle > 180) then
+		angle = 180
+	end
+
+	-- Avoid duplicate work
+	if ((self.startAngle == angle) and not self.dirty) then
+		return
+	end
+	
+	-- Determine the quadrant
+	-- (Quadrant 5 means 'all quadrants filled')
 	local quad = math.floor(angle / 90) + 1
-	local A = math.fmod(angle, 90)
 	local quadOfs = self.quadOffset or 0
 	local effQuad
 	if (self.reversed) then
@@ -244,73 +564,96 @@ function ArcHUDRingTemplate:SetAngle(angle)
 
 	-- Check to see if we've changed quandrants since the last time we were
 	-- called. Quadrant changes re-configure some textures.
-	if ((quad ~= self.lastQuad) or self.dirty) then
-		-- Loop through all quadrants
-		for i=1,2 do
-			T=self.quadrants[i]
-			if (self.reversed) then
-				qi = math.fmod((4-i)+quadOfs, 4)+1
-			else
-				qi = math.fmod(i+quadOfs-1, 4)+1
-			end
-			
-			if (i < quad) then
-				-- If self quadrant is full shown, then show all of the texture
-				T:ClearAllPoints()
-				setSubsetFuncs[qi](T, self, self.radius, 0.0, 1.0, 0.0, 1.0)
-				T:Show()
-				
-			elseif (i == quad) then
-				-- If self quadrant is partially or fully shown, begin by
-				-- showing all of the texture. Also configure the slice
-				-- texture's orientation.
-				T:ClearAllPoints()
-				setSubsetFuncs[qi](T, self, self.radius, 0.0, 0.8, 0.4, 1.0)
-				T:Show()
-				if (self.reversed) then
-					setSliceFuncs[math.fmod(qi+1,4)+1](self.slice)
-				else
-					setSliceFuncs[qi](self.slice)
-				end
-
-			else
-				-- If self quadrant is not shown at all, hide it.
-				T:Hide()
-			end
+	if ((quad ~= self.lastStartQuad) or self.dirty) then
+		-- Configure the slice texture's orientation
+		if (self.reversed) then
+			setSliceFuncs[effQuad](self.slice2)
+		else
+			setSliceFuncs[math.fmod(effQuad+1,4)+1](self.slice2)
 		end
 
-		-- Hide the chip and slice textures, and de-anchor them (They'll be
-		-- re-anchored as necessary later).
-		self.chip:Hide()
-		self.chip:ClearAllPoints()
-		self.slice:Hide()
-		self.slice:ClearAllPoints()
+		-- Hide the chip and slice textures, and de-anchor them
+		self.chip2:Hide()
+		self.chip2:ClearAllPoints()
+		self.slice2:Hide()
+		self.slice2:ClearAllPoints()
 
 		-- Remember self for next time
-		self.lastQuad = quad
+		self.lastStartQuad = quad
 	end
-
-	-- Remember the angle for next time
-	self.angle = angle
 	
-	-- Extra bounds check for paranoia (also handles quad 5 case)
-	if ((quad < 1) or (quad > 2)) then
-	   return
+	-- Remember some values for later use
+	if angle <= 90 then
+		self.startAngleRingFactor = 0.9 + ((90 - angle) / (90/0.1))
+	elseif angle <= 180 then
+		self.startAngleRingFactor = 0.9 + ((angle - 90) / (90/0.1))
+	end
+	self.startAngle = angle
+	self.startQuad = quad
+	self.effStartQuad = effQuad
+end
+
+-----------------------------------------------------------
+-- Method function to set the end angle to display
+--
+-- Param:
+--  self  - The ring template instance
+--  angle - The start angle in degrees (0 <= angle <= 180)
+-----------------------------------------------------------
+function ArcHUDRingTemplate:SetEndAngle(angle)
+	-- Bounds checking on the angle so that it's between 0 and 180 (inclusive)
+	if (angle < 0) then
+		angle = 0
+	end
+	if (angle > 180) then
+		angle = 180
 	end
 
-	-- Get quadrant-specific elements
-	local T = self.quadrants[quad]
-	local SS = setSubsetFuncs[effQuad]
+	-- Avoid duplicate work
+	if ((self.endAngle == angle) and not self.dirty) then
+		return
+	end
+	
+	-- Determine the quadrant
+	-- (Quadrant 5 means 'all quadrants filled')
+	local quad = math.floor(angle / 90) + 1
+	local quadOfs = self.quadOffset or 0
+	local effQuad
+	if (self.reversed) then
+		effQuad = math.fmod((4-quad)+quadOfs, 4)+1
+	else
+		effQuad = math.fmod(quad+quadOfs-1, 4)+1
+	end
 
-	-- Call the quadrant function to do the work
-	if SS ~= nil then
+	-- Check to see if we've changed quandrants since the last time we were
+	-- called. Quadrant changes re-configure some textures.
+	if ((quad ~= self.lastEndQuad) or self.dirty) then
+		-- Configure the slice texture's orientation
 		if (self.reversed) then
-			self:DoQuadrantReversed(A, T, SS)
+			setSliceFuncs[effQuad](self.slice1)
 		else
-			self:DoQuadrant(A, T, SS)
+			setSliceFuncs[math.fmod(effQuad+1,4)+1](self.slice1)
 		end
+
+		-- Hide the chip and slice textures, and de-anchor them
+		self.chip1:Hide()
+		self.chip1:ClearAllPoints()
+		self.slice1:Hide()
+		self.slice1:ClearAllPoints()
+
+		-- Remember self for next time
+		self.lastEndQuad = quad
 	end
-	self.dirty = false
+	
+	-- Remember some values for later use
+	if angle <= 90 then
+		self.endAngleRingFactor = 0.9 + ((90 - angle) / (90/0.1))
+	elseif angle <= 180 then
+		self.endAngleRingFactor = 0.9 + ((angle - 90) / (90/0.1))
+	end
+	self.endAngle = angle
+	self.endQuad = quad
+	self.effEndQuad = effQuad
 end
 
 -----------------------------------------------------------
@@ -324,37 +667,23 @@ end
 function ArcHUDRingTemplate:CallTextureMethod(method, ...)
 	self.quadrants[1][method](self.quadrants[1], ...)
 	self.quadrants[2][method](self.quadrants[2], ...)
-	self.chip[method](self.chip, ...)
-	self.slice[method](self.slice, ...)
+	self.chip1[method](self.chip1, ...)
+	self.chip2[method](self.chip2, ...)
+	self.slice1[method](self.slice1, ...)
+	self.slice2[method](self.slice2, ...)
 end
 
 -----------------------------------------------------------
--- StatsRingRingTemplate:SetRingTextures(ringFactor,ringTexFile,sliceTexFile)
---
--- Sets the textures to use for self ring
---
--- Param:
---   ringFactor   - The ring factor (Inner Radius / Outer Radius)
---   ringTexFile  - The ring texture filename
---   sliceTexFile - The slice texture filename
+-- Calculate angle for given value
 -----------------------------------------------------------
-function ArcHUDRingTemplate:SetRingTextures(ringFactor, ringTexture, sliceTexture)
-	--DEFAULT_CHAT_FRAME:AddMessage("called setringtextures")
-	local savedAngle = self.angle
-	self.angle = nil
-	self.lastQuad = nil
-
-	self.ringFactor = ringFactor
-
-	for i=1,2 do
-		self.quadrants[i]:SetTexture(ringTexture)
+function ArcHUDRingTemplate:GetAngle(value)
+	local angle
+	if self.inverseFill then
+		angle = self.endAngle - self.startValue / self.maxValue * (self.endAngle - self.startAngle)
+	else
+		angle = self.startValue / self.maxValue * (self.endAngle - self.startAngle) + self.startAngle
 	end
-	self.chip:SetTexture(ringTexture)
-	self.slice:SetTexture(sliceTexture)
-
-	if (savedAngle) then
-		self:SetAngle(savedAngle)
-	end
+	return angle
 end
 
 -----------------------------------------------------------
@@ -375,6 +704,9 @@ function ArcHUDRingTemplate:SetReversed(isReversed)
 	end
 	self.reversed = isReversed
 	self.dirty = true
+	if (self.startAngle) then
+		self:SetStartAngle(self.startAngle)
+	end
 end
 
 -----------------------------------------------------------
@@ -394,8 +726,16 @@ end
 
 -----------------------------------------------------------
 -- Set current value for ring
+--
+-- value - Value to set
+-- fadeTime - Time to fade to set value
+-- 				nil: default (logarithmic)
+--				0: immediate
+--				else: time in seconds (linear fade)
+-- startFadeTime - Absolute time when fade should have started / is going to start
+-- startValue - Start value to use if startFadeTime is set
 -----------------------------------------------------------
-function ArcHUDRingTemplate:SetValue(value)
+function ArcHUDRingTemplate:SetValue(value, fadeTime, startFadeTime, startValue)
 	if value == nil then value = 0 end
 	if value > self.maxValue then
 		value = self.maxValue
@@ -403,11 +743,35 @@ function ArcHUDRingTemplate:SetValue(value)
 	if value <= 0 then
 		value = self.maxValue / 10000 -- "small", not 0
 	end
-	if self.casting == 1 then
+	if (self.casting == 1) or (fadeTime == 0) then
 		self.startValue = value
 	end
 	self.endValue = value
-	self.fadeTime = 0
+	
+	if (fadeTime and fadeTime > 0) then
+		self.maxFadeTime = fadeTime
+	end
+	
+	if startFadeTime then
+		self.fadeTime = GetTime() - startFadeTime
+		if startValue then
+			if self.fadeTime > 0 then
+				-- compute start offset
+				local diff = (self.endValue - startValue) / self.maxFadeTime * self.fadeTime
+				self.startValue = startValue + diff
+			else
+				self.startValue = startValue
+				self:SetAngle(self:GetAngle(startValue))
+			end
+		end
+	else
+		self.fadeTime = 0
+	end
+	
+	if (fadeTime == 0) then
+		self.fadeTime = self.maxFadeTime
+		self:SetAngle(self:GetAngle(self.endValue))
+	end
 end
 
 -----------------------------------------------------------
@@ -427,7 +791,7 @@ function ArcHUDRingTemplate:SetSpark(value, red, scale)
 		return
 	end
 	
-	local angle = value / self.maxValue * 180
+	local angle = value / self.maxValue * (self.endAngle - self.startAngle) + self.startAngle
 	local ringFactor = 0.9
 	if angle <= 90 then
 		ringFactor = 0.9 + ((90 - angle) / (90/0.1))
@@ -437,8 +801,8 @@ function ArcHUDRingTemplate:SetSpark(value, red, scale)
 	local angleR = math.rad(angle)
 	local R = self.radius
 	
-	local Ox = self.radius * math.sin(angleR)
-	local Oy = self.radius * math.cos(angleR) * -1
+	local Ox = R * math.sin(angleR)
+	local Oy = R * math.cos(angleR) * -1
 	local Ix = Ox * ringFactor
 	local Iy = Oy * ringFactor
 	
@@ -455,9 +819,74 @@ function ArcHUDRingTemplate:SetSpark(value, red, scale)
 	else
 		spark:SetPoint("TOPLEFT", self, "BOTTOMLEFT", -Ox-offset, Oy+offset)
 		spark:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", -Ix+offset, Iy-offset)
-		spark:SetRotation(2*self.PI - angleR)
+		spark:SetRotation(2*PI - angleR)
 	end
 	spark:Show()
+end
+
+-----------------------------------------------------------
+-- Set angle of shine texture
+-----------------------------------------------------------
+function ArcHUDRingTemplate:SetShineAngle(angle, scale)
+	-- Bounds checking on the angle so that it's between 0 and 180 (inclusive)
+	if (angle < 0) then
+		angle = 0
+	end
+	if (angle > 180) then
+		angle = 180
+	end
+	
+	local ringFactor = 0.9
+	if angle <= 90 then
+		ringFactor = 0.9 + ((90 - angle) / (90/0.1))
+	elseif angle <= 180 then
+		ringFactor = 0.9 + ((angle - 90) / (90/0.1))
+	end
+	local angleR = math.rad(angle)
+	local R = self.radius
+	local Ox = R * math.sin(angleR)
+	local Oy = R * math.cos(angleR) * -1
+	local Ix = Ox * ringFactor
+	local Iy = Oy * ringFactor
+	
+	local offset = 25
+	if (scale) then
+		offset = offset * scale
+	end
+	
+	ArcHUD:LevelDebug(1, "SetShineAngle(%f) I(%f, %f), O(%f, %f) rev %s", angle, Ix, Iy, Ox, Oy, tostring(self.reversed))
+	
+	self.shine:ClearAllPoints()
+	if (self.reversed) then
+		self.shine:SetPoint("TOPLEFT", self, "BOTTOMLEFT", Ix-offset, Iy+offset)
+		self.shine:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", Ox+offset, Oy-offset)
+	else
+		self.shine:SetPoint("TOPLEFT", self, "BOTTOMLEFT", -Ox-offset, Oy+offset)
+		self.shine:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", -Ix+offset, Iy-offset)
+	end
+end
+
+-----------------------------------------------------------
+-- Do shine (fade in and out)
+-----------------------------------------------------------
+function ArcHUDRingTemplate:DoShine()
+	if self.shining then return end
+	local fadeInfo = {
+		mode = "IN",
+		timeToFade = 0.5,
+		finishedFunc = ArcHUDRingTemplate.ShineFadeOut,
+		finishedArg1 = self,
+	}
+	self.shining = true
+	UIFrameFade(self.shine, fadeInfo)
+end
+
+-----------------------------------------------------------
+-- Handle end of fade in
+-----------------------------------------------------------
+function ArcHUDRingTemplate:ShineFadeOut()
+	self.shining = false
+	UIFrameFadeOut(self.shine, 0.5)
 end
 
 -----------------------------------------------------------
@@ -468,21 +897,29 @@ function ArcHUDRingTemplate:DoFadeUpdate(tdelta)
 	if (self.UpdateHook) then
 		self:UpdateHook(tdelta)
 	end
+	
 	if self.fadeTime < self.maxFadeTime then
 		self.fadeTime = self.fadeTime + tdelta
+		if self.fadeTime < 0 then
+			return -- do not start fading yet
+		end
 		if self.fadeTime > self.maxFadeTime then
 			self.fadeTime = self.maxFadeTime
 		end
 		local delta = self.endValue - self.startValue
-		local diff = delta * (self.fadeTime / self.maxFadeTime)
-		self.startValue = self.startValue + diff
-		local angle = self.startValue / self.maxValue * 180
-		if angle <= 90 then
-			self.ringFactor = 0.9 + ((90 - angle) / (90/0.1))
-		elseif angle <= 180 then
-			self.ringFactor = 0.9 + ((angle - 90) / (90/0.1))
+		local diff
+		if self.linearFade then -- linear fade
+			local dt = self.maxFadeTime - self.fadeTime
+			if dt > 0 then
+				diff = delta / dt * tdelta
+			else
+				diff = delta
+			end
+		else -- logarithmic fade
+			diff = delta * self.fadeTime / self.maxFadeTime
 		end
-		self:SetAngle(angle)
+		self.startValue = self.startValue + diff
+		self:SetAngle(self:GetAngle(self.startValue))
 	end
 end
 
@@ -644,7 +1081,7 @@ end
 -----------------------------------------------------------
 function ArcHUDRingTemplate:OnEvent(event, ...)
 	if (self.unitEvents) then
-		ue = self.unitEvents[event]
+		local ue = self.unitEvents[event]
 		if (ue) then
 			ue.module[ue.cb](ue.module, event, ...)
 		end
@@ -666,6 +1103,8 @@ function ArcHUDRingTemplate:OnLoad(frame)
 	frame.DoQuadrant				= self.DoQuadrant
 	frame.DoQuadrantReversed		= self.DoQuadrantReversed
 	frame.SetAngle          		= self.SetAngle
+	frame.SetStartAngle          	= self.SetStartAngle
+	frame.SetEndAngle	          	= self.SetEndAngle
 	frame.CallTextureMethod 		= self.CallTextureMethod
 	frame.SetRingTextures   		= self.SetRingTextures
 	frame.SetMax					= self.SetMax
@@ -680,6 +1119,10 @@ function ArcHUDRingTemplate:OnLoad(frame)
 	frame.applyAlpha_OnFinished		= self.applyAlpha_OnFinished
 	frame.SetSpark					= self.SetSpark
 	frame.OnEvent					= self.OnEvent
+	frame.SetShineAngle				= self.SetShineAngle
+	frame.DoShine					= self.DoShine
+	frame.ShineFadeOut				= self.ShineFadeOut
+	frame.GetAngle					= self.GetAngle
 
 	frame.startValue = 0
 	frame.endValue = 0
@@ -687,8 +1130,6 @@ function ArcHUDRingTemplate:OnLoad(frame)
 	frame.fadeTime = 0
 	frame.maxFadeTime = 1
 	frame.alphaState = -1
-	frame.PI = 3.14159265
-	frame.twoPi = (frame.PI * 2)
 	frame.pulse = false
 	frame.alphaPulse = 0
 	
@@ -697,7 +1138,19 @@ function ArcHUDRingTemplate:OnLoad(frame)
 	-- Animation groups
 	frame.fillUpdate = frame.fillUpdateFrame.fillUpdate
 
+	-- Hide the chip and slice textures, and de-anchor them
+	frame.chip1:Hide()
+	frame.chip1:ClearAllPoints()
+	frame.chip2:Hide()
+	frame.chip2:ClearAllPoints()
+	frame.slice1:Hide()
+	frame.slice1:ClearAllPoints()
+	frame.slice2:Hide()
+	frame.slice2:ClearAllPoints()
+	
 	-- Set angle to zero (initializes texture visibility)
+	frame:SetStartAngle(0)
+	frame:SetEndAngle(180)
 	frame:SetAngle(0)
 	frame:SetSpark(-1)
 	frame:SetSpark(-1, true)
@@ -716,11 +1169,25 @@ function ArcHUDRingTemplate:OnLoadBG(frame)
 	frame.DoQuadrant				= self.DoQuadrant
 	frame.DoQuadrantReversed		= self.DoQuadrantReversed
 	frame.SetAngle          		= self.SetAngle
+	frame.SetStartAngle          	= self.SetStartAngle
+	frame.SetEndAngle         	 	= self.SetEndAngle
 	frame.CallTextureMethod 		= self.CallTextureMethod
 	frame.UpdateColor				= self.UpdateColor
 	frame.SetReversed				= self.SetReversed
 
+	-- Hide the chip and slice textures, and de-anchor them
+	frame.chip1:Hide()
+	frame.chip1:ClearAllPoints()
+	frame.chip2:Hide()
+	frame.chip2:ClearAllPoints()
+	frame.slice1:Hide()
+	frame.slice1:ClearAllPoints()
+	frame.slice2:Hide()
+	frame.slice2:ClearAllPoints()
+	
 	-- Set angle to 180 degrees (initializes texture visibility)
+	frame:SetStartAngle(0)
+	frame:SetEndAngle(180)
 	frame:SetAngle(180)
 
 	-- Set color

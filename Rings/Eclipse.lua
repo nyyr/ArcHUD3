@@ -20,6 +20,7 @@ module.defaults = {
 module.options = {
 	{name = "Flash", text = "FLASH", tooltip = "FLASH"},
 	attach = true,
+	nocolor = true,
 }
 module.localized = true
 

@@ -193,6 +193,7 @@ LM["HolyPower"]		= "Paladin: Holy Power"
 LM["SoulShards"]	= "Warlock: Soul Shards, Burning Embers, Demonic Fury"
 LM["Eclipse"]		= "Druid: Eclipse"
 LM["Chi"]			= "Monk: Chi"
+LM["Runes"]			= "Death Knight: Runes"
 
 LM["TEXT"] = {
 	TITLE		= "Arcs Options",

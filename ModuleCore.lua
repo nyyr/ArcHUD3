@@ -213,29 +213,7 @@ function ArcHUD.modulePrototype:ARCHUD_MODULE_UPDATE(message, module)
 			end
 
 			if(self.options.attach) then
-				local oldValue = self.f.endValue
-				self.f:SetValue(0)
-				-- Clear all points for the ring
-				self.f:ClearAllPoints()
-				if(self.db.profile.Side == 1) then
-					-- Attach to left side
-					self.f:SetPoint("TOPLEFT", self.parent:GetModule("Anchors").Left, "TOPLEFT", self.db.profile.Level * -15, 0)
-					if(self.f.BG) then
-						self.f.BG:SetReversed(false)
-					end
-					self.f:SetReversed(false)
-				else
-					-- Attach to right side
-					self.f:SetPoint("TOPRIGHT", self.parent:GetModule("Anchors").Right, "TOPRIGHT", self.db.profile.Level * 15, 0)
-					if(self.f.BG) then
-						self.f.BG:SetReversed(true)
-					end
-					self.f:SetReversed(true)
-				end
-				if(self.f.BG) then
-					self.f.BG:SetAngle(180)
-				end
-				self.f:SetValue(oldValue)
+				self:AttachRing()
 			end
 
 			if(self.OnModuleUpdate) then
@@ -255,6 +233,38 @@ function ArcHUD.modulePrototype:CreateRing(hasBG, parent)
 	f.module = self
 
 	return f
+end
+
+----------------------------------------------
+-- Anchor ring frame according to config
+----------------------------------------------
+function ArcHUD.modulePrototype:AttachRing(ring)
+	if (not ring) then
+		ring = self.f
+	end
+	local oldValue = ring.endValue
+	ring:SetValue(0)
+	-- Clear all points for the ring
+	ring:ClearAllPoints()
+	if(self.db.profile.Side == 1) then
+		-- Attach to left side
+		ring:SetPoint("TOPLEFT", self.parent:GetModule("Anchors").Left, "TOPLEFT", self.db.profile.Level * -15, 0)
+		if(ring.BG) then
+			ring.BG:SetReversed(false)
+		end
+		ring:SetReversed(false)
+	else
+		-- Attach to right side
+		ring:SetPoint("TOPRIGHT", self.parent:GetModule("Anchors").Right, "TOPRIGHT", self.db.profile.Level * 15, 0)
+		if(ring.BG) then
+			ring.BG:SetReversed(true)
+		end
+		ring:SetReversed(true)
+	end
+	if(ring.BG) then
+		ring.BG:SetAngle(180)
+	end
+	ring:SetValue(oldValue)
 end
 
 ----------------------------------------------
@@ -300,6 +310,45 @@ function ArcHUD.modulePrototype:CreateTexture(parent, layer, size, texture, poin
 end
 
 -----------------------------------------------------------
+-- Update of alpha value for all frames
+--
+-- alpha - Alpha value to set
+-- alpha2 - If not nil and ring not full/empty, use alpha2 instead of alpha
+-----------------------------------------------------------
+function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2)
+	if (self.frames) then
+		-- module with multiple frames
+		for i,f in pairs(self.frames) do
+			if (f.maxValue == 0) then
+				f:SetRingAlpha(0)
+			elseif (alpha2) then
+				if(f.startValue < f.maxValue or math.floor(f.startValue) ~= math.floor(f.endValue)) then
+					f:SetRingAlpha(alpha2)
+				elseif(self.f.startValue == self.f.maxValue) then
+					f:SetRingAlpha(alpha)
+				end
+			else
+				f:SetRingAlpha(alpha)
+			end
+		end
+	elseif (self.f) then
+		-- single/no frame
+		local f = self.f
+		if (f.maxValue == 0) then
+			f:SetRingAlpha(0)
+		elseif (alpha2) then
+			if(f.startValue < f.maxValue or math.floor(f.startValue) ~= math.floor(f.endValue)) then
+				f:SetRingAlpha(alpha2)
+			elseif(self.f.startValue == self.f.maxValue) then
+				f:SetRingAlpha(alpha)
+			end
+		else
+			f:SetRingAlpha(alpha)
+		end
+	end
+end
+
+-----------------------------------------------------------
 -- Trigger update of alpha value (e.g. on entering combat)
 -----------------------------------------------------------
 function ArcHUD.modulePrototype:CheckAlpha()
@@ -333,7 +382,8 @@ function ArcHUD.modulePrototype:CheckAlpha()
 			elseif (self.isHealth and UnitIsDead(unit)) then
 				self.f:SetRingAlpha(AH_profile.FadeFull)
 			else
-				self.f:SetRingAlpha(AH_profile.FadeIC)
+				-- all other frames
+				self:SetFramesAlpha(AH_profile.FadeIC) 
 			end
 		else
 			local powerTypeId, _ = UnitPowerType(unit)
@@ -350,11 +400,8 @@ function ArcHUD.modulePrototype:CheckAlpha()
 				elseif (self.isHealth and UnitIsDead(unit)) then
 					self.f:SetRingAlpha(AH_profile.FadeFull)
 				else
-					if(self.f.startValue < self.f.maxValue or math.floor(self.f.startValue) ~= math.floor(self.f.endValue)) then
-						self.f:SetRingAlpha(AH_profile.FadeOOC)
-					elseif(self.f.startValue == self.f.maxValue) then
-						self.f:SetRingAlpha(AH_profile.FadeFull)
-					end
+					-- all other frames
+					self:SetFramesAlpha(AH_profile.FadeFull, AH_profile.FadeOOC)
 				end
 			end
 		end
@@ -366,10 +413,11 @@ function ArcHUD.modulePrototype:CheckAlpha()
 		elseif (self.isHealth and UnitIsDead(unit)) then
 			self.f:SetRingAlpha(AH_profile.FadeFull)
 		else
+			-- all other frames
 			if(isInCombat) then
-				self.f:SetRingAlpha(AH_profile.FadeIC)
+				self:SetFramesAlpha(AH_profile.FadeIC)
 			else
-				self.f:SetRingAlpha(AH_profile.FadeFull)
+				self:SetFramesAlpha(AH_profile.FadeFull)
 			end
 		end
 		
@@ -380,7 +428,13 @@ end
 -- Start ring timers (filling and alpha check)
 ----------------------------------------------
 function ArcHUD.modulePrototype:StartRingTimers()
-	if (self.f:GetAlpha() > 0) then
+	if (self.frames) then
+		-- module with multiple frames
+		for i,f in pairs(self.frames) do
+			f.fillUpdate:Play()
+		end
+	elseif (self.f and self.f:GetAlpha() > 0) then
+		-- module with single or no frame
 		self.f.fillUpdate:Play()
 	end
 	if (not self.noAutoAlpha) then
@@ -392,7 +446,13 @@ end
 -- Stop ring timers
 ----------------------------------------------
 function ArcHUD.modulePrototype:StopRingTimers()
-	if self.f then
+	if (self.frames) then
+		-- module with multiple frames
+		for i,f in pairs(self.frames) do
+			f.fillUpdate:Stop()
+		end
+	elseif (self.f) then
+		-- module with single or no frame
 		self.f.fillUpdate:Stop()
 	end
 	self:StopTimer("CheckAlpha")

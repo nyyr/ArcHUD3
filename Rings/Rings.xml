@@ -19,5 +19,6 @@
 <Script file="CustomBuff.lua" />
 <Script file="Eclipse.lua" />
 <Script file="Chi.lua" />
+<Script file="Runes.lua" />
 
 </Ui>

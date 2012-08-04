@@ -8,14 +8,16 @@
 	
 	<Layers>
 		<Layer level="ARTWORK">
-			<Texture name="$parentQ1"    parentKey="ringQuadrant1" file="Interface\Addons\ArcHUD3\Icons\Ring.tga"></Texture>
-			<Texture name="$parentQ2"    parentKey="ringQuadrant2" file="Interface\Addons\ArcHUD3\Icons\Ring.tga"></Texture>
-			<Texture name="$parentChip"  parentKey="chip"          file="Interface\Addons\ArcHUD3\Icons\Ring.tga"></Texture>
-			<Texture name="$parentSlice" parentKey="slice"         file="Interface\Addons\ArcHUD3\Icons\Slice.tga"></Texture>
+			<Texture name="$parentQ1"     parentKey="ringQuadrant1" file="Interface\Addons\ArcHUD3\Icons\Ring.tga"></Texture>
+			<Texture name="$parentQ2"     parentKey="ringQuadrant2" file="Interface\Addons\ArcHUD3\Icons\Ring.tga"></Texture>
+			<Texture name="$parentChip1"  parentKey="chip1"         file="Interface\Addons\ArcHUD3\Icons\Ring.tga"></Texture>
+			<Texture name="$parentChip2"  parentKey="chip2"         file="Interface\Addons\ArcHUD3\Icons\Ring.tga"></Texture>
+			<Texture name="$parentSlice1" parentKey="slice1"        file="Interface\Addons\ArcHUD3\Icons\Slice.tga"></Texture>
+			<Texture name="$parentSlice2" parentKey="slice2"        file="Interface\Addons\ArcHUD3\Icons\Slice.tga"></Texture>
 		</Layer>
 		<Layer level="OVERLAY">
-			<Texture name="$parentSpark" parentKey="spark"         file="Interface\CastingBar\UI-CastingBar-Spark.blp" alphaMode="ADD"></Texture>
-			<Texture name="$parentSparkRed" parentKey="sparkRed"   file="Interface\CastingBar\UI-CastingBar-SparkRed.blp" alphaMode="ADD"></Texture>
+			<Texture name="$parentSpark"    parentKey="spark"    file="Interface\CastingBar\UI-CastingBar-Spark" alphaMode="ADD" hidden="true"></Texture>
+			<Texture name="$parentSparkRed" parentKey="sparkRed" file="Interface\CastingBar\UI-CastingBar-SparkRed" alphaMode="ADD" hidden="true"></Texture>
 		</Layer>
 	</Layers>
 	
@@ -29,10 +31,12 @@
 			
 			<Layers>
 				<Layer level="BACKGROUND">
-					<Texture name="$parentQ1"    parentKey="ringQuadrant1" file="Interface\Addons\ArcHUD3\Icons\RingBG.tga"></Texture>
-					<Texture name="$parentQ2"    parentKey="ringQuadrant2" file="Interface\Addons\ArcHUD3\Icons\RingBG.tga"></Texture>
-					<Texture name="$parentChip"  parentKey="chip"          file="Interface\Addons\ArcHUD3\Icons\RingBG.tga"></Texture>
-					<Texture name="$parentSlice" parentKey="slice"         file="Interface\Addons\ArcHUD3\Icons\Slice.tga"></Texture>
+					<Texture name="$parentQ1"     parentKey="ringQuadrant1" file="Interface\Addons\ArcHUD3\Icons\RingBG.tga"></Texture>
+					<Texture name="$parentQ2"     parentKey="ringQuadrant2" file="Interface\Addons\ArcHUD3\Icons\RingBG.tga"></Texture>
+					<Texture name="$parentChip1"  parentKey="chip1"         file="Interface\Addons\ArcHUD3\Icons\RingBG.tga"></Texture>
+					<Texture name="$parentChip2"  parentKey="chip2"         file="Interface\Addons\ArcHUD3\Icons\RingBG.tga"></Texture>
+					<Texture name="$parentSlice1" parentKey="slice1"        file="Interface\Addons\ArcHUD3\Icons\Slice.tga"></Texture>
+					<Texture name="$parentSlice2" parentKey="slice2"        file="Interface\Addons\ArcHUD3\Icons\Slice.tga"></Texture>
 				</Layer>
 			</Layers>
 
@@ -41,7 +45,17 @@
 					ArcHUDRingTemplate:OnLoadBG(self)
 				</OnLoad>
 			</Scripts>
-			
+		</Frame>
+		
+		<Frame name="$parentShine" parentKey="shine" frameStrata="MEDIUM" hidden="true">
+			<Layers>
+				<Layer level="OVERLAY">
+					<Texture name="$parentTexture" parentKey="texture" file="Interface\ComboFrame\ComboPoint" alphaMode="ADD">
+						<Size x="60" y="35"/>
+						<TexCoords left="0.5625" right="1" top="0" bottom="1"/>
+					</Texture>
+				</Layer>
+			</Layers>
 		</Frame>
 		
 		<Frame name="$parentFillUpdateFrame" parentKey="fillUpdateFrame">
