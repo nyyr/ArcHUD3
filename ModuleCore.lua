@@ -231,6 +231,12 @@ function ArcHUD.modulePrototype:CreateRing(hasBG, parent)
 	-- Create frame
 	local f = CreateFrame("Frame", "ArcHUD_"..self:GetName().."_Ring", parent, "ArcHUDRingTemplate")
 	f.module = self
+	
+	if not hasBG then
+		f.BG:Hide()
+		f.oldBG = f.BG -- if needed later again
+		f.BG = nil
+	end
 
 	return f
 end
@@ -770,6 +776,12 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 			-- Color
 			self.optionsTable.args.color = colorOption(self, "COLORSETFADE", "Color")
 			
+		elseif (self.options.customcolors) then
+		
+			for i,v in ipairs(self.options.customcolors) do
+				self.optionsTable.args[v.name] = colorOption(self, v.text, v.name)
+			end
+		
 		else
 			
 			-- Color
@@ -785,10 +797,17 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 			order		= 45,
 			func		= function ()
 				local resetColor = function(color, default)
-					if (color) then
+					if (color and default) then
 						color.r, color.g, color.b = default.r, default.g, default.b
 					end
 				end
+				
+				for k,v in pairs(self.db.profile) do
+					if (k ~= "ColorMode") and (strsub(k, 1, 5) == "Color") then
+						resetColor(self.db.profile[k], self.defaults.profile[k])
+					end
+				end
+				--[[
 				resetColor(self.db.profile.Color, self.defaults.profile.Color)
 				resetColor(self.db.profile.ColorFriend, self.defaults.profile.ColorFriend)
 				resetColor(self.db.profile.ColorFoe, self.defaults.profile.ColorFoe)
@@ -797,7 +816,7 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 				resetColor(self.db.profile.ColorFocus, self.defaults.profile.ColorFocus)
 				resetColor(self.db.profile.ColorEnergy, self.defaults.profile.ColorEnergy)
 				resetColor(self.db.profile.ColorRunic, self.defaults.profile.ColorRunic)
-				
+				]]
 				if (self.db.profile.ColorMode) then
 					self.db.profile.ColorMode = self.defaults.profile.ColorMode
 				end

@@ -775,6 +775,44 @@ function ArcHUDRingTemplate:SetValue(value, fadeTime, startFadeTime, startValue)
 end
 
 -----------------------------------------------------------
+-- Set a texture or frame at a given angle on the ring
+--   tex - texture or frame to reposition
+--   angle - angle in degrees
+--   offset - offset from center of the ring (e.g. width/2)
+--   rotate - true if the texture should be rotated according to angle
+-----------------------------------------------------------
+function ArcHUDRingTemplate:SetTextureAngle(tex, angle, offset, rotate)
+	local ringFactor = 0.9
+	if angle <= 90 then
+		ringFactor = 0.9 + ((90 - angle) / (90/0.1))
+	elseif angle <= 180 then
+		ringFactor = 0.9 + ((angle - 90) / (90/0.1))
+	end
+	local angleR = math.rad(angle)
+	local R = self.radius
+	
+	local Ox = R * math.sin(angleR)
+	local Oy = R * math.cos(angleR) * -1
+	local Ix = Ox * ringFactor
+	local Iy = Oy * ringFactor
+	
+	tex:ClearAllPoints()
+	if (self.reversed) then
+		tex:SetPoint("TOPLEFT", self, "BOTTOMLEFT", Ix-offset, Iy+offset)
+		tex:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", Ox+offset, Oy-offset)
+		if rotate then
+			tex:SetRotation(angleR)
+		end
+	else
+		tex:SetPoint("TOPLEFT", self, "BOTTOMLEFT", -Ox-offset, Oy+offset)
+		tex:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", -Ix+offset, Iy-offset)
+		if rotate then
+			tex:SetRotation(2*PI - angleR)
+		end
+	end
+end
+
+-----------------------------------------------------------
 -- Set position of spark (can be used as an indicator)
 --   value - value on arc
 --   red   - true: set red spark, false: set yellow spark
@@ -792,35 +830,13 @@ function ArcHUDRingTemplate:SetSpark(value, red, scale)
 	end
 	
 	local angle = value / self.maxValue * (self.endAngle - self.startAngle) + self.startAngle
-	local ringFactor = 0.9
-	if angle <= 90 then
-		ringFactor = 0.9 + ((90 - angle) / (90/0.1))
-	elseif angle <= 180 then
-		ringFactor = 0.9 + ((angle - 90) / (90/0.1))
-	end
-	local angleR = math.rad(angle)
-	local R = self.radius
-	
-	local Ox = R * math.sin(angleR)
-	local Oy = R * math.cos(angleR) * -1
-	local Ix = Ox * ringFactor
-	local Iy = Oy * ringFactor
-	
 	local offset = 16
 	if (scale) then
 		offset = offset * scale
 	end
 	
-	spark:ClearAllPoints()
-	if (self.reversed) then
-		spark:SetPoint("TOPLEFT", self, "BOTTOMLEFT", Ix-offset, Iy+offset)
-		spark:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", Ox+offset, Oy-offset)
-		spark:SetRotation(angleR)
-	else
-		spark:SetPoint("TOPLEFT", self, "BOTTOMLEFT", -Ox-offset, Oy+offset)
-		spark:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", -Ix+offset, Iy-offset)
-		spark:SetRotation(2*PI - angleR)
-	end
+	self:SetTextureAngle(spark, angle, offset, true)
+	
 	spark:Show()
 end
 
@@ -836,34 +852,12 @@ function ArcHUDRingTemplate:SetShineAngle(angle, scale)
 		angle = 180
 	end
 	
-	local ringFactor = 0.9
-	if angle <= 90 then
-		ringFactor = 0.9 + ((90 - angle) / (90/0.1))
-	elseif angle <= 180 then
-		ringFactor = 0.9 + ((angle - 90) / (90/0.1))
-	end
-	local angleR = math.rad(angle)
-	local R = self.radius
-	local Ox = R * math.sin(angleR)
-	local Oy = R * math.cos(angleR) * -1
-	local Ix = Ox * ringFactor
-	local Iy = Oy * ringFactor
-	
 	local offset = 25
 	if (scale) then
 		offset = offset * scale
 	end
 	
-	ArcHUD:LevelDebug(1, "SetShineAngle(%f) I(%f, %f), O(%f, %f) rev %s", angle, Ix, Iy, Ox, Oy, tostring(self.reversed))
-	
-	self.shine:ClearAllPoints()
-	if (self.reversed) then
-		self.shine:SetPoint("TOPLEFT", self, "BOTTOMLEFT", Ix-offset, Iy+offset)
-		self.shine:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", Ox+offset, Oy-offset)
-	else
-		self.shine:SetPoint("TOPLEFT", self, "BOTTOMLEFT", -Ox-offset, Oy+offset)
-		self.shine:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", -Ix+offset, Iy-offset)
-	end
+	self:SetTextureAngle(self.shine, angle, offset)
 end
 
 -----------------------------------------------------------
@@ -1123,6 +1117,7 @@ function ArcHUDRingTemplate:OnLoad(frame)
 	frame.DoShine					= self.DoShine
 	frame.ShineFadeOut				= self.ShineFadeOut
 	frame.GetAngle					= self.GetAngle
+	frame.SetTextureAngle			= self.SetTextureAngle
 
 	frame.startValue = 0
 	frame.endValue = 0

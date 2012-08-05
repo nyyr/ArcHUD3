@@ -14,15 +14,23 @@ module.defaults = {
 		Level = 1,
 		ColorLunar = {r = 0.5, g = 0.5, b = 1}, -- lunar
 		ColorSolar = {r = 1, g = 0.5, b = 0.5}, -- solar
-		RingVisibility = 2, -- always fade out when out of combat, regardless of ring status
+		--RingVisibility = 2, -- always fade out when out of combat, regardless of ring status
 	}
 }
 module.options = {
 	{name = "Flash", text = "FLASH", tooltip = "FLASH"},
 	attach = true,
-	nocolor = true,
+	customcolors = {
+		{name = "ColorLunar", text = "COLORLUNAR"},
+		{name = "ColorSolar", text = "COLORSOLAR"},
+	}
 }
 module.localized = true
+
+local ECLIPSE_MARKER_COORDS = {}
+ECLIPSE_MARKER_COORDS["none"] = { 0.93, 0.99, 0.82, 0.99 }
+ECLIPSE_MARKER_COORDS["sun"] = { 0.93, 1.0, 0.641, 0.82 }
+ECLIPSE_MARKER_COORDS["moon"] = { 1.0, 0.93, 0.641, 0.82 }
 
 function module:Initialize()
 	-- Setup the frame we need
@@ -33,19 +41,45 @@ function module:Initialize()
 end
 
 function module:OnModuleUpdate()
-	self:UpdateColor()
+	if self.frames then
+		self.frames[1]:UpdateColor(self.db.profile.ColorLunar)
+		self.frames[2]:UpdateColor(self.db.profile.ColorSolar)
+	end
 end
 
 function module:OnModuleEnable()
 	local _, class = UnitClass(self.unit)
 	if (class ~= "DRUID") then return end
 	
-	self:Debug(1, "Eclipse running!")
-	
-	self.f.dirty = true
-	self.f.fadeIn = 0.25
-
-	self:UpdateColor()
+	if (not self.frames) then
+		-- two rings, one for lunar and one for solar energy
+		self.frames = {}
+		self.frames[1] = self.f
+		self.frames[1]:UpdateColor(self.db.profile.ColorLunar)
+		self.frames[1]:SetStartAngle(90)
+		self:AttachRing(self.frames[1])
+		
+		self.frames[2] = self:CreateRing(false, ArcHUDFrame)
+		self.frames[2]:SetAlpha(0)
+		self.frames[2]:UpdateColor(self.db.profile.ColorSolar)
+		self.frames[2]:SetEndAngle(89.99)
+		self.frames[2].inverseFill = true
+		self:AttachRing(self.frames[2])
+		
+		for i=1,2 do
+			self.frames[i].dirty = true
+			self.frames[i].fadeIn = 0.25
+		end
+		
+--[[		-- direction indicator
+		self.indicator = self.f:CreateTexture(nil, "OVERLAY")
+		self.indicator:SetTexture("Interface\\PlayerFrame\\UI-DruidEclipse", true)
+		self.indicator:SetBlendMode("ADD")
+		self.indicator:SetRotation(math.rad(90))
+		self.indicator:SetTexCoord(unpack(ECLIPSE_MARKER_COORDS["moon"]))
+		self.f:SetTextureAngle(self.indicator, 90, 5)
+		self.indicator:Show() ]]
+	end
 
 	-- check whether we are balanced spec'ed and in caster/moonkin form
 	self:RegisterEvent("PLAYER_TALENT_UPDATE",		"CheckCurrentPower")
@@ -69,14 +103,16 @@ function module:CheckCurrentPower()
 			-- Activate ring timers
 			self:StartRingTimers()
 			
-			self.f:Show()
+			self.frames[1]:Show()
+			self.frames[2]:Show()
 		end
 		
 		self:UpdatePowerRing()
 		
 	else
 		if (self.active) then
-			self.f:Hide()
+			self.frames[1]:Hide()
+			self.frames[2]:Hide()
 			self.active = nil
 			
 			self:UnregisterEvent("PLAYER_ENTERING_WORLD")
@@ -91,26 +127,31 @@ end
 function module:UpdatePowerRing()
 	local maxPower = UnitPowerMax(self.unit, SPELL_POWER_ECLIPSE)
 	local num = UnitPower(self.unit, SPELL_POWER_ECLIPSE)
-	self.f:SetMax(maxPower)
+	local f
 	
 	if (num < 0) then
 		-- lunar power
 		num = num * -1
-		self.f:UpdateColor(self.db.profile.ColorLunar)
+		f = self.frames[1]
+		self.frames[2]:SetValue(0)
+		--self.indicator:SetTexCoord(unpack(ECLIPSE_MARKER_COORDS["moon"]))
 	else
 		-- solar power
-		self.f:UpdateColor(self.db.profile.ColorSolar)
+		f = self.frames[2]
+		self.frames[1]:SetValue(0)
+		--self.indicator:SetTexCoord(unpack(ECLIPSE_MARKER_COORDS["sun"]))
 	end
 	
-	self.f:SetValue(num)
+	f:SetMax(maxPower)
+	f:SetValue(num)
 	
 	if (num < maxPower and num >= 0) then
-		self.f:StopPulse()
+		f:StopPulse()
 	else
 		if (self.db.profile.Flash) then
-			self.f:StartPulse()
+			f:StartPulse()
 		else
-			self.f:StopPulse()
+			f:StopPulse()
 		end
 	end
 end

@@ -116,7 +116,7 @@ ArcHUD.configOptionsTableCmd = {
 				end
 			end,
 		},
---[[		perf = {
+		perf = {
 			type		= "execute",
 			name		= "config",
 			desc		= "Show performance infos on timers (developers only!)",
@@ -124,8 +124,8 @@ ArcHUD.configOptionsTableCmd = {
 			func		= function()
 				ArcHUD:TimersPrintPerf()
 			end,
-		},]]
-		test = {
+		},
+--[[		test = {
 			type		= "execute",
 			name		= "test",
 			desc		= "Internal testing of some functions (developers only!)",
@@ -147,7 +147,7 @@ ArcHUD.configOptionsTableCmd = {
 					testSwitch = not testSwitch
 				end
 			end,
-		},
+		},]]
 	},
 }
 

@@ -231,6 +231,14 @@ LM["TEXT"] = {
 	COLORFOCUS 	= "Focus ring color",
 	COLORENERGY	= "Energy ring color",
 	COLORRUNIC	= "Runic power ring color",
+	
+	COLORLUNAR	= "Lunar power color",
+	COLORSOLAR	= "Solar power color",
+	COLORBLOODRUNE = "Blood rune color",
+	COLORFROSTRUNE = "Frost rune color",
+	COLORUNHOLYRUNE = "Unholy rune color",
+	COLORDEATHRUNE = "Death rune color",
+	
 	ATTACHRING	= "Detach ring",
 	
 	CUSTOM		= "Custom Buff Arcs",

@@ -13,13 +13,22 @@ module.defaults = {
 		Flash = true,
 		Side = 2,
 		Level = 1,
+		ColorBloodRune  = {r = 0.7, g = 0,   b = 0},
+		ColorFrostRune  = {r = 0,   g = 0.6, b = 0.7},
+		ColorUnholyRune = {r = 0,   g = 0.6, b = 0},
+		ColorDeathRune  = {r = 0.8, g = 0.1, b = 1},
 		--RingVisibility = 2, -- always fade out when out of combat, regardless of ring status
 	}
 }
 module.options = {
 	--{name = "Flash", text = "FLASH", tooltip = "FLASH"},
 	attach = true,
-	nocolor = true,
+	customcolors = {
+		{name = "ColorBloodRune", text = "COLORBLOODRUNE"},
+		{name = "ColorFrostRune", text = "COLORFROSTRUNE"},
+		{name = "ColorUnholyRune", text = "COLORUNHOLYRUNE"},
+		{name = "ColorDeathRune", text = "COLORDEATHRUNE"},
+	}
 }
 module.localized = true
 
@@ -56,6 +65,11 @@ function module:Initialize()
 end
 
 function module:OnModuleUpdate()
+	runeColors[RUNETYPE_BLOOD] = self.db.profile.ColorBloodRune
+	runeColors[RUNETYPE_FROST] = self.db.profile.ColorFrostRune
+	runeColors[RUNETYPE_UNHOLY] = self.db.profile.ColorUnholyRune
+	runeColors[RUNETYPE_DEATH] = self.db.profile.ColorDeathRune
+
 	if (self.frames) then
 		self:UpdateRunes()
 	end
@@ -71,13 +85,10 @@ function module:OnModuleEnable()
 		self.frames[1] = self.f
 		for i=2,6 do
 			self.frames[i] = self:CreateRing(false, ArcHUDFrame)
-			self.frames[i].BG:Hide()
-			self.frames[i].oldBG = self.frames[i].BG
-			self.frames[i].BG = nil
 			self.frames[i]:SetAlpha(0)
 		end
 		
-		-- compute angles
+		-- set angles
 		local angles = {
 			[1] = { e = 180, s = 135 },
 			[2] = { e = 135, s = 112 },
