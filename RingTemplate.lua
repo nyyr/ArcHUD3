@@ -726,9 +726,11 @@ function ArcHUDRingTemplate:SetMax(max)
 		self.endValue = max
 	end
 	if (max ~= self.maxValue) then
+		self.maxValue = max
 		self:RefreshSeparators()
+	else
+		self.maxValue = max
 	end
-	self.maxValue = max
 end
 
 -----------------------------------------------------------
