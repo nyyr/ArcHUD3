@@ -1,6 +1,6 @@
 local moduleName = "FocusCasting"
 local module = ArcHUD:NewModule(moduleName)
-local _, _, rev = string.find("$Rev: 82 $", "([0-9]+)")
+local _, _, rev = string.find("$Rev$", "([0-9]+)")
 module.version = "2.0 (r"..rev..")"
 
 module.unit = "focus"
