@@ -52,6 +52,7 @@ L["TEXT"] = {
 	TOTOT		= "Enable target's target's target",
 
 	NAMEPLATES	= "Nameplate options",
+	NPHINT		= "Mouse behavior of nameplates is configured here. Their visibility can be changed under 'Display Options'.",
 	NPPLAYEROPT = "Player",
 	NPPLAYER	= "Player",
 	NPPET		= "Pet",
@@ -81,7 +82,7 @@ L["TEXT"] = {
 	RINGVIS_2	= "Fade OOC: Fade when out of combat",
 	RINGVIS_3	= "Fade Both: Fade when full or out of combat (default)",
 	
-	POSITIONING	= "Positioning",
+	POSITIONING	= "Positioning / Scaling",
 	WIDTH		= "HUD width",
 	YLOC		= "Vertical alignment",
 	XLOC		= "Horizontal alignment",
@@ -105,8 +106,8 @@ L["TOOLTIP"] = {
 	PROFILES_CREATE = "Create a new profile based on the current profile and activate it.",
 	PROFILES_DELETE = "Delete current profile and set default profile as active one.",
 
-	PLAYERFRAME	= "Toggle display of player and pet nameplates",
-	TARGETFRAME = "Toggle display of entire target frame",
+	PLAYERFRAME	= "Toggle display of player and pet nameplates.\nNOTE: Mouse behavior can be configured under Nameplate Options.",
+	TARGETFRAME = "Toggle display of entire target frame.\nNOTE: Mouse behavior can be configured under Nameplate Options.",
 	PLAYERMODEL = "Toggle display of 3D target model of players",
 	MOBMODEL	= "Toggle display of 3D target model of mobs",
 	SHOWGUILD	= "Show player guild information next to their name",
@@ -120,16 +121,17 @@ L["TOOLTIP"] = {
 	TOT			= "Enable displaying of target's target",
 	TOTOT		= "Enable displaying of target's target's target",
 
-	NPPLAYER	= "Toggle clickable player's nameplate. "..
+	NPPLAYER	= "Toggle clickable player's nameplate.\n"..
+		"NOTE: This option only takes effect if the Player Frame is visible (see Display Options).\n\n"..
 		"The player nameplate's state cannot be changed in combat due to UI restrictions. "..
 		"Thus, it cannot be activated in combat by hovering over them, or it will remain activated if active upon entering combat.",
-	NPPET		= "Toggle clickable pet's nameplate. "..
+	NPPET		= "Toggle clickable pet's nameplate.\n"..
+		"NOTE: This option only takes effect if the Player Frame is visible (see Display Options).\n\n"..
 		"The pet nameplate's state cannot be changed in combat due to UI restrictions. "..
 		"Thus, it cannot be activated in combat by hovering over them, or it will remain activated if active upon entering combat.",
-	NPTARGET	= "Toggle clickable target's nameplate",
-	NPTOT		= "Toggle clickable target's target nameplate",
-	NPTOTOT		= "Toggle clickable target's target's target nameplate",
-	NPCOMBAT	= "Toggle always enabling clickable nameplates when entering combat", -- TODO: obsolete
+	NPTARGET	= "Toggle clickable target's nameplate.\nNOTE: This option only takes effect if the Target Frame is visible (see Display Options).",
+	NPTOT		= "Toggle clickable target's target nameplate.\nNOTE: This option only takes effect if the Target Frame is visible (see Display Options).",
+	NPTOTOT		= "Toggle clickable target's target's target nameplate.\nNOTE: This option only takes effect if the Target Frame is visible (see Display Options).",
 	HOVERMSG	= "Toggle displaying of a chat message when mouse input is enabled",
 	HOVERDELAY	= "Amount of seconds needed to hover above the player/pet nameplate to activate it",
 	
@@ -218,6 +220,9 @@ LM["TEXT"] = {
 	ATTACH		= "Attachment",
 	SIDE		= "Side",
 	LEVEL		= "Level",
+	
+	SEPARATORS  = "Show separators",
+	
 	COLOR		= "Color mode",
 	COLORRESET	= "Reset color",
 	COLORFADE	= "Color fading",
@@ -276,6 +281,9 @@ LM["TOOLTIP"] = {
 	SHOWINSTEALTH="Toggle showing ticking while stealthed",
 	SIDE		= "Set which side to attach to",
 	LEVEL		= "Set at which level it should be attached relative to the anchor (<-1: towards center, 0: at anchor, >1: away from center)",
+	
+	SEPARATORS  = "Toggle separators (only for maximum ring values between 2 and 20)",
+	
 	COLOR		= "Set color mode:\n"..
 					"Color fading: Set the ring color to fade (green to red for health)\n"..
 					"Custom color: Set the ring color to a custom defined color",

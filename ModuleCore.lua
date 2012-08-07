@@ -270,6 +270,13 @@ function ArcHUD.modulePrototype:AttachRing(ring)
 	if(ring.BG) then
 		ring.BG:SetAngle(180)
 	end
+	
+	-- separators
+	if (self.db.profile.ShowSeparators) then
+		ring.showSeparators = true
+	end
+	ring:RefreshSeparators()
+	
 	ring:SetValue(oldValue)
 end
 
@@ -700,6 +707,22 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 		},
 	}
 	
+	if (self.options.hasseparators) then
+		t = {
+			type		= "toggle",
+			name		= LM["TEXT"]["SEPARATORS"],
+			desc		= LM["TOOLTIP"]["SEPARATORS"],
+			order		= 30,
+			get			= function ()
+				return self.db.profile.ShowSeparators
+			end,
+			set			= function (info, val)
+				self.db.profile.ShowSeparators = val
+				self:SendMessage("ARCHUD_MODULE_UPDATE", self:GetName())
+			end,
+		}
+		self.optionsTable.args.ShowSeparators = t
+	end
 	
 	for k,v in ipairs(self.options) do
 		if(type(v) == "table") then
@@ -807,16 +830,7 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 						resetColor(self.db.profile[k], self.defaults.profile[k])
 					end
 				end
-				--[[
-				resetColor(self.db.profile.Color, self.defaults.profile.Color)
-				resetColor(self.db.profile.ColorFriend, self.defaults.profile.ColorFriend)
-				resetColor(self.db.profile.ColorFoe, self.defaults.profile.ColorFoe)
-				resetColor(self.db.profile.ColorMana, self.defaults.profile.ColorMana)
-				resetColor(self.db.profile.ColorRage, self.defaults.profile.ColorRage)
-				resetColor(self.db.profile.ColorFocus, self.defaults.profile.ColorFocus)
-				resetColor(self.db.profile.ColorEnergy, self.defaults.profile.ColorEnergy)
-				resetColor(self.db.profile.ColorRunic, self.defaults.profile.ColorRunic)
-				]]
+
 				if (self.db.profile.ColorMode) then
 					self.db.profile.ColorMode = self.defaults.profile.ColorMode
 				end

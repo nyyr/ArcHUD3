@@ -150,9 +150,10 @@ function ArcHUDRingTemplate:DoQuadrantReversed(A, T, SS, A2)
 	if (A < 90) then
 		local RF = self.ringFactor1
 		Arad = math.rad(A)
-		Ox = math.cos(Arad)
+		local cos_a = math.cos(Arad)
+		Ox = cos_a
 		Oy = math.sin(Arad)
-		Ix = Ox * RF
+		Ix = Ox * RF - cos_a/64 -- small correction (not sure why this is necessary)
 		Iy = Oy * RF
 	else -- upper/left end is at North (angle == 90)
 		Ox = 0; Oy = 1
@@ -165,9 +166,10 @@ function ArcHUDRingTemplate:DoQuadrantReversed(A, T, SS, A2)
 	if (A2 > 0) then
 		local SRF = self.ringFactor2
 		A2rad = math.rad(A2)
-		EOx = math.cos(A2rad)
+		local cos_a2 = math.cos(A2rad)
+		EOx = cos_a2
 		EOy = math.sin(A2rad)
-		EIx = EOx * SRF
+		EIx = EOx * SRF - cos_a2/64 -- small correction (not sure why this is necessary)
 		EIy = EOy * SRF
 	else -- lower/right end is at East (angle == 0)
 		EOx = 1; EOy = 0
@@ -264,9 +266,10 @@ function ArcHUDRingTemplate:DoQuadrant(A, T, SS, A2)
 	if (A < 90) then
 		local RF = self.ringFactor1
 		Arad = math.rad(A)
+		local cos_a = math.cos(Arad)
 		Ox = math.sin(Arad)
-		Oy = math.cos(Arad)
-		Ix = Ox * RF
+		Oy = cos_a
+		Ix = Ox * RF - cos_a/64 -- small correction (not sure why this is necessary)
 		Iy = Oy * RF
 	else -- lower/right end is at East (angle == 90)
 		Ox = 1; Oy = 0
@@ -279,9 +282,10 @@ function ArcHUDRingTemplate:DoQuadrant(A, T, SS, A2)
 	if (A2 > 0) then
 		local SRF = self.ringFactor2
 		A2rad = math.rad(A2)
+		local cos_a2 = math.cos(A2rad)
 		NOx = math.sin(A2rad)
-		NOy = math.cos(A2rad)
-		NIx = NOx * SRF
+		NOy = cos_a2
+		NIx = NOx * SRF - cos_a2/64 -- small correction (not sure why this is necessary)
 		NIy = NOy * SRF
 	else -- upper/left end is at North (angle == 0)
 		NOx = 0; NOy = 1
@@ -721,6 +725,9 @@ function ArcHUDRingTemplate:SetMax(max)
 	if (self.endValue > max) then
 		self.endValue = max
 	end
+	if (max ~= self.maxValue) then
+		self:RefreshSeparators()
+	end
 	self.maxValue = max
 end
 
@@ -780,8 +787,9 @@ end
 --   angle - angle in degrees
 --   offset - offset from center of the ring (e.g. width/2)
 --   rotate - true if the texture should be rotated according to angle
+--   squeeze - 'squeeze' texture inside the arc area
 -----------------------------------------------------------
-function ArcHUDRingTemplate:SetTextureAngle(tex, angle, offset, rotate)
+function ArcHUDRingTemplate:SetTextureAngle(tex, angle, offset, rotate, squeeze)
 	local ringFactor = 0.9
 	if angle <= 90 then
 		ringFactor = 0.9 + ((90 - angle) / (90/0.1))
@@ -791,23 +799,52 @@ function ArcHUDRingTemplate:SetTextureAngle(tex, angle, offset, rotate)
 	local angleR = math.rad(angle)
 	local R = self.radius
 	
-	local Ox = R * math.sin(angleR)
-	local Oy = R * math.cos(angleR) * -1
+	local sin_a = math.sin(angleR)
+	local cos_a = math.cos(angleR)
+	local Ox = R * sin_a
+	local Oy = R * cos_a * -1
 	local Ix = Ox * ringFactor
 	local Iy = Oy * ringFactor
 	
+	local Mx = (Ox + Ix)/2
+	local My = (Oy + Iy)/2
+	
+	if squeeze then
+		offset = offset * sin_a
+	end
+	
 	tex:ClearAllPoints()
-	if (self.reversed) then
-		tex:SetPoint("TOPLEFT", self, "BOTTOMLEFT", Ix-offset, Iy+offset)
-		tex:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", Ox+offset, Oy-offset)
+	if (self.reversed) then -- right side
+		if (angle <= 90) then
+			Mx = Mx - 2*cos_a -- small correction (not sure why this is necessary)
+			--tex:SetPoint("TOPLEFT", self, "BOTTOMLEFT", Ix-offset, Iy+offset)
+			--tex:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", Ox+offset, Oy-offset)
+		else
+			Mx = Mx + 2*cos_a -- small correction (not sure why this is necessary)
+			--tex:SetPoint("TOPLEFT", self, "BOTTOMLEFT", Ix-offset, Oy+offset)
+			--tex:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", Ox+offset, Iy-offset)
+		end
+		--ArcHUD:LevelDebug(1, "M(%f,%f)", Mx, My)
+		tex:SetPoint("TOPLEFT", self, "BOTTOMLEFT", Mx-offset, My+offset)
+		tex:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", Mx+offset, My-offset)
 		if rotate then
 			tex:SetRotation(angleR)
 		end
-	else
-		tex:SetPoint("TOPLEFT", self, "BOTTOMLEFT", -Ox-offset, Oy+offset)
-		tex:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", -Ix+offset, Iy-offset)
+	else -- left side
+		if (angle <= 90) then
+			Mx = Mx - 2*cos_a -- small correction (not sure why this is necessary)
+			--tex:SetPoint("TOPLEFT", self, "BOTTOMLEFT", -Ox-offset, Iy+offset)
+			--tex:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", -Ix+offset, Oy-offset)
+		else
+			Mx = Mx + 2*cos_a -- small correction (not sure why this is necessary)
+			--tex:SetPoint("TOPLEFT", self, "BOTTOMLEFT", -Ox-offset, Oy+offset)
+			--tex:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", -Ix+offset, Iy-offset)
+		end
+		--ArcHUD:LevelDebug(1, "M(%f,%f)", Mx, My)
+		tex:SetPoint("TOPLEFT", self, "BOTTOMLEFT", -Mx-offset, My+offset)
+		tex:SetPoint("BOTTOMRIGHT", self, "BOTTOMLEFT", -Mx+offset, My-offset)
 		if rotate then
-			tex:SetRotation(2*PI - angleR)
+			tex:SetRotation(TWOPI - angleR)
 		end
 	end
 end
@@ -881,6 +918,38 @@ end
 function ArcHUDRingTemplate:ShineFadeOut()
 	self.shining = false
 	UIFrameFadeOut(self.shine, 0.5)
+end
+
+----------------------------------------------
+-- Shows separators if needed
+----------------------------------------------
+function ArcHUDRingTemplate:RefreshSeparators()
+	if (self.sep) then
+		-- hide all
+		for i,s in ipairs(self.sep) do
+			s:Hide()
+		end
+	end
+	
+	if (self.showSeparators) then
+		if (not self.sep) then
+			self.sep = {}
+		end
+		if (self.maxValue > 1) and (self.maxValue <= 20) then
+			local anglestep = (self.endAngle-self.startAngle)/self.maxValue
+			local angle = self.startAngle + anglestep
+			for i=1,(self.maxValue-1) do
+				if (not self.sep[i]) then
+					self.sep[i] = self:CreateTexture(nil, "OVERLAY")
+					self.sep[i]:SetTexture("Interface\\Addons\\ArcHUD3\\Icons\\Separator")
+					self.sep[i]:SetVertexColor(0, 0, 0)
+				end
+				self:SetTextureAngle(self.sep[i], angle, 12, true, true)
+				self.sep[i]:Show()
+				angle = angle + anglestep
+			end
+		end
+	end
 end
 
 -----------------------------------------------------------
@@ -1118,6 +1187,7 @@ function ArcHUDRingTemplate:OnLoad(frame)
 	frame.ShineFadeOut				= self.ShineFadeOut
 	frame.GetAngle					= self.GetAngle
 	frame.SetTextureAngle			= self.SetTextureAngle
+	frame.RefreshSeparators			= self.RefreshSeparators
 
 	frame.startValue = 0
 	frame.endValue = 0

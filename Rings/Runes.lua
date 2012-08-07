@@ -104,7 +104,7 @@ function module:OnModuleEnable()
 		-- configure rune arcs
 		for i=1,6 do
 			self:AttachRing(self.frames[i])
-			if i <= 3 then
+			if i <= 1 then
 				self.frames[i].inverseFill = true
 			end
 			self.frames[i].linearFade = true

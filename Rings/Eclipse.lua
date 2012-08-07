@@ -58,11 +58,13 @@ function module:OnModuleEnable()
 		self.frames[1]:UpdateColor(self.db.profile.ColorLunar)
 		self.frames[1]:SetStartAngle(90)
 		self:AttachRing(self.frames[1])
+		self.frames[1].sparkRed:SetVertexColor(0.5, 0.5, 0.5)
+		self.frames[1]:SetSpark(0.001, true)
 		
 		self.frames[2] = self:CreateRing(false, ArcHUDFrame)
 		self.frames[2]:SetAlpha(0)
 		self.frames[2]:UpdateColor(self.db.profile.ColorSolar)
-		self.frames[2]:SetEndAngle(89.99)
+		self.frames[2]:SetEndAngle(89.999)
 		self.frames[2].inverseFill = true
 		self:AttachRing(self.frames[2])
 		
@@ -70,15 +72,6 @@ function module:OnModuleEnable()
 			self.frames[i].dirty = true
 			self.frames[i].fadeIn = 0.25
 		end
-		
---[[		-- direction indicator
-		self.indicator = self.f:CreateTexture(nil, "OVERLAY")
-		self.indicator:SetTexture("Interface\\PlayerFrame\\UI-DruidEclipse", true)
-		self.indicator:SetBlendMode("ADD")
-		self.indicator:SetRotation(math.rad(90))
-		self.indicator:SetTexCoord(unpack(ECLIPSE_MARKER_COORDS["moon"]))
-		self.f:SetTextureAngle(self.indicator, 90, 5)
-		self.indicator:Show() ]]
 	end
 
 	-- check whether we are balanced spec'ed and in caster/moonkin form

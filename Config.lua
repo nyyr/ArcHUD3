@@ -482,6 +482,12 @@ ArcHUD.configOptionsTableCore = {
 			name		= L["TEXT"]["NAMEPLATES"],
 			order		= 11,
 			args		= {
+				-- Hint
+				NameplateHint = {
+					type		= "description",
+					name		= L["TEXT"]["NPHINT"],
+					order		= 1,
+				},
 				-- Separator
 				NameplatePlayerSep = {
 					type		= "header",

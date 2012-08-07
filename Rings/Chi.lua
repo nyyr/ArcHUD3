@@ -12,6 +12,7 @@ module.defaults = {
 		Flash = true,
 		Side = 2,
 		Level = 1,
+		ShowSeparators = true,
 		Color = {r = 0.7, g = 1, b = 0.9},
 		RingVisibility = 2, -- always fade out when out of combat, regardless of ring status
 	}
@@ -19,6 +20,7 @@ module.defaults = {
 module.options = {
 	{name = "Flash", text = "FLASH", tooltip = "FLASH"},
 	attach = true,
+	hasseparators = true,
 }
 module.localized = true
 

@@ -12,12 +12,14 @@ module.defaults = {
 		Flash = false,
 		Side = 2,
 		Level = 1,
+		ShowSeparators = true,
 		Color = {r = 0.5, g = 0, b = 0.5},
 		RingVisibility = 2, -- always fade out when out of combat, regardless of ring status
 	}
 }
 module.options = {
 	attach = true,
+	hasseparators = true,
 }
 module.localized = true
 

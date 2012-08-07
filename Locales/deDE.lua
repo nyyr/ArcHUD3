@@ -39,8 +39,8 @@ L["TEXT"] = {
 	PROFILES_EXISTS= "Ein Profil mit diesem Namen existiert bereits.",
 	
 	DISPLAY		= "Anzeige",
-	PLAYERFRAME	= "Spielernamensplakette",
-	TARGETFRAME	= "Zieleinheitenfenster",
+	PLAYERFRAME	= "Spielernamen-Rahmen",
+	TARGETFRAME	= "Zieleinheiten-Rahmen",
 	PLAYERMODEL	= "3D Modell für Spieler",
 	MOBMODEL	= "3D Modell für NSCs",
 	SHOWGUILD	= "Zeige Gildennamen des Spielers",
@@ -55,6 +55,7 @@ L["TEXT"] = {
 	TOTOT		= "Aktiviere Ziel des Ziel-des-Ziels",
 
 	NAMEPLATES	= "Namensplaketten",
+	NPHINT		= "Hier kann das Mausverhalten der Namensplaketten konfiguriert werden. Die Sichtbarkeit kann unter 'Anzeige-Optionen' eingestellt werden.",
 	NPPLAYEROPT = "Spieler",
 	NPPLAYER	= "Spieler",
 	NPPET		= "Begleiter",
@@ -108,8 +109,8 @@ L["TOOLTIP"] = {
 	PROFILES_CREATE = "Erstellt ein neues Profil basierend auf dem aktuellen und aktiviert es.",
 	PROFILES_DELETE = "Löscht das aktuelle Profil und aktiviert das Hauptprofil.",
 
-	PLAYERFRAME	= "Schaltet Anzeige der Spieler/Begleiter-Namensschilder ein/aus",
-	TARGETFRAME = "Schaltet Anzeige der Zieleinheitenfenster ein/aus",
+	PLAYERFRAME	= "Schaltet Anzeige der Spieler/Begleiter-Namen ein/aus.\nHINWEIS: Mausverhalten kann unter 'Namensplaketten' eingestellt werden.",
+	TARGETFRAME = "Schaltet Anzeige der Zieleinheiten-Rahmen ein/aus.\nHINWEIS: Mausverhalten kann unter 'Namensplaketten' eingestellt werden.",
 	PLAYERMODEL = "Schaltet Anzeige von 3D-Spielermodellen ein/aus",
 	MOBMODEL	= "Schaltet Anzeige von 3D-NSC-Modellen ein/aus",
 	SHOWGUILD	= "Schaltet Anzeige von Spieler-Gildenzugehörigkeit ein/aus",
@@ -123,13 +124,18 @@ L["TOOLTIP"] = {
 	TOT			= "Schaltet Anzeige des Ziel des Ziels ein/aus",
 	TOTOT		= "Schaltet Anzeige des Ziel des Ziel-des-Ziels ein/aus",
 
-	NPPLAYER	= "(De-)Aktiviert Interaktion mit Spieler-Namensschild. "..
+	NPPLAYER	= "(De-)Aktiviert Interaktion mit Spieler-Namensschild.\n"..
+		"HINWEIS: Diese Option hat nur einen Effekt, wenn der Spielernamen-Rahmen angezeigt wird (siehe Anzeige-Optionen).\n\n"..
 		"Der Interaktionsstatus kann im Kampf nicht geändert werden und verbleibt im Zustand wie er zu Kampfesbeginn war.",
-	NPPET		= "(De-)Aktiviert Interaktion mit Begleiter-Namensschild. "..
+	NPPET		= "(De-)Aktiviert Interaktion mit Begleiter-Namensschild.\n"..
+		"HINWEIS: Diese Option hat nur einen Effekt, wenn der Spielernamen-Rahmen angezeigt wird (siehe Anzeige-Optionen).\n\n"..
 		"Der Interaktionsstatus kann im Kampf nicht geändert werden und verbleibt im Zustand wie er zu Kampfesbeginn war.",
-	NPTARGET	= "(De-)Aktiviert Interaktion mit Ziel-Namensschild",
-	NPTOT		= "(De-)Aktiviert Interaktion mit Ziel-des-Ziels-Namensschild",
-	NPTOTOT		= "(De-)Aktiviert Interaktion mit Ziel-des-Ziel-des-Ziels-Namensschild",
+	NPTARGET	= "(De-)Aktiviert Interaktion mit Ziel-Namensschild.\n"..
+		"HINWEIS: Diese Option hat nur einen Effekt, wenn der Zieleinheiten-Rahmen angezeigt wird (siehe Anzeige-Optionen).",
+	NPTOT		= "(De-)Aktiviert Interaktion mit Ziel-des-Ziels-Namensschild.\n"..
+		"HINWEIS: Diese Option hat nur einen Effekt, wenn der Zieleinheiten-Rahmen angezeigt wird (siehe Anzeige-Optionen).",
+	NPTOTOT		= "(De-)Aktiviert Interaktion mit Ziel-des-Ziel-des-Ziels-Namensschild.\n"..
+		"HINWEIS: Diese Option hat nur einen Effekt, wenn der Zieleinheiten-Rahmen angezeigt wird (siehe Anzeige-Optionen).",
 	NPCOMBAT	= "Toggle always enabling clickable nameplates when entering combat", -- TODO: obsolete
 	HOVERMSG	= "Schaltet Anzeige einer Chat-Nachricht ein/aus wenn Mauseingabe aktiviert wird",
 	HOVERDELAY	= "Anzahl der Sekunden, die die Maus über den Spieler/Begleiter-Namensschildern schweben muss, um diese zu aktivieren",

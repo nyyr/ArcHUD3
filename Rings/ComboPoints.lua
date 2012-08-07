@@ -12,12 +12,14 @@ module.defaults = {
 		Flash = true,
 		Side = 2,
 		Level = 1,
+		ShowSeparators = true,
 		Color = {r = 1, g = 0, b = 0},
 	}
 }
 module.options = {
 	{name = "Flash", text = "FLASH", tooltip = "FLASH"},
 	attach = true,
+	hasseparators = true,
 }
 module.localized = true
 
@@ -50,7 +52,7 @@ function module:OnModuleEnable()
 	self.f:UpdateColor(self.db.profile.Color)
 	self.f:SetMax(5)
 	self.f:SetValue(GetComboPoints(self.unit))
-
+	
 	-- Register the events we will use
 	self:RegisterUnitEvent("UNIT_COMBO_POINTS",	"UpdateComboPoints")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED",	"UpdateComboPoints")

@@ -23,6 +23,7 @@ CustomBuffRingTemplate.defaults = {
 		Flash = false,
 		Side = 2,
 		Level = 2,
+		ShowSeparators = false,
 		Color = {r = 1, g = 1, b = 0.5},
 		
 		Debuff = false,
@@ -40,6 +41,7 @@ CustomBuffRingTemplate.options = {
 	{name = "Flash", text = "FLASH", tooltip = "FLASH"},
 	hascolor = true,
 	attach = true,
+	hasseparators = true,
 }
 
 CustomBuffRingTemplate.localized = true
