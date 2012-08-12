@@ -16,16 +16,14 @@ module.defaults = {
 		ColorFocus = PowerBarColor[2],
 		ColorEnergy = PowerBarColor[3],
 		ColorRunic = PowerBarColor[6],
-		Attach = false,
+		InnerAnchor = true,
 		Side = 2,
-		Level = -2,
+		Level = 0,
 	}
 }
 module.options = {
 	{name = "ShowPerc", text = "SHOWPERC", tooltip = "SHOWPERC"},
-	{name = "Attach", text = "ATTACHRING", tooltip = "ATTACHRING"},
 	hasmanabar = true,
-	attach = false,
 }
 module.localized = true
 
@@ -51,8 +49,7 @@ function module:OnModuleUpdate()
 		self.MPPerc:Hide()
 	end
 
-	if(self.db.profile.Attach) then
-		self.f:SetScale(1)
+	if not self.db.profile.InnerAnchor then
 		fontName, _, fontFlags = self.MPPerc:GetFont()
 		self.MPPerc:SetFont(fontName, 11, fontFlags)
 
@@ -68,21 +65,15 @@ function module:OnModuleUpdate()
 			self.MPPerc:SetPoint("TOPLEFT", self.f, "BOTTOMLEFT", 50, -115)
 		end
 	else
-		self.f:SetScale(0.6)
-		self.f.BG:SetReversed(true)
-		self.f.BG:SetAngle(180)
-
-		self.f:SetReversed(true)
-		self.f:ClearAllPoints()
-		self.f:SetPoint("TOPLEFT", self.parent:GetModule("Anchors").Right, "LEFT", 0, 90)
-
+		fontName, _, fontFlags = self.MPPerc:GetFont()
+		self.MPPerc:SetFont(fontName, 16, fontFlags)
+		
 		self.MPPerc:SetWidth(100)
 		self.MPPerc:SetHeight(17)
 
+		-- TODO side
 		self.MPPerc:ClearAllPoints()
 		self.MPPerc:SetPoint("BOTTOMLEFT", self.f, "BOTTOMLEFT", 65, -125)
-		fontName, _, fontFlags = self.MPPerc:GetFont()
-		self.MPPerc:SetFont(fontName, 16, fontFlags)
 	end
 
 	self.f:SetValue(UnitPower(self.unit))

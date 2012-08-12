@@ -208,11 +208,7 @@ function ArcHUD.modulePrototype:ARCHUD_MODULE_UPDATE(message, module)
 			end
 
 			-- Special treatment for Pet rings
-			if(string.find(self.name, "Pet")) then
-				self.options.attach = self.db.profile.Attach
-			end
-
-			if(self.options.attach) then
+			if self.name ~= "Anchors" then
 				self:AttachRing()
 			end
 
@@ -252,16 +248,29 @@ function ArcHUD.modulePrototype:AttachRing(ring)
 	ring:SetValue(0)
 	-- Clear all points for the ring
 	ring:ClearAllPoints()
+	
 	if(self.db.profile.Side == 1) then
 		-- Attach to left side
-		ring:SetPoint("TOPLEFT", self.parent:GetModule("Anchors").Left, "TOPLEFT", self.db.profile.Level * -15, 0)
+		if self.db.profile.InnerAnchor then
+			ring:SetScale(0.6)
+			ring:SetPoint("TOPLEFT", self.parent:GetModule("Anchors").Left, "LEFT", self.db.profile.Level * -9, 90)
+		else
+			ring:SetScale(1)
+			ring:SetPoint("TOPLEFT", self.parent:GetModule("Anchors").Left, "TOPLEFT", self.db.profile.Level * -15, 0)
+		end
 		if(ring.BG) then
 			ring.BG:SetReversed(false)
 		end
 		ring:SetReversed(false)
 	else
 		-- Attach to right side
-		ring:SetPoint("TOPRIGHT", self.parent:GetModule("Anchors").Right, "TOPRIGHT", self.db.profile.Level * 15, 0)
+		if self.db.profile.InnerAnchor then
+			ring:SetScale(0.6)
+			ring:SetPoint("TOPLEFT", self.parent:GetModule("Anchors").Right, "LEFT", self.db.profile.Level * 9, 90)
+		else
+			ring:SetScale(1)
+			ring:SetPoint("TOPRIGHT", self.parent:GetModule("Anchors").Right, "TOPRIGHT", self.db.profile.Level * 15, 0)
+		end
 		if(ring.BG) then
 			ring.BG:SetReversed(true)
 		end
@@ -674,12 +683,25 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 					self:SendMessage("ARCHUD_MODULE_UPDATE", self:GetName())
 				end,
 			},
+			inneranchor = {
+				type		= "toggle",
+				name		= LM["TEXT"]["INNERANCHOR"],
+				desc		= LM["TOOLTIP"]["INNERANCHOR"],
+				order		= 23,
+				get			= function ()
+					return self.db.profile.InnerAnchor
+				end,
+				set			= function (info, v)
+					self.db.profile.InnerAnchor = v
+					self:SendMessage("ARCHUD_MODULE_UPDATE", self:GetName())
+				end,
+			},
 			side = {
 				type		= "select",
 				name		= LM["TEXT"]["SIDE"],
 				desc		= LM["TOOLTIP"]["SIDE"],
 				values		= {LM["SIDE"]["LEFT"], LM["SIDE"]["RIGHT"]},
-				order		= 23,
+				order		= 24,
 				get			= function ()
 					return self.db.profile.Side
 				end,
@@ -695,7 +717,7 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 				min			= -5,
 				max			= 5,
 				step		= 1,
-				order		= 24,
+				order		= 25,
 				get			= function ()
 					return self.db.profile.Level
 				end,

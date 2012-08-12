@@ -45,7 +45,7 @@ function module:OnModuleUpdate()
 	else
 		self.HPPerc:Hide()
 	end
-
+--[[
 	if (self.db.profile.Attach) then
 		self.f:SetScale(1)
 		--fontName, _, fontFlags = self.HPPerc:GetFont()
@@ -79,7 +79,7 @@ function module:OnModuleUpdate()
 		--fontName, _, fontFlags = self.HPPerc:GetFont()
 		--self.HPPerc:SetFont(fontName, 16, fontFlags)
 	end
-	
+]]
 	-- Clear all points for the percentage display
 	self.HPPerc:ClearAllPoints()
 	if(self.db.profile.Side == 1) then

@@ -244,7 +244,7 @@ LM["TEXT"] = {
 	COLORUNHOLYRUNE = "Unholy rune color",
 	COLORDEATHRUNE = "Death rune color",
 	
-	ATTACHRING	= "Detach ring",
+	INNERANCHOR = "Attach ring to inner ('pet') anchor",
 	
 	CUSTOM		= "Custom Buff Arcs",
 	CUSTNEW		= "New custom arc",
@@ -299,7 +299,8 @@ LM["TOOLTIP"] = {
 	COLORFOCUS	= "Set custom focus ring color",
 	COLORENERGY	= "Set custom energy ring color",
 	COLORRUNIC	= "Set custom runic power ring color",
-	ATTACHRING	= "Toggle attachment of the ring to the normal frame anchors (will behave like a normal ring when active)",
+	
+	INNERANCHOR = "If selected, attach ring to inner ('pet') anchor. If not, use normal (outer) anchors.",
 	
 	CUSTNEW		= "Create a new custom arc for a specific buff or debuff",
 	CUSTDEBUFF	= "Look for debuffs instead of buffs",

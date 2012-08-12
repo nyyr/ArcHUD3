@@ -133,7 +133,7 @@ function CustomBuffRingTemplate:OnModuleEnable()
 
 	self.f:Show()
 	
-	self:Debug(1, "CustomBuffRingTemplate:OnModuleEnable()")
+	--self:Debug(1, "CustomBuffRingTemplate:OnModuleEnable()")
 end
 
 function CustomBuffRingTemplate:OnModuleDisable()

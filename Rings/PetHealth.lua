@@ -13,16 +13,14 @@ module.defaults = {
 		ShowPerc = true,
 		ColorMode = "fade",
 		Color = {r = 0, g = 1, b = 0},
-		Attach = false,
+		InnerAnchor = true,
 		Side = 1,
-		Level = -2,
+		Level = 0,
 	}
 }
 module.options = {
 	{name = "ShowPerc", text = "SHOWPERC", tooltip = "SHOWPERC"},
-	{name = "Attach", text = "ATTACHRING", tooltip = "ATTACHRING"},
 	hascolorfade = true,
-	attach = false,
 }
 module.localized = true
 
@@ -44,8 +42,7 @@ function module:OnModuleUpdate()
 		self.HPPerc:Hide()
 	end
 
-	if(self.db.profile.Attach) then
-		self.f:SetScale(1)
+	if not self.db.profile.InnerAnchor then
 		fontName, _, fontFlags = self.HPPerc:GetFont()
 		self.HPPerc:SetFont(fontName, 11, fontFlags)
 
@@ -61,21 +58,15 @@ function module:OnModuleUpdate()
 			self.HPPerc:SetPoint("TOPLEFT", self.f, "BOTTOMLEFT", 50, -115)
 		end
 	else
-		self.f:SetScale(0.6)
-		self.f.BG:SetReversed(false)
-		self.f.BG:SetAngle(180)
-
-		self.f:SetReversed(false)
-		self.f:ClearAllPoints()
-		self.f:SetPoint("TOPLEFT", self.parent:GetModule("Anchors").Left, "LEFT", 0, 90)
-
+		fontName, _, fontFlags = self.HPPerc:GetFont()
+		self.HPPerc:SetFont(fontName, 16, fontFlags)
+		
 		self.HPPerc:SetWidth(100)
 		self.HPPerc:SetHeight(17)
 
+		-- TODO side
 		self.HPPerc:ClearAllPoints()
 		self.HPPerc:SetPoint("BOTTOMLEFT", self.f, "BOTTOMLEFT", -165, -125)
-		fontName, _, fontFlags = self.HPPerc:GetFont()
-		self.HPPerc:SetFont(fontName, 16, fontFlags)
 	end
 
 	self.f:SetValue(UnitHealth(self.unit))

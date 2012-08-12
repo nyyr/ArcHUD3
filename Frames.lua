@@ -95,9 +95,21 @@ local function AH_CreateBuffButton(parent, id, point)
 	return f
 end
 
-
 local function AH_CreateNameplate(parent, unit, size, point)
-	local f = CreateFrame("Button", nil, parent, "SecureUnitButtonTemplate")
+	local name
+	if parent and parent:GetName() then
+		name = parent:GetName() .. "_"
+	else
+		name = "ArcHUD_"
+	end
+	name = name .. unit
+	
+	-- be sure we don't create a frame with an existing name (should not happen)
+	assert(not _G[name])
+	
+	ArcHUD:LevelDebug(1, "Creating unit frame "..name)
+	
+	local f = CreateFrame("Button", name, parent, "SecureUnitButtonTemplate")
 	local width, height = unpack(size)
 
 	f:SetWidth(width)
@@ -221,13 +233,13 @@ function ArcHUD:CreateHUDFrames()
 	targethud.MLFrame = nil
 	targethud.MLIcon = nil
 
-	targethud.Target = AH_CreateFrame("Frame", nil, targethud, {100, 30}, {"TOPLEFT", targethud, "TOPLEFT", 0, -70})
+	targethud.Target = AH_CreateFrame("Frame", targethud:GetName().."TT", targethud, {100, 30}, {"TOPLEFT", targethud, "TOPLEFT", 0, -70})
 	AH_CreateMoverFrame(targethud.Target, "targettarget", {120, 50}, {"TOPLEFT", -10, 10}, {"TOPLEFT", targethud, "TOPLEFT", 0, -70})
 	targethud.Target.Name = AH_CreateFontString(targethud.Target, "ARTWORK", {100, 14}, 13, "RIGHT", {1, 1, 1}, {"TOPLEFT", targethud.Target, "TOPLEFT"})
 	targethud.Target.HPText = AH_CreateFontString(targethud.Target, "ARTWORK", {50, 11}, 10, "RIGHT", {1, 1, 1}, {"TOPRIGHT", targethud.Target.Name, "BOTTOMRIGHT", 0, -5})
 	targethud.Target.MPText = AH_CreateFontString(targethud.Target, "ARTWORK", {50, 11}, 10, "LEFT", {1, 1, 1}, {"TOPLEFT", targethud.Target.Name, "BOTTOMLEFT", 0, -5})
 
-	targethud.TargetTarget = AH_CreateFrame("Frame", nil, targethud, {100, 30}, {"TOPRIGHT", targethud, "TOPRIGHT", 0, -70})
+	targethud.TargetTarget = AH_CreateFrame("Frame", targethud:GetName().."TTT", targethud, {100, 30}, {"TOPRIGHT", targethud, "TOPRIGHT", 0, -70})
 	AH_CreateMoverFrame(targethud.TargetTarget, "targettargettarget", {120, 50}, {"TOPLEFT", -10, 10}, {"TOPRIGHT", targethud, "TOPRIGHT", 0, -70})
 	targethud.TargetTarget.Name = AH_CreateFontString(targethud.TargetTarget, "ARTWORK", {100, 14}, 13, "LEFT", {1, 1, 1}, {"TOPLEFT", targethud.TargetTarget, "TOPLEFT"})
 	targethud.TargetTarget.HPText = AH_CreateFontString(targethud.TargetTarget, "ARTWORK", {50, 11}, 10, "LEFT", {1, 1, 1}, {"TOPLEFT", targethud.TargetTarget.Name, "BOTTOMLEFT", 0, -5})
