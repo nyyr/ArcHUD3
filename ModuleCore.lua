@@ -603,7 +603,13 @@ function ArcHUD.modulePrototype:RegisterUnitEvent(event, callback, unit)
 	
 	self.f.unitEvents[event] = { cb = callback, module = self }
 	
-	self.f:RegisterUnitEvent(event, unit, unit2)
+	if (self.f.RegisterUnitEvent) then
+		-- introduced in WoW 5.x
+		self.f:RegisterUnitEvent(event, unit, unit2)
+	else
+		-- for backward compatibility (WoW 4.x)
+		self:RegisterEvent(event, callback)
+	end
 end
 
 ----------------------------------------------

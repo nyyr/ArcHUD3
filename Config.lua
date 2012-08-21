@@ -986,7 +986,7 @@ ArcHUD.configOptionsTableCore = {
 						ArcHUD.db.profile.BlizzSpellActCenter = v
 						if v then
 							SpellActivationOverlayFrame:ClearAllPoints()
-							SpellActivationOverlayFrame:SetPoint("CENTER", ArcHUDFrame, "CENTER", 0, 0)
+							SpellActivationOverlayFrame:SetPoint("CENTER", ArcHUDFrame, "CENTER", 0, -175)
 						else
 							SpellActivationOverlayFrame:ClearAllPoints()
 							SpellActivationOverlayFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
@@ -1008,6 +1008,13 @@ ArcHUD.configOptionsTableCore = {
 					set			= function (info, v)
 						ArcHUD.db.profile.BlizzSpellActScale = v
 						SpellActivationOverlayFrame:SetScale(v)
+						if ArcHUD.db.profile.BlizzSpellActCenter then
+							SpellActivationOverlayFrame:ClearAllPoints()
+							SpellActivationOverlayFrame:SetPoint("CENTER", ArcHUDFrame, "CENTER", 0, -87)
+						else
+							SpellActivationOverlayFrame:ClearAllPoints()
+							SpellActivationOverlayFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+						end
 					end,
 				},
 				-- Blizzard Spell Activation Opacity

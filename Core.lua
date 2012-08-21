@@ -71,7 +71,7 @@ ArcHUD.defaults = {
 		BlizzTarget = true,
 		BlizzFocus = true,
 		BlizzSpellActCenter = true,
-		BlizzSpellActScale = 1.0,
+		BlizzSpellActScale = 0.8,
 		BlizzSpellActOpacity = 1.0,
 		ShowPVP = true,
 		ShowComboPoints = true,
@@ -277,14 +277,14 @@ function ArcHUD:OnProfileChanged(db, profile)
 		self:HideBlizzardFocus(self.db.profile.BlizzFocus)
 	end
 	
+	SpellActivationOverlayFrame:SetScale(self.db.profile.BlizzSpellActScale)
 	if self.db.profile.BlizzSpellActCenter then
 		SpellActivationOverlayFrame:ClearAllPoints()
-		SpellActivationOverlayFrame:SetPoint("CENTER", ArcHUDFrame, "CENTER", 0, 0)
+		SpellActivationOverlayFrame:SetPoint("CENTER", ArcHUDFrame, "CENTER", 0, -87)
 	else
 		SpellActivationOverlayFrame:ClearAllPoints()
 		SpellActivationOverlayFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
 	end
-	SpellActivationOverlayFrame:SetScale(self.db.profile.BlizzSpellActScale)
 	self:HookBlizzardSpellActivation((self.db.profile.BlizzSpellActOpacity < 1.0))
 	
 	if (self.db.profile.PlayerFrame) then
@@ -363,7 +363,7 @@ function ArcHUD:OnProfileChanged(db, profile)
 	--self:LevelDebug(d_notice, "Setting scale. Scale: "..self.db.profile.Scale)
 	-- Scale the HUD according to user settings.
 	ArcHUDFrame:SetScale(self.db.profile.Scale)
-
+	
 	-- Set playername
 	self:UpdateFaction()
 	self:PLAYER_UPDATE_RESTING()
