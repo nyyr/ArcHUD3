@@ -102,7 +102,7 @@ ArcHUD.configOptionsTableCmd = {
 			name		= "debug",
 			desc		= L["CMD_OPTS_DEBUG"],
 			order		= 5,
-			values		= {"off", "warn", "info", "notice"},
+			values		= {"warn", "info", "notice", "off"},
 			get			= function()
 				return debugLevels[ArcHUD:GetDebugLevel() or 4]
 			end,
@@ -111,12 +111,12 @@ ArcHUD.configOptionsTableCmd = {
 					ArcHUD:SetDebugLevel(nil)
 					ArcHUD.db.profile.Debug = nil
 				else 
-					ArcHUD:SetDebugLevel(v - 1)
+					ArcHUD:SetDebugLevel(v)
 					ArcHUD.db.profile.Debug = v
 				end
 			end,
 		},
-		perf = {
+--[[		perf = {
 			type		= "execute",
 			name		= "config",
 			desc		= "Show performance infos on timers (developers only!)",
@@ -125,7 +125,7 @@ ArcHUD.configOptionsTableCmd = {
 				ArcHUD:TimersPrintPerf()
 			end,
 		},
---[[		test = {
+		test = {
 			type		= "execute",
 			name		= "test",
 			desc		= "Internal testing of some functions (developers only!)",
@@ -973,15 +973,52 @@ ArcHUD.configOptionsTableCore = {
 						ArcHUD:HideBlizzardFocus(v)
 					end,
 				},
-				-- Buff icon size
+				-- Blizzard Spell Activation Center on ArcHUD
+				blizzSpellActCenter = {
+					type		= "toggle",
+					name		= L["TEXT"]["BLIZZSPELLACT_CENTER"],
+					desc		= L["TOOLTIP"]["BLIZZSPELLACT_CENTER"],
+					order		= 10,
+					get			= function ()
+						return ArcHUD.db.profile.BlizzSpellActCenter
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.BlizzSpellActCenter = v
+						if v then
+							SpellActivationOverlayFrame:ClearAllPoints()
+							SpellActivationOverlayFrame:SetPoint("CENTER", ArcHUDFrame, "CENTER", 0, 0)
+						else
+							SpellActivationOverlayFrame:ClearAllPoints()
+							SpellActivationOverlayFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+						end
+					end,
+				},
+				-- Blizzard Spell Activation Opacity
+				blizzSpellActScale = {
+					type		= "range",
+					name		= L["TEXT"]["BLIZZSPELLACT_SCALE"],
+					desc		= L["TOOLTIP"]["BLIZZSPELLACT_SCALE"],
+					min			= 0.2,
+					max			= 2.0,
+					step		= 0.1,
+					order		= 11,
+					get			= function ()
+						return ArcHUD.db.profile.BlizzSpellActScale
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.BlizzSpellActScale = v
+						SpellActivationOverlayFrame:SetScale(v)
+					end,
+				},
+				-- Blizzard Spell Activation Opacity
 				blizzSpellActOpacity = {
 					type		= "range",
-					name		= L["TEXT"]["BLIZZSPELLACT"],
-					desc		= L["TOOLTIP"]["BLIZZSPELLACT"],
+					name		= L["TEXT"]["BLIZZSPELLACT_OPAC"],
+					desc		= L["TOOLTIP"]["BLIZZSPELLACT_OPAC"],
 					min			= 0.2,
 					max			= 1.0,
 					step		= 0.1,
-					order		= 3,
+					order		= 12,
 					get			= function ()
 						return ArcHUD.db.profile.BlizzSpellActOpacity
 					end,

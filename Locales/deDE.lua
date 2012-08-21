@@ -98,7 +98,7 @@ L["TEXT"] = {
 	BLIZZPLAYER = "Blizzard Spielereinheitenfenster sichtbar",
 	BLIZZTARGET = "Blizzard Zieleinheitenfenster sichtbar",
 	BLIZZFOCUS  = "Blizzard Fokuszieleinheitenfenster sichtbar",
-	BLIZZSPELLACT= "Deckkraft der Zauberspruchaktivierungsanzeige",
+	BLIZZSPELLACT_OPAC = "Deckkraft der Zauberspruchaktivierungsanzeige",
 
 	RINGS		= "Ringoptionen",
 	RING		= "Ring",
@@ -170,7 +170,7 @@ L["TOOLTIP"] = {
 	BLIZZPLAYER = "Schaltet die Sichtbarkeit des Blizzard-Spieler-Einheitenfensters ein/aus",
 	BLIZZTARGET = "Schaltet die Sichtbarkeit des Blizzard-Ziel-Einheitenfensters ein/aus",
 	BLIZZFOCUS  = "Schaltet die Sichtbarkeit des Blizzard-Fokusziel-Einheitenfensters ein/aus",
-	BLIZZSPELLACT= "Setzt die Deckkraft von Blizzards Zauberspruchaktivierungssymbole.",
+	BLIZZSPELLACT_OPAC = "Setzt die Deckkraft von Blizzards Zauberspruchaktivierungssymbole.",
 	
 }
 

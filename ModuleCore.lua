@@ -207,7 +207,6 @@ function ArcHUD.modulePrototype:ARCHUD_MODULE_UPDATE(message, module)
 				self.ColorMode = self.db.profile.ColorMode or "custom"
 			end
 
-			-- Special treatment for Pet rings
 			if self.name ~= "Anchors" then
 				self:AttachRing()
 			end

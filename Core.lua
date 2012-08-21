@@ -70,6 +70,8 @@ ArcHUD.defaults = {
 		BlizzPlayer = true,
 		BlizzTarget = true,
 		BlizzFocus = true,
+		BlizzSpellActCenter = true,
+		BlizzSpellActScale = 1.0,
 		BlizzSpellActOpacity = 1.0,
 		ShowPVP = true,
 		ShowComboPoints = true,
@@ -101,6 +103,11 @@ ArcHUD.ClassColor = {
 
 -- Reputation colors
 ArcHUD.RepColor = { "FF4444", "DD4444", "DD7744", "BB9944", "44DD44", "55EE44", "66FF44"}
+
+-- for backward compatibility (WoW 4.x-5.x)
+if not UnitIsGroupLeader then
+	UnitIsGroupLeader = UnitIsPartyLeader
+end
 
 ----------------------------------------------
 -- Print debug message
@@ -270,6 +277,14 @@ function ArcHUD:OnProfileChanged(db, profile)
 		self:HideBlizzardFocus(self.db.profile.BlizzFocus)
 	end
 	
+	if self.db.profile.BlizzSpellActCenter then
+		SpellActivationOverlayFrame:ClearAllPoints()
+		SpellActivationOverlayFrame:SetPoint("CENTER", ArcHUDFrame, "CENTER", 0, 0)
+	else
+		SpellActivationOverlayFrame:ClearAllPoints()
+		SpellActivationOverlayFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+	end
+	SpellActivationOverlayFrame:SetScale(self.db.profile.BlizzSpellActScale)
 	self:HookBlizzardSpellActivation((self.db.profile.BlizzSpellActOpacity < 1.0))
 	
 	if (self.db.profile.PlayerFrame) then

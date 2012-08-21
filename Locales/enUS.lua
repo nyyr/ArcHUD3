@@ -95,7 +95,9 @@ L["TEXT"] = {
 	BLIZZPLAYER = "Blizzard player frame visible",
 	BLIZZTARGET = "Blizzard target frame visible",
 	BLIZZFOCUS  = "Blizzard focus frame visible",
-	BLIZZSPELLACT= "Opacity of spell activation overlays",
+	BLIZZSPELLACT_CENTER = "Center Blizzard's spell activation overlays on ArcHUD",
+	BLIZZSPELLACT_SCALE = "Scale of spell activation overlays",
+	BLIZZSPELLACT_OPAC = "Opacity of spell activation overlays",
 
 	RINGS		= "Ring options",
 	RING		= "Ring",
@@ -165,7 +167,9 @@ L["TOOLTIP"] = {
 	BLIZZPLAYER = "Toggles visibility of the Blizzard player frame",
 	BLIZZTARGET = "Toggles visibility of the Blizzard target frame",
 	BLIZZFOCUS  = "Toggles visibility of the Blizzard focus frame",
-	BLIZZSPELLACT= "Sets opacity of Blizzard's spell activation overlays.",
+	BLIZZSPELLACT_CENTER = "Toggles whether Blizzard's spell activation overlays are centered on ArcHUD or on the screen",
+	BLIZZSPELLACT_SCALE = "Sets the scaling factor of Blizzard's spell activation overlays",
+	BLIZZSPELLACT_OPAC = "Sets opacity of Blizzard's spell activation overlays.",
 	
 }
 

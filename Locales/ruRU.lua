@@ -83,7 +83,7 @@ L["TEXT"] = {
 	BLIZZPLAYER = "Blizzard фрейм игрока",
 	BLIZZTARGET = "Blizzard фрейм цели",
 	BLIZZFOCUS  = "Blizzard фрейм фокуса",
-	BLIZZSPELLACT= "Opacity of spell activation overlays",
+	BLIZZSPELLACT_OPAC = "Opacity of spell activation overlays",
 
 	RINGS		= "Опции дуги",
 	RING		= "Дуга",
@@ -147,7 +147,7 @@ L["TOOLTIP"] = {
 	BLIZZPLAYER = "Вкл/Выкл отображение Blizzardского фрейма игрока",
 	BLIZZTARGET = "Вкл/Выкл отображение Blizzardского фрейма цели",
 	BLIZZFOCUS  = "Вкл/Выкл отображение Blizzardского фрейма фокуса",
-	BLIZZSPELLACT= "Sets opacity of Blizzard's spell activation overlays.",
+	BLIZZSPELLACT_OPAC = "Sets opacity of Blizzard's spell activation overlays.",
 
 }
 
