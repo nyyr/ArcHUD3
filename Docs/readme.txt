@@ -1,12 +1,18 @@
 ArcHUD3 2.0 (WoW 5.0)
 -------------
 
-* added Moonkin-Eclipse ring
-* added Burning Embers and Demonic Fury to Soul Shards ring
-* added ring for DK runes
-* added rendering of arbitrary arcs (used by DK runes)
-* added inverse fillings of rings
-* added "shine" to rings
+* added Monk Chi ring
+* added Moonkin Eclipse ring
+* added Burning Embers and Demonic Fury to Warlock Soul Shards ring
+* added ring for Death Knight runes
+* added options to center/scale Blizzard's spell activation overlays on ArcHUD
+* added option to all arcs to allow attachment to inner (pet) anchor
+* added dynamic separators to certain rings (configurable)
+* added rendering of arbitrary arcs (configurable in v2.1)
+* added inverse fillings of rings (configurable in v2.1)
+* added "shine" to rings (currently DK runes only)
+* fixed an issue with changing pet anchors (ticket #51)
+* fixed an issue with unit frames created by ArcHUD and used by other addons (tickets #52/#38) 
 
 nyyr
 

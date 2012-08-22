@@ -1,3 +1,9 @@
+This documentation describes how to create your own ring. It is quite out-dated
+and won't be updated until some real 3rd party interest is there.
+
+nyyr, 2012-08-22
+
+
 ArcHUD Rings support
 ---------------------
 

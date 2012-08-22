@@ -5,7 +5,8 @@ v2.0 - 2012-08-02 (nyyr)
     at the end of this document)
 
 v0.3 - 2005-10-19 (Antiarc)
-  * Gave a bunch of functionality to the template frames, so you can just set max value/current value and it flows between them nicely.
+  * Gave a bunch of functionality to the template frames, so you can just set
+    max value/current value and it flows between them nicely.
   * Added target health and combo point rings
   * Prettied it up a bit
   

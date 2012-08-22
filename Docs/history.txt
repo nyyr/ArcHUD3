@@ -1,0 +1,51 @@
+
+(nyyr) When starting to take over ArcHUD2 and continuing it as ArcHUD3, I asked
+Nenie about ArcHUD's history. This is what he answered:
+
+
+(Nenie) I know everything about the history of ArcHUD since I was the sole
+developer behind it. In it's very beginning it was based on a pre-alpha version
+of NurfedHud which used the amazing animation-code of Antiarc named StatRings.
+Later on NurfedHud decided to scrap it and move on with a simpler design
+without StatRings and that's when I started coding ArcHUD. At first I simply
+made changes to the old NurfedHud but later decided to make an addon of my own.
+
+It was my first ever Lua project and ArcHUD has been my way of learning to
+master Lua. It has since been through a few rewrites and ports. The first
+version didn't use Ace I think mostly because I was still pretty new with the
+whole Lua thing and this Ace-thing was way above my head back then. The name
+ArcHUD was a two-part naming thing where Arc was of course a reference to it
+having arcs but also because Arc was the acronym for the guild I was part of
+back then called Ashen Rose Conspiracy.
+
+Somewhere along the line StatRings became an addon of its own with player-,
+target- and party-frames. About then ArcHUD had already gained a bit of
+popularity and feature after feature was implemented. The configuration changed
+from simple command-line to a graphical configuration window to a Dewdrop-menu.
+The code of course grew more robust and modular as I started to learn Lua
+better and have a better understanding on coding structure.
+
+And then finally the last version of ArcHUD2 was released from me. I had by
+then changed to another unit frame-addon and no longer used ArcHUD2 and hence
+no longer maintained the addon. A few coders from the Wowace community has made
+some compatibility and bug fixes over the years but that's about it. Until you
+came along of course. And now it's alive and well again.
+
+That's the story behind ArcHUD.
+
+
+(nyyr) As for me, ArcHUD was also the reason to start coding in Lua. I got into
+Ace3 and came along with it, so that any other dependencies were removed and
+replaced by Ace3 libraries. One obvious result is the powerful configuration
+interface it has now. I added a lot of extra features, the most prominent one
+being the custom buff rings. For a long time, I did not touch the StatRings
+code since it looked complex. But with ArcHUD3 2.0, I fully understood it and
+added additional rendering features such as the ability to show arbitrary parts
+of the half rings.
+
+
+Major version history:
+
+ArcHUD: 2.2.39509 for WoW 2.1.1 Jun 12, 2007
+ArcHUD2: 3.0.2beta5 for WoW 3.0.3 Nov 17, 2008
+ArcHUD3: since WoW 4.0.1 Oct 16, 2010
