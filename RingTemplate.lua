@@ -147,13 +147,15 @@ function ArcHUDRingTemplate:DoQuadrantReversed(A, T, SS, A2)
 	--   Ix,Iy - I coordinates
 	local Ox; local Oy
 	local Ix; local Iy
+	local corr1 -- small correction (not sure why this is necessary)
 	if (A < 90) then
 		local RF = self.ringFactor1
-		Arad = math.rad(A)
+		local Arad = math.rad(A)
 		local cos_a = math.cos(Arad)
+		corr1 = cos_a/64
 		Ox = cos_a
 		Oy = math.sin(Arad)
-		Ix = Ox * RF - cos_a/64 -- small correction (not sure why this is necessary)
+		Ix = Ox * RF - corr1
 		Iy = Oy * RF
 	else -- upper/left end is at North (angle == 90)
 		Ox = 0; Oy = 1
@@ -163,13 +165,15 @@ function ArcHUDRingTemplate:DoQuadrantReversed(A, T, SS, A2)
 	-- Same for start of arc
 	local EOx; local EOy
 	local EIx; local EIy
+	local corr2 -- small correction (not sure why this is necessary)
 	if (A2 > 0) then
 		local SRF = self.ringFactor2
-		A2rad = math.rad(A2)
+		local A2rad = math.rad(A2)
 		local cos_a2 = math.cos(A2rad)
+		corr2 = cos_a2/64
 		EOx = cos_a2
 		EOy = math.sin(A2rad)
-		EIx = EOx * SRF - cos_a2/64 -- small correction (not sure why this is necessary)
+		EIx = EOx * SRF - corr2
 		EIy = EOy * SRF
 	else -- lower/right end is at East (angle == 0)
 		EOx = 1; EOy = 0
@@ -263,13 +267,15 @@ function ArcHUDRingTemplate:DoQuadrant(A, T, SS, A2)
 	--   Ix,Iy - I coordinates
 	local Ox; local Oy
 	local Ix; local Iy
+	local corr1 -- small correction (not sure why this is necessary)
 	if (A < 90) then
 		local RF = self.ringFactor1
-		Arad = math.rad(A)
+		local Arad = math.rad(A)
 		local cos_a = math.cos(Arad)
+		corr1 = cos_a/64
 		Ox = math.sin(Arad)
 		Oy = cos_a
-		Ix = Ox * RF - cos_a/64 -- small correction (not sure why this is necessary)
+		Ix = Ox * RF - corr1
 		Iy = Oy * RF
 	else -- lower/right end is at East (angle == 90)
 		Ox = 1; Oy = 0
@@ -279,13 +285,15 @@ function ArcHUDRingTemplate:DoQuadrant(A, T, SS, A2)
 	-- Same for start of arc
 	local NOx; local NOy
 	local NIx; local NIy
+	local corr2 -- small correction (not sure why this is necessary)
 	if (A2 > 0) then
 		local SRF = self.ringFactor2
-		A2rad = math.rad(A2)
+		local A2rad = math.rad(A2)
 		local cos_a2 = math.cos(A2rad)
+		corr2 = cos_a2/64
 		NOx = math.sin(A2rad)
 		NOy = cos_a2
-		NIx = NOx * SRF - cos_a2/64 -- small correction (not sure why this is necessary)
+		NIx = NOx * SRF - corr2
 		NIy = NOy * SRF
 	else -- upper/left end is at North (angle == 0)
 		NOx = 0; NOy = 1
@@ -323,10 +331,10 @@ function ArcHUDRingTemplate:DoQuadrant(A, T, SS, A2)
 	
 	-- Strech slices between I and O
 	if (A < 90) then
-		SS(S1, self, OR, Ix, Ox, Iy, Oy, 1)
+		SS(S1, self, OR, Ix, Ox - corr1, Iy, Oy, 1)
 	end
 	if (A2 > 0) then
-		SS(S2, self, OR, NIx, NOx, NIy, NOy, 1)
+		SS(S2, self, OR, NIx, NOx - corr2, NIy, NOy, 1)
 	end
 	
 	T:Show()
