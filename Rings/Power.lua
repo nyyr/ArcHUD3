@@ -12,7 +12,9 @@ module.defaults = {
 		Enabled = true,
 		Outline = true,
 		ShowText = true,
+		ShowTextMax = true,
 		ShowPerc = true,
+		SwapHealthPowerText = false,
 		ColorMana = PowerBarColor[0],
 		ColorRage = PowerBarColor[1],
 		ColorFocus = PowerBarColor[2],
@@ -24,7 +26,9 @@ module.defaults = {
 }
 module.options = {
 	{name = "ShowText", text = "SHOWTEXT", tooltip = "SHOWTEXT"},
+	{name = "ShowTextMax", text = "SHOWTEXTMAX", tooltip = "SHOWTEXTMAX"},
 	{name = "ShowPerc", text = "SHOWPERC", tooltip = "SHOWPERC"},
+	{name = "SwapHealthPowerText", text = "SWAPHEALTHPOWERTEXT", tooltip = "SWAPHEALTHPOWERTEXT"},
 	hasmanabar = true,
 	attach = true,
 }
@@ -40,7 +44,7 @@ function module:Initialize()
 	self.f:SetAlpha(0)
 
 	self.MPText = self:CreateFontString(self.f, "BACKGROUND", {150, 15}, 14, "LEFT", {1.0, 1.0, 0.0}, {"TOPLEFT", ArcHUDFrameCombo, "TOPRIGHT", 0, 0})
-	self.MPPerc = self:CreateFontString(self.f, "BACKGROUND", {40, 14}, 12, "LEFT", {1.0, 1.0, 1.0}, {"TOPLEFT", self.MPText, "BOTTOMLEFT", 0, 0})
+	self.MPPerc = self:CreateFontString(self.f, "BACKGROUND", {70, 14}, 12, "LEFT", {1.0, 1.0, 1.0}, {"TOPLEFT", self.MPText, "BOTTOMLEFT", 0, 0})
 	self:RegisterTimer("UpdatePowerBar", self.UpdatePowerBar, 0.1, self, true)
 	
 	self:CreateStandardModuleOptions(10)
@@ -50,20 +54,44 @@ end
 -- Update
 ----------------------------------------------
 function module:OnModuleUpdate()
-	if(self.db.profile.ShowText) then
+	if self.db.profile.ShowText then
 		self.MPText:Show()
 	else
 		self.MPText:Hide()
 	end
 
-	if(self.db.profile.ShowPerc) then
+	if self.db.profile.ShowPerc then
 		self.MPPerc:Show()
 	else
 		self.MPPerc:Hide()
 	end
+	
+	if self.db.profile.SwapHealthPowerText then
+		-- left
+		self.MPText:ClearAllPoints()
+		self.MPText:SetPoint("TOPRIGHT", ArcHUDFrameCombo, "TOPLEFT", 0, 0)
+		self.MPText:SetJustifyH("RIGHT")
+		self.MPPerc:ClearAllPoints()
+		self.MPPerc:SetPoint("TOPRIGHT", self.MPText, "BOTTOMRIGHT", 0, 0)
+		self.MPPerc:SetJustifyH("RIGHT")
+	else
+		-- right
+		self.MPText:ClearAllPoints()
+		self.MPText:SetPoint("TOPLEFT", ArcHUDFrameCombo, "TOPRIGHT", 0, 0)
+		self.MPText:SetJustifyH("LEFT")
+		self.MPPerc:ClearAllPoints()
+		self.MPPerc:SetPoint("TOPLEFT", self.MPText, "BOTTOMLEFT", 0, 0)
+		self.MPPerc:SetJustifyH("LEFT")
+	end
+	
+	local HealthMod = ArcHUD:GetModule("Health")
+	if HealthMod.db.profile.SwapHealthPowerText ~= self.db.profile.SwapHealthPowerText then
+		HealthMod.db.profile.SwapHealthPowerText = self.db.profile.SwapHealthPowerText
+		ArcHUD:SendMessage("ARCHUD_MODULE_UPDATE", "Health")
+	end
 
-	self.f:SetValue(UnitPower(self.unit))
 	self:UpdateColor(UnitPowerType(self.unit))
+	self:UpdatePowerBar()
 end
 
 ----------------------------------------------
@@ -115,7 +143,11 @@ function module:UpdatePowerBar()
 		local maxPower = UnitPowerMax(self.unit)
 		
 		if (maxPower > 0) then
-			self.MPText:SetText(self.parent:fint(power).."/"..self.parent:fint(maxPower))
+			if self.db.profile.ShowTextMax then
+				self.MPText:SetText(self.parent:fint(power).."/"..self.parent:fint(maxPower))
+			else
+				self.MPText:SetText(self.parent:fint(power))
+			end
 			self.MPPerc:SetText(floor((power/maxPower)*100).."%")
 		else
 			self.MPText:SetText("")
@@ -145,7 +177,11 @@ function module:UpdatePowerEvent(event, arg1)
 			self.f:GhostMode(false, self.unit)
 			
 			if (maxPower > 0) then
-				self.MPText:SetText(self.parent:fint(power).."/"..self.parent:fint(maxPower))
+				if self.db.profile.ShowTextMax then
+					self.MPText:SetText(self.parent:fint(power).."/"..self.parent:fint(maxPower))
+				else
+					self.MPText:SetText(self.parent:fint(power))
+				end
 				self.MPPerc:SetText(floor((power/maxPower)*100).."%")
 			else
 				self.MPText:SetText("")

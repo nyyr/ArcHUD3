@@ -207,6 +207,7 @@ LM["TEXT"] = {
 	ENABLED		= "Enabled",
 	OUTLINE		= "Ring outline",
 	SHOWTEXT	= "Show text",
+	SHOWTEXTMAX	= "Show maximum",
 	SHOWPERC	= "Show percentage",
 	FLASH		= "Flash when ring is full",
 	FLASH_HP	= "Flash when 3 Holy Power are gained",
@@ -226,6 +227,7 @@ LM["TEXT"] = {
 	LEVEL		= "Level",
 	
 	SEPARATORS  = "Show separators",
+	SWAPHEALTHPOWERTEXT = "Swap health and power text display",
 	
 	COLOR		= "Color mode",
 	COLORRESET	= "Reset color",
@@ -269,6 +271,7 @@ LM["TOOLTIP"] = {
 	ENABLED		= "Toggle the ring on and off",
 	OUTLINE		= "Toggle the outline around the ring",
 	SHOWTEXT	= "Toggle text display (health, mana, etc.)",
+	SHOWTEXTMAX	= "Toggle text display of maximum value",
 	SHOWPERC	= "Toggle showing percentage",
 	SHOWSPELL	= "Toggle displaying of current spell being casted",
 	SHOWTIME	= "Toggle showing spell timer",
@@ -287,6 +290,7 @@ LM["TOOLTIP"] = {
 	LEVEL		= "Set at which level it should be attached relative to the anchor (<-1: towards center, 0: at anchor, >1: away from center)",
 	
 	SEPARATORS  = "Toggle separators (only for maximum ring values between 2 and 20)",
+	SWAPHEALTHPOWERTEXT = "Swaps health and power text display so that power text is displayed left and health text displayed right",
 	
 	COLOR		= "Set color mode:\n"..
 					"Color fading: Set the ring color to fade (green to red for health)\n"..

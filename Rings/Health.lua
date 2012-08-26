@@ -15,9 +15,11 @@ module.defaults = {
 		Enabled = true,
 		Outline = true,
 		ShowText = true,
+		ShowTextMax = true,
 		ShowPerc = true,
 		ShowDef = false,
 		ShowIncoming = false,
+		SwapHealthPowerText = false,
 		ColorMode = "fade",
 		Color = {r = 0, g = 1, b = 0},
 		Side = 1,
@@ -26,9 +28,11 @@ module.defaults = {
 }
 module.options = {
 	{name = "ShowText", text = "SHOWTEXT", tooltip = "SHOWTEXT"},
+	{name = "ShowTextMax", text = "SHOWTEXTMAX", tooltip = "SHOWTEXTMAX"},
 	{name = "ShowPerc", text = "SHOWPERC", tooltip = "SHOWPERC"},
 	{name = "ShowDef", text = "DEFICIT", tooltip = "DEFICIT"},
 	{name = "ShowIncoming", text = "INCOMINGHEALS", tooltip = "INCOMINGHEALS"},
+	{name = "SwapHealthPowerText", text = "SWAPHEALTHPOWERTEXT", tooltip = "SWAPHEALTHPOWERTEXT"},
 	hascolorfade = true,
 	attach = true,
 }
@@ -71,6 +75,36 @@ function module:OnModuleUpdate()
 		self.DefText:Show()
 	else
 		self.DefText:Hide()
+	end
+	
+	if self.db.profile.SwapHealthPowerText then
+		-- right
+		self.HPText:ClearAllPoints()
+		self.HPText:SetPoint("TOPLEFT", ArcHUDFrameCombo, "TOPRIGHT", 0, 0)
+		self.HPText:SetJustifyH("LEFT")
+		self.HPPerc:ClearAllPoints()
+		self.HPPerc:SetPoint("TOPLEFT", self.HPText, "BOTTOMLEFT", 0, 0)
+		self.HPPerc:SetJustifyH("LEFT")
+		self.DefText:ClearAllPoints()
+		self.DefText:SetPoint("BOTTOMLEFT", self.HPText, "TOPLEFT", 0, 0)
+		self.DefText:SetJustifyH("LEFT")
+	else
+		-- left
+		self.HPText:ClearAllPoints()
+		self.HPText:SetPoint("TOPRIGHT", ArcHUDFrameCombo, "TOPLEFT", 0, 0)
+		self.HPText:SetJustifyH("RIGHT")
+		self.HPPerc:ClearAllPoints()
+		self.HPPerc:SetPoint("TOPRIGHT", self.HPText, "BOTTOMRIGHT", 0, 0)
+		self.HPPerc:SetJustifyH("RIGHT")
+		self.DefText:ClearAllPoints()
+		self.DefText:SetPoint("BOTTOMRIGHT", self.HPText, "TOPRIGHT", 0, 0)
+		self.DefText:SetJustifyH("RIGHT")
+	end
+	
+	local PowerMod = ArcHUD:GetModule("Power")
+	if PowerMod.db.profile.SwapHealthPowerText ~= self.db.profile.SwapHealthPowerText then
+		PowerMod.db.profile.SwapHealthPowerText = self.db.profile.SwapHealthPowerText
+		ArcHUD:SendMessage("ARCHUD_MODULE_UPDATE", "Power")
 	end
 
 	self:UpdateHealth(nil, self.unit)
@@ -146,7 +180,11 @@ function module:UpdateHealth(event, arg1)
 				self.HPText:SetTextColor(0, 1, 0)
 				self:UpdateColor()
 			end
-			self.HPText:SetText(self.parent:fint(health).."/"..self.parent:fint(maxHealth))
+			if self.db.profile.ShowTextMax then
+				self.HPText:SetText(self.parent:fint(health).."/"..self.parent:fint(maxHealth))
+			else
+				self.HPText:SetText(self.parent:fint(health))
+			end
 			self.HPPerc:SetText(floor((health/maxHealth)*100).."%")
 
 			local deficit = maxHealth - health
