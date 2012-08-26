@@ -446,12 +446,26 @@ ArcHUD.configOptionsTableCore = {
 						ArcHUD:UpdateTargetHUD()
 					end,
 				},
+				-- Show health/power maximum text
+				ShowHealthPowerTextMax = {
+					type		= "toggle",
+					name		= L["TEXT"]["SHOWTEXTMAX"],
+					desc		= L["TOOLTIP"]["SHOWTEXTMAX"],
+					order		= 12,
+					get			= function ()
+						return ArcHUD.db.profile.ShowHealthPowerTextMax
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.ShowHealthPowerTextMax = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
 				-- Target of target
 				targetTarget = {
 					type		= "toggle",
 					name		= L["TEXT"]["TOT"],
 					desc		= L["TOOLTIP"]["TOT"],
-					order		= 12,
+					order		= 13,
 					get			= function ()
 						return ArcHUD.db.profile.TargetTarget
 					end,
@@ -465,7 +479,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["TOTOT"],
 					desc		= L["TOOLTIP"]["TOTOT"],
-					order		= 13,
+					order		= 14,
 					get			= function ()
 						return ArcHUD.db.profile.TargetTargetTarget
 					end,

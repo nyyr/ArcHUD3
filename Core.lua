@@ -56,10 +56,8 @@ ArcHUD.defaults = {
 		Nameplate_target = false,
 		Nameplate_targettarget = false,
 		Nameplate_targettargettarget = false,
-		--NameplateCombat = false, -- deprecated (functionality removed, causes taint)
 		HoverMsg = false,
 		HoverDelay = 1.5,
-		--PetNameplateFade = true, -- deprecated (pet happiness removed in WoW 4.1)
 		Scale = 1.0,
 		AttachTop = false,
 		ShowBuffs = true,
@@ -67,6 +65,7 @@ ArcHUD.defaults = {
 		ShowBuffTooltips = true,
 		HideBuffTooltipsIC = false,
 		BuffIconSize = 20,
+		ShowHealthPowerTextMax = true,
 		BlizzPlayer = true,
 		BlizzTarget = true,
 		BlizzFocus = true,
@@ -471,12 +470,20 @@ function ArcHUD:TargetUpdate(event, arg1)
 		if(UnitIsDead("target") or UnitIsGhost("target")) then
 			self.TargetHUD.HPText:SetText("Dead")
 		else
-			self.TargetHUD.HPText:SetText(self:fint(UnitHealth("target")).."/"..self:fint(UnitHealthMax("target")))
+			if self.db.profile.ShowHealthPowerTextMax then
+				self.TargetHUD.HPText:SetText(self:fint(UnitHealth("target")).."/"..self:fint(UnitHealthMax("target")))
+			else
+				self.TargetHUD.HPText:SetText(self:fint(UnitHealth("target")))
+			end
 		end
 
 		-- Does the unit have power? If so we want to show it
 		if (UnitPowerMax("target") > 0) then
-			self.TargetHUD.MPText:SetText(self:fint(UnitPower("target")).."/"..self:fint(UnitPowerMax("target")))
+			if self.db.profile.ShowHealthPowerTextMax then
+				self.TargetHUD.MPText:SetText(self:fint(UnitPower("target")).."/"..self:fint(UnitPowerMax("target")))
+			else
+				self.TargetHUD.MPText:SetText(self:fint(UnitPower("target")))
+			end
 			self:StartTimer("UpdateTargetPower")
 		else
 			self.TargetHUD.MPText:SetText(" ")
@@ -735,7 +742,11 @@ end
 -- UpdateTargetPower()
 ----------------------------------------------
 function ArcHUD:UpdateTargetPower()
-	self.TargetHUD.MPText:SetText(self:fint(UnitPower("target")).."/"..self:fint(UnitPowerMax("target")))
+	if self.db.profile.ShowHealthPowerTextMax then
+		self.TargetHUD.MPText:SetText(self:fint(UnitPower("target")).."/"..self:fint(UnitPowerMax("target")))
+	else
+		self.TargetHUD.MPText:SetText(self:fint(UnitPower("target")))
+	end
 end
 
 ----------------------------------------------
@@ -1000,7 +1011,11 @@ function ArcHUD:EventHandler(event, arg1)
 
 	elseif (event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH") then
 		if (arg1 == "target") then
-			self.TargetHUD.HPText:SetText(self:fint(UnitHealth(arg1)).."/"..self:fint(UnitHealthMax(arg1)))
+			if self.db.profile.ShowHealthPowerTextMax then
+				self.TargetHUD.HPText:SetText(self:fint(UnitHealth(arg1)).."/"..self:fint(UnitHealthMax(arg1)))
+			else
+				self.TargetHUD.HPText:SetText(self:fint(UnitHealth(arg1)))
+			end
 		end
 
 	elseif(event == "PLAYER_ENTERING_WORLD") then

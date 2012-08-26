@@ -48,6 +48,7 @@ L["TEXT"] = {
 	HIDEBUFFTTIC = "Hide (de)buff tooltips in combat",
 	BUFFICONSIZE= "(De)buff icon size",
 	SHOWPVP		= "Show player PvP status flag",
+	SHOWTEXTMAX	= "Show health/power maximum text",
 	TOT			= "Enable target's target",
 	TOTOT		= "Enable target's target's target",
 
@@ -120,6 +121,7 @@ L["TOOLTIP"] = {
 	HIDEBUFFTTIC = "Toggle display of buff or debuff tooltips in combat",
 	BUFFICONSIZE= "Set icon size of (de)buffs in pixels",
 	SHOWPVP		= "Toggle display of PVP status flag on the player nameplate",
+	SHOWTEXTMAX	= "Toggle display of health/power maximum text",
 	TOT			= "Enable displaying of target's target",
 	TOTOT		= "Enable displaying of target's target's target",
 
