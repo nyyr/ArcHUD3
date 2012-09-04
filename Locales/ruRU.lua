@@ -7,6 +7,7 @@ if not L then return end
 L["CMD_OPTS_FRAME"]		= "Открывает окно настроек"
 L["CMD_OPTS_MODULES"]	= "Открывает окно настроек модуля"
 L["CMD_OPTS_CUSTOM"]	= "Открывает окно настроек пользовательского модуля"
+L["CMD_OPTS_TOGGLE"]	= "Toggle visibility of ArcHUD"
 L["CMD_OPTS_DEBUG"]		= "Уровень отладки"
 L["CMD_OPTS_DEBUG_SET"]	= "Настройка уровня отладки: '%s'"
 L["CMD_RESET"]			= "Сброс настроек для данного персонажа на стандартные"
@@ -14,6 +15,8 @@ L["CMD_RESET_HELP"]		= "Данная опция позволит вам сбро
 L["CMD_RESET_CONFIRM"]	= "Данная опция сбросит все настройки на стандартные на те что были установлены при установке аддона"
 L["TEXT_RESET"]			= "Пожалуйста введите CONFIRM после команды, для потверждения того что вы согласны сбросить все настройки"
 L["TEXT_RESET_CONFIRM"]	= "Все настройки будут сброшены на стандартные"
+L["TEXT_ENABLED"]       = "ArcHUD is now enabled."
+L["TEXT_DISABLED"]      = "ArcHUD is now disabled."
 
 L["FONT"]				= "FRIZQT__.TTF"
 
@@ -25,6 +28,14 @@ L["TEXT"] = {
 	TITLE		= "Настройки ArcHUD3",
 	GENERAL		= "Основные настройки",
 
+	PROFILES	= "Profiles",
+	PROFILES_SELECT= "Select profile",
+	PROFILES_CREATE= "Create new profile",
+	PROFILES_DELETE= "Delete profile",
+	PROFILES_CANNOTDELETE= "Cannot delete default profile.",
+	PROFILES_DEFAULT= "Default profile",
+	PROFILES_EXISTS= "Profile already exists.",
+	
 	DISPLAY		= "Настройки отображения",
 	PLAYERFRAME	= "Фрейм игрока",
 	TARGETFRAME	= "Фрейм цели",
@@ -36,11 +47,14 @@ L["TEXT"] = {
 	SHOWONLYBUFFSCASTBYPLAYER = "Show only your (de)buffs",
 	SHOWBUFFTT 	= "Показ подсказки (де)баффов",
 	HIDEBUFFTTIC = "Скрыть подсказки (де)баффов в бою",
+	BUFFICONSIZE= "(De)buff icon size",
 	SHOWPVP		= "Показ статус PVP игрока",
+	SHOWTEXTMAX	= "Show health/power maximum text",
 	TOT	        = "Включить цель цели",
 	TOTOT		= "Включить цель цели цели",
 
     NAMEPLATES	= "Настройки индикаторов",
+	NPHINT		= "Mouse behavior of nameplates is configured here. Their visibility can be changed under 'Display Options'.",
 	NPPLAYEROPT = "Игрок",
 	NPPLAYER	= "Игрок",
 	NPPET		= "Питомец",
@@ -83,6 +97,8 @@ L["TEXT"] = {
 	BLIZZPLAYER = "Blizzard фрейм игрока",
 	BLIZZTARGET = "Blizzard фрейм цели",
 	BLIZZFOCUS  = "Blizzard фрейм фокуса",
+	BLIZZSPELLACT_CENTER = "Center Blizzard's spell activation overlays on ArcHUD",
+	BLIZZSPELLACT_SCALE = "Scale of spell activation overlays",
 	BLIZZSPELLACT_OPAC = "Opacity of spell activation overlays",
 
 	RINGS		= "Опции дуги",
@@ -90,6 +106,10 @@ L["TEXT"] = {
 }
 
 L["TOOLTIP"] = {
+	PROFILES_SELECT = "Select a profile for this character.",
+	PROFILES_CREATE = "Create a new profile based on the current profile and activate it.",
+	PROFILES_DELETE = "Delete current profile and set default profile as active one.",
+
 	PLAYERFRAME	= "Вкл/Выкл отображение индикатора игрока и питомца",
 	TARGETFRAME = "Вкл/Выкл отображение фрейма цели",
 	PLAYERMODEL = "Вкл/Выкл отображение 3D модели игроков",
@@ -100,17 +120,20 @@ L["TOOLTIP"] = {
 	SHOWONLYBUFFSCASTBYPLAYER = "Show (de)buffs only if cast by you. 'Показ (де)баффы' must be enabled.",
 	SHOWBUFFTT 	= "Вкл/Выкл отображение подсказок баффов/дебаффов",
 	HIDEBUFFTTIC = "Вкл/Выкл отображение подсказок баффов/дебаффов в бою",
+	BUFFICONSIZE= "Set icon size of (de)buffs in pixels",
 	SHOWPVP		= "Вкл/Выкл отображение стутуса, метки PVP на индикаторе игрока",
+	SHOWTEXTMAX	= "Toggle display of health/power maximum text",
 	TOT	        = "Включить отображение цели цели",
 	TOTOT		= "Включить отображение цели цели цели",
 
 	NPPLAYER	= "Вкл/Выкл кликабельность имен игроков"..
+		"NOTE: This option only takes effect if the Player Frame is visible (see Display Options).\n\n"..
 		"The player nameplate's state cannot be changed in combat due to UI restrictions. "..
 		"Thus, it cannot be activated in combat by hovering over them, or it will remain activated if active upon entering combat.",
 	NPPET		= "Вкл/Выкл кликабельность имен питомцев"..
+		"NOTE: This option only takes effect if the Player Frame is visible (see Display Options).\n\n"..
 		"The pet nameplate's state cannot be changed in combat due to UI restrictions. "..
-		"Thus, it cannot be activated in combat by hovering over them, or it will remain activated if active upon entering combat.",
-	NPTARGET	= "Вкл/Выкл кликабельность имен целей",
+		"Thus, it cannot be activated in combat by hovering over them, or it will remain activated if active upon entering combat.",	NPTARGET	= "Вкл/Выкл кликабельность имен целей",
 	NPTOT		= "Вкл/Выкл кликабельность имен целей целей",
 	NPTOTOT		= "Вкл/Выкл кликабельность имен целей целей цели",
 	NPCOMBAT	= "Вкл/Выкл кликабельность имен при началебоя",
@@ -147,6 +170,8 @@ L["TOOLTIP"] = {
 	BLIZZPLAYER = "Вкл/Выкл отображение Blizzardского фрейма игрока",
 	BLIZZTARGET = "Вкл/Выкл отображение Blizzardского фрейма цели",
 	BLIZZFOCUS  = "Вкл/Выкл отображение Blizzardского фрейма фокуса",
+	BLIZZSPELLACT_CENTER = "Toggles whether Blizzard's spell activation overlays are centered on ArcHUD or on the screen",
+	BLIZZSPELLACT_SCALE = "Sets the scaling factor of Blizzard's spell activation overlays",
 	BLIZZSPELLACT_OPAC = "Sets opacity of Blizzard's spell activation overlays.",
 
 }
@@ -171,13 +196,13 @@ LM["FocusCasting"]	= "Focus Casting"
 LM["FocusHealth"]	= "Здоровье фокуса"
 LM["FocusPower"]	= "Энергия фокуса"
 LM["Casting"]		= "Применение"
-LM["DruidMana"]		= "Мана друида"
 LM["MirrorTimer"]	= "Таймер зеркала"
 LM["ComboPoints"]	= "Пиемы в серии"
-LM["EnergyTick"]	= "Такт энергии"
-LM["HolyPower"]		= "Энергия Света"
-LM["SoulShards"]	= "Осколки душ"
-LM["CustomBuff"]	= "Свои баффы" -- TODO: to be removed
+LM["HolyPower"]		= "Paladin: Энергия Света"
+LM["SoulShards"]	= "Warlock: Осколки душ"
+LM["Eclipse"]		= "Druid: Eclipse"
+LM["Chi"]			= "Monk: Chi"
+LM["Runes"]			= "Death Knight: Runes"
 
 LM["TEXT"] = {
 	TITLE		= "Настройки модуля",
@@ -185,8 +210,10 @@ LM["TEXT"] = {
 	ENABLED		= "Включен",
 	OUTLINE		= "Контур дуги",
 	SHOWTEXT	= "Показ текста",
+	SHOWTEXTMAX	= "Show maximum",
 	SHOWPERC	= "Показ проценты",
 	FLASH		= "Вспышка при макс приемов в серии",
+	FLASH_HP	= "Flash when 3 Holy Power are gained",
 	SHOWSPELL	= "Показ применение заклинания",
 	SHOWTIME	= "Показ таймера заклинаний",
 	INDINTERRUPT= "Подсвечивать прерываемые заклинания",
@@ -195,11 +222,14 @@ LM["TEXT"] = {
 	HIDEBLIZZ	= "Скрыть стандартные фреймы Blizzard",
 	ENABLEMENU	= "Включить меню по [правому-клику]",
 	DEFICIT		= "Нехватка",
-	SHOWINCOMBAT= "Показ в бою",
-	SHOWINSTEALTH="Показ при скрытности",
+	INCOMINGHEALS= "Indicate incoming heals",
 	ATTACH		= "Прикрепления",
 	SIDE		= "Сторона",
 	LEVEL		= "Уровень",
+	
+	SEPARATORS  = "Show separators",
+	SWAPHEALTHPOWERTEXT = "Swap health and power text display",
+	
 	COLOR		= "Цвет дуги",
 	COLORRESET	= "Сброс цвета",
 	COLORFADE	= "Цвет затухания",
@@ -213,8 +243,16 @@ LM["TEXT"] = {
 	COLORFOCUS 	= "Цвет фокуса",
 	COLORENERGY	= "Цвет энергии",
 	COLORRUNIC	= "Цвет руническо энергии",
-	ATTACHRING	= "Отсоединить дугу",
 
+	COLORLUNAR	= "Lunar power color",
+	COLORSOLAR	= "Solar power color",
+	COLORBLOODRUNE = "Blood rune color",
+	COLORFROSTRUNE = "Frost rune color",
+	COLORUNHOLYRUNE = "Unholy rune color",
+	COLORDEATHRUNE = "Death rune color",
+	
+	INNERANCHOR = "Attach ring to inner ('pet') anchor",
+	
 	CUSTOM		= "Свои баффы",
 	CUSTNEW		= "Новая своя дуга",
 	CUSTRING	= "Настройки дуги",
@@ -234,6 +272,7 @@ LM["TOOLTIP"] = {
 	ENABLED		= "Вкл/Выкл дугу",
 	OUTLINE		= "Вкл/Выкл контур дуги",
 	SHOWTEXT	= "Вкл/Выкл отображение текста (здоровье, мана, и т.д.)",
+	SHOWTEXTMAX	= "Toggle text display of maximum value",
 	SHOWPERC	= "Вкл/Выкл отображение процентов",
 	SHOWSPELL	= "Вкл/Выкл отображение нечало применения текущего заклинание",
 	SHOWTIME	= "Вкл/Выкл отображение таймера заклинания",
@@ -241,13 +280,17 @@ LM["TOOLTIP"] = {
 	INDLATENCY  = "Toggle indication of current world latency. Adds with spell queue time limit if selected.",
 	INDSPELLQ   = "Toggle indication of spell queue time limit (lag tolerance). It should be safe to start casting the next spell once the current cast passes the indicator. Adds with latency if selected.",
 	FLASH		= "Вкл/Выкл отображение вспышки когда достигнуто макс приемов в серии",
+	FLASH_HP	= "Toggle flashing when 3 Holy Power are gained",
 	HIDEBLIZZ	= "Вкл/Выкл отображение стандартных фреймов Blizzardа",
 	ENABLEMENU	= "Вкл/Выкл отображение меню по [правому-клику]",
 	DEFICIT		= "Вкл/Выкл нехватку здоровья (Макс здоровья - текущее здоровья)",
-	SHOWINCOMBAT= "Вкл/Выкл отображение тиков в бою",
-	SHOWINSTEALTH="Вкл/Выкл отображение тиков во время Незаметности",
+	INCOMINGHEALS= "Toggle indication of incoming heals",
 	SIDE		= "Установка к какой стороне прикрепить",
 	LEVEL		= "Установка на коком уровне прикреплять, отображать по отношению якоря (<-1: по направлению к центру, 0: at anchor, >1: в сторону от центра)",
+	
+	SEPARATORS  = "Toggle separators (only for maximum ring values between 2 and 20)",
+	SWAPHEALTHPOWERTEXT = "Swaps health and power text display so that power text is displayed left and health text displayed right",
+
 	COLOR		= "Настройки окраски дуг:\n"..
 					"Color fading: Установка затухания цвета дуги (для здоровья, зеленый -> красный)\n"..
 					"Custom color: Установка цвета дуги на пользовательские цвета",
@@ -263,7 +306,8 @@ LM["TOOLTIP"] = {
 	COLORFOCUS	= "Установка пользовательского цвета дуги фокуса",
 	COLORENERGY	= "Установка пользовательского цвета дуги энергии",
 	COLORRUNIC	= "Установка пользовательского цвета дуги рунической энергии",
-	ATTACHRING	= "Вкл/Выкл прикрепление дуги к обычному якорю фрейма (будет вести себя как обычная дуга при активности)",
+	
+	INNERANCHOR = "If selected, attach ring to inner ('pet') anchor. If not, use normal (outer) anchors.",
 	
 	CUSTNEW		= "Создать новую пользовательскую дугу для специфических баффов или дебаффов",
 	CUSTDEBUFF	= "Поиск дебаффов вместо баффов",

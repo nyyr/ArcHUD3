@@ -222,8 +222,6 @@ LM["TEXT"] = {
 	ENABLEMENU	= "Enable right-click menu",
 	DEFICIT		= "Deficit",
 	INCOMINGHEALS= "Indicate incoming heals",
-	SHOWINCOMBAT= "Show in combat",
-	SHOWINSTEALTH="Show in stealth",
 	ATTACH		= "Attachment",
 	SIDE		= "Side",
 	LEVEL		= "Level",
@@ -286,8 +284,6 @@ LM["TOOLTIP"] = {
 	ENABLEMENU	= "Toggle right-click menu on and off",
 	DEFICIT		= "Toggle health deficit (Max health - current health)",
 	INCOMINGHEALS= "Toggle indication of incoming heals",
-	SHOWINCOMBAT= "Toggle showing ticking while in combat",
-	SHOWINSTEALTH="Toggle showing ticking while stealthed",
 	SIDE		= "Set which side to attach to",
 	LEVEL		= "Set at which level it should be attached relative to the anchor (<-1: towards center, 0: at anchor, >1: away from center)",
 	

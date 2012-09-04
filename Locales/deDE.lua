@@ -51,6 +51,7 @@ L["TEXT"] = {
 	HIDEBUFFTTIC= "Verstecke (De-)Buff-Tooltips im Kampf",
 	BUFFICONSIZE= "(De-)Buff-Größe",
 	SHOWPVP		= "Zeige Spieler-PvP-Status",
+	SHOWTEXTMAX	= "Zeige Maximalgesundheit/-energie",
 	TOT			= "Aktiviere Ziel des Ziels",
 	TOTOT		= "Aktiviere Ziel des Ziel-des-Ziels",
 
@@ -85,7 +86,7 @@ L["TEXT"] = {
 	RINGVIS_2	= "Fade OOC: Außerhalb des Kampfes",
 	RINGVIS_3	= "Fade Both: Wenn voll oder außerhalb des Kampfes (Standard)",
 	
-	POSITIONING	= "Positionierung",
+	POSITIONING	= "Positionierung / Größe",
 	WIDTH		= "Breite des HUD",
 	YLOC		= "Vertikale Ausrichtung",
 	XLOC		= "Horizontale Ausrichtung",
@@ -98,6 +99,8 @@ L["TEXT"] = {
 	BLIZZPLAYER = "Blizzard Spielereinheitenfenster sichtbar",
 	BLIZZTARGET = "Blizzard Zieleinheitenfenster sichtbar",
 	BLIZZFOCUS  = "Blizzard Fokuszieleinheitenfenster sichtbar",
+	BLIZZSPELLACT_CENTER = "Zentriere Zauberspruchaktivierungsanzeige",
+	BLIZZSPELLACT_SCALE = "Skalierung der Zauberspruchaktivierungsanzeige",
 	BLIZZSPELLACT_OPAC = "Deckkraft der Zauberspruchaktivierungsanzeige",
 
 	RINGS		= "Ringoptionen",
@@ -121,6 +124,7 @@ L["TOOLTIP"] = {
 	HIDEBUFFTTIC = "Schaltet Anzeige von Buff/Debuff-Tooltips im Kampf ein/aus",
 	BUFFICONSIZE= "Setzt die Größe des (De-)Buff-Piktogramms in Pixel",
 	SHOWPVP		= "Schaltet Anzeige des PvP-Status am Spieler-Namensschild ein/aus",
+	SHOWTEXTMAX	= "Schaltet Anzeige der Maximalgesundheit/-energie ein/aus",
 	TOT			= "Schaltet Anzeige des Ziel des Ziels ein/aus",
 	TOTOT		= "Schaltet Anzeige des Ziel des Ziel-des-Ziels ein/aus",
 
@@ -170,6 +174,8 @@ L["TOOLTIP"] = {
 	BLIZZPLAYER = "Schaltet die Sichtbarkeit des Blizzard-Spieler-Einheitenfensters ein/aus",
 	BLIZZTARGET = "Schaltet die Sichtbarkeit des Blizzard-Ziel-Einheitenfensters ein/aus",
 	BLIZZFOCUS  = "Schaltet die Sichtbarkeit des Blizzard-Fokusziel-Einheitenfensters ein/aus",
+	BLIZZSPELLACT_CENTER = "Zentriert Blizzards Zauberspruchaktivierungssymbole über ArcHUD",
+	BLIZZSPELLACT_SCALE = "Setzt den Skalierungsfaktor von Blizzards Zauberspruchaktivierungssymbole.",
 	BLIZZSPELLACT_OPAC = "Setzt die Deckkraft von Blizzards Zauberspruchaktivierungssymbole.",
 	
 }
@@ -197,8 +203,10 @@ LM["Casting"]		= "Spieler Zauberwirken"
 LM["MirrorTimer"]	= "Spiegel Timer"
 LM["ComboPoints"]	= "Kombopunkte"
 LM["HolyPower"]		= "Paladin: Heilige Kraft"
---LM["SoulShards"]	= "Hexenmeister: Seelensplitter / Brennende..."
---LM["Chi"]			= "Mönch: Chi"
+LM["SoulShards"]	= "Hexenmeister: Seelensplitter etc."
+LM["Eclipse"]		= "Druide: Finsternis"
+LM["Chi"]			= "Mönch: Chi"
+LM["Runes"]			= "Todesritter: Runen"
 
 LM["TEXT"] = {
 	TITLE		= "Ringoptionen",
@@ -206,8 +214,10 @@ LM["TEXT"] = {
 	ENABLED		= "Aktiviert",
 	OUTLINE		= "Ringumrandung",
 	SHOWTEXT	= "Zeige Text",
+	SHOWTEXTMAX	= "Zeige Maximalwert",
 	SHOWPERC	= "Zeige Prozente",
 	FLASH		= "Pulsieren wenn Ring voll",
+	FLASH_HP	= "Pulsiere wenn 3 Heilige Kraft aktiv sind",
 	SHOWSPELL	= "Zeige gewirkten Zauber",
 	SHOWTIME	= "Zeige Zauberzeit",
 	INDINTERRUPT= "Unterbrechbare Zauber hervorheben",
@@ -217,11 +227,13 @@ LM["TEXT"] = {
 	ENABLEMENU	= "Aktiviere Rechts-Klick-Menü",
 	DEFICIT		= "Defizit",
 	INCOMINGHEALS= "Zeige eintreffende Heilungen",
-	SHOWINCOMBAT= "Zeige im Kampf",
-	SHOWINSTEALTH="Zeige bei Verstohlenheit",
 	ATTACH		= "Anheften",
 	SIDE		= "Seite",
 	LEVEL		= "Ebene",
+	
+	SEPARATORS  = "Zeige Trennlinien",
+	SWAPHEALTHPOWERTEXT = "Vertausche Gesundheits- und Energie-Text",
+	
 	COLOR		= "Farbmodus",
 	COLORRESET	= "Farben zurücksetzen",
 	COLORFADE	= "Farb-Fading",
@@ -235,7 +247,15 @@ LM["TEXT"] = {
 	COLORFOCUS 	= "Fokus-Farbe",
 	COLORENERGY	= "Energie-Farbe",
 	COLORRUNIC	= "Runenmacht-Farbe",
-	ATTACHRING	= "Ring loslösen",
+	
+	COLORLUNAR	= "Farbe Lunarenergie",
+	COLORSOLAR	= "Farbe Solarenergie",
+	COLORBLOODRUNE = "Farbe Blutrune",
+	COLORFROSTRUNE = "Farbe Frostrune",
+	COLORUNHOLYRUNE = "Farbe Unheiligrune",
+	COLORDEATHRUNE = "Farbe Todesrune",
+	
+	INNERANCHOR = "Am inneren ('Begleiter') Anker befestigen",
 	
 	CUSTOM		= "Benutzerdef. Buff-Ring",
 	CUSTNEW		= "Neuer benutzerdef. Ring",
@@ -256,6 +276,7 @@ LM["TOOLTIP"] = {
 	ENABLED		= "Schaltet den Ring ein/aus",
 	OUTLINE		= "Schaltet die Ringumrandung ein/aus",
 	SHOWTEXT	= "Schaltet die Textanzeige ein/aus",
+	SHOWTEXTMAX	= "Schaltet die Textanzeige des Maximalwert ein/aus",
 	SHOWPERC	= "Schaltet die Prozentanzeige ein/aus",
 	SHOWSPELL	= "Schaltet Anzeige des gewirkten Zaubers ein/aus",
 	SHOWTIME	= "Schaltet Anzeige der Zauberzeit ein/aus",
@@ -263,14 +284,17 @@ LM["TOOLTIP"] = {
 	INDLATENCY  = "Schaltet Andeutung der aktuellen Netzwerklatenz (Welt) ein/aus. Addiert sich mit dem Zauber-Queuing-Zeitfenster, wenn aktiviert.",
 	INDSPELLQ   = "Schaltet Andeutung des Zauber-Queuing-Zeitfensters (Latenztoleranz) ein/aus. Es sollte möglich sein, den nächsten Zauber zu aktivieren, sobald der Marker passiert wurde. Addiert sich mit der Netzwerklatenz, wenn aktiviert.",
 	FLASH		= "Schaltet Pulsieren bei vollem Ring ein/aus",
+	FLASH_HP	= "Toggle flashing when 3 Holy Power are gained",
 	HIDEBLIZZ	= "Schaltet Anzeige des Standard-Blizzard-Rahmens ein/aus",
 	ENABLEMENU	= "Schaltet Rechts-Klick-Menü ein/aus",
 	DEFICIT		= "Schaltet Anzeige des Gesundheitsdefizits (Maximum - aktueller Wert) ein/aus",
 	INCOMINGHEALS= "Schaltet die Anzeige eintreffender Heilungen ein/aus",
-	SHOWINCOMBAT= "Toggle showing ticking while in combat", -- TODO: obsolete
-	SHOWINSTEALTH="Toggle showing ticking while stealthed", -- TODO: obsolete
 	SIDE		= "Legt die Seite fest, auf welcher der Ring angeheftet werden soll",
 	LEVEL		= "Setzt die Ebene, auf der der Ring angeheftet werden soll (<-1: zur Mitte, 0: am Anker, >1: zum Rand)",
+	
+	SEPARATORS  = "Schaltet Trennlinien ein/aus (nur für Maximalwerte zwischen 2 und 20)",
+	SWAPHEALTHPOWERTEXT = "Vertauscht die Gesundheits- und Energietextanzeige, sodass die Energie links und die Gesundheit rechts angezeigt werden",
+	
 	COLOR		= "Setzt den Farbenmodus:\n"..
 					"Farb-Fading: Farbverlauf anhängig vom Füllstand (z.B. von grün nach rot für Gesundheit)\n"..
 					"Benutzerdef. Farbe: Setzt die Farbe zu einer benutzerdefinierten Farbe",
@@ -286,7 +310,8 @@ LM["TOOLTIP"] = {
 	COLORFOCUS	= "Setzt eine benutzderdefinierte Farbe für Fokus",
 	COLORENERGY	= "Setzt eine benutzderdefinierte Farbe für Energie",
 	COLORRUNIC	= "Setzt eine benutzderdefinierte Farbe für Runenmacht",
-	ATTACHRING	= "Toggle attachment of the ring to the normal frame anchors (will behave like a normal ring when active)",
+	
+	INNERANCHOR = "Wenn ausgewählt, befestige und skaliere den Ring am inneren ('Begleiter') Anker. Ansonsten befestige den Ring in seiner normalen Größe am äußeren Anker (Standard).",
 	
 	CUSTNEW		= "Erstellt einen neuen benutzerdefinierten Ring für einen bestimmten Buff oder Debuff",
 	CUSTDEBUFF	= "Überwachter Buff ist ein Debuff",
