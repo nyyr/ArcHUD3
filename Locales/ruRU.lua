@@ -133,7 +133,8 @@ L["TOOLTIP"] = {
 	NPPET		= "Вкл/Выкл кликабельность имен питомцев"..
 		"NOTE: This option only takes effect if the Player Frame is visible (see Display Options).\n\n"..
 		"The pet nameplate's state cannot be changed in combat due to UI restrictions. "..
-		"Thus, it cannot be activated in combat by hovering over them, or it will remain activated if active upon entering combat.",	NPTARGET	= "Вкл/Выкл кликабельность имен целей",
+		"Thus, it cannot be activated in combat by hovering over them, or it will remain activated if active upon entering combat.",
+	NPTARGET	= "Вкл/Выкл кликабельность имен целей",
 	NPTOT		= "Вкл/Выкл кликабельность имен целей целей",
 	NPTOTOT		= "Вкл/Выкл кликабельность имен целей целей цели",
 	NPCOMBAT	= "Вкл/Выкл кликабельность имен при началебоя",
@@ -180,7 +181,7 @@ L["TOOLTIP"] = {
 -- Modules
 local LM = LibStub("AceLocale-3.0"):NewLocale("ArcHUD_Module", "ruRU")
 
-LM["FONT"]			= "FRIZQT__.TTF"
+LM["FONT"]			= "FRIZQT__CYR.TTF"
 
 LM["Version"]	= "Версия: "
 LM["Authors"]	= "Авторы: "
