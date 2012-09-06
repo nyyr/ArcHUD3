@@ -94,14 +94,12 @@ function module:OnModuleEnable()
 	end
 
 	-- Register the events we will use
-	self:RegisterEvent("PET_UI_UPDATE",			"UpdatePet")
-	self:RegisterEvent("PLAYER_PET_CHANGED",	"UpdatePet")
-	self:RegisterEvent("PET_BAR_CHANGED",		"UpdatePet")
-	self:RegisterUnitEvent("UNIT_PET",			"UpdatePet")
-	self:RegisterUnitEvent("UNIT_POWER",		"UpdatePower")
-	self:RegisterUnitEvent("UNIT_MAXPOWER",		"UpdatePower")
+	self:RegisterEvent("PET_UI_UPDATE",		"UpdatePet")
+	self:RegisterEvent("PET_BAR_CHANGED",	"UpdatePet")
+	self:RegisterUnitEvent("UNIT_PET",		"UpdatePet", "player")
+	self:RegisterUnitEvent("UNIT_POWER",	"UpdatePower")
+	self:RegisterUnitEvent("UNIT_MAXPOWER",	"UpdatePower")
 	self:RegisterUnitEvent("UNIT_DISPLAYPOWER")
-	--self:RegisterEvent("PET_UI_CLOSE")
 
 	-- Activate ring timers
 	self:StartRingTimers()

@@ -18,7 +18,7 @@ L["TEXT_RESET_CONFIRM"]	= "Все настройки будут сброшены
 L["TEXT_ENABLED"]       = "ArcHUD is now enabled."
 L["TEXT_DISABLED"]      = "ArcHUD is now disabled."
 
-L["FONT"]				= "FRIZQT__.TTF"
+L["FONT"]				= "FRIZQT__CYR.TTF"
 
 L["Version"]		= "Версия: "
 L["Authors"]		= "Автор: "
