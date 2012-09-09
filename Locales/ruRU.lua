@@ -1,5 +1,6 @@
 ------------------------------
 ----- Translation for ruRU by StingerSoft
+----- with additions from evilstar
 local L = LibStub("AceLocale-3.0"):NewLocale("ArcHUD_Core", "ruRU")
 if not L then return end
 
@@ -44,10 +45,10 @@ L["TEXT"] = {
 	SHOWGUILD	= "Показ гильдию игрока",
 	SHOWCLASS	= "Показ класс цели",
 	SHOWBUFFS 	= "Показ (де)баффы",
-	SHOWONLYBUFFSCASTBYPLAYER = "Show only your (de)buffs",
+	SHOWONLYBUFFSCASTBYPLAYER = "Показывать только свои (де)баффы",
 	SHOWBUFFTT 	= "Показ подсказки (де)баффов",
 	HIDEBUFFTTIC = "Скрыть подсказки (де)баффов в бою",
-	BUFFICONSIZE= "(De)buff icon size",
+	BUFFICONSIZE= "Размер иконок (де)баффов",
 	SHOWPVP		= "Показ статус PVP игрока",
 	SHOWTEXTMAX	= "Show health/power maximum text",
 	TOT	        = "Включить цель цели",
@@ -117,10 +118,10 @@ L["TOOLTIP"] = {
 	SHOWGUILD	= "Отображать информацию о гильдии игрока рядом с его именем",
 	SHOWCLASS	= "Отображать класс цели или тип создания",
 	SHOWBUFFS	= "Вкл/Выкл отображение баффов/дебаффов",
-	SHOWONLYBUFFSCASTBYPLAYER = "Show (de)buffs only if cast by you. 'Показ (де)баффы' must be enabled.",
+	SHOWONLYBUFFSCASTBYPLAYER = "Показывать (де)баффы наложенные вами. 'Показ (де)баффов' должен быть включен.",
 	SHOWBUFFTT 	= "Вкл/Выкл отображение подсказок баффов/дебаффов",
 	HIDEBUFFTTIC = "Вкл/Выкл отображение подсказок баффов/дебаффов в бою",
-	BUFFICONSIZE= "Set icon size of (de)buffs in pixels",
+	BUFFICONSIZE= "Размер иконки (де)баффов в пикселях",
 	SHOWPVP		= "Вкл/Выкл отображение стутуса, метки PVP на индикаторе игрока",
 	SHOWTEXTMAX	= "Toggle display of health/power maximum text",
 	TOT	        = "Включить отображение цели цели",
@@ -277,9 +278,9 @@ LM["TOOLTIP"] = {
 	SHOWPERC	= "Вкл/Выкл отображение процентов",
 	SHOWSPELL	= "Вкл/Выкл отображение нечало применения текущего заклинание",
 	SHOWTIME	= "Вкл/Выкл отображение таймера заклинания",
-	INDINTERRUPT= "Toggle highlighting of interruptable spells. The casting arc will have a yellow outline for interruptable spells. Arc outline needs to be activated.",
-	INDLATENCY  = "Toggle indication of current world latency. Adds with spell queue time limit if selected.",
-	INDSPELLQ   = "Toggle indication of spell queue time limit (lag tolerance). It should be safe to start casting the next spell once the current cast passes the indicator. Adds with latency if selected.",
+	INDINTERRUPT= "Подсвечивать заклинания которые можно сбить. Дуга будет желтого цвета если каст можно сбить. Дуга каста должна быть включена.",
+	INDLATENCY  = "Отображать текущую задержку мира. Добавляет к времени применения время задержки если включено.",
+	INDSPELLQ   = "Добавляет к времени каста задержку (при лагах). Это должно помочь при задержках вовремя индексировать для последующего удара. Добавить к задержке если включено.",
 	FLASH		= "Вкл/Выкл отображение вспышки когда достигнуто макс приемов в серии",
 	FLASH_HP	= "Toggle flashing when 3 Holy Power are gained",
 	HIDEBLIZZ	= "Вкл/Выкл отображение стандартных фреймов Blizzardа",
