@@ -19,7 +19,7 @@ L["TEXT_RESET_CONFIRM"]	= "Все настройки будут сброшены
 L["TEXT_ENABLED"]       = "ArcHUD is now enabled."
 L["TEXT_DISABLED"]      = "ArcHUD is now disabled."
 
-L["FONT"]				= "FRIZQT__CYR.TTF"
+L["FONT"]				= "FRIZQT___CYR.TTF"
 
 L["Version"]		= "Версия: "
 L["Authors"]		= "Автор: "
@@ -182,7 +182,7 @@ L["TOOLTIP"] = {
 -- Modules
 local LM = LibStub("AceLocale-3.0"):NewLocale("ArcHUD_Module", "ruRU")
 
-LM["FONT"]			= "FRIZQT__CYR.TTF"
+LM["FONT"]			= "FRIZQT___CYR.TTF"
 
 LM["Version"]	= "Версия: "
 LM["Authors"]	= "Авторы: "
