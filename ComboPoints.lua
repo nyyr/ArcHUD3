@@ -37,6 +37,8 @@ function ArcHUD:UpdateComboPointsFrame()
 		points = UnitPower("player", SPELL_POWER_HOLY_POWER)
 	elseif (class == "WARLOCK") then
 		points = UnitPower("player", SPELL_POWER_SOUL_SHARDS)
+	elseif (class == "MONK") then
+		points = UnitPower("player", SPELL_POWER_LIGHT_FORCE)
 	else
 		points = GetComboPoints("player")
 	end
@@ -65,7 +67,7 @@ function ArcHUD:UpdateComboPoints(event, arg1)
 	elseif (event == "PLAYER_TARGET_CHANGED") then
 		if (self.db.profile.OldComboPointsDecay > 0.0) then
 			if (not RemoveOldComboPoints_started and oldComboPoints > 0 and
-				class ~= "PALADIN" and class ~= "WARLOCK") then
+				class ~= "PALADIN" and class ~= "WARLOCK" and class ~= "MONK") then
 				-- we have still some points on previous target
 				self.TargetHUD.Combo:SetTextColor(
 					self.db.profile.ColorOldComboPoints.r, 

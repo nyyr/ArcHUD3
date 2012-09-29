@@ -893,11 +893,25 @@ ArcHUD.configOptionsTableCore = {
 						ArcHUD:UpdateTargetHUD()
 					end,
 				},
+				-- Chi as Combo Points
+				ShowChiPoints = {
+					type		= "toggle",
+					name		= L["TEXT"]["CHICOMBO"],
+					desc		= L["TOOLTIP"]["CHICOMBO"],
+					order		= 12,
+					get			= function ()
+						return ArcHUD.db.profile.ShowChiPoints
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.ShowChiPoints = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
 				ColorComboPoints = {
 					type		= "color",
 					name		= L["TEXT"]["CPCOLOR"],
 					desc		= L["TOOLTIP"]["CPCOLOR"],
-					order		= 12,
+					order		= 13,
 					get			= function ()
 						return ArcHUD.db.profile.ColorComboPoints.r, ArcHUD.db.profile.ColorComboPoints.g, ArcHUD.db.profile.ColorComboPoints.b
 					end,
@@ -910,7 +924,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "color",
 					name		= L["TEXT"]["CPCOLORDECAY"],
 					desc		= L["TOOLTIP"]["CPCOLORDECAY"],
-					order		= 13,
+					order		= 14,
 					get			= function ()
 						return ArcHUD.db.profile.ColorOldComboPoints.r, ArcHUD.db.profile.ColorOldComboPoints.g, ArcHUD.db.profile.ColorOldComboPoints.b
 					end,
@@ -923,7 +937,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "execute",
 					name		= L["TEXT"]["RESETCOLORS"],
 					desc		= L["TOOLTIP"]["RESETCOLORS"],
-					order		= 14,
+					order		= 15,
 					func		= function ()
 						local defaults = ArcHUD.defaults.profile.ColorComboPoints
 						local defaultsold = ArcHUD.defaults.profile.ColorOldComboPoints

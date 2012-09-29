@@ -78,6 +78,7 @@ ArcHUD.defaults = {
 		ShowResting = true,
 		ShowHolyPowerPoints = false,
 		ShowSoulShardPoints = false,
+		ShowChiPoints = false,
 		ColorComboPoints = {r = 1, g = 1, b = 0},
 		ColorOldComboPoints = {r = 0.5, g = 0.5, b = 0.5},
 		OldComboPointsDecay = 10.0,
@@ -433,7 +434,8 @@ function ArcHUD:UpdateTargetHUD()
 		self.TargetHUD.Combo:Show()
 		local _, class = UnitClass("player")
 		if ((class == "PALADIN" and not self.db.profile.ShowHolyPowerPoints) or
-			(class == "WARLOCK" and not self.db.profile.ShowSoulShardPoints)) then
+			(class == "WARLOCK" and not self.db.profile.ShowSoulShardPoints) or
+			(class == "MONK" and not self.db.profile.ShowChiPoints)) then
 			self:SetComboPoints(0)
 		else
 			self:UpdateComboPointsFrame()
@@ -763,7 +765,7 @@ function ArcHUD:UpdateFaction(unit)
 		if(UnitIsPVPFreeForAll("target")) then
 			self.TargetHUD.PVPIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-FFA")
 			self.TargetHUD.PVPIcon:Show()
-		elseif(factionGroup and UnitIsPVP("target")) then
+		elseif(factionGroup and UnitIsPVP("target") and factionGroup ~= "Neutral") then
 			self.TargetHUD.PVPIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-"..factionGroup)
 			self.TargetHUD.PVPIcon:Show()
 		else
@@ -997,14 +999,16 @@ function ArcHUD:EventHandler(event, arg1)
 			self.TargetHUD.MPText:SetTextColor(info.r, info.g, info.b)
 
 		elseif ((arg1 == "player" and class == "PALADIN" and self.db.profile.ShowHolyPowerPoints) or
-				(arg1 == "player" and class == "WARLOCK" and self.db.profile.ShowSoulShardPoints)) then
+				(arg1 == "player" and class == "WARLOCK" and self.db.profile.ShowSoulShardPoints) or
+				(arg1 == "player" and class == "MONK" and self.db.profile.ShowChiPoints)) then
 			-- Affects Holy Power / Soul Shards
 			self:UpdateComboPointsFrame()
 		end
 
 	elseif (event == "UNIT_POWER") then
 		if ((arg1 == "player" and class == "PALADIN" and self.db.profile.ShowHolyPowerPoints) or
-			(arg1 == "player" and class == "WARLOCK" and self.db.profile.ShowSoulShardPoints)) then
+			(arg1 == "player" and class == "WARLOCK" and self.db.profile.ShowSoulShardPoints) or
+			(arg1 == "player" and class == "MONK" and self.db.profile.ShowChiPoints)) then
 			-- Affects Holy Power / Soul Shards
 			self:UpdateComboPointsFrame()
 		end
