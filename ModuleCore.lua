@@ -10,6 +10,8 @@ local d_warn = 1
 local d_info = 2
 local d_notice = 3
 
+local _
+
 -- Set libraries
 ArcHUD:SetDefaultModuleLibraries("AceEvent-3.0")
 ArcHUD.modulePrototype = {

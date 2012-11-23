@@ -209,6 +209,7 @@ LM["SoulShards"]	= "Hexenmeister: Seelensplitter etc."
 LM["Eclipse"]		= "Druide: Finsternis"
 LM["Chi"]			= "Mönch: Chi"
 LM["Runes"]			= "Todesritter: Runen"
+LM["ShadowOrbs"]	= "Priester: Schattenkugeln"
 
 LM["TEXT"] = {
 	TITLE		= "Ringoptionen",

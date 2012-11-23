@@ -3,6 +3,7 @@
 --
 
 local oldComboPoints = 0
+local _
 local class = ""
 local RemoveOldComboPoints_started = false
 
