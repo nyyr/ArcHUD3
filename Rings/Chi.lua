@@ -1,6 +1,6 @@
 local module = ArcHUD:NewModule("Chi")
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "2.0 (r" .. rev .. ")"
+module.version = "2.1 (r" .. rev .. ")"
 
 module.unit = "player"
 module.noAutoAlpha = nil
@@ -59,8 +59,8 @@ function module:OnModuleEnable()
 end
 
 function module:UpdateChi()
-	local maxChi = UnitPowerMax(self.unit, SPELL_POWER_LIGHT_FORCE)
-	local num = UnitPower(self.unit, SPELL_POWER_LIGHT_FORCE)
+	local maxChi = UnitPowerMax(self.unit, SPELL_POWER_CHI)
+	local num = UnitPower(self.unit, SPELL_POWER_CHI)
 	self.f:SetMax(maxChi)
 	self.f:SetValue(num)
 	
@@ -77,7 +77,7 @@ end
 
 function module:UpdatePower(event, arg1, arg2)
 	if (event == "UNIT_POWER_FREQUENT") then
-		if (arg1 == self.unit and (arg2 == "LIGHT_FORCE" or arg2 == "DARK_FORCE")) then
+		if (arg1 == self.unit and (arg2 == "CHI" or arg2 == "CHI")) then
 			self:UpdateChi()
 		end
 	else
