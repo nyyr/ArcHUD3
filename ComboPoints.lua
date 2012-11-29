@@ -39,7 +39,7 @@ function ArcHUD:UpdateComboPointsFrame()
 	elseif (class == "WARLOCK") then
 		points = UnitPower("player", SPELL_POWER_SOUL_SHARDS)
 	elseif (class == "MONK") then
-		points = UnitPower("player", SPELL_POWER_LIGHT_FORCE)
+		points = UnitPower("player", SPELL_POWER_CHI)
 	else
 		points = GetComboPoints("player")
 	end
