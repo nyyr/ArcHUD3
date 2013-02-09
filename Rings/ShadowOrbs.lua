@@ -24,6 +24,8 @@ module.options = {
 }
 module.localized = true
 
+local SHADOW_ORBS_SHOW_LEVEL = 10
+
 function module:Initialize()
 	-- Setup the frame we need
 	self.f = self:CreateRing(true, ArcHUDFrame)
@@ -46,28 +48,69 @@ function module:OnModuleEnable()
 	self:UpdateColor()
 
 	-- Register the events we will use
-	self:RegisterEvent("PLAYER_ENTERING_WORLD",	"UpdatePower")
-	self:RegisterUnitEvent("UNIT_POWER_FREQUENT", "UpdatePower")
-	self:RegisterUnitEvent("UNIT_DISPLAYPOWER", "UpdatePower")
-
-	-- Activate ring timers
-	self:StartRingTimers()
+	self:RegisterEvent("PLAYER_TALENT_UPDATE", "CheckCurrentPower")
+	self:RegisterEvent("PLAYER_LEVEL_UP", "CheckCurrentPower")
 	
-	self:UpdateOrbs()
-
-	self.f:Show()
+	-- Check whether we may actually show this ring
+	self:CheckCurrentPower()
 end
 
-function module:UpdateOrbs()
-	local max = UnitPowerMax(self.unit, SPELL_POWER_SHADOW_ORBS)
-	local num = UnitPower(self.unit, SPELL_POWER_SHADOW_ORBS)
-	self.f:SetMax(max)
+function module:CheckCurrentPower()
+	local spec = GetSpecialization()
+	if (spec == SPEC_PRIEST_SHADOW and (UnitLevel("player") >= SHADOW_ORBS_SHOW_LEVEL)) then
+		self.currentSpellPower = SPELL_POWER_SHADOW_ORBS
+	else
+		self.currentSpellPower = nil
+	end
+	
+	--self:Debug(1, "CheckCurrentPower(): %s", tostring(self.currentSpellPower))
+	
+	if (self.currentSpellPower) then
+		if (not self.active) then
+			-- Register the events we will use
+			self:RegisterEvent("PLAYER_ENTERING_WORLD",	"UpdatePower")
+			self:RegisterUnitEvent("UNIT_POWER_FREQUENT", "UpdatePower")
+			self:RegisterUnitEvent("UNIT_DISPLAYPOWER", "UpdatePower")
+			
+			-- we'll never need it again
+			self:UnregisterEvent("SPELLS_CHANGED")
+			
+			-- Activate ring timers
+			self:StartRingTimers()
+			
+			self.f:Show()
+			self.active = true
+		end
+		
+		self:UpdatePowerRing()
+		
+	else
+		if (self.active) then
+			self.f:Hide()
+			self.active = nil
+			
+			self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+			self:UnregisterUnitEvent("UNIT_POWER_FREQUENT")
+			self:UnregisterUnitEvent("UNIT_DISPLAYPOWER")
+			
+			self:StopRingTimers()
+		end
+	end
+end
+
+function module:UpdatePowerRing()
+	local maxPower = UnitPowerMax(self.unit, self.currentSpellPower)
+	local num = UnitPower(self.unit, self.currentSpellPower)
+	self.f:SetMax(maxPower)
 	self.f:SetValue(num)
 	
-	if(num < max and num >= 0) then
+	--self:Debug(1, "UpdatePowerRing(): %d/%d", num, maxPower)
+	
+	if (num < maxPower and num >= 0) then
 		self.f:StopPulse()
+		self.f:UpdateColor(self.db.profile.Color)
 	else
-		if(self.db.profile.Flash) then
+		if (self.Flash) then
 			self.f:StartPulse()
 		else
 			self.f:StopPulse()
@@ -78,9 +121,9 @@ end
 function module:UpdatePower(event, arg1, arg2)
 	if (event == "UNIT_POWER_FREQUENT") then
 		if (arg1 == self.unit and arg2 == "SHADOW_ORBS") then
-			self:UpdateOrbs()
+			self:UpdatePowerRing()
 		end
 	else
-		self:UpdateOrbs()
+		self:UpdatePowerRing()
 	end
 end
