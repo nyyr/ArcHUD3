@@ -210,7 +210,12 @@ function ArcHUD.modulePrototype:ARCHUD_MODULE_UPDATE(message, module)
 			end
 
 			if self.name ~= "Anchors" then
-				self:AttachRing()
+				self:AttachRing() -- default frame
+				if self.frames then -- any additional frames
+					for i,v in ipairs(self.frames) do
+						self:AttachRing(v)
+					end
+				end
 			end
 
 			if(self.OnModuleUpdate) then

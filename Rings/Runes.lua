@@ -1,10 +1,18 @@
 local module = ArcHUD:NewModule("Runes")
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "2.0 (r" .. rev .. ")"
+module.version = "2.2 (r" .. rev .. ")"
+
+-- localization
+local LM = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Module")
 
 module.unit = "player"
 module.noAutoAlpha = nil
 module.noAutoAlpha = nil
+
+local RUNETYPE_BLOOD = 1
+local RUNETYPE_UNHOLY = 2
+local RUNETYPE_FROST = 3
+local RUNETYPE_DEATH = 4
 
 module.defaults = {
 	profile = {
@@ -18,6 +26,9 @@ module.defaults = {
 		ColorUnholyRune = {r = 0,   g = 0.6, b = 0},
 		ColorDeathRune  = {r = 0.8, g = 0.1, b = 1},
 		--RingVisibility = 2, -- always fade out when out of combat, regardless of ring status
+		RuneOrderTop = RUNETYPE_BLOOD,
+		RuneOrderMiddle = RUNETYPE_FROST,
+		RuneOrderBottom = RUNETYPE_UNHOLY,
 	}
 }
 module.options = {
@@ -35,11 +46,6 @@ module.localized = true
 local MAX_RUNES = 6
 local MAX_RING_VALUE = 100
 
-local RUNETYPE_BLOOD = 1
-local RUNETYPE_UNHOLY = 2
-local RUNETYPE_FROST = 3
-local RUNETYPE_DEATH = 4
-
 local runeColors = {
 	[RUNETYPE_BLOOD]  = {r = 0.7, g = 0,   b = 0},
 	[RUNETYPE_UNHOLY] = {r = 0,   g = 0.6, b = 0},
@@ -56,12 +62,87 @@ local colorByIndex = {
 	[6] = runeColors[RUNETYPE_FROST],
 }
 
+local runeTypeToIndex = {
+	[RUNETYPE_BLOOD]  = { [1] = 1, [2] = 2 },
+	[RUNETYPE_UNHOLY] = { [1] = 3, [2] = 4 },
+	[RUNETYPE_FROST]  = { [1] = 5, [2] = 6 },
+}
+
 function module:Initialize()
 	-- Setup the frame we need
 	self.f = self:CreateRing(true, ArcHUDFrame)
 	self.f:SetAlpha(0)
 	
 	self:CreateStandardModuleOptions(55)
+	
+	-- additional options
+	local runeOrderValues = {LM["TEXT_RUNES"]["ORDER_BLOOD"], LM["TEXT_RUNES"]["ORDER_UNHOLY"], LM["TEXT_RUNES"]["ORDER_FROST"]}
+	local additionalOptions = {
+		runeOrder_header = {
+			type		= "header",
+			name		= LM["TEXT_RUNES"]["ORDER"],
+			order		= 100,
+		},
+		runeOrderTop = {
+			type		= "select",
+			name		= LM["TEXT_RUNES"]["ORDER_TOP"],
+			desc		= LM["TOOLTIP_RUNES"]["ORDER"],
+			values		= runeOrderValues,
+			order		= 101,
+			get			= function ()
+				return self.db.profile.RuneOrderTop
+			end,
+			set			= function (info, v)
+				if v == self.db.profile.RuneOrderMiddle then
+					self.db.profile.RuneOrderMiddle = self.db.profile.RuneOrderTop
+				elseif v == self.db.profile.RuneOrderBottom then
+					self.db.profile.RuneOrderBottom = self.db.profile.RuneOrderTop
+				end
+				self.db.profile.RuneOrderTop = v
+				self:SendMessage("ARCHUD_MODULE_UPDATE", self:GetName())
+			end,
+		},
+		runeOrderMiddle = {
+			type		= "select",
+			name		= LM["TEXT_RUNES"]["ORDER_MIDDLE"],
+			desc		= LM["TOOLTIP_RUNES"]["ORDER"],
+			values		= runeOrderValues,
+			order		= 102,
+			get			= function ()
+				return self.db.profile.RuneOrderMiddle
+			end,
+			set			= function (info, v)
+				if v == self.db.profile.RuneOrderTop then
+					self.db.profile.RuneOrderTop = self.db.profile.RuneOrderMiddle
+				elseif v == self.db.profile.RuneOrderBottom then
+					self.db.profile.RuneOrderBottom = self.db.profile.RuneOrderMiddle
+				end
+				self.db.profile.RuneOrderMiddle = v
+				self:SendMessage("ARCHUD_MODULE_UPDATE", self:GetName())
+			end,
+		},
+		runeOrderBottom = {
+			type		= "select",
+			name		= LM["TEXT_RUNES"]["ORDER_BOTTOM"],
+			desc		= LM["TOOLTIP_RUNES"]["ORDER"],
+			values		= runeOrderValues,
+			order		= 103,
+			get			= function ()
+				return self.db.profile.RuneOrderBottom
+			end,
+			set			= function (info, v)
+				if v == self.db.profile.RuneOrderTop then
+					self.db.profile.RuneOrderTop = self.db.profile.RuneOrderBottom
+				elseif v == self.db.profile.RuneOrderMiddle then
+					self.db.profile.RuneOrderMiddle = self.db.profile.RuneOrderBottom
+				end
+				self.db.profile.RuneOrderBottom = v
+				self:SendMessage("ARCHUD_MODULE_UPDATE", self:GetName())
+			end,
+		},
+	}
+	
+	self:AppendModuleOptions(additionalOptions)
 end
 
 function module:OnModuleUpdate()
@@ -71,7 +152,22 @@ function module:OnModuleUpdate()
 	runeColors[RUNETYPE_DEATH] = self.db.profile.ColorDeathRune
 
 	if (self.frames) then
-		self:UpdateRunes()
+		self.frames[runeTypeToIndex[self.db.profile.RuneOrderTop][1]] = self.origFrameOrder[1]
+		self.frames[runeTypeToIndex[self.db.profile.RuneOrderTop][2]] = self.origFrameOrder[2]
+		self.frames[runeTypeToIndex[self.db.profile.RuneOrderMiddle][1]] = self.origFrameOrder[3]
+		self.frames[runeTypeToIndex[self.db.profile.RuneOrderMiddle][2]] = self.origFrameOrder[4]
+		self.frames[runeTypeToIndex[self.db.profile.RuneOrderBottom][1]] = self.origFrameOrder[5]
+		self.frames[runeTypeToIndex[self.db.profile.RuneOrderBottom][2]] = self.origFrameOrder[6]	
+		
+		self:UpdateRunes()	
+		
+		for i=1,6 do
+			self:AttachRing(self.frames[i])
+			if (i > 1) then
+				self.frames[i]:SetSpark(99.9, true)
+			end
+			self.frames[i].dirty = true
+		end
 	end
 end
 
@@ -126,13 +222,17 @@ function module:OnModuleEnable()
 		self.frames[1]:SetShineAngle(angles[1].s + 12)
 		self.frames[6]:SetShineAngle(angles[6].e - 12)
 		
-		-- reorder frost/unholy runes
-		local tmpRing = self.frames[3]
-		self.frames[3] = self.frames[5]
-		self.frames[5] = tmpRing
-		tmpRing = self.frames[4]
-		self.frames[4] = self.frames[6]
-		self.frames[6] = tmpRing
+		-- reorder runes
+		self.origFrameOrder = {}
+		for i,v in ipairs(self.frames) do
+			self.origFrameOrder[i] = self.frames[i]
+		end
+		self.frames[runeTypeToIndex[self.db.profile.RuneOrderTop][1]] = self.origFrameOrder[1]
+		self.frames[runeTypeToIndex[self.db.profile.RuneOrderTop][2]] = self.origFrameOrder[2]
+		self.frames[runeTypeToIndex[self.db.profile.RuneOrderMiddle][1]] = self.origFrameOrder[3]
+		self.frames[runeTypeToIndex[self.db.profile.RuneOrderMiddle][2]] = self.origFrameOrder[4]
+		self.frames[runeTypeToIndex[self.db.profile.RuneOrderBottom][1]] = self.origFrameOrder[5]
+		self.frames[runeTypeToIndex[self.db.profile.RuneOrderBottom][2]] = self.origFrameOrder[6]
 	end
 
 	self:RegisterEvent("RUNE_POWER_UPDATE", "UpdatePower")

@@ -9,8 +9,8 @@ ArcHUD = LibStub("AceAddon-3.0"):NewAddon("ArcHUD",
 
 -- Version
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-ArcHUD.version = "2.1 (r"..rev..")"
-ArcHUD.codename = "Dizzying Curiosity"
+ArcHUD.version = "2.2 (r"..rev..")"
+ArcHUD.codename = "Burning Skies"
 ArcHUD.authors = "nyyr, Nenie"
 
 -- Locale object

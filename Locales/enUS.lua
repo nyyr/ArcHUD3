@@ -326,3 +326,17 @@ LM["SIDE"] = {
 	LEFT		= "Left anchor",
 	RIGHT		= "Right anchor",
 }
+
+LM["TEXT_RUNES"] = {
+	ORDER = "Rune order",
+	ORDER_TOP = "Top",
+	ORDER_MIDDLE = "Middle",
+	ORDER_BOTTOM = "Bottom",
+	ORDER_BLOOD = "Blood/Death",
+	ORDER_FROST = "Frost",
+	ORDER_UNHOLY = "Unholy",
+}
+
+LM["TOOLTIP_RUNES"] = {
+	ORDER = "Change order of runes (from top to bottom)",
+}

@@ -331,3 +331,17 @@ LM["SIDE"] = {
 	LEFT		= "Linker Anker",
 	RIGHT		= "Rechter Anker",
 }
+
+LM["TEXT_RUNES"] = {
+	ORDER = "Runen-Reihenfolge",
+	ORDER_TOP = "Oben",
+	ORDER_MIDDLE = "Mitte",
+	ORDER_BOTTOM = "Unten",
+	ORDER_BLOOD = "Blut-/Todesrune",
+	ORDER_FROST = "Frostrune",
+	ORDER_UNHOLY = "Unheiligrune",
+}
+
+LM["TOOLTIP_RUNES"] = {
+	ORDER = "Legt die Reihenfolge der Runen fest (von oben nach unten)",
+}

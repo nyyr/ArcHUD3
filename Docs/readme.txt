@@ -1,4 +1,22 @@
-ArcHUD3 2.0 (WoW 5.0)
+ArcHUD3 2.2 "Burning Skies"
+-------------
+
+* added option to change Death Knight rune order
+* bug fixes
+
+nyyr
+
+
+ArcHUD3 2.1 "Dizzying Curiosity"
+-------------
+
+* added Shadow Orbs ring
+* bug fixes
+
+nyyr
+
+
+ArcHUD3 2.0 "Dizzying Curiosity" (WoW 5.0)
 -------------
 
 * added Monk Chi ring
@@ -17,7 +35,7 @@ ArcHUD3 2.0 (WoW 5.0)
 nyyr
 
 
-ArcHUD3 1.4
+ArcHUD3 1.4 "Maximum Focus"
 -------------
 
 * added possibility to set maximum duration of custom buff arcs (#48)
@@ -27,7 +45,7 @@ ArcHUD3 1.4
 nyyr
 
 
-ArcHUD3 1.3
+ArcHUD3 1.3 "Hidden Chimera"
 -------------
 
 * added profile management
@@ -42,7 +60,7 @@ ArcHUD3 1.3
 nyyr
 
 
-ArcHUD3 1.2
+ArcHUD3 1.2 "Fiery Babel Fish"
 -------------
 
 * added deDE locale
@@ -53,7 +71,7 @@ ArcHUD3 1.2
 nyyr
 
 
-ArcHUD3 1.1
+ArcHUD3 1.1 "Happy Plainsrunner"
 -------------
 
 * Fixed a taint (disabled dynamic nameplates IC)
@@ -70,7 +88,7 @@ ArcHUD3 1.1
 nyyr
 
 
-ArcHUD3 1.0
+ArcHUD3 1.0 "Plainsrunner"
 -------------
 
 First complete release with some new features such as custom buff arcs.
@@ -78,7 +96,7 @@ First complete release with some new features such as custom buff arcs.
 nyyr
 
 
-ArcHUD3 0.9 (WoW 4.0)
+ArcHUD3 0.9 "Phoenix" (WoW 4.0)
 -------------
 
 Updated to Ace3 and API fixes for WoW 4.0.1
