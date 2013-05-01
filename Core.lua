@@ -59,6 +59,7 @@ ArcHUD.defaults = {
 		HoverMsg = false,
 		HoverDelay = 1.5,
 		Scale = 1.0,
+		ScaleTargetFrame = 1.0,
 		AttachTop = false,
 		ShowBuffs = true,
 		ShowOnlyBuffsCastByPlayer = false,
@@ -363,6 +364,9 @@ function ArcHUD:OnProfileChanged(db, profile)
 	--self:LevelDebug(d_notice, "Setting scale. Scale: "..self.db.profile.Scale)
 	-- Scale the HUD according to user settings.
 	ArcHUDFrame:SetScale(self.db.profile.Scale)
+	
+	-- Scale TargetHUD according to user settings (relative to ArcHUDFrame).
+	self.TargetHUD:SetScale(self.db.profile.ScaleTargetFrame)
 	
 	-- Set playername
 	self:UpdateFaction()

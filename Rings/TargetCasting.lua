@@ -15,7 +15,7 @@ module.defaults = {
 		ColorFriend = {r = 0, g = 1, b = 0},
 		ColorFoe = {r = 1, g = 0, b = 0},
 		Side = 1,
-		Level = -1,
+		Level = 2,
 		IndicateInterruptible = true,
 		ColorInterruptible = {r = 1, g = 1, b = 0},
 	}

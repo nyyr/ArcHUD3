@@ -707,6 +707,23 @@ ArcHUD.configOptionsTableCore = {
 						ArcHUDFrame:SetScale(v)
 					end,
 				},
+				-- Scaling of TargetFrame
+				ScaleTargetFrame = {
+					type		= "range",
+					min			= 0.2,
+					max			= 2.0,
+					step		= 0.1,
+					name		= L["TEXT"]["SCALETARGETFRAME"],
+					desc		= L["TOOLTIP"]["SCALETARGETFRAME"],
+					order		= 1,
+					get			= function ()
+						return ArcHUD.db.profile.ScaleTargetFrame
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.ScaleTargetFrame = v
+						ArcHUD.TargetHUD:SetScale(v)
+					end,
+				},
 				-- YLoc
 				YLoc = {
 					type		= "range",
@@ -715,7 +732,7 @@ ArcHUD.configOptionsTableCore = {
 					step		= 1,
 					name		= L["TEXT"]["YLOC"],
 					desc		= L["TOOLTIP"]["YLOC"],
-					order		= 1,
+					order		= 2,
 					get			= function ()
 						return ArcHUD.db.profile.YLoc
 					end,
@@ -733,7 +750,7 @@ ArcHUD.configOptionsTableCore = {
 					step		= 1,
 					name		= L["TEXT"]["XLOC"],
 					desc		= L["TOOLTIP"]["XLOC"],
-					order		= 2,
+					order		= 3,
 					get			= function ()
 						return ArcHUD.db.profile.XLoc
 					end,
@@ -751,7 +768,7 @@ ArcHUD.configOptionsTableCore = {
 					step		= 1,
 					name		= L["TEXT"]["WIDTH"],
 					desc		= L["TOOLTIP"]["WIDTH"],
-					order		= 3,
+					order		= 4,
 					get			= function ()
 						return ArcHUD.db.profile.Width
 					end,

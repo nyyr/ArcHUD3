@@ -8,7 +8,7 @@ module.noAutoAlpha = true
 
 module.defaults = {
 	profile = {
-		Enabled = true,
+		Enabled = false,
 		Outline = true,
 		ShowSpell = true,
 		ShowTime = true,
