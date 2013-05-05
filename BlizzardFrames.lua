@@ -7,10 +7,12 @@ function ArcHUD:HideBlizzardPlayer(show)
 	self.BlizzPlayerHidden = not show
 	if not show then
 		PlayerFrame:UnregisterAllEvents()
-		PlayerFrame:Hide();
+		PlayerFrame:Hide()
 
 		PetFrame:UnregisterAllEvents()
-		PetFrame:Hide();
+		PetFrame:Hide()
+		
+		RuneFrame:Hide()
 	else
 		PlayerFrame:RegisterAllEvents()
 		PlayerFrame:Show()
@@ -18,6 +20,11 @@ function ArcHUD:HideBlizzardPlayer(show)
 		
 		PetFrame:RegisterAllEvents()
 		PetFrame_Update(PetFrame, true)
+		
+		local _, class = UnitClass("player")
+		if ( class == "DEATHKNIGHT" ) then
+			RuneFrame:Show()
+		end
 	end
 end
 
