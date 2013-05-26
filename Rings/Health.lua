@@ -18,10 +18,12 @@ module.defaults = {
 		ShowTextMax = true,
 		ShowPerc = true,
 		ShowDef = false,
-		ShowIncoming = false,
+		ShowIncoming = true,
+		ShowAbsorbs = true,
 		SwapHealthPowerText = false,
 		ColorMode = "fade",
 		Color = {r = 0, g = 1, b = 0},
+		ColorAbsorbs = {r = 1, g = 1, b = 1},
 		Side = 1,
 		Level = 0,
 	}
@@ -32,9 +34,13 @@ module.options = {
 	{name = "ShowPerc", text = "SHOWPERC", tooltip = "SHOWPERC"},
 	{name = "ShowDef", text = "DEFICIT", tooltip = "DEFICIT"},
 	{name = "ShowIncoming", text = "INCOMINGHEALS", tooltip = "INCOMINGHEALS"},
+	{name = "ShowAbsorbs", text = "SHOWABSORBS", tooltip = "SHOWABSORBS"},
 	{name = "SwapHealthPowerText", text = "SWAPHEALTHPOWERTEXT", tooltip = "SWAPHEALTHPOWERTEXT"},
 	hascolorfade = true,
 	attach = true,
+	customcolors = {
+		{name = "ColorAbsorbs", text = "COLORABSORBS"},
+	}
 }
 
 module.localized = true
@@ -107,6 +113,13 @@ function module:OnModuleUpdate()
 		ArcHUD:SendMessage("ARCHUD_MODULE_UPDATE", "Power")
 	end
 
+	if self.db.profile.ShowAbsorbs then
+		self.frames[2]:Show()
+		self:UpdateAbsorbs(nil, self.unit)
+	else
+		self.frames[2]:Hide()
+	end
+	
 	self:UpdateHealth(nil, self.unit)
 end
 
@@ -130,11 +143,28 @@ function module:OnModuleEnable()
 		self.HPPerc:SetText(floor((UnitHealth(self.unit)/UnitHealthMax(self.unit))*100).."%")
 		self.DefText:SetText("0")
 	end
+	
+	if (not self.frames) then
+		-- create frame for absorbs
+		self.frames = {}
+		self.frames[1] = self.f
+		self.frames[2] = self:CreateRing(false, ArcHUDFrame)
+		
+		self.frames[1].nextRingPart = self.frames[2]
+		
+		self.frames[2]:SetStartAngle(self.frames[1].angle)
+		self.frames[2]:SetMax(10)
+		self.frames[2]:SetValue(0, 0)
+		self.frames[2]:UpdateColor(self.db.profile.ColorAbsorbs)
+		self.frames[2]:SetRingAlpha(0)
+		self.frames[2].dirty = true
+	end
 
 	-- Register the events we will use
 	self:RegisterUnitEvent("UNIT_HEALTH", "UpdateHealth")
 	self:RegisterUnitEvent("UNIT_MAXHEALTH", "UpdateHealth")
 	self:RegisterUnitEvent("UNIT_HEAL_PREDICTION", "UpdateHealthPrediction")
+	self:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", "UpdateAbsorbs")
 	self:RegisterEvent("PLAYER_LEVEL_UP")
 
 	-- Activate ring timers
@@ -196,6 +226,12 @@ function module:UpdateHealth(event, arg1)
 			self.DefText:SetText(deficit)
 
 			self.f:SetMax(maxHealth)
+			
+			local totalAbsorbs = UnitGetTotalAbsorbs(self.unit)
+			if totalAbsorbs > 0 then
+				self.frames[2]:SetMax(maxHealth - health)
+			end
+			
 			self.f:SetValue(health)
 		end
 		
@@ -227,6 +263,31 @@ function module:UpdateHealthPrediction(event, arg1)
 			end
 			--self:Debug(1, "spark: %s", tostring(health+ih))
 			self.f:SetSpark(health + ih)
+		end
+	end
+end
+
+----------------------------------------------
+-- UpdateAbsorbs
+----------------------------------------------
+function module:UpdateAbsorbs(event, arg1)
+	if self.db.profile.ShowAbsorbs and (arg1 == self.unit) then
+		local totalAbsorbs = UnitGetTotalAbsorbs(self.unit)
+		
+		if totalAbsorbs == 0 then
+			self.frames[2].isHidden = true
+			self.frames[2]:SetValue(0)
+			self.frames[2]:SetRingAlpha(0)
+		else
+			local health, maxHealth = UnitHealth(self.unit), UnitHealthMax(self.unit)
+			self.frames[2].isHidden = nil
+			self.frames[2]:SetMax(maxHealth - health)
+			self.frames[2]:SetValue(totalAbsorbs)
+			if(ArcHUD.db.profile.FadeIC > ArcHUD.db.profile.FadeOOC) then
+				self.frames[2]:SetRingAlpha(ArcHUD.db.profile.FadeIC)
+			else
+				self.frames[2]:SetRingAlpha(ArcHUD.db.profile.FadeOOC)
+			end
 		end
 	end
 end

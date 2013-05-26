@@ -233,6 +233,7 @@ LM["TEXT"] = {
 	ENABLEMENU	= "Aktiviere Rechts-Klick-Menü",
 	DEFICIT		= "Defizit",
 	INCOMINGHEALS= "Zeige eintreffende Heilungen",
+	SHOWABSORBS = "Zeige Absorptionen",
 	ATTACH		= "Anheften",
 	SIDE		= "Seite",
 	LEVEL		= "Ebene",
@@ -253,6 +254,7 @@ LM["TEXT"] = {
 	COLORFOCUS 	= "Fokus-Farbe",
 	COLORENERGY	= "Energie-Farbe",
 	COLORRUNIC	= "Runenmacht-Farbe",
+	COLORABSORBS = "Farbe für Absorptionen",
 	
 	COLORLUNAR	= "Farbe Lunarenergie",
 	COLORSOLAR	= "Farbe Solarenergie",
@@ -260,6 +262,11 @@ LM["TEXT"] = {
 	COLORFROSTRUNE = "Farbe Frostrune",
 	COLORUNHOLYRUNE = "Farbe Unheiligrune",
 	COLORDEATHRUNE = "Farbe Todesrune",
+	
+	STAGGER_MAX = "Maximum value (in max. health %)",
+	COLORSTAGGERL = "Color for Light Stagger",
+	COLORSTAGGERM = "Color for Moderate Stagger",
+	COLORSTAGGERH = "Color for Heavy Stagger",
 	
 	INNERANCHOR = "Am inneren ('Begleiter') Anker befestigen",
 	
@@ -295,6 +302,7 @@ LM["TOOLTIP"] = {
 	ENABLEMENU	= "Schaltet Rechts-Klick-Menü ein/aus",
 	DEFICIT		= "Schaltet Anzeige des Gesundheitsdefizits (Maximum - aktueller Wert) ein/aus",
 	INCOMINGHEALS= "Schaltet die Anzeige eintreffender Heilungen ein/aus",
+	SHOWABSORBS = "Schaltet die Anzeige von Absorptionen ein/aus",
 	SIDE		= "Legt die Seite fest, auf welcher der Ring angeheftet werden soll",
 	LEVEL		= "Setzt die Ebene, auf der der Ring angeheftet werden soll (<-1: zur Mitte, 0: am Anker, >1: zum Rand)",
 	
@@ -309,13 +317,19 @@ LM["TOOLTIP"] = {
 	COLORCUST	= "Benutzerdefinierte Farbe",
 	COLORSET	= "Setzt eine benutzerdefinierte Farbe",
 	COLORSETFADE= "Setzt eine benutzerdefinierte Farbe (Farbmodus muss auf 'benutzerdefiniert' stehen)",
-	COLORFRIEND	= "Setzt eine benutzderdefinierte Farbe für freundliche Einheiten",
-	COLORFOE	= "Setzt eine benutzderdefinierte Farbe für feindliche Einheiten",
-	COLORMANA	= "Setzt eine benutzderdefinierte Farbe für Mana",
-	COLORRAGE	= "Setzt eine benutzderdefinierte Farbe für Wut",
-	COLORFOCUS	= "Setzt eine benutzderdefinierte Farbe für Fokus",
-	COLORENERGY	= "Setzt eine benutzderdefinierte Farbe für Energie",
-	COLORRUNIC	= "Setzt eine benutzderdefinierte Farbe für Runenmacht",
+	COLORFRIEND	= "Setzt eine benutzerdefinierte Farbe für freundliche Einheiten",
+	COLORFOE	= "Setzt eine benutzerdefinierte Farbe für feindliche Einheiten",
+	COLORMANA	= "Setzt eine benutzerdefinierte Farbe für Mana",
+	COLORRAGE	= "Setzt eine benutzerdefinierte Farbe für Wut",
+	COLORFOCUS	= "Setzt eine benutzerdefinierte Farbe für Fokus",
+	COLORENERGY	= "Setzt eine benutzerdefinierte Farbe für Energie",
+	COLORRUNIC	= "Setzt eine benutzerdefinierte Farbe für Runenmacht",
+	COLORABSORBS = "Setzt eine benutzerdefinierte Farbe für Absorptionen",
+	
+	STAGGER_MAX = "Maximumwert des Rings in Prozent der maximalen Trefferpunkte des Spieler-Characters",
+	COLORSTAGGERL = "Setzt eine benutzerdefinierte Farbe des Rings bei leichter Staffelung",
+	COLORSTAGGERM = "Setzt eine benutzerdefinierte Farbe des Rings bei moderater Staffelung",
+	COLORSTAGGERH = "Setzt eine benutzerdefinierte Farbe des Rings bei schwerer Staffelung",
 	
 	INNERANCHOR = "Wenn ausgewählt, befestige und skaliere den Ring am inneren ('Begleiter') Anker. Ansonsten befestige den Ring in seiner normalen Größe am äußeren Anker (Standard).",
 	

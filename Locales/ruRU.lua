@@ -231,6 +231,7 @@ LM["TEXT"] = {
 	ENABLEMENU	= "Включить меню по [правому-клику]",
 	DEFICIT		= "Нехватка",
 	INCOMINGHEALS= "Indicate incoming heals",
+	SHOWABSORBS = "Show absorbs",
 	ATTACH		= "Прикрепления",
 	SIDE		= "Сторона",
 	LEVEL		= "Уровень",
@@ -258,6 +259,11 @@ LM["TEXT"] = {
 	COLORFROSTRUNE = "Frost rune color",
 	COLORUNHOLYRUNE = "Unholy rune color",
 	COLORDEATHRUNE = "Death rune color",
+	
+	STAGGER_MAX = "Maximum value (in max. health %)",
+	COLORSTAGGERL = "Color for Light Stagger",
+	COLORSTAGGERM = "Color for Moderate Stagger",
+	COLORSTAGGERH = "Color for Heavy Stagger",
 	
 	INNERANCHOR = "Attach ring to inner ('pet') anchor",
 	
@@ -293,6 +299,7 @@ LM["TOOLTIP"] = {
 	ENABLEMENU	= "Вкл/Выкл отображение меню по [правому-клику]",
 	DEFICIT		= "Вкл/Выкл нехватку здоровья (Макс здоровья - текущее здоровья)",
 	INCOMINGHEALS= "Toggle indication of incoming heals",
+	SHOWABSORBS = "Toggle display of active absorbs",
 	SIDE		= "Установка к какой стороне прикрепить",
 	LEVEL		= "Установка на коком уровне прикреплять, отображать по отношению якоря (<-1: по направлению к центру, 0: at anchor, >1: в сторону от центра)",
 	
@@ -314,6 +321,12 @@ LM["TOOLTIP"] = {
 	COLORFOCUS	= "Установка пользовательского цвета дуги фокуса",
 	COLORENERGY	= "Установка пользовательского цвета дуги энергии",
 	COLORRUNIC	= "Установка пользовательского цвета дуги рунической энергии",
+	COLORABSORBS = "Set custom ring color for active absorbs",
+	
+	STAGGER_MAX = "Maximum ring value in percentage of maximum health",
+	COLORSTAGGERL = "Change ring color for Light Stagger",
+	COLORSTAGGERM = "Change ring color for Moderate Stagger",
+	COLORSTAGGERH = "Change ring color for Heavy Stagger",
 	
 	INNERANCHOR = "If selected, attach ring to inner ('pet') anchor. If not, use normal (outer) anchors.",
 	

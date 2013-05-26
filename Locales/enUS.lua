@@ -228,6 +228,7 @@ LM["TEXT"] = {
 	ENABLEMENU	= "Enable right-click menu",
 	DEFICIT		= "Deficit",
 	INCOMINGHEALS= "Indicate incoming heals",
+	SHOWABSORBS = "Show absorbs",
 	ATTACH		= "Attachment",
 	SIDE		= "Side",
 	LEVEL		= "Level",
@@ -248,6 +249,7 @@ LM["TEXT"] = {
 	COLORFOCUS 	= "Focus ring color",
 	COLORENERGY	= "Energy ring color",
 	COLORRUNIC	= "Runic power ring color",
+	COLORABSORBS = "Color for active absorbs",
 	
 	COLORLUNAR	= "Lunar power color",
 	COLORSOLAR	= "Solar power color",
@@ -255,6 +257,11 @@ LM["TEXT"] = {
 	COLORFROSTRUNE = "Frost rune color",
 	COLORUNHOLYRUNE = "Unholy rune color",
 	COLORDEATHRUNE = "Death rune color",
+	
+	STAGGER_MAX = "Maximum value (in max. health %)",
+	COLORSTAGGERL = "Color for Light Stagger",
+	COLORSTAGGERM = "Color for Moderate Stagger",
+	COLORSTAGGERH = "Color for Heavy Stagger",
 	
 	INNERANCHOR = "Attach ring to inner ('pet') anchor",
 	
@@ -290,6 +297,7 @@ LM["TOOLTIP"] = {
 	ENABLEMENU	= "Toggle right-click menu on and off",
 	DEFICIT		= "Toggle health deficit (Max health - current health)",
 	INCOMINGHEALS= "Toggle indication of incoming heals",
+	SHOWABSORBS = "Toggle display of active absorbs",
 	SIDE		= "Set which side to attach to",
 	LEVEL		= "Set at which level it should be attached relative to the anchor (<-1: towards center, 0: at anchor, >1: away from center)",
 	
@@ -311,6 +319,12 @@ LM["TOOLTIP"] = {
 	COLORFOCUS	= "Set custom focus ring color",
 	COLORENERGY	= "Set custom energy ring color",
 	COLORRUNIC	= "Set custom runic power ring color",
+	COLORABSORBS = "Set custom ring color for active absorbs",
+	
+	STAGGER_MAX = "Maximum ring value in percentage of maximum health",
+	COLORSTAGGERL = "Change ring color for Light Stagger",
+	COLORSTAGGERM = "Change ring color for Moderate Stagger",
+	COLORSTAGGERH = "Change ring color for Heavy Stagger",
 	
 	INNERANCHOR = "If selected, attach ring to inner ('pet') anchor. If not, use normal (outer) anchors.",
 	

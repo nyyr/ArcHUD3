@@ -347,7 +347,7 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2)
 	if (self.frames) then
 		-- module with multiple frames
 		for i,f in pairs(self.frames) do
-			if (f.maxValue == 0) then
+			if (f.maxValue == 0) or f.isHidden then
 				f:SetRingAlpha(0)
 			elseif (alpha2) then
 				if(f.startValue < f.maxValue or math.floor(f.startValue) ~= math.floor(f.endValue)) then
@@ -362,7 +362,7 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2)
 	elseif (self.f) then
 		-- single/no frame
 		local f = self.f
-		if (f.maxValue == 0) then
+		if (f.maxValue == 0) or f.isHidden then
 			f:SetRingAlpha(0)
 		elseif (alpha2) then
 			if(f.startValue < f.maxValue or math.floor(f.startValue) ~= math.floor(f.endValue)) then

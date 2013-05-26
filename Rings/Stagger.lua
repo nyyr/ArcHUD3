@@ -15,16 +15,22 @@ module.defaults = {
 		Enabled = true,
 		Outline = true,
 		ShowText = true,
+		Side = 1,
+		Level = -1,
 		ColorLight = {r = 0, g = 1, b = 0},
 		ColorModerate = {r = 1, g = 1, b = 0},
 		ColorHeavy = {r = 1, g = 0, b = 0},
-		Side = 1,
-		Level = -1,
+		MaxPerc = 100, -- maximum value of ring in % of maximum health
 	}
 }
 module.options = {
 	{name = "ShowText", text = "SHOWTEXT", tooltip = "SHOWTEXT"},
 	attach = true,
+	customcolors = {
+		{name = "ColorLight", text = "COLORSTAGGERL"},
+		{name = "ColorModerate", text = "COLORSTAGGERM"},
+		{name = "ColorHeavy", text = "COLORSTAGGERH"},
+	}
 }
 
 module.localized = true
@@ -62,6 +68,28 @@ function module:Initialize()
 	self.Text:Show()
 	
 	self:CreateStandardModuleOptions(55)
+	
+	-- additional options
+	local additionalOptions = {
+		maxPerc = {
+			type		= "range",
+			name		= LM["TEXT"]["STAGGER_MAX"],
+			desc		= LM["TOOLTIP"]["STAGGER_MAX"],
+			min			= 10,
+			max			= 100,
+			step		= 10,
+			order		= 100,
+			get			= function ()
+				return self.db.profile.MaxPerc
+			end,
+			set			= function (info, v)
+				self.db.profile.MaxPerc = v
+				self:UpdateValue(nil, self.unit)
+			end,
+		},
+	}
+	
+	self:AppendModuleOptions(additionalOptions)
 end
 
 ----------------------------------------------
@@ -118,9 +146,6 @@ end
 ----------------------------------------------
 function module:UpdateValue(event, arg1)
 	if(arg1 == self.unit) then
-		local maxHealth = UnitHealthMax(self.unit)
-		self.f:SetMax(maxHealth)
-		
 		local name, iconTex, debuffType, duration, expirationTime, unitCaster, spellId, v1, v2, v3
 		local hasStagger
 		for i = 1,40 do
@@ -133,7 +158,11 @@ function module:UpdateValue(event, arg1)
 		end
 		
 		if hasStagger then
-			self:Debug(1, "SpellId: "..tostring(spellId)..", Amount: "..tostring(v1).."/"..tostring(v2)..", Duration: "..tostring(duration))
+			local maxHealth = UnitHealthMax(self.unit)
+			self.f:SetMax(maxHealth * self.db.profile.MaxPerc / 100)
+			self.f.isHidden = nil
+			
+			--self:Debug(1, "SpellId: "..tostring(spellId)..", Amount: "..tostring(v1).."/"..tostring(v2)..", Duration: "..tostring(duration))
 			
 			if(ArcHUD.db.profile.FadeIC > ArcHUD.db.profile.FadeOOC) then
 				self.f:SetRingAlpha(ArcHUD.db.profile.FadeIC)
@@ -163,6 +192,7 @@ function module:UpdateValue(event, arg1)
 			self.BuffButton.Icon:SetTexture(iconTex)
 			self.BuffButton:Show()
 		else
+			self.f.isHidden = true
 			self.f:SetValue(0)
 			self.f:SetRingAlpha(0)
 			self.Text:SetText("")

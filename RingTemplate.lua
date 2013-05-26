@@ -384,6 +384,11 @@ function ArcHUDRingTemplate:SetAngle(angle)
 		self.ringFactor2 = self.startAngleRingFactor
 	end
 	
+	-- adjust connected ring part
+	if self.nextRingPart then
+		self.nextRingPart:MoveBaseAngle(angle)
+	end
+	
 	-- Hide ring completely if nothing can be shown
 	if ((angle1 - angle2) <= 0) then
 		self.quadrants[1]:Hide()
@@ -666,6 +671,22 @@ function ArcHUDRingTemplate:SetEndAngle(angle)
 	self.endAngle = angle
 	self.endQuad = quad
 	self.effEndQuad = effQuad
+end
+
+-----------------------------------------------------------
+-- MoveBaseAngle(angle)
+-- Moves the arc so it starts from a new base angle
+-- Note: the maximum angle is not touched, only start angle and current angle
+-----------------------------------------------------------
+function ArcHUDRingTemplate:MoveBaseAngle(angle)
+	--if self.inverseFill then
+		-- TODO
+	--else
+		local diff = angle - self.startAngle
+		self.dirty = true
+		self:SetStartAngle(angle)
+		self:SetAngle(self.angle + diff)
+	--end
 end
 
 -----------------------------------------------------------
@@ -1014,7 +1035,7 @@ function ArcHUDRingTemplate:SetRingAlpha(destAlpha, instant)
 		return
 		
 	elseif (self.destAlpha ~= destAlpha) then
-		--ArcHUD:LevelDebug(1, "ArcHUDRingTemplate:SetRingAlpha("..tostring(destAlpha).."), current "..tostring(self.destAlpha)..", name "..tostring(self:GetName()))
+		ArcHUD:LevelDebug(1, "ArcHUDRingTemplate:SetRingAlpha("..tostring(destAlpha).."), current "..tostring(self.destAlpha)..", name "..tostring(self:GetName()))
 		self.destAlpha = destAlpha
 		if (self.applyAlpha:IsPlaying()) then
 			self.applyAlpha:Stop()
@@ -1178,6 +1199,7 @@ function ArcHUDRingTemplate:OnLoad(frame)
 	frame.SetAngle          		= self.SetAngle
 	frame.SetStartAngle          	= self.SetStartAngle
 	frame.SetEndAngle	          	= self.SetEndAngle
+	frame.MoveBaseAngle	          	= self.MoveBaseAngle
 	frame.CallTextureMethod 		= self.CallTextureMethod
 	frame.SetRingTextures   		= self.SetRingTextures
 	frame.SetMax					= self.SetMax
