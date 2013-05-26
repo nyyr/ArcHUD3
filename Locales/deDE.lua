@@ -210,6 +210,7 @@ LM["HolyPower"]		= "Paladin: Heilige Kraft"
 LM["SoulShards"]	= "Hexenmeister: Seelensplitter etc."
 LM["Eclipse"]		= "Druide: Finsternis"
 LM["Chi"]			= "Mönch: Chi"
+LM["Stagger"]		= "Mönch: Staffelung"
 LM["Runes"]			= "Todesritter: Runen"
 LM["ShadowOrbs"]	= "Priester: Schattenkugeln"
 

@@ -22,6 +22,7 @@
 <Script file="Chi.lua" />
 <Script file="Eclipse.lua" />
 <Script file="Runes.lua" />
+<Script file="Stagger.lua" />
 
 <Script file="CustomBuff.lua" />
 

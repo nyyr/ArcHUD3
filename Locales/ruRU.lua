@@ -208,6 +208,7 @@ LM["HolyPower"]		= "Paladin: Энергия Света"
 LM["SoulShards"]	= "Warlock: Осколки душ"
 LM["Eclipse"]		= "Druid: Eclipse"
 LM["Chi"]			= "Monk: Chi"
+LM["Stagger"]		= "Monk: Stagger"
 LM["Runes"]			= "Death Knight: Runes"
 LM["ShadowOrbs"]	= "Priest: Shadow Orbs"
 
