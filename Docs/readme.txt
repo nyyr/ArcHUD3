@@ -1,3 +1,16 @@
+ArcHUD3 2.3 "Staggering Troll"
+-------------
+
+* added absorbs to Player Health ring
+* added Stagger ring
+* added separate scaling option for Target Frame
+* change: set new default position for Target Casting ring
+* change: disabled Focus Casting ring by default
+* bug fix: hide/show RuneFrame with PlayerFrame
+
+nyyr
+
+
 ArcHUD3 2.2 "Burning Skies"
 -------------
 
