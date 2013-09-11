@@ -9,8 +9,8 @@ ArcHUD = LibStub("AceAddon-3.0"):NewAddon("ArcHUD",
 
 -- Version
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-ArcHUD.version = "2.3 (r"..rev..")"
-ArcHUD.codename = "Staggering Troll"
+ArcHUD.version = "2.4 (r"..rev..")"
+ArcHUD.codename = "Lazy Orc"
 ArcHUD.authors = "nyyr, Nenie"
 
 -- Locale object
@@ -311,8 +311,9 @@ function ArcHUD:OnProfileChanged(db, profile)
 				self.TargetHUD["Debuff"..i]:Hide()
 			end
 		end
-		self:RegisterEvent("PLAYER_TARGET_CHANGED",	"TargetUpdate")
-		self:RegisterEvent("PLAYER_FOCUS_CHANGED", 	"TargetUpdate")
+		self:UnregisterEvent("PLAYER_TARGET_CHANGED", "UpdateComboPoints")
+		self:RegisterEvent("PLAYER_TARGET_CHANGED",	  "TargetUpdate")
+		self:RegisterEvent("PLAYER_FOCUS_CHANGED", 	  "TargetUpdate")
 
 		-- Show target frame if we have a target
 		if(UnitExists("target")) then
@@ -345,6 +346,17 @@ function ArcHUD:OnProfileChanged(db, profile)
 		self:StopTimer("UpdateTargetPower")
 		self.TargetHUD:SetAlpha(0)
 		self.TargetHUD:Lock()
+		
+		self:UnregisterEvent("UNIT_HEALTH", 			"EventHandler")
+		self:UnregisterEvent("UNIT_MAXHEALTH", 			"EventHandler")
+		self:UnregisterEvent("UNIT_POWER", 				"EventHandler")
+		self:UnregisterEvent("UNIT_MAXPOWER",			"EventHandler")
+		self:UnregisterEvent("UNIT_DISPLAYPOWER", 		"EventHandler")
+		self:UnregisterEvent("UNIT_AURA", 				"TargetAuras")
+		self:UnregisterEvent("PLAYER_TARGET_CHANGED",	"TargetUpdate")
+		self:UnregisterEvent("PLAYER_FOCUS_CHANGED", 	"TargetUpdate")
+		
+		self:RegisterEvent("PLAYER_TARGET_CHANGED",	"UpdateComboPoints")
 	end
 
 	self:LevelDebug(d_notice, "Positioning ring anchors. Width: "..self.db.profile.Width)
