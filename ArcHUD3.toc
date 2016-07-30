@@ -1,9 +1,9 @@
-## Interface: 60100
+## Interface: 70000
 ## Title: ArcHUD3
 ## Notes: Smooth combat HUD based on ArcHUD2
 ## Author: nyyr, Nenie
 ## SavedVariables: ArcHUD3DB
-## Version: 3.0.1
+## Version: 4.0.0
 ## X-Date: $Date$
 ## X-Category: HUDs
 

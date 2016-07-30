@@ -1,7 +1,7 @@
 local moduleName = "FocusHealth"
 local module = ArcHUD:NewModule(moduleName)
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "2.0 (r" .. rev .. ")"
+module.version = "2.1 (r" .. rev .. ")"
 
 module.unit = "focus"
 module.isHealth = true
@@ -108,7 +108,7 @@ function module:PLAYER_FOCUS_CHANGED()
 			self.f:GhostMode(true, self.unit)
 		else
 			self.f:GhostMode(false, self.unit)
-			if (UnitIsTapped(self.unit) and not UnitIsTappedByPlayer(self.unit)) then
+			if UnitIsTapDenied(self.unit) then
 				self:UpdateColor({r = 0.5, g = 0.5, b = 0.5})
 				self.tapped = true
 			elseif (UnitIsFriend("player", self.unit)) then
@@ -137,7 +137,7 @@ function module:UpdateHealth(event, arg1)
 			self.f:GhostMode(false, self.unit)
 
 			-- Update ring color based on target status
-			if(not self.tapped and UnitIsTappedByPlayer(self.unit) and not UnitIsTappedByPlayer(self.unit)) then
+			if (not self.tapped and UnitIsTapDenied(self.unit)) then
 				self:UpdateColor({r = 0.5, g = 0.5, b = 0.5})
 				self.tapped = true
 			elseif(not self.friend and UnitIsFriend("player", self.unit)) then

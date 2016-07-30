@@ -307,25 +307,25 @@ function ArcHUDRingTemplate:DoQuadrant(A, T, SS, A2)
 		-- 'cut' textures horizontally
 		if (A < 90) then
 			-- Chip1 subset is from I to (NIx,Oy)
-			SS(C1, self, OR, Ix, NIx, Oy, Iy)
+			SS(C1, self, OR, NIx, Ix, Iy, Oy)
 		end
 		-- Main subset is from O to NI
-		SS(T, self, OR, Ox, NIx, NIy, Oy)
+		SS(T, self, OR, NIx, Ox, Oy, NIy)
 		if (A2 > 0) then
 			-- Chip2 subset is from NO to (Ox,NIy)
-			SS(C2, self, OR, NOx, Ox, NIy, NOy)
+			SS(C2, self, OR, Ox, NOx, NOy, NIy)
 		end
 	else
 		-- 'cut' textures vertically
 		if (A < 90) then
 			-- Chip1 subset is from (Ix,NOy) to O
-			SS(C1, self, OR, Ox, Ix, NOy, Oy)
+			SS(C1, self, OR, Ix, Ox, Oy, NOy)
 		end
 		-- Main subset is from NO to I
-		SS(T, self, OR, Ix, NOx, NOy, Iy)
+		SS(T, self, OR, NOx, Ix, Iy, NOy)
 		if (A2 > 0) then
 			-- Chip2 subset is from NI to (NOx,Iy)
-			SS(C2, self, OR, NOx, NIx, NIy, Iy)
+			SS(C2, self, OR, NIx, NOx, Iy, NIy)
 		end
 	end
 	
@@ -1035,12 +1035,14 @@ function ArcHUDRingTemplate:SetRingAlpha(destAlpha, instant)
 		return
 		
 	elseif (self.destAlpha ~= destAlpha) then
-		ArcHUD:LevelDebug(1, "ArcHUDRingTemplate:SetRingAlpha("..tostring(destAlpha).."), current "..tostring(self.destAlpha)..", name "..tostring(self:GetName()))
+		--ArcHUD:LevelDebug(1, "ArcHUDRingTemplate:SetRingAlpha("..tostring(destAlpha).."), current "..tostring(self.destAlpha)..", name "..tostring(self:GetName()))
 		self.destAlpha = destAlpha
 		if (self.applyAlpha:IsPlaying()) then
 			self.applyAlpha:Stop()
 		end
-		self.applyAlpha.alphaAnim:SetChange(destAlpha - self:GetAlpha())
+		--self.applyAlpha.alphaAnim:SetChange(destAlpha - self:GetAlpha())
+		self.applyAlpha.alphaAnim:SetFromAlpha(self:GetAlpha())
+		self.applyAlpha.alphaAnim:SetToAlpha(destAlpha)
 		self.applyAlpha:Play()
 	end
 end
@@ -1055,15 +1057,21 @@ function ArcHUDRingTemplate:applyAlpha_OnFinished()
 		local pulseMax = 1.0
 		local pulseMin = 0.25
 		if (curAlpha < pulseMax) then
-			self.applyAlpha.alphaAnim:SetChange(pulseMax - curAlpha)
+			--self.applyAlpha.alphaAnim:SetChange(pulseMax - curAlpha)
+			self.applyAlpha.alphaAnim:SetFromAlpha(self:GetAlpha())
+			self.applyAlpha.alphaAnim:SetToAlpha(pulseMax)
 		else
-			self.applyAlpha.alphaAnim:SetChange(pulseMin - pulseMax)
+			--self.applyAlpha.alphaAnim:SetChange(pulseMin - pulseMax)
+			self.applyAlpha.alphaAnim:SetFromAlpha(self:GetAlpha())
+			self.applyAlpha.alphaAnim:SetToAlpha(pulseMin)
 		end
 		self.applyAlpha:Play()
 	else
 		--ArcHUD:LevelDebug(1, "curAlpha "..curAlpha..", destAlpha "..self.destAlpha)
 		if (curAlpha ~= self.destAlpha) then
-			self.applyAlpha.alphaAnim:SetChange(self.destAlpha - curAlpha)
+			--self.applyAlpha.alphaAnim:SetChange(self.destAlpha - curAlpha)
+			self.applyAlpha.alphaAnim:SetFromAlpha(self:GetAlpha())
+			self.applyAlpha.alphaAnim:SetToAlpha(self.destAlpha)
 			self.applyAlpha:Play()
 		else
 			self:SetAlpha(self.destAlpha)
@@ -1085,9 +1093,13 @@ function ArcHUDRingTemplate:StartPulse()
 		local pulseMin = 0.25
 		local curAlpha = math.floor(self:GetAlpha()*100 + 0.5)/100
 		if (curAlpha < pulseMax) then
-			self.applyAlpha.alphaAnim:SetChange(pulseMax - curAlpha)
+			--self.applyAlpha.alphaAnim:SetChange(pulseMax - curAlpha)
+			self.applyAlpha.alphaAnim:SetFromAlpha(self:GetAlpha())
+			self.applyAlpha.alphaAnim:SetToAlpha(pulseMax)
 		else
-			self.applyAlpha.alphaAnim:SetChange(pulseMin - pulseMax)
+			--self.applyAlpha.alphaAnim:SetChange(pulseMin - pulseMax)
+			self.applyAlpha.alphaAnim:SetFromAlpha(self:GetAlpha())
+			self.applyAlpha.alphaAnim:SetToAlpha(pulseMin)
 		end
 		self.applyAlpha:Play()
 	end
