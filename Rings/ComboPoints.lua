@@ -1,9 +1,10 @@
 local module = ArcHUD:NewModule("ComboPoints")
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "2.0 (r" .. rev .. ")"
+module.version = "3.0 (r" .. rev .. ")"
 
 module.unit = "player"
-module.noAutoAlpha = true
+module.noAutoAlpha = nil
+module.maxUsablePoints = 5
 
 module.defaults = {
 	profile = {
@@ -14,6 +15,7 @@ module.defaults = {
 		Level = 1,
 		ShowSeparators = true,
 		Color = {r = 1, g = 0, b = 0},
+		RingVisibility = 2, -- always fade out when out of combat, regardless of ring status
 	}
 }
 module.options = {
@@ -23,62 +25,65 @@ module.options = {
 }
 module.localized = true
 
-module.oldPoints = 0
-module.RemoveOldCP_started = false
-
 function module:Initialize()
 	-- Setup the frame we need
 	self.f = self:CreateRing(true, ArcHUDFrame)
 	self.f:SetAlpha(0)
-
-	-- Override Update timer
-	self:RegisterTimer("RemoveOldCP", self.RemoveOldCP, self.parent.db.profile.OldComboPointsDecay, self)
-	
 	self:CreateStandardModuleOptions(50)
 end
 
 function module:OnModuleUpdate()
 	self.Flash = self.db.profile.Flash
 	self:UpdateColor()
-	self:StopTimer("RemoveOldCP")
-	--self.parent:UnregisterMetro(self.name .. "RemoveOldCP")
-	self:RegisterTimer("RemoveOldCP", self.RemoveOldCP, self.parent.db.profile.OldComboPointsDecay, self)
 end
 
 function module:OnModuleEnable()
+	local _, myclass = UnitClass("player");
+
+	if ((myclass ~= "ROGUE") and (myclass ~= "DRUID")) then
+		return
+	end
+		
 	self.f.dirty = true
 	self.f.fadeIn = 0.25
 
 	self.f:UpdateColor(self.db.profile.Color)
-	self.f:SetMax(5)
-	self.f:SetValue(GetComboPoints(self.unit))
 	
 	-- Register the events we will use
-	self:RegisterUnitEvent("UNIT_COMBO_POINTS",	"UpdateComboPoints")
-	self:RegisterEvent("PLAYER_TARGET_CHANGED",	"UpdateComboPoints")
-
+	self:RegisterEvent("PLAYER_ENTERING_WORLD", "OnEvent");
+	self:RegisterEvent("PLAYER_TARGET_CHANGED",	"OnEvent")
+	self:RegisterEvent("UNIT_DISPLAYPOWER", "OnEvent");
+	self:RegisterUnitEvent("UNIT_POWER_FREQUENT", "OnEvent", self.unit);	
+	self:RegisterUnitEvent("UNIT_MAXPOWER", "OnEvent", self.unit);
+	
 	-- Activate ring timers
 	self:StartRingTimers()
-
+	
+	self:UpdateComboPointsMax()
+	self:UpdateComboPoints()
+	
 	self.f:Show()
 end
 
-function module:UpdateComboPoints(event, arg1)
-	--self:Debug(3, "UpdateComboPoints("..tostring(event)..", "..tostring(arg1)..")")
-	if ((event == "UNIT_COMBO_POINTS" and arg1 == self.unit) or
-		(event == "PLAYER_TARGET_CHANGED" and GetComboPoints(self.unit) > 0 and
-			UnitExists("target") and not UnitIsDead("target"))) then
-		
-		if (self.RemoveOldCP_started) then
-			self:StopTimer("RemoveOldCP")
-			self.RemoveOldCP_started = false
-		end
-		
-		self.oldPoints = GetComboPoints(self.unit)
-		self.f:SetValue(self.oldPoints)
-		if(self.oldPoints < 5 and self.oldPoints >= 0) then
+function module:UpdateComboPointsMax()
+	local maxComboPoints = UnitPowerMax(self.unit, SPELL_POWER_COMBO_POINTS)
+	self.f:SetMax(maxComboPoints)
+	
+	if (maxComboPoints == 5 or maxComboPoints == 8) then
+		self.maxUsablePoints = 5;
+	elseif (maxComboPoints == 6) then
+		self.maxUsablePoints = 6;
+	end
+end
+
+function module:UpdateComboPoints()
+	local powerType, powerToken = UnitPowerType(self.unit);
+	if (powerType == SPELL_POWER_ENERGY) then
+		self.f:Show()
+		local comboPoints = UnitPower(self.unit, SPELL_POWER_COMBO_POINTS);
+		self.f:SetValue(comboPoints)
+		if(comboPoints < self.maxUsablePoints) then
 			self.f:StopPulse()
-			self.f:UpdateColor(self.db.profile.Color)
 		else
 			if(self.Flash) then
 				self.f:StartPulse()
@@ -86,34 +91,20 @@ function module:UpdateComboPoints(event, arg1)
 				self.f:StopPulse()
 			end
 		end
-		if(self.oldPoints > 0) then
-			if(ArcHUD.db.profile.FadeIC > ArcHUD.db.profile.FadeOOC) then
-				self.f:SetRingAlpha(ArcHUD.db.profile.FadeIC)
-			else
-				self.f:SetRingAlpha(ArcHUD.db.profile.FadeOOC)
-			end
-		else
-			self.f:SetRingAlpha(0)
-		end
-		
-	elseif (event == "PLAYER_TARGET_CHANGED") then
-		if (ArcHUD.db.profile.OldComboPointsDecay > 0.0) then
-			if (not self.RemoveOldCP_started and self.oldPoints > 0) then
-				-- we have still some points on previous target
-				self.f:UpdateColor(ArcHUD.db.profile.ColorOldComboPoints)
-				self:StartTimer("RemoveOldCP")
-				self.RemoveOldCP_started = true
-			end
-		else
-			self.oldPoints = 0
-			self.f:SetRingAlpha(0)
-		end
+	else
+		-- Druid not in feral form with leftover combo points
+		self.f:Hide()
 	end
 end
 
-function module:RemoveOldCP()
-	self.RemoveOldCP_started = false
-	self.oldPoints = 0
-	self.f:StopPulse()
-	self.f:SetRingAlpha(0)
+function module:OnEvent(event, arg1, arg2)
+	if (event == "UNIT_POWER_FREQUENT") then
+		if (arg1 == self.unit and arg2 == "COMBO_POINTS") then
+			self:UpdateComboPoints()
+		end
+	elseif (event == "UNIT_MAXPOWER") then
+		self:UpdateComboPointsMax()
+	else
+		self:UpdateComboPoints()
+	end
 end

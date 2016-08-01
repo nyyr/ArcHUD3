@@ -1040,7 +1040,6 @@ function ArcHUDRingTemplate:SetRingAlpha(destAlpha, instant)
 		if (self.applyAlpha:IsPlaying()) then
 			self.applyAlpha:Stop()
 		end
-		--self.applyAlpha.alphaAnim:SetChange(destAlpha - self:GetAlpha())
 		self.applyAlpha.alphaAnim:SetFromAlpha(self:GetAlpha())
 		self.applyAlpha.alphaAnim:SetToAlpha(destAlpha)
 		self.applyAlpha:Play()
@@ -1057,11 +1056,9 @@ function ArcHUDRingTemplate:applyAlpha_OnFinished()
 		local pulseMax = 1.0
 		local pulseMin = 0.25
 		if (curAlpha < pulseMax) then
-			--self.applyAlpha.alphaAnim:SetChange(pulseMax - curAlpha)
 			self.applyAlpha.alphaAnim:SetFromAlpha(self:GetAlpha())
 			self.applyAlpha.alphaAnim:SetToAlpha(pulseMax)
 		else
-			--self.applyAlpha.alphaAnim:SetChange(pulseMin - pulseMax)
 			self.applyAlpha.alphaAnim:SetFromAlpha(self:GetAlpha())
 			self.applyAlpha.alphaAnim:SetToAlpha(pulseMin)
 		end
@@ -1069,7 +1066,6 @@ function ArcHUDRingTemplate:applyAlpha_OnFinished()
 	else
 		--ArcHUD:LevelDebug(1, "curAlpha "..curAlpha..", destAlpha "..self.destAlpha)
 		if (curAlpha ~= self.destAlpha) then
-			--self.applyAlpha.alphaAnim:SetChange(self.destAlpha - curAlpha)
 			self.applyAlpha.alphaAnim:SetFromAlpha(self:GetAlpha())
 			self.applyAlpha.alphaAnim:SetToAlpha(self.destAlpha)
 			self.applyAlpha:Play()
@@ -1093,11 +1089,9 @@ function ArcHUDRingTemplate:StartPulse()
 		local pulseMin = 0.25
 		local curAlpha = math.floor(self:GetAlpha()*100 + 0.5)/100
 		if (curAlpha < pulseMax) then
-			--self.applyAlpha.alphaAnim:SetChange(pulseMax - curAlpha)
 			self.applyAlpha.alphaAnim:SetFromAlpha(self:GetAlpha())
 			self.applyAlpha.alphaAnim:SetToAlpha(pulseMax)
 		else
-			--self.applyAlpha.alphaAnim:SetChange(pulseMin - pulseMax)
 			self.applyAlpha.alphaAnim:SetFromAlpha(self:GetAlpha())
 			self.applyAlpha.alphaAnim:SetToAlpha(pulseMin)
 		end

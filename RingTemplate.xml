@@ -87,7 +87,6 @@
 					if (not self.ring.fillUpdate:IsPlaying()) then
 						self.ring.fillUpdate:Play();
 					end
-					--self.destAlpha = self.ring:GetAlpha() + self.alphaAnim:GetChange()
 					self.destAlpha = self.alphaAnim:GetToAlpha()
 				</OnPlay>
 				<OnFinished>

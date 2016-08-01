@@ -202,12 +202,13 @@ LM["Casting"]		= "Player Casting"
 LM["MirrorTimer"]	= "Mirror Timer"
 LM["ComboPoints"]	= "Combo Points"
 LM["HolyPower"]		= "Paladin: Holy Power"
-LM["SoulShards"]	= "Warlock: Soul Shards, Burning Embers, Demonic Fury"
+LM["SoulShards"]	= "Warlock: Soul Shards"
 LM["Eclipse"]		= "Druid: Eclipse"
 LM["Chi"]			= "Monk: Chi"
 LM["Stagger"]		= "Monk: Stagger"
 LM["Runes"]			= "Death Knight: Runes"
 LM["ShadowOrbs"]	= "Priest: Shadow Orbs"
+LM["ArcaneCharges"]	= "Mage: Arcane Charges"
 
 LM["TEXT"] = {
 	TITLE		= "Arcs Options",
@@ -253,10 +254,6 @@ LM["TEXT"] = {
 	
 	COLORLUNAR	= "Lunar power color",
 	COLORSOLAR	= "Solar power color",
-	COLORBLOODRUNE = "Blood rune color",
-	COLORFROSTRUNE = "Frost rune color",
-	COLORUNHOLYRUNE = "Unholy rune color",
-	COLORDEATHRUNE = "Death rune color",
 	
 	STAGGER_MAX = "Maximum value (in max. health %)",
 	COLORSTAGGERL = "Color for Light Stagger",
@@ -342,18 +339,4 @@ LM["TOOLTIP"] = {
 LM["SIDE"] = {
 	LEFT		= "Left anchor",
 	RIGHT		= "Right anchor",
-}
-
-LM["TEXT_RUNES"] = {
-	ORDER = "Rune order",
-	ORDER_TOP = "Top",
-	ORDER_MIDDLE = "Middle",
-	ORDER_BOTTOM = "Bottom",
-	ORDER_BLOOD = "Blood/Death",
-	ORDER_FROST = "Frost",
-	ORDER_UNHOLY = "Unholy",
-}
-
-LM["TOOLTIP_RUNES"] = {
-	ORDER = "Change order of runes (from top to bottom)",
 }

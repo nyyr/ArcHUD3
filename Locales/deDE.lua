@@ -213,6 +213,7 @@ LM["Chi"]			= "Mönch: Chi"
 LM["Stagger"]		= "Mönch: Staffelung"
 LM["Runes"]			= "Todesritter: Runen"
 LM["ShadowOrbs"]	= "Priester: Schattenkugeln"
+LM["ArcaneCharges"]	= "Magier: Arkane Ladungen"
 
 LM["TEXT"] = {
 	TITLE		= "Ringoptionen",
@@ -258,10 +259,6 @@ LM["TEXT"] = {
 	
 	COLORLUNAR	= "Farbe Lunarenergie",
 	COLORSOLAR	= "Farbe Solarenergie",
-	COLORBLOODRUNE = "Farbe Blutrune",
-	COLORFROSTRUNE = "Farbe Frostrune",
-	COLORUNHOLYRUNE = "Farbe Unheiligrune",
-	COLORDEATHRUNE = "Farbe Todesrune",
 	
 	STAGGER_MAX = "Maximum value (in max. health %)",
 	COLORSTAGGERL = "Color for Light Stagger",
@@ -347,18 +344,4 @@ LM["TOOLTIP"] = {
 LM["SIDE"] = {
 	LEFT		= "Linker Anker",
 	RIGHT		= "Rechter Anker",
-}
-
-LM["TEXT_RUNES"] = {
-	ORDER = "Runen-Reihenfolge",
-	ORDER_TOP = "Oben",
-	ORDER_MIDDLE = "Mitte",
-	ORDER_BOTTOM = "Unten",
-	ORDER_BLOOD = "Blut-/Todesrune",
-	ORDER_FROST = "Frostrune",
-	ORDER_UNHOLY = "Unheiligrune",
-}
-
-LM["TOOLTIP_RUNES"] = {
-	ORDER = "Legt die Reihenfolge der Runen fest (von oben nach unten)",
 }

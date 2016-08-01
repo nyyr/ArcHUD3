@@ -211,6 +211,7 @@ LM["Chi"]			= "Monk: Chi"
 LM["Stagger"]		= "Monk: Stagger"
 LM["Runes"]			= "Death Knight: Runes"
 LM["ShadowOrbs"]	= "Priest: Shadow Orbs"
+LM["ArcaneCharges"]	= "Mage: Arcane Charges"
 
 LM["TEXT"] = {
 	TITLE		= "Настройки модуля",
@@ -255,10 +256,6 @@ LM["TEXT"] = {
 
 	COLORLUNAR	= "Lunar power color",
 	COLORSOLAR	= "Solar power color",
-	COLORBLOODRUNE = "Blood rune color",
-	COLORFROSTRUNE = "Frost rune color",
-	COLORUNHOLYRUNE = "Unholy rune color",
-	COLORDEATHRUNE = "Death rune color",
 	
 	STAGGER_MAX = "Maximum value (in max. health %)",
 	COLORSTAGGERL = "Color for Light Stagger",
@@ -344,18 +341,4 @@ LM["TOOLTIP"] = {
 LM["SIDE"] = {
 	LEFT		= "Якорь слево",
 	RIGHT		= "Якорь справо",
-}
-
-LM["TEXT_RUNES"] = {
-	ORDER = "Rune order",
-	ORDER_TOP = "Top",
-	ORDER_MIDDLE = "Middle",
-	ORDER_BOTTOM = "Bottom",
-	ORDER_BLOOD = "Blood/Death",
-	ORDER_FROST = "Frost",
-	ORDER_UNHOLY = "Unholy",
-}
-
-LM["TOOLTIP_RUNES"] = {
-	ORDER = "Change order of runes (from top to bottom)",
 }

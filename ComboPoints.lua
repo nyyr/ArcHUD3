@@ -2,16 +2,16 @@
 -- Show combo points / holy power / soul shards
 --
 
-local oldComboPoints = 0
 local _
 local class = ""
-local RemoveOldComboPoints_started = false
 
 function ArcHUD:InitComboPointsFrame()
-	self:RegisterEvent("UNIT_COMBO_POINTS", "UpdateComboPoints")
-	self:RegisterTimer("RemoveOldComboPoints", self.RemoveOldComboPoints, self.db.profile.OldComboPointsDecay, self)
+	 _, class = UnitClass("player")
 	
-	_, class = UnitClass("player")
+	if ((class == "ROGUE") or (class == "DRUID")) then
+		self:RegisterEvent("UNIT_POWER_FREQUENT", "UpdateComboPoints", "player");
+		self:UpdateComboPointsFrame()
+	end
 	
 	self.TargetHUD.Combo:SetTextColor(self.db.profile.ColorComboPoints.r, self.db.profile.ColorComboPoints.g, self.db.profile.ColorComboPoints.b)
 	
@@ -40,52 +40,22 @@ function ArcHUD:UpdateComboPointsFrame()
 		points = UnitPower("player", SPELL_POWER_SOUL_SHARDS)
 	elseif (class == "MONK") then
 		points = UnitPower("player", SPELL_POWER_CHI)
-	else
-		points = GetComboPoints("player")
+	elseif (class == "ROGUE" or class == "DRUID") then
+		local powerType, powerToken = UnitPowerType("player");
+		if (powerType == SPELL_POWER_ENERGY) then
+			points = UnitPower("player", SPELL_POWER_COMBO_POINTS);
+		end
 	end
 	self:SetComboPoints(points)
 end
 
-function ArcHUD:UpdateComboPoints(event, arg1)
+function ArcHUD:UpdateComboPoints(event, arg1, arg2)
 	--self:LevelDebug(3, "UpdateComboPoints("..tostring(event)..", "..tostring(arg1)..")")
-	if ((event == "UNIT_COMBO_POINTS" and arg1 == "player") or
-		(event == "PLAYER_TARGET_CHANGED" and GetComboPoints("player") > 0 and
-			UnitExists("target") and not UnitIsDead("target"))) then
-		
-		if (RemoveOldComboPoints_started) then
-			self:StopTimer("RemoveOldComboPoints")
-			RemoveOldComboPoints_started = false
+	if (event == "UNIT_POWER_FREQUENT") then
+		if (arg1 == "player" and arg2 == "COMBO_POINTS") then
+			self:UpdateComboPointsFrame()
 		end
-		
-		self.TargetHUD.Combo:SetTextColor(
-			self.db.profile.ColorComboPoints.r, 
-			self.db.profile.ColorComboPoints.g, 
-			self.db.profile.ColorComboPoints.b)
-		
-		oldComboPoints = GetComboPoints("player")
-		self:SetComboPoints(oldComboPoints)
-		
-	elseif (event == "PLAYER_TARGET_CHANGED") then
-		if (self.db.profile.OldComboPointsDecay > 0.0) then
-			if (not RemoveOldComboPoints_started and oldComboPoints > 0 and
-				class ~= "PALADIN" and class ~= "WARLOCK" and class ~= "MONK") then
-				-- we have still some points on previous target
-				self.TargetHUD.Combo:SetTextColor(
-					self.db.profile.ColorOldComboPoints.r, 
-					self.db.profile.ColorOldComboPoints.g, 
-					self.db.profile.ColorOldComboPoints.b)
-				self:StartTimer("RemoveOldComboPoints")
-				RemoveOldComboPoints_started = true
-			end
-		else
-			oldComboPoints = 0
-			self:SetComboPoints(0)
-		end
+	else
+		self:UpdateComboPointsFrame()
 	end
-end
-
-function ArcHUD:RemoveOldComboPoints()
-	RemoveOldComboPoints_started = false
-	oldComboPoints = 0
-	self:SetComboPoints(0)
 end
