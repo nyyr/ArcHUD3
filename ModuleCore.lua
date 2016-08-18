@@ -415,8 +415,8 @@ function ArcHUD.modulePrototype:CheckAlpha()
 			end
 		else
 			local powerTypeId, _ = UnitPowerType(unit)
-			-- powerTypeId: 1 = rage, 6 = runic_power
-			if (self.isPower and unit ~= "pet" and (powerTypeId == 1 or powerTypeId == 6) and self.f.maxValue > 0) then
+			-- powerTypeId: 1 = rage, 6 = runic_power, 17 = fury
+			if (self.isPower and unit ~= "pet" and (powerTypeId == SPELL_POWER_RAGE or powerTypeId == SPELL_POWER_RUNIC_POWER or powerTypeId == SPELL_POWER_FURY) and self.f.maxValue > 0) then
 				if(math.floor(self.f.startValue) > 0 or math.floor(self.f.startValue) ~= math.floor(self.f.endValue)) then
 					self.f:SetRingAlpha(AH_profile.FadeOOC)
 				elseif(math.floor(self.f.startValue) == 0) then
