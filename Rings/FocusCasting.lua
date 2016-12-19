@@ -1,7 +1,7 @@
 local moduleName = "FocusCasting"
 local module = ArcHUD:NewModule(moduleName)
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "2.0 (r"..rev..")"
+module.version = "2.1 (r"..rev..")"
 
 module.unit = "focus"
 module.noAutoAlpha = true
@@ -59,7 +59,7 @@ function module:OnModuleUpdate()
 end
 
 local function Focus_Casting(frame, elapsed)
-	self = frame.module
+	local self = frame.module
 	if (self.f.casting == 1) then
 		local status = (GetTime()*1000 - self.spellstart)
 		local time_remaining = self.f.maxValue - status

@@ -4,7 +4,7 @@ local LM = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Module")
 local moduleName = "MirrorTimer"
 local module = ArcHUD:NewModule(moduleName)
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "1.0 (r"..rev..")"
+module.version = "1.1 (r"..rev..")"
 
 module.unit = "player"
 module.noAutoAlpha = true
@@ -57,7 +57,7 @@ function module:OnModuleUpdate()
 end
 
 local function MirrorTimer_UpdateTimers(frame, elapsed)
-	self = frame.module
+	local self = frame.module
 	for i=1,MIRRORTIMER_NUMTIMERS do
 		if(self.timers[i] and not self.timers[i].paused) then
 			self.timers[i].value = self.timers[i].value + self.timers[i].scale * elapsed*1000
