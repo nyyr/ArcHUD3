@@ -9,7 +9,7 @@ ArcHUD = LibStub("AceAddon-3.0"):NewAddon("ArcHUD",
 
 -- Version
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-ArcHUD.version = "4.2.1 (r"..rev..")"
+ArcHUD.version = "4.2.2 (r"..rev..")"
 ArcHUD.codename = "Friendly Demons"
 ArcHUD.authors = "nyyr, Nenie"
 
@@ -1041,7 +1041,23 @@ function ArcHUD:EventHandler(event, arg1)
 	elseif(event == "PLAYER_ENTERING_WORLD") then
 		self.PlayerIsInCombat = false
 		self.PlayerIsRegenOn = true
-		self:SetComboPoints(0)
+		
+		-- This is the new bit of code that actually queries for the amount of combo points/chi/soul shards that the player has instead of assuming zero.
+		-- This is required because warlocks generally start off with 3 sould shards
+		-- Note: this could probably be refactored into its own function or, at the very least, some sort of hash type thing to make it pretty. I'm lazy and don't know lua so I'll leave the correction of my shortcomings to the open source community
+		local points = 0
+
+		if (UnitClass("player") == "Warlock") then
+			points = UnitPower("player", SPELL_POWER_SOUL_SHARDS)
+		elseif(UnitClass("player") == "Paladin") then
+			points = UnitPower("player", SPELL_POWER_HOLY_POWER)
+		elseif(UnitClass("player") == "Monk") then
+			points = UnitPower("player", SPELL_POWER_CHI)
+		elseif(UnitClass("player") == "Rogue" or UnitClass("player") == "Druid") then
+			points = UnitPower("player", SPELL_POWER_COMBO_POINTS)
+		end
+
+		self:SetComboPoints(points)
 
 	else
 		if (arg1 == "target") then
