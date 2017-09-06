@@ -9,7 +9,7 @@ ArcHUD = LibStub("AceAddon-3.0"):NewAddon("ArcHUD",
 
 -- Version
 local _, _, rev = string.find("$Rev$", "([0-9]+)")
-ArcHUD.version = "4.2.2 (r"..rev..")"
+ArcHUD.version = "4.2.3 (r"..rev..")"
 ArcHUD.codename = "Friendly Demons"
 ArcHUD.authors = "nyyr, Nenie"
 
@@ -622,11 +622,11 @@ function ArcHUD:TargetUpdate(event, arg1)
 
 		if(self.BlizzTargetHidden and not self.updating) then
 			if(UnitIsEnemy("target", "player")) then
-				PlaySound("igCreatureAggroSelect")
+				PlaySound(SOUNDKIT.IG_CREATURE_AGGRO_SELECT) -- igCreatureAggroSelect
 			elseif(UnitIsFriend("player", "target")) then
-				PlaySound("igCharacterNPCSelect")
+				PlaySound(SOUNDKIT.IG_CHARACTER_NPC_SELECT) -- igCharacterNPCSelect
 			else
-				PlaySound("igCreatureNeutralSelect")
+				PlaySound(SOUNDKIT.IG_CREATURE_NEUTRAL_SELECT) -- igCreatureNeutralSelect
 			end
 		end
 
@@ -635,7 +635,7 @@ function ArcHUD:TargetUpdate(event, arg1)
 		-- We didn't have anything targeted or ArcHUD is disabled so lets hide the
 		--   target frame again
 		if(self.BlizzTargetHidden and not self.updating) then
-			PlaySound("INTERFACESOUND_LOSTTARGETUNIT")
+			PlaySound(SOUNDKIT.INTERFACE_SOUND_LOST_TARGET_UNIT) -- INTERFACESOUND_LOSTTARGETUNIT
 		end
 		if (self.TargetHUD.locked) then
 			self.TargetHUD:SetAlpha(0)
@@ -1000,7 +1000,7 @@ end
 ----------------------------------------------
 function ArcHUD:EventHandler(event, arg1)
 	local class = nil
-	if (arg1) then
+	if (arg1 and type(arg1) == "string") then
 		_, class = UnitClass(arg1)
 	end
 
