@@ -1,3 +1,18 @@
+ArcHUD3 v4.1/4.2 (fixes for WoW 7)
+-------------
+
+* Added support for language zhCN (thanks to yuningning520)
+* Updated ComboPoints (thanks to jasonolive)
+* Updated rings ComboPoints, SoulShards, Runes (thanks to jasonolive)
+* Added ring ArcaneCharges (thanks to jasonolive)
+
+ArcHUD3 v4.0 (fixes for WoW 7)
+-------------
+
+* Migrated to UnitIsTapDenied (TargetHealth, FocusHealth)
+* Migrated alpha animation to SetFromAlpha/SetToAlpha
+* Texture rendering fix (thanks to jasonolive)
+
 ArcHUD3 2.3 "Staggering Troll"
 -------------
 
