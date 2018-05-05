@@ -75,6 +75,13 @@ function CustomBuffRingTemplate:Initialize()
 end
 
 function CustomBuffRingTemplate:OnModuleUpdate()
+	-- Update unit
+	if self.unit ~= self.db.profile.Unit then
+		self.unit = self.db.profile.Unit
+		self:UnregisterUnitEvent("UNIT_AURA")
+		self:RegisterUnitEvent("UNIT_AURA", "EventHandler") -- default unit is self.unit
+	end
+
 	self.Flash = self.db.profile.Flash
 	self:UpdateColor()
 	
@@ -310,7 +317,6 @@ function CustomBuffRingTemplate:AppendCustomModuleOptions()
 		end,
 		set			= function (info, v)
 			self.db.profile.Unit = v
-			self.unit = v
 			self:OnModuleUpdate()
 			self.optionsTable.name = self.db.profile.BuffName .. " (" .. self.db.profile.Unit .. ")"
 			AceConfigRegistry:NotifyChange("ArcHUD_CustomModules")
