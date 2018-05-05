@@ -1,8 +1,10 @@
 local module = ArcHUD:NewModule("Runes")
-module.version = "3.0 (@file-abbreviated-hash@)"
+module.version = "4.0 (@file-abbreviated-hash@)"
 
 module.unit = "player"
 module.noAutoAlpha = nil
+
+local shadingFactor = 0.4
 
 module.defaults = {
 	profile = {
@@ -12,18 +14,32 @@ module.defaults = {
 		Side = 2,
 		Level = 1,
 		ShowSeparators = true,
+		SortRunes = true,
 		Color = {r = 0, g = 0.6, b = 0.7},
+		PartialColor = {r = 0 * shadingFactor, g = 0.6 * shadingFactor, b = 0.7 * shadingFactor},
+		-- PartialColor = {r = 0, g = 0.5, b = 0.6},
+		-- PartialColor = {r = 0, g = 1, b = 0},
 		RingVisibility = 2, -- always fade out when out of combat, regardless of ring status
 	}
 }
 module.options = {
 	attach = true,
 	hasseparators = true,
+	{name = "SortRunes", text = "SORTRUNES", tooltip = "SORTRUNES"},
 }
 module.localized = true
 
 local MAX_RUNES = 6
 local MAX_RING_VALUE = 100
+
+local RuneLastState = {
+	[1] = true,
+	[2] = true,
+	[3] = true,
+	[4] = true,
+	[5] = true,
+	[6] = true,
+}
 
 function module:Initialize()
 	-- Setup the frame we need
@@ -34,7 +50,14 @@ function module:Initialize()
 end
 
 function module:OnModuleUpdate()
-		self:UpdateRunes()	
+	local _, class = UnitClass(self.unit)
+	if class ~= "DEATHKNIGHT" then return end
+	
+	self:UpdateRunes()
+
+	if self.db.profile.SortRunes then
+		self:UpdateRuneCooldown(arg1, arg2)
+	end
 end
 
 function module:OnModuleEnable()
@@ -67,7 +90,7 @@ function module:OnModuleEnable()
 		for i=1,6 do
 			self:AttachRing(self.frames[i])
 			if i <= 1 then
-				self.frames[i].inverseFill = true
+				-- self.frames[i].inverseFill = true
 			end
 			self.frames[i].linearFade = true
 			self.frames[i]:SetEndAngle(angles[i].e)
@@ -89,11 +112,30 @@ function module:OnModuleEnable()
 		self.frames[6]:SetShineAngle(angles[6].e - 12)
 	end
 
+	-- un-register all previous events
+	self:UnregisterAllEvents();
+	
+	-- Register the events we will use
+		
+	-- Runes
 	self:RegisterEvent("RUNE_POWER_UPDATE", "UpdatePower")
 	self:RegisterEvent("RUNE_TYPE_UPDATE", "UpdatePower")
-	self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdatePower")
 	
-	self:UpdateRunes()
+	-- Unit Power
+	self:RegisterUnitEvent("UNIT_POWER", "UpdatePower", self.unit)
+	self:RegisterUnitEvent("UNIT_POWER_FREQUENT", "UpdatePower", self.unit)
+
+	-- Entering/Leaving Combat
+	self:RegisterEvent("PLAYER_REGEN_ENABLED", "UpdatePower")
+	self:RegisterEvent("PLAYER_REGEN_DISABLED", "UpdatePower")
+	
+	-- Dying/Ressurecting/Insance Zoning
+	self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdatePower")
+	self:RegisterEvent("PLAYER_DEAD", "UpdatePower")
+	self:RegisterEvent("PLAYER_UNGHOST", "UpdatePower")
+	self:RegisterEvent("PLAYER_ALIVE", "UpdatePower")
+	
+	-- self:UpdateRunes()
 	
 	-- Activate ring timers
 	self:StartRingTimers()
@@ -103,46 +145,145 @@ function module:UpdateRunes()
 	-- update all runes
 	if (self.frames) then
 		for i=1,MAX_RUNES do
-			self.frames[i]:UpdateColor(self.db.profile.Color)
+			local start, duration, runeReady = GetRuneCooldown(i)
+			if not runeReady and start then
+				self.frames[i]:UpdateColor(self.db.profile.PartialColor)
+			else
+				self.frames[i]:UpdateColor(self.db.profile.Color)
+			end	
 		end
 	end
 end
 
-function module:UpdateRuneCooldown(runeIndex, isEnergize)
-	if (not runeIndex) then
-		-- update all runes
-		for i=1,MAX_RUNES do
-			self:UpdateRuneCooldown(i)
-		end
-		return
+function module:GetRuneOrder() 
+
+	local RemainingTime = {}
+	local RuneOrder = {}
+	local issorted = false
+	local unsortedsize = MAX_RUNES-1
+		
+	for i = 1, MAX_RUNES do
+		local start, duration, runeReady = GetRuneCooldown(i)
+		if duration and start then 
+			RemainingTime[i] = duration - start
+			RuneOrder [i] = i
+		end	
 	end
 	
+	if RuneOrder == {} or RemainingTime == {} then 
+		return 0
+	end	
+	
+	while not issorted and unsortedsize ~= 0 do 
+		issorted = true
+		for i = 1, unsortedsize do 
+			if RemainingTime[i] > RemainingTime[i+1] then 
+				local tempval = RemainingTime[i];
+				RemainingTime[i] = RemainingTime[i+1]
+				RemainingTime[i+1] = tempval
+				
+				local tempval = RuneOrder[i];
+				RuneOrder[i] = RuneOrder[i+1]
+				RuneOrder[i+1] = tempval
+				
+				issorted = false
+			end	
+		end
+		
+		unsortedsize = unsortedsize - 1
+		
+	end 
+
+	return (RuneOrder or 0)
+	
+end
+
+function module:UpdateSortedRuneCooldown(runeIndex)
+
+	for i=1,MAX_RUNES do
+
+		local RuneOrder = self:GetRuneOrder()
+		runeIndex = RuneOrder[i]
+		
+		if runeIndex then
+			local start, duration, runeReady = GetRuneCooldown(runeIndex)
+			
+			if not runeReady then
+				if start then
+					self.frames[i]:UpdateColor(self.db.profile.PartialColor)
+					self.frames[i]:SetValue(MAX_RING_VALUE, duration, start, 0)
+					RuneLastState[i] = false
+				end
+			else
+				self.frames[i]:UpdateColor(self.db.profile.Color)
+				self.frames[i]:SetValue(MAX_RING_VALUE, 0)
+				if RuneLastState[i] == false then 
+					self.frames[i]:DoShine()
+				end
+				RuneLastState[i] = true
+			end
+		end
+	end
+
+end
+
+function module:UpdateUnsortedRuneCooldown(runeIndex)
+
+	-- FIXME: This method is also called with runeIndex = 'player'
+	runeIndex = tonumber(runeIndex)
+
+	if not runeIndex then 
+		return
+	end
+
 	local start, duration, runeReady = GetRuneCooldown(runeIndex)
 	
 	--self:Debug(1, "R %s, S %s, D %s, RR %s", tostring(runeIndex), tostring(start), tostring(duration), tostring(runeReady))
-			
+
 	if not runeReady then
 		if start then
+			self.frames[runeIndex]:UpdateColor(self.db.profile.PartialColor)
 			self.frames[runeIndex]:SetValue(MAX_RING_VALUE, duration, start, 0)
+			RuneLastState[runeIndex] = false
 		end
-		--runeButton.energize:Stop();
 	else
+		self.frames[runeIndex]:UpdateColor(self.db.profile.Color)
 		self.frames[runeIndex]:SetValue(MAX_RING_VALUE, 0)
-		self.frames[runeIndex]:DoShine()
+		if RuneLastState[runeIndex] == false then
+			self.frames[runeIndex]:DoShine()
+		end	
+		RuneLastState[runeIndex] = true
 	end
-	
-	if isEnergize  then
-		--runeButton.energize:Play();
+
+end
+
+function module:UpdateRuneCooldown(runeIndex, isEnergize)
+
+	if self.db.profile.SortRunes then
+		-- update and sort all runes
+		self:UpdateSortedRuneCooldown()
+	else
+		if not runeIndex then
+			-- update all runes
+			for i=1,MAX_RUNES do
+				self:UpdateUnsortedRuneCooldown(i)
+			end
+		else
+			-- just update the current rune
+			self:UpdateUnsortedRuneCooldown(runeIndex)
+		end	
 	end
+		
 end
 
 function module:UpdatePower(event, arg1, arg2)
-	if (event == "PLAYER_ENTERING_WORLD") then
+	if event == "PLAYER_ENTERING_WORLD" then
 		self:UpdateRunes()
-	elseif (event == "RUNE_POWER_UPDATE") then
 		self:UpdateRuneCooldown(arg1, arg2)
-	elseif (event == "RUNE_TYPE_UPDATE") then
-		self:UpdateRunes(arg1)
+	elseif event == "RUNE_POWER_UPDATE" or event == "RUNE_TYPE_UPDATE" then
+		self:UpdateRuneCooldown(arg1, arg2)
+	else
+		self:UpdateRuneCooldown(arg1, arg2)
 	end
 end
 

@@ -259,6 +259,8 @@ LM["TEXT"] = {
 	COLORSTAGGERL = "Color for Light Stagger",
 	COLORSTAGGERM = "Color for Moderate Stagger",
 	COLORSTAGGERH = "Color for Heavy Stagger",
+
+	SORTRUNES   = "Sort Runes",
 	
 	INNERANCHOR = "Attach ring to inner ('pet') anchor",
 	
@@ -322,6 +324,8 @@ LM["TOOLTIP"] = {
 	COLORSTAGGERL = "Change ring color for Light Stagger",
 	COLORSTAGGERM = "Change ring color for Moderate Stagger",
 	COLORSTAGGERH = "Change ring color for Heavy Stagger",
+
+	SORTRUNES   = "Sort the Runes according to their status",
 	
 	INNERANCHOR = "If selected, attach ring to inner ('pet') anchor. If not, use normal (outer) anchors.",
 	

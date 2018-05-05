@@ -264,6 +264,8 @@ LM["TEXT"] = {
 	COLORSTAGGERL = "Color for Light Stagger",
 	COLORSTAGGERM = "Color for Moderate Stagger",
 	COLORSTAGGERH = "Color for Heavy Stagger",
+
+	SORTRUNES   = "Runen sortieren",
 	
 	INNERANCHOR = "Am inneren ('Begleiter') Anker befestigen",
 	
@@ -327,6 +329,8 @@ LM["TOOLTIP"] = {
 	COLORSTAGGERL = "Setzt eine benutzerdefinierte Farbe des Rings bei leichter Staffelung",
 	COLORSTAGGERM = "Setzt eine benutzerdefinierte Farbe des Rings bei moderater Staffelung",
 	COLORSTAGGERH = "Setzt eine benutzerdefinierte Farbe des Rings bei schwerer Staffelung",
+
+	SORTRUNES   = "Runen nach ihrem Status sortieren",
 	
 	INNERANCHOR = "Wenn ausgewählt, befestige und skaliere den Ring am inneren ('Begleiter') Anker. Ansonsten befestige den Ring in seiner normalen Größe am äußeren Anker (Standard).",
 	

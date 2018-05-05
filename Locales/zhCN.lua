@@ -260,6 +260,8 @@ LM["TEXT"] = {
 	COLORSTAGGERL = "轻度醉拳颜色",
 	COLORSTAGGERM = "中度醉拳颜色",
 	COLORSTAGGERH = "重度醉拳颜色",
+
+	SORTRUNES   = "Sort Runes",
 	
 	INNERANCHOR = "附着弧形到内部(“宠物”)锚点",
 	
@@ -323,6 +325,8 @@ LM["TOOLTIP"] = {
 	COLORSTAGGERL = "更改轻度醉拳弧形颜色",
 	COLORSTAGGERM = "更改中度醉拳弧形颜色",
 	COLORSTAGGERH = "更改重度醉拳弧形颜色",
+
+	SORTRUNES   = "Sort the Runes according to their status",
 	
 	INNERANCHOR = "如果选择，附着弧形到内部(“宠物”)锚点。如果没选择，使用通常(外部)锚点。",
 	
