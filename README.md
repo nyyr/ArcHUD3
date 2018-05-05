@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/nyyr/ArcHUD3.svg)](https://travis-ci.org/nyyr/ArcHUD3)
+
 # ArcHUD3
 
 ArcHUD displays smooth arcs around your character in the middle of the screen to inform you about the health and power (mana, rage, ...) of you, your pet, and your target. In addition, it shows casts, combo points, holy power, soul shards, and a couple of other things. It discretely fades when you are out of combat and at full health/power.
