@@ -1,0 +1,13 @@
+sudo: false
+language: c
+  
+addons:
+  apt:
+    packages:
+    - pandoc
+  
+script: curl -s https://raw.githubusercontent.com/nyyr/packager/master/release.sh | bash
+  
+branches:
+  only:
+  - /^(v|t)?\d+\.\d+(\.\d+)?(\.\d+)?(-\S*)?$/

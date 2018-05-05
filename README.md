@@ -39,9 +39,17 @@ Small warning: Using this addon apparently bears a high risk of getting addicted
 
 So use it at your own risk ;)
 
+## Download
+
+* On Github under [releases](https://github.com/nyyr/ArcHUD3/releases)
+* On [WoW Interface](http://www.wowinterface.com/downloads/info24629-ArcHUD3.html)
+* On [WowAce](https://www.wowace.com/projects/archud3)
+* On [CurseForge](https://www.curseforge.com/wow/addons/archud3)
+
 ## Developer Notes
 
 * [Change log](Docs/changelog.md)
 * [Ring Prototypes](Docs/ring-prototypes.txt) (a bit outdated)
 * [Maths behind the rings](Docs/statrings.txt)
 * [History](Docs/history.txt)
+* [Publishing via Travis CI](http://www.wowinterface.com/forums/showthread.php?t=55801)

@@ -3,9 +3,11 @@
 ## Notes: Smooth combat HUD based on ArcHUD2
 ## Author: nyyr, Nenie
 ## SavedVariables: ArcHUD3DB
-## Version: 4.2.3
-## X-Date: $Date$
+## Version: @project-version@
+## X-Date: @project-date-iso@
 ## X-Category: HUDs
+## X-WoWI-ID: 24629
+## X-Curse-Project-ID: 26891
 
 # Libraries
 embeds.xml
