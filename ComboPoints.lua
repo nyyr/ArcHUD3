@@ -56,7 +56,6 @@ end
 
 function ArcHUD:UpdateComboPointsFrame()
 	local points = 0
-	local _, class = UnitClass("player")
 	
 	if (class == "PALADIN") then
 		points = UnitPower("player", SPELL_POWER_HOLY_POWER)
@@ -94,5 +93,21 @@ function ArcHUD:get_active_runes()
 end
 
 function ArcHUD:UpdateComboPoints(event, arg1, arg2)
-	self:UpdateComboPointsFrame()
+	if (not self:HasComboPoints(class)) then
+		self:SetComboPoints(0)
+	else
+		self:UpdateComboPointsFrame()
+	end
+end
+
+----------------------------------------------
+-- Check whether to display combopoints
+----------------------------------------------
+function ArcHUD:HasComboPoints(class)
+	return ((class == "ROGUE" or class == "DRUID") or
+		(class == "PALADIN" and self.db.profile.ShowHolyPowerPoints) or
+		(class == "WARLOCK" and self.db.profile.ShowSoulShardPoints) or
+		(class == "MONK" and self.db.profile.ShowChiPoints) or
+		(class == "DEATHKNIGHT" and self.db.profile.ShowRunePoints) or
+		(class == "DEMONHUNTER" and self.db.profile.ShowSoulFragmentPoints))
 end

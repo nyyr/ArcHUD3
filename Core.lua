@@ -79,6 +79,8 @@ ArcHUD.defaults = {
 		ShowHolyPowerPoints = false,
 		ShowSoulShardPoints = false,
 		ShowChiPoints = false,
+		ShowRunePoints = false,
+		ShowSoulFragmentPoints = false,
 		ColorComboPoints = {r = 1, g = 1, b = 0},
 		ColorOldComboPoints = {r = 0.5, g = 0.5, b = 0.5},
 		OldComboPointsDecay = 10.0,
@@ -447,14 +449,7 @@ function ArcHUD:UpdateTargetHUD()
 	-- Show/Hide combopoints display and refresh it if necessary
 	if(self.db.profile.ShowComboPoints) then
 		self.TargetHUD.Combo:Show()
-		local _, class = UnitClass("player")
-		if ((class == "PALADIN" and not self.db.profile.ShowHolyPowerPoints) or
-			(class == "WARLOCK" and not self.db.profile.ShowSoulShardPoints) or
-			(class == "MONK" and not self.db.profile.ShowChiPoints)) then
-			self:SetComboPoints(0)
-		else
-			self:UpdateComboPointsFrame()
-		end
+		self:UpdateComboPoints()
 	else
 		self.TargetHUD.Combo:Hide()
 	end
@@ -1013,19 +1008,15 @@ function ArcHUD:EventHandler(event, arg1)
 			end
 			self.TargetHUD.MPText:SetTextColor(info.r, info.g, info.b)
 
-		elseif ((arg1 == "player" and class == "PALADIN" and self.db.profile.ShowHolyPowerPoints) or
-				(arg1 == "player" and class == "WARLOCK" and self.db.profile.ShowSoulShardPoints) or
-				(arg1 == "player" and class == "MONK" and self.db.profile.ShowChiPoints)) then
-			-- Affects Holy Power / Soul Shards
-			self:UpdateComboPointsFrame()
+		elseif (arg1 == "player") then
+			-- Affects Holy Power / Soul Shards / ...
+			self:UpdateComboPoints()
 		end
 
 	elseif (event == "UNIT_POWER") then
-		if ((arg1 == "player" and class == "PALADIN" and self.db.profile.ShowHolyPowerPoints) or
-			(arg1 == "player" and class == "WARLOCK" and self.db.profile.ShowSoulShardPoints) or
-			(arg1 == "player" and class == "MONK" and self.db.profile.ShowChiPoints)) then
-			-- Affects Holy Power / Soul Shards
-			self:UpdateComboPointsFrame()
+		if (arg1 == "player") then
+			-- Affects Holy Power / Soul Shards / ...
+			self:UpdateComboPoints()
 		end
 
 	elseif (event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH") then

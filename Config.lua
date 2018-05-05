@@ -924,6 +924,34 @@ ArcHUD.configOptionsTableCore = {
 						ArcHUD:UpdateTargetHUD()
 					end,
 				},
+				-- Runes as Combo Points
+				ShowRunePoints = {
+					type		= "toggle",
+					name		= L["TEXT"]["RUNECOMBO"],
+					desc		= L["TOOLTIP"]["RUNECOMBO"],
+					order		= 12,
+					get			= function ()
+						return ArcHUD.db.profile.ShowRunePoints
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.ShowRunePoints = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
+				-- Soul Fragments as Combo Points
+				ShowSoulFragmentPoints = {
+					type		= "toggle",
+					name		= L["TEXT"]["SOULFRAGMENTCOMBO"],
+					desc		= L["TOOLTIP"]["SOULFRAGMENTCOMBO"],
+					order		= 12,
+					get			= function ()
+						return ArcHUD.db.profile.ShowSoulFragmentPoints
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.ShowSoulFragmentPoints = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
 				ColorComboPoints = {
 					type		= "color",
 					name		= L["TEXT"]["CPCOLOR"],
