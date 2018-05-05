@@ -1,6 +1,5 @@
 local module = ArcHUD:NewModule("Runes")
-local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "2.2 (r" .. rev .. ")"
+module.version = "2.2 (@file-abbreviated-hash@)"
 
 -- localization
 local LM = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Module")

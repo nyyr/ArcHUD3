@@ -1,6 +1,5 @@
 local module = ArcHUD:NewModule("ComboPoints")
-local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "3.0 (r" .. rev .. ")"
+module.version = "3.0 (@file-abbreviated-hash@)"
 
 module.unit = "player"
 module.noAutoAlpha = nil

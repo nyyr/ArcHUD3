@@ -1,6 +1,5 @@
 local module = ArcHUD:NewModule("ArcaneCharges")
-local _, _, rev = string.find("$Rev: 109 $", "([0-9]+)")
-module.version = "1.0 (r" .. rev .. ")"
+module.version = "1.0 (@file-abbreviated-hash@)"
 
 module.unit = "player"
 module.noAutoAlpha = nil

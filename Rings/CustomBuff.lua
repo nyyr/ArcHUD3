@@ -9,8 +9,7 @@ ArcHUD.customModules = {}
 
 local CustomBuffRingTemplate = {}
 
-local _, _, rev = string.find("$Rev$", "([0-9]+)")
-CustomBuffRingTemplate.version = "1.4 (r" .. rev .. ")"
+CustomBuffRingTemplate.version = "1.4 (@file-abbreviated-hash@)"
 
 CustomBuffRingTemplate.unit = "player"
 CustomBuffRingTemplate.noAutoAlpha = true

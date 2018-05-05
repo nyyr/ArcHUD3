@@ -1,6 +1,5 @@
 local module = ArcHUD:NewModule("Chi")
-local _, _, rev = string.find("$Rev$", "([0-9]+)")
-module.version = "2.1 (r" .. rev .. ")"
+module.version = "2.1 (@file-abbreviated-hash@)"
 
 module.unit = "player"
 module.noAutoAlpha = nil
