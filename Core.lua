@@ -787,13 +787,13 @@ function ArcHUD:UpdateFaction(unit)
 		local color = self.ClassColor[class]
 		if(self.db.profile.ShowPVP and UnitIsPVPFreeForAll("player")) then
 			if(not self.PVPEnabled) then
-				PlaySound("igPVPUpdate")
+				PlaySound(SOUNDKIT.IG_PVP_UPDATE)
 			end
 			self.Nameplates.player.Text:SetText("|cffffff00[FFA] |cff"..(color or "ffffff")..(UnitName("player") or "Unknown Entity").."|r")
 			self.PVPEnabled = true
 		elseif(self.db.profile.ShowPVP and factionGroup and UnitIsPVP("player")) then
 			if(not self.PVPEnabled) then
-				PlaySound("igPVPUpdate")
+				PlaySound(SOUNDKIT.IG_PVP_UPDATE)
 			end
 			self.Nameplates.player.Text:SetText("|cffff0000[PVP] |cff"..(color or "ffffff")..(UnitName("player") or "Unknown Entity").."|r")
 			self.PVPEnabled = true
