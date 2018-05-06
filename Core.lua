@@ -732,6 +732,8 @@ function ArcHUD:TargetAuras(event, arg1)
 			button:Hide()
 		end
 	end
+
+	self:UpdateComboPoints(event, arg1)
 end
 
 ----------------------------------------------
@@ -1070,8 +1072,8 @@ end
 ----------------------------------------------
 -- CombatStatus()
 ----------------------------------------------
-function ArcHUD:CombatStatus(event)
-	--self:LevelDebug(d_info, "CombatStatus: event = " .. event)
+function ArcHUD:CombatStatus(event, arg1, arg2)
+	self:LevelDebug(d_info, "CombatStatus: event = " .. event)
 
 	if(event == "PLAYER_ENTER_COMBAT" or event == "PLAYER_REGEN_DISABLED") then
 		self.PlayerIsInCombat = true
@@ -1079,10 +1081,8 @@ function ArcHUD:CombatStatus(event)
 			self.PlayerIsRegenOn = false
 		end
 	elseif(event == "PLAYER_LEAVE_COMBAT" or event == "PLAYER_REGEN_ENABLED") then
-		if(event == "PLAYER_LEAVE_COMBAT" and self.PlayerIsRegenOn) then
-			self.PlayerIsInCombat = false
-		elseif(event == "PLAYER_REGEN_ENABLED") then
-			self.PlayerIsInCombat = false
+		self.PlayerIsInCombat = false
+		if(event == "PLAYER_REGEN_ENABLED") then
 			self.PlayerIsRegenOn = true
 		end
 	elseif(event == "PET_ATTACK_START") then
@@ -1090,6 +1090,8 @@ function ArcHUD:CombatStatus(event)
 	elseif(event == "PET_ATTACK_STOP") then
 		self.PetIsInCombat = false
 	end
+
+	self:UpdateComboPoints(event, arg1, arg2)
 end
 
 ----------------------------------------------

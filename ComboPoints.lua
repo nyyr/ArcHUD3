@@ -10,7 +10,7 @@ function ArcHUD:InitComboPointsFrame()
 	_, class = UnitClass("player")
 	
 	-- NOTE: Demon Hunter Events
-	if class == "DEMONHUNTER" then 
+	if class == "DEMONHUNTER" and not self.db.profile.ShowBuffs then 
 		self:RegisterEvent("UNIT_AURA", "UpdateComboPoints");
 	end	
 	
@@ -20,18 +20,13 @@ function ArcHUD:InitComboPointsFrame()
 		self:RegisterEvent("RUNE_TYPE_UPDATE", "UpdateComboPoints");
 	end
 	
-	-- NOTE: General Events
-	
 	-- NOTE: Unit Power
-	self:RegisterEvent("UNIT_POWER", "UpdateComboPoints")
-	self:RegisterEvent("UNIT_POWER_FREQUENT", "UpdateComboPoints")
-
-	-- NOTE: Entering/Leaving Combat
-	self:RegisterEvent("PLAYER_REGEN_ENABLED", "UpdateComboPoints")
-	-- self:RegisterEvent("PLAYER_REGEN_DISABLED", "UpdateComboPoints")
+	if not self.db.profile.TargetFrame then
+		self:RegisterEvent("UNIT_POWER", "UpdateComboPoints")
+		self:RegisterEvent("UNIT_POWER_FREQUENT", "UpdateComboPoints")
+	end
 	
 	-- NOTE: Dying/Ressurecting/Insance Zoning
-	self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateComboPoints")
 	self:RegisterEvent("PLAYER_DEAD", "UpdateComboPoints")
 	self:RegisterEvent("PLAYER_UNGHOST", "UpdateComboPoints")
 	self:RegisterEvent("PLAYER_ALIVE", "UpdateComboPoints")
