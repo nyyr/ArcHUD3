@@ -133,7 +133,7 @@ end
 
 function module:UNIT_SPELLCAST_START(event, arg1)
 	if (arg1 == self.unit) then
-		local spell, rank, displayName, icon, startTime, endTime = UnitCastingInfo(self.unit)
+		local spell, displayName, icon, startTime, endTime = UnitCastingInfo(self.unit)
 		if (spell) then
 			self.f:UpdateColor({["r"] = 1.0, ["g"] = 0.7, ["b"] = 0})
 			self.Text:SetText(displayName)
@@ -167,7 +167,7 @@ end
 
 function module:UNIT_SPELLCAST_CHANNEL_START(event, arg1)
 	if(arg1 == self.unit) then
-		local spell, rank, displayName, icon, startTime, endTime = UnitChannelInfo(self.unit)
+		local spell, displayName, icon, startTime, endTime = UnitChannelInfo(self.unit)
 		if (spell) then
 			self.f:UpdateColor({["r"] = 0.3, ["g"] = 0.3, ["b"] = 1.0})
 			self.Text:SetText(displayName)
@@ -196,7 +196,7 @@ end
 
 function module:UNIT_SPELLCAST_CHANNEL_UPDATE(event, arg1)
 	if(arg1 == self.unit) then
-		local spell, rank, displayName, icon, startTime, endTime = UnitChannelInfo(arg1)
+		local spell, displayName, icon, startTime, endTime = UnitChannelInfo(arg1)
 		if (spell == nil) then
 			-- might be due to lag
 			-- SpellcastChannelStop resets all
@@ -210,7 +210,7 @@ end
 
 function module:UNIT_SPELLCAST_DELAYED(event, arg1)
 	if(arg1 == self.unit) then
-		local spell, rank, displayName, icon, startTime, endTime = UnitCastingInfo(arg1)
+		local spell, displayName, icon, startTime, endTime = UnitCastingInfo(arg1)
 		if (spell == nil) then
 			-- might be due to lag
 			-- SpellcastChannelStop resets all

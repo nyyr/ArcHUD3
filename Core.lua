@@ -301,7 +301,7 @@ function ArcHUD:OnProfileChanged(db, profile)
 		self:LevelDebug(d_notice, "Targetframe enabled. Registering unit events")
 		self:RegisterEvent("UNIT_HEALTH", 			"EventHandler")
 		self:RegisterEvent("UNIT_MAXHEALTH", 		"EventHandler")
-		self:RegisterEvent("UNIT_POWER", 			"EventHandler")
+		self:RegisterEvent("UNIT_POWER_UPDATE", 	"EventHandler")
 		self:RegisterEvent("UNIT_MAXPOWER",			"EventHandler")
 		self:RegisterEvent("UNIT_DISPLAYPOWER", 	"EventHandler")
 		if(self.db.profile.ShowBuffs) then
@@ -350,7 +350,7 @@ function ArcHUD:OnProfileChanged(db, profile)
 		
 		self:UnregisterEvent("UNIT_HEALTH", 			"EventHandler")
 		self:UnregisterEvent("UNIT_MAXHEALTH", 			"EventHandler")
-		self:UnregisterEvent("UNIT_POWER", 				"EventHandler")
+		self:UnregisterEvent("UNIT_POWER_UPDATE", 				"EventHandler")
 		self:UnregisterEvent("UNIT_MAXPOWER",			"EventHandler")
 		self:UnregisterEvent("UNIT_DISPLAYPOWER", 		"EventHandler")
 		self:UnregisterEvent("UNIT_AURA", 				"TargetAuras")
@@ -408,7 +408,7 @@ function ArcHUD:UnregisterAll()
 
 	self:UnregisterEvent("UNIT_HEALTH")
 	self:UnregisterEvent("UNIT_MAXHEALTH")
-	self:UnregisterEvent("UNIT_POWER")
+	self:UnregisterEvent("UNIT_POWER_UPDATE")
 	self:UnregisterEvent("UNIT_MAXPOWER")
 	self:UnregisterEvent("UNIT_DISPLAYPOWER")
 
@@ -658,8 +658,8 @@ function ArcHUD:TargetAuras(event, arg1)
 	end
 	
 	-- buffs
-	for i = 1, 16 do
-		local _, _, buff, count, buffType, duration, expirationTime = UnitBuff(unit, i, filter)
+	for i = 1, 40 do
+		local _, buff, count, buffType, duration, expirationTime = UnitBuff(unit, i, filter)
 		button = self.TargetHUD["Buff"..i]
 		if (buff) then
 			button.Icon:SetTexture(buff)
@@ -691,8 +691,8 @@ function ArcHUD:TargetAuras(event, arg1)
 	end
 
 	-- debuffs
-	for i = 1, 16 do
-		local _, _, buff, count, buffType, duration, expirationTime = UnitDebuff(unit, i, filter)
+	for i = 1, 40 do
+		local _, buff, count, buffType, duration, expirationTime = UnitDebuff(unit, i, filter)
 		button = self.TargetHUD["Debuff"..i]
 		if (buff) then
 			button.Icon:SetTexture(buff)
@@ -1015,7 +1015,7 @@ function ArcHUD:EventHandler(event, arg1)
 			self:UpdateComboPoints()
 		end
 
-	elseif (event == "UNIT_POWER") then
+	elseif (event == "UNIT_POWER_UPDATE") then
 		if (arg1 == "player") then
 			-- Affects Holy Power / Soul Shards / ...
 			self:UpdateComboPoints()

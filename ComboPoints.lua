@@ -61,7 +61,7 @@ function ArcHUD:UpdateComboPointsFrame()
 	elseif (class == "DEATHKNIGHT") then
 		points = self:get_active_runes()
 	elseif (class == "DEMONHUNTER") then		
-		local _, _, _, count = UnitAura("player", "Soul Fragments")
+		local _, _, count = UnitAura("player", "Soul Fragments")
 		if count then 
 			points = count
 		else 

@@ -156,26 +156,35 @@ local function CustomBuff_UpdateBuff(frame, elapsed)
 	frame.module:UpdateBuff()
 end
 
+local function CustomBuff_UnitAuraByName(unit, auraName, isDebuff)
+	local name, iconTex, count, duration, expirationTime, unitCaster
+	
+	local filter = "HELPFUL"
+	if isDebuff then
+		filter = "HARMFUL"
+	end
+
+	for i = 1, 40 do
+		name, iconTex, count, _, duration, expirationTime, unitCaster = UnitAura(unit, i, filter)
+		if not name then
+			return nil
+		end
+		if name == auraName then
+			return name, iconTex, count, duration, expirationTime, unitCaster
+		end
+	end
+end
+
 function CustomBuffRingTemplate:UpdateBuff()
 	local name, iconTex, count, duration, expirationTime, unitCaster
 	local visible = false
 	local timer = false
 	
-	if (self.db.profile.Debuff) then
-		for i,n in ipairs(self.BuffNames) do
-			name, _, iconTex, count, _, duration, expirationTime, unitCaster = 
-				UnitDebuff(self.unit, n)
-			if (name and ((not self.db.profile.CastByPlayer) or unitCaster == "player")) then
-				break -- prioritize buffs in their given order
-			end
-		end
-	else
-		for i,n in ipairs(self.BuffNames) do
-			name, _, iconTex, count, _, duration, expirationTime, unitCaster = 
-				UnitBuff(self.unit, n)
-			if (name and ((not self.db.profile.CastByPlayer) or unitCaster == "player")) then
-				break -- prioritize buffs in their given order
-			end
+	for i,n in ipairs(self.BuffNames) do
+		name, iconTex, count, duration, expirationTime, unitCaster = 
+			CustomBuff_UnitAuraByName(self.unit, n, self.db.profile.Debuff)
+		if (name and ((not self.db.profile.CastByPlayer) or unitCaster == "player")) then
+			break -- prioritize buffs in their given order
 		end
 	end
 	
