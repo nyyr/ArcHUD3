@@ -22,7 +22,7 @@ function ArcHUD:InitComboPointsFrame()
 	
 	-- NOTE: Unit Power
 	if not self.db.profile.TargetFrame then
-		self:RegisterEvent("UNIT_POWER", "UpdateComboPoints")
+		self:RegisterEvent("UNIT_POWER_UPDATE", "UpdateComboPoints")
 		self:RegisterEvent("UNIT_POWER_FREQUENT", "UpdateComboPoints")
 	end
 	

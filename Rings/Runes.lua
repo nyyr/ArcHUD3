@@ -96,7 +96,7 @@ function module:OnModuleEnable()
 	self:RegisterEvent("RUNE_TYPE_UPDATE", "UpdatePower")
 	
 	-- Unit Power
-	self:RegisterUnitEvent("UNIT_POWER", "UpdatePower", self.unit)
+	self:RegisterUnitEvent("UNIT_POWER_UPDATE", "UpdatePower", self.unit)
 	self:RegisterUnitEvent("UNIT_POWER_FREQUENT", "UpdatePower", self.unit)
 
 	-- Entering/Leaving Combat

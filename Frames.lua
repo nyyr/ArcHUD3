@@ -265,21 +265,37 @@ function ArcHUD:CreateHUDFrames()
 
 	-- Create buffframes
 	targethud.Buff1 = AH_CreateBuffButton(targethud, 1, {"TOPRIGHT", targethud.HPText, "BOTTOMRIGHT", 0, -2}, "Buff")
-	for i=2,8 do
+	for i=2,10 do
 		targethud["Buff"..i] = AH_CreateBuffButton(targethud, i, {"RIGHT", targethud["Buff"..(i-1)], "LEFT", -1, 0}, "Buff")
 	end
-	targethud.Buff9 = AH_CreateBuffButton(targethud, 9, {"TOPRIGHT", targethud.Buff1, "BOTTOMRIGHT", 0, -1}, "Buff")
-	for i=10,16 do
+	targethud.Buff11 = AH_CreateBuffButton(targethud, 11, {"TOPRIGHT", targethud.Buff1, "BOTTOMRIGHT", 0, -1}, "Buff")
+	for i=12,20 do
+		targethud["Buff"..i] = AH_CreateBuffButton(targethud, i, {"RIGHT", targethud["Buff"..(i-1)], "LEFT", -1, 0}, "Buff")
+	end
+	targethud.Buff21 = AH_CreateBuffButton(targethud, 21, {"TOPRIGHT", targethud.Buff11, "BOTTOMRIGHT", 0, -1}, "Buff")
+	for i=22,30 do
+		targethud["Buff"..i] = AH_CreateBuffButton(targethud, i, {"RIGHT", targethud["Buff"..(i-1)], "LEFT", -1, 0}, "Buff")
+	end
+	targethud.Buff31 = AH_CreateBuffButton(targethud, 31, {"TOPRIGHT", targethud.Buff21, "BOTTOMRIGHT", 0, -1}, "Buff")
+	for i=32,40 do
 		targethud["Buff"..i] = AH_CreateBuffButton(targethud, i, {"RIGHT", targethud["Buff"..(i-1)], "LEFT", -1, 0}, "Buff")
 	end
 
 	-- Create debuffframes
 	targethud.Debuff1 = AH_CreateBuffButton(targethud, 1, {"TOPLEFT", targethud.MPText, "BOTTOMLEFT", 0, -2}, "DeBuff")
-	for i=2,8 do
+	for i=2,10 do
 		targethud["Debuff"..i] = AH_CreateBuffButton(targethud, i, {"LEFT", targethud["Debuff"..(i-1)], "RIGHT", -1, 0}, "DeBuff")
 	end
-	targethud.Debuff9 = AH_CreateBuffButton(targethud, 9, {"TOPLEFT", targethud.Debuff1, "BOTTOMLEFT", 0, -1}, "DeBuff")
-	for i=10,16 do
+	targethud.Debuff11 = AH_CreateBuffButton(targethud, 11, {"TOPLEFT", targethud.Debuff1, "BOTTOMLEFT", 0, -1}, "DeBuff")
+	for i=12,20 do
+		targethud["Debuff"..i] = AH_CreateBuffButton(targethud, i, {"LEFT", targethud["Debuff"..(i-1)], "RIGHT", -1, 0}, "DeBuff")
+	end
+	targethud.Debuff21 = AH_CreateBuffButton(targethud, 21, {"TOPLEFT", targethud.Debuff11, "BOTTOMLEFT", 0, -1}, "DeBuff")
+	for i=22,30 do
+		targethud["Debuff"..i] = AH_CreateBuffButton(targethud, i, {"LEFT", targethud["Debuff"..(i-1)], "RIGHT", -1, 0}, "DeBuff")
+	end
+	targethud.Debuff31 = AH_CreateBuffButton(targethud, 31, {"TOPLEFT", targethud.Debuff21, "BOTTOMLEFT", 0, -1}, "DeBuff")
+	for i=32,40 do
 		targethud["Debuff"..i] = AH_CreateBuffButton(targethud, i, {"LEFT", targethud["Debuff"..(i-1)], "RIGHT", -1, 0}, "DeBuff")
 	end
 
