@@ -58,6 +58,8 @@ function module:OnModuleUpdate()
 	if self.db.profile.SortRunes then
 		self:UpdateRuneCooldown(arg1, arg2)
 	end
+
+	self:RefreshRuneRings()
 end
 
 function module:OnModuleEnable()
@@ -73,44 +75,16 @@ function module:OnModuleEnable()
 			self.frames[i]:SetAlpha(0)
 		end
 		
-		-- set angles
-		local angles = {
-			[1] = { e = 180, s = 135 },
-			[2] = { e = 135, s = 112 },
-			[3] = { e = 112, s = 90 },
-		}
-		for i=4,6 do
-			angles[i] = {
-				e = 180 - angles[3-math.fmod(i-1,3)].s,
-				s = 180 - angles[3-math.fmod(i-1,3)].e,
-			}
-		end
-		
 		-- configure rune arcs
 		for i=1,6 do
 			self:AttachRing(self.frames[i])
-			if i <= 1 then
-				-- self.frames[i].inverseFill = true
-			end
 			self.frames[i].linearFade = true
-			self.frames[i]:SetEndAngle(angles[i].e)
-			self.frames[i]:SetStartAngle(angles[i].s)
-			self.frames[i]:SetShineAngle((angles[i].e + angles[i].s)/2)
-			self.frames[i]:SetMax(MAX_RING_VALUE)
-			self.frames[i]:SetValue(MAX_RING_VALUE, 0)
-			if (i > 1) then
-				self.frames[i].sparkRed:SetVertexColor(0.5, 0.5, 0.5)
-				self.frames[i]:SetSpark(99.9, true)
-			end
 			self.frames[i].dirty = true
 			self.frames[i].isRune = true
-			--self:Debug(1, "Rune %d set up (angle %f-%f)", i, angles[i].s, angles[i].e)
 		end
-		
-		-- adjust shine for first and last rune
-		self.frames[1]:SetShineAngle(angles[1].s + 12)
-		self.frames[6]:SetShineAngle(angles[6].e - 12)
 	end
+
+	self:RefreshRuneRings()
 
 	-- un-register all previous events
 	self:UnregisterAllEvents();
@@ -287,3 +261,39 @@ function module:UpdatePower(event, arg1, arg2)
 	end
 end
 
+function module:RefreshRuneRings()
+	if (self.frames) then
+		-- refresh sparks & shine
+
+		-- set angles
+		local angles = {
+			[1] = { e = 180, s = 135 },
+			[2] = { e = 135, s = 112 },
+			[3] = { e = 112, s = 90 },
+		}
+		for i=4,6 do
+			angles[i] = {
+				e = 180 - angles[3-math.fmod(i-1,3)].s,
+				s = 180 - angles[3-math.fmod(i-1,3)].e,
+			}
+		end
+
+		for i=1,6 do
+			self.frames[i]:SetEndAngle(angles[i].e)
+			self.frames[i]:SetStartAngle(angles[i].s)
+			self.frames[i]:SetShineAngle((angles[i].e + angles[i].s)/2)
+			self.frames[i]:SetMax(MAX_RING_VALUE)
+			self.frames[i]:SetValue(MAX_RING_VALUE, 0)
+			if (i > 1) then
+				self.frames[i].sparkRed:SetVertexColor(0.5, 0.5, 0.5)
+				self.frames[i]:SetSpark(99.9, true)
+			end
+			self.frames[i].dirty = true
+			--self:Debug(1, "Rune %d set up (angle %f-%f)", i, angles[i].s, angles[i].e)
+		end
+		
+		-- adjust shine for first and last rune
+		self.frames[1]:SetShineAngle(angles[1].s + 12)
+		self.frames[6]:SetShineAngle(angles[6].e - 12)
+	end
+end
