@@ -135,7 +135,7 @@ function ArcHUDRingTemplate:DoQuadrantReversed(A, T, SS, A2)
 	-- 
 	--        S
 	
-	-- Ring fills from E to N (N = 90°, E = 0°)
+	-- Ring fills from E to N (N = 90Â°, E = 0Â°)
 	-- Drawing scheme uses three/four locations
 	--   E (Ex,Ey) - The start position of the arc (Ex=1, Ey=0 if start angle = 0) (towards East)
 	--   O (Ox,Oy) - Intersection of angle line with Outer edge
@@ -255,7 +255,7 @@ function ArcHUDRingTemplate:DoQuadrant(A, T, SS, A2)
 	-- 
 	--        S
 	
-	-- Ring fills from N to E (N = 0°, E = 90°)
+	-- Ring fills from N to E (N = 0Â°, E = 90Â°)
 	-- Drawing scheme uses three/four locations
 	--   N (Nx,Ny) - The start position of the arc (Nx=0, Ny=1 if start angle = 0) (towards North)
 	--   O (Ox,Oy) - Intersection of angle line with Outer edge
@@ -313,7 +313,7 @@ function ArcHUDRingTemplate:DoQuadrant(A, T, SS, A2)
 		SS(T, self, OR, NIx, Ox, Oy, NIy)
 		if (A2 > 0) then
 			-- Chip2 subset is from NO to (Ox,NIy)
-			SS(C2, self, OR, Ox, NOx, NOy, NIy)
+			SS(C2, self, OR, NOx, Ox, NIy, NOy)
 		end
 	else
 		-- 'cut' textures vertically
