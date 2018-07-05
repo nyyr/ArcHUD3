@@ -23,6 +23,8 @@ module.options = {
 }
 module.localized = true
 
+local HOLY_POWER_FULL = 3
+
 function module:Initialize()
 	-- Setup the frame we need
 	self.f = self:CreateRing(true, ArcHUDFrame)
@@ -57,8 +59,8 @@ function module:OnModuleEnable()
 end
 
 function module:UpdateHolyPower()
-	local maxHolyPower = UnitPowerMax(self.unit, SPELL_POWER_HOLY_POWER);
-	local num = UnitPower(self.unit, SPELL_POWER_HOLY_POWER)
+	local maxHolyPower = UnitPowerMax(self.unit, Enum.PowerType.HolyPower);
+	local num = UnitPower(self.unit, Enum.PowerType.HolyPower)
 	self.f:SetMax(maxHolyPower)
 	self.f:SetValue(num)
 	
