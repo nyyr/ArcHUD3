@@ -15,8 +15,8 @@ module.defaults = {
 		Level = 1,
 		ShowSeparators = true,
 		SortRunes = true,
-		Color = {r = 0, g = 0.6, b = 0.7},
-		PartialColor = {r = 0 * shadingFactor, g = 0.6 * shadingFactor, b = 0.7 * shadingFactor},
+		Color = {r = 0.3, g = 0.4, b = 0.8},
+		PartialColor = {r = 0.3 * shadingFactor, g = 0.4 * shadingFactor, b = 0.8 * shadingFactor},
 		-- PartialColor = {r = 0, g = 0.5, b = 0.6},
 		-- PartialColor = {r = 0, g = 1, b = 0},
 		RingVisibility = 2, -- always fade out when out of combat, regardless of ring status
@@ -93,7 +93,6 @@ function module:OnModuleEnable()
 		
 	-- Runes
 	self:RegisterEvent("RUNE_POWER_UPDATE", "UpdatePower")
-	self:RegisterEvent("RUNE_TYPE_UPDATE", "UpdatePower")
 	
 	-- Unit Power
 	self:RegisterUnitEvent("UNIT_POWER_UPDATE", "UpdatePower", self.unit)
@@ -254,7 +253,7 @@ function module:UpdatePower(event, arg1, arg2)
 	if event == "PLAYER_ENTERING_WORLD" then
 		self:UpdateRunes()
 		self:UpdateRuneCooldown(arg1, arg2)
-	elseif event == "RUNE_POWER_UPDATE" or event == "RUNE_TYPE_UPDATE" then
+	elseif event == "RUNE_POWER_UPDATE" then
 		self:UpdateRuneCooldown(arg1, arg2)
 	else
 		self:UpdateRuneCooldown(arg1, arg2)

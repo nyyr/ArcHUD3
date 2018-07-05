@@ -17,7 +17,6 @@ function ArcHUD:InitComboPointsFrame()
 	-- NOTE: Deathknight Events
 	if class == "DEATHKNIGHT" then 
 		self:RegisterEvent("RUNE_POWER_UPDATE", "UpdateComboPoints");
-		self:RegisterEvent("RUNE_TYPE_UPDATE", "UpdateComboPoints");
 	end
 	
 	-- NOTE: Unit Power
