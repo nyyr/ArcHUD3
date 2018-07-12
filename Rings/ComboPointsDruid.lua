@@ -1,4 +1,4 @@
-local module = ArcHUD:NewModule("SoulShards")
+local module = ArcHUD:NewModule("ComboPointsDruid")
 module.version = "5.0 (@file-abbreviated-hash@)"
 
 module.unit = "player"
@@ -12,9 +12,9 @@ module.defaults = {
 		Side = 2,
 		Level = 1,
 		ShowSeparators = true,
-		Color = PowerBarColor["SOUL_SHARDS"],
+		Color = PowerBarColor["COMBO_POINTS"],
 		RingVisibility = 2, -- always fade out when out of combat, regardless of ring status
-		ShowTextHuge = false
+		ShowTextHuge = true
 	}
 }
 module.options = {
@@ -25,10 +25,10 @@ module.options = {
 }
 module.localized = true
 
-module.class = "WARLOCK"
-module.specs = nil -- array of SPEC_... constants
-module.powerType = Enum.PowerType.SoulShards
-module.powerTypeString = "SOUL_SHARDS"
+module.class = "DRUID"
+module.specs = nil -- array of SPEC_... constants; nil if this ring is available for all specs
+module.powerType = Enum.PowerType.ComboPoints
+module.powerTypeString = "COMBO_POINTS"
 module.flashAt = nil -- flash when full
 
 function module:Initialize()
@@ -40,4 +40,27 @@ function module:Initialize()
 	self.UpdateActive = ArcHUD.templatePowerRing.UpdateActive
 
 	self:InitializePowerRing()
+end
+
+--
+-- Can be overridden in case more events must be registered (e.g., for detecting shapeshifts)
+--
+function module:OnActiveChanged(oldState, newState)
+	if newState then
+		-- Register additional events
+		self:RegisterEvent("UPDATE_SHAPESHIFT_FORM", "UpdateActive")
+		self:RegisterEvent("UPDATE_SHAPESHIFT_FORMS", "UpdateActive")
+	else
+		-- Unregister additional events
+		self:UnregisterEvent("UPDATE_SHAPESHIFT_FORM")
+		self:UnregisterEvent("UPDATE_SHAPESHIFT_FORMS")
+	end
+end
+
+--
+-- Can be overridden in case other conditions apply (e.g., shapeshift form)
+--
+function module:CheckVisible()
+	local formId = GetShapeshiftFormID()
+	return formId == CAT_FORM
 end

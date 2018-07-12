@@ -204,7 +204,7 @@ function module:UpdatePowerType(event, arg1)
 		if(event == "UNIT_DISPLAYPOWER") then
 			self:UpdateColor(UnitPowerType(self.unit))
 			
-			info = self:GetPowerBarColorText(UnitPowerType(self.unit))
+			local info = self:GetPowerBarColorText(UnitPowerType(self.unit))
 			self.MPText:SetVertexColor(info.r, info.g, info.b)
 		end
 		self:UpdatePowerBar()

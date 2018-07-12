@@ -15,8 +15,10 @@
 <Script file="FocusPower.lua" />
 <Script file="FocusCasting.lua" />
 
+<Script file="PowerTemplate.lua" />
 <Script file="ArcaneCharges.lua" />
 <Script file="ComboPoints.lua" />
+<Script file="ComboPointsDruid.lua" />
 <Script file="HolyPower.lua" />
 <Script file="SoulShards.lua" />
 <Script file="ShadowOrbs.lua" />

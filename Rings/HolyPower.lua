@@ -1,5 +1,5 @@
 local module = ArcHUD:NewModule("HolyPower")
-module.version = "2.0 (@file-abbreviated-hash@)"
+module.version = "5.0 (@file-abbreviated-hash@)"
 
 module.unit = "player"
 module.noAutoAlpha = nil
@@ -12,75 +12,32 @@ module.defaults = {
 		Side = 2,
 		Level = 1,
 		ShowSeparators = true,
-		Color = {r = 1, g = 1, b = 0.5},
+		Color = PowerBarColor["HOLY_POWER"],
 		RingVisibility = 2, -- always fade out when out of combat, regardless of ring status
+		ShowTextHuge = false
 	}
 }
 module.options = {
 	{name = "Flash", text = "FLASH_HP", tooltip = "FLASH_HP"},
+	{name = "ShowTextHuge", text = "SHOWTEXTHUGE", tooltip = "SHOWTEXTHUGE"}, -- fka "combo points"
 	attach = true,
 	hasseparators = true,
 }
 module.localized = true
 
-local HOLY_POWER_FULL = 3
+module.class = "PALADIN"
+module.specs = { SPEC_PALADIN_RETRIBUTION } -- array of SPEC_... constants; nil if this ring is available for all specs
+module.powerType = Enum.PowerType.HolyPower
+module.powerTypeString = "HOLY_POWER"
+module.flashAt = 3
 
 function module:Initialize()
-	-- Setup the frame we need
-	self.f = self:CreateRing(true, ArcHUDFrame)
-	self.f:SetAlpha(0)
-	
-	self:CreateStandardModuleOptions(55)
-end
+	self.InitializePowerRing = ArcHUD.templatePowerRing.InitializePowerRing
+	self.OnModuleUpdate = ArcHUD.templatePowerRing.OnModuleUpdate
+	self.OnModuleEnable = ArcHUD.templatePowerRing.OnModuleEnable
+	self.UpdatePowerRing = ArcHUD.templatePowerRing.UpdatePowerRing
+	self.UpdatePower = ArcHUD.templatePowerRing.UpdatePower
+	self.UpdateActive = ArcHUD.templatePowerRing.UpdateActive
 
-function module:OnModuleUpdate()
-	self:UpdateColor()
-end
-
-function module:OnModuleEnable()
-	local _, class = UnitClass("player")
-	if (class ~= "PALADIN") then return end
-
-	self.f.dirty = true
-	self.f.fadeIn = 0.25
-
-	-- Register the events we will use
-	self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdatePower")
-	self:RegisterUnitEvent("UNIT_POWER_FREQUENT", "UpdatePower", self.unit)
-	self:RegisterUnitEvent("UNIT_DISPLAYPOWER", "UpdatePower", self.unit)
-	
-	-- Activate ring timers
-	self:StartRingTimers()
-
-	self:UpdateColor()
-	self:UpdateHolyPower()
-	
-	self.f:Show()
-end
-
-function module:UpdateHolyPower()
-	local maxHolyPower = UnitPowerMax(self.unit, Enum.PowerType.HolyPower);
-	local num = UnitPower(self.unit, Enum.PowerType.HolyPower)
-	self.f:SetMax(maxHolyPower)
-	self.f:SetValue(num)
-	
-	if(num < HOLY_POWER_FULL and num >= 0) then
-		self.f:StopPulse()
-	else
-		if(self.db.profile.Flash and num >= HOLY_POWER_FULL) then
-			self.f:StartPulse()
-		else
-			self.f:StopPulse()
-		end
-	end
-end
-
-function module:UpdatePower(event, arg1, arg2)
-	if (event == "UNIT_POWER_FREQUENT") then
-		if (arg1 == self.unit and arg2 == "HOLY_POWER") then
-			self:UpdateHolyPower()
-		end
-	else
-		self:UpdateHolyPower()
-	end
+	self:InitializePowerRing()
 end
