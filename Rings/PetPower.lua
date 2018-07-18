@@ -96,7 +96,7 @@ function module:OnModuleEnable()
 	self:RegisterEvent("PET_UI_UPDATE",		"UpdatePet")
 	self:RegisterEvent("PET_BAR_CHANGED",	"UpdatePet")
 	self:RegisterUnitEvent("UNIT_PET",		"UpdatePet", "player")
-	self:RegisterUnitEvent("UNIT_POWER",	"UpdatePower")
+	self:RegisterUnitEvent("UNIT_POWER_UPDATE",	"UpdatePower")
 	self:RegisterUnitEvent("UNIT_MAXPOWER",	"UpdatePower")
 	self:RegisterUnitEvent("UNIT_DISPLAYPOWER")
 
