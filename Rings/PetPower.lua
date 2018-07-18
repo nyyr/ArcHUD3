@@ -37,7 +37,7 @@ function module:Initialize()
 	self.f:SetAlpha(0)
 
 	self.MPPerc = self:CreateFontString(self.f, "BACKGROUND", {100, 17}, 16, "LEFT", {1.0, 1.0, 1.0}, {"BOTTOMLEFT", self.f, "BOTTOMLEFT", 65, -125})
-	
+
 	self:CreateStandardModuleOptions(36)
 end
 
@@ -66,7 +66,7 @@ function module:OnModuleUpdate()
 	else
 		fontName, _, fontFlags = self.MPPerc:GetFont()
 		self.MPPerc:SetFont(fontName, 16, fontFlags)
-		
+
 		self.MPPerc:SetWidth(100)
 		self.MPPerc:SetHeight(17)
 
@@ -94,9 +94,9 @@ function module:OnModuleEnable()
 
 	-- Register the events we will use
 	self:RegisterEvent("PET_UI_UPDATE",		"UpdatePet")
-	self:RegisterEvent("PET_BAR_CHANGED",	"UpdatePet")
+	self:RegisterEvent("PET_BAR_UPDATE_USABLE",	"UpdatePet")
 	self:RegisterUnitEvent("UNIT_PET",		"UpdatePet", "player")
-	self:RegisterUnitEvent("UNIT_POWER",	"UpdatePower")
+	self:RegisterUnitEvent("UNIT_POWER_UPDATE",	"UpdatePower")
 	self:RegisterUnitEvent("UNIT_MAXPOWER",	"UpdatePower")
 	self:RegisterUnitEvent("UNIT_DISPLAYPOWER")
 
@@ -145,4 +145,3 @@ function module:UpdatePower(event, arg1)
 		end
 	end
 end
-

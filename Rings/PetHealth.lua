@@ -30,7 +30,7 @@ function module:Initialize()
 	self.f:SetAlpha(0)
 
 	self.HPPerc = self:CreateFontString(self.f, "BACKGROUND", {100, 17}, 16, "RIGHT", {1.0, 1.0, 1.0}, {"BOTTOMLEFT", self.f, "BOTTOMLEFT", -165, -125})
-	
+
 	self:CreateStandardModuleOptions(35)
 end
 
@@ -59,7 +59,7 @@ function module:OnModuleUpdate()
 	else
 		fontName, _, fontFlags = self.HPPerc:GetFont()
 		self.HPPerc:SetFont(fontName, 16, fontFlags)
-		
+
 		self.HPPerc:SetWidth(100)
 		self.HPPerc:SetHeight(17)
 
@@ -86,7 +86,7 @@ function module:OnModuleEnable()
 
 	-- Register the events we will use
 	self:RegisterEvent("PET_UI_UPDATE",		 "UpdatePet")
-	self:RegisterEvent("PET_BAR_CHANGED",	 "UpdatePet")
+	self:RegisterEvent("PET_BAR_UPDATE_USABLE",	 "UpdatePet")
 	self:RegisterUnitEvent("UNIT_PET",		 "UpdatePet", "player")
 	self:RegisterUnitEvent("UNIT_HEALTH", 	 "UpdateHealth")
 	self:RegisterUnitEvent("UNIT_MAXHEALTH", "UpdateHealth")
@@ -139,7 +139,7 @@ function module:UpdateHealth(event, arg1)
 
 		--self:Debug(3, "PetHealth:UpdateHealth("..event..", "..arg1.."): max = "..
 		--	tostring(UnitHealthMax(self.unit))..", health = "..tostring(UnitHealth(self.unit)))
-		
+
 		if (event == "UNIT_MAXHEALTH") then
 			self.f:SetMax(UnitHealthMax(self.unit))
 		else
