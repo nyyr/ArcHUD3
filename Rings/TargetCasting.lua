@@ -1,6 +1,6 @@
 local moduleName = "TargetCasting"
 local module = ArcHUD:NewModule(moduleName)
-module.version = "2.1 (@file-abbreviated-hash@)"
+module.version = "2.1 (01920a3)"
 
 module.unit = "target"
 module.noAutoAlpha = true
@@ -142,7 +142,7 @@ end
 function module:UNIT_SPELLCAST_START(event, arg1)
 	if (arg1 == self.unit) then
 		--self:Debug(3, "TargetCasting:UNIT_SPELLCAST_START("..tostring(arg1)..")")
-		local spell, rank, displayName, icon, startTime, endTime, _, _, notInterruptible = UnitCastingInfo(self.unit)
+		local spell, text, _, startTime, endTime, _, _, notInterruptible = UnitCastingInfo(self.unit)
 		if (spell) then 
 			if(UnitIsFriend("player", self.unit)) then
 				self:UpdateColor(1)
@@ -160,7 +160,7 @@ function module:UNIT_SPELLCAST_START(event, arg1)
 					self.Time:SetTextColor(1, 0, 0)
 				end
 			end
-			self.Text:SetText(displayName)
+			self.Text:SetText(text)
 			self.channeling = 0
 			self.f.casting = 1
 			self.f:SetMax(endTime - startTime)
@@ -177,7 +177,7 @@ end
 function module:UNIT_SPELLCAST_CHANNEL_START(event, arg1)
 	if (arg1 == self.unit) then
 		--self:Debug(3, "TargetCasting:UNIT_SPELLCAST_CHANNEL_START("..tostring(arg1)..")")
-		local spell, rank, displayName, icon, startTime, endTime, _, notInterruptible = UnitChannelInfo(self.unit)
+		local spell, text, _, startTime, endTime, isTradeSkill, notInterruptible, spellID = UnitChannelInfo(unit);
 		if (spell) then 
 			if(UnitIsFriend("player", self.unit)) then
 				self:UpdateColor(1)
@@ -195,7 +195,7 @@ function module:UNIT_SPELLCAST_CHANNEL_START(event, arg1)
 					self.Time:SetTextColor(1, 0, 0)
 				end
 			end
-			self.Text:SetText(displayName)
+			self.Text:SetText(text)
 			self.channeling = 1
 			self.f.casting = 1
 			self.f:SetMax(endTime - startTime)
@@ -213,7 +213,7 @@ end
 function module:UNIT_SPELLCAST_CHANNEL_UPDATE(event, arg1)
 	if (arg1 == self.unit) then
 		--self:Debug(3, "TargetCasting:UNIT_SPELLCAST_CHANNEL_UPDATE("..tostring(arg1)..")")
-		local spell, rank, displayName, icon, startTime, endTime = UnitChannelInfo(arg1)
+		local spell, text, _, startTime, endTime = UnitChannelInfo(arg1)
 		if (spell == nil) then
 			-- might be due to lag
 			-- SpellcastChannelStop resets all
@@ -228,7 +228,7 @@ end
 function module:UNIT_SPELLCAST_DELAYED(event, arg1)
 	if (arg1 == self.unit) then
 		--self:Debug(3, "TargetCasting:UNIT_SPELLCAST_DELAYED("..tostring(arg1)..")")
-		local spell, rank, displayName, icon, startTime, endTime = UnitCastingInfo(arg1)
+		local spell, text, _, startTime, endTime = UnitCastingInfo(arg1)
 		if (spell == nil) then
 			-- might be due to lag
 			-- SpellcastChannelStop resets all
