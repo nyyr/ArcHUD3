@@ -850,153 +850,17 @@ ArcHUD.configOptionsTableCore = {
 			name		= L["TEXT"]["COMBOPOINTS"],
 			order		= 14,
 			args		= {
-				-- Show Combo Points
-				showComboPoints = {
-					type		= "toggle",
-					name		= L["TEXT"]["SHOWCOMBO"],
-					desc		= L["TOOLTIP"]["SHOWCOMBO"],
+				info1 = {
+					type		= "description",
+					name		= L["TEXT"]["COMBOPOINTSSETTINGS1"],
 					order		= 0,
-					get			= function ()
-						return ArcHUD.db.profile.ShowComboPoints
-					end,
-					set			= function (info, v)
-						ArcHUD.db.profile.ShowComboPoints = v
-						ArcHUD:UpdateTargetHUD()
-					end,
 				},
-				comboPointsDecay = {
-					type		= "range",
-					name		= L["TEXT"]["COMBODECAY"],
-					desc		= L["TOOLTIP"]["COMBODECAY"],
-					min			= 0.0,
-					max			= 10.0,
-					step		= 0.1,
+				info2 = {
+					type		= "description",
+					name		= L["TEXT"]["COMBOPOINTSSETTINGS2"],
 					order		= 1,
-					get			= function ()
-						return ArcHUD.db.profile.OldComboPointsDecay
-					end,
-					set			= function (info, v)
-						ArcHUD.db.profile.OldComboPointsDecay = v
-						ArcHUD:UnregisterMetro("RemoveOldComboPoints")
-						ArcHUD:RegisterMetro("RemoveOldComboPoints", ArcHUD.RemoveOldComboPoints, ArcHUD.db.profile.OldComboPointsDecay, ArcHUD)
-						ArcHUD:SendMessage("ARCHUD_MODULE_UPDATE", "ComboPoints")
-					end,
 				},
-				-- Holy Power as Combo Points
-				ShowHolyPowerPoints = {
-					type		= "toggle",
-					name		= L["TEXT"]["HOLYPOWERCOMBO"],
-					desc		= L["TOOLTIP"]["HOLYPOWERCOMBO"],
-					order		= 10,
-					get			= function ()
-						return ArcHUD.db.profile.ShowHolyPowerPoints
-					end,
-					set			= function (info, v)
-						ArcHUD.db.profile.ShowHolyPowerPoints = v
-						ArcHUD:UpdateTargetHUD()
-					end,
-				},
-				-- Soul Shards as Combo Points
-				ShowSoulShardPoints = {
-					type		= "toggle",
-					name		= L["TEXT"]["SOULSHARDCOMBO"],
-					desc		= L["TOOLTIP"]["SOULSHARDCOMBO"],
-					order		= 11,
-					get			= function ()
-						return ArcHUD.db.profile.ShowSoulShardPoints
-					end,
-					set			= function (info, v)
-						ArcHUD.db.profile.ShowSoulShardPoints = v
-						ArcHUD:UpdateTargetHUD()
-					end,
-				},
-				-- Chi as Combo Points
-				ShowChiPoints = {
-					type		= "toggle",
-					name		= L["TEXT"]["CHICOMBO"],
-					desc		= L["TOOLTIP"]["CHICOMBO"],
-					order		= 12,
-					get			= function ()
-						return ArcHUD.db.profile.ShowChiPoints
-					end,
-					set			= function (info, v)
-						ArcHUD.db.profile.ShowChiPoints = v
-						ArcHUD:UpdateTargetHUD()
-					end,
-				},
-				-- Runes as Combo Points
-				ShowRunePoints = {
-					type		= "toggle",
-					name		= L["TEXT"]["RUNECOMBO"],
-					desc		= L["TOOLTIP"]["RUNECOMBO"],
-					order		= 12,
-					get			= function ()
-						return ArcHUD.db.profile.ShowRunePoints
-					end,
-					set			= function (info, v)
-						ArcHUD.db.profile.ShowRunePoints = v
-						ArcHUD:UpdateTargetHUD()
-					end,
-				},
-				-- Soul Fragments as Combo Points
-				ShowSoulFragmentPoints = {
-					type		= "toggle",
-					name		= L["TEXT"]["SOULFRAGMENTCOMBO"],
-					desc		= L["TOOLTIP"]["SOULFRAGMENTCOMBO"],
-					order		= 12,
-					get			= function ()
-						return ArcHUD.db.profile.ShowSoulFragmentPoints
-					end,
-					set			= function (info, v)
-						ArcHUD.db.profile.ShowSoulFragmentPoints = v
-						ArcHUD:UpdateTargetHUD()
-					end,
-				},
-				ColorComboPoints = {
-					type		= "color",
-					name		= L["TEXT"]["CPCOLOR"],
-					desc		= L["TOOLTIP"]["CPCOLOR"],
-					order		= 13,
-					get			= function ()
-						return ArcHUD.db.profile.ColorComboPoints.r, ArcHUD.db.profile.ColorComboPoints.g, ArcHUD.db.profile.ColorComboPoints.b
-					end,
-					set			= function (info, r, g, b, a)
-						ArcHUD.db.profile.ColorComboPoints.r, ArcHUD.db.profile.ColorComboPoints.g, ArcHUD.db.profile.ColorComboPoints.b = r, g, b
-						ArcHUD.TargetHUD.Combo:SetTextColor(r, g, b)
-					end,
-				},
-				ColorOldComboPoints = {
-					type		= "color",
-					name		= L["TEXT"]["CPCOLORDECAY"],
-					desc		= L["TOOLTIP"]["CPCOLORDECAY"],
-					order		= 14,
-					get			= function ()
-						return ArcHUD.db.profile.ColorOldComboPoints.r, ArcHUD.db.profile.ColorOldComboPoints.g, ArcHUD.db.profile.ColorOldComboPoints.b
-					end,
-					set			= function (info, r, g, b, a)
-						ArcHUD.db.profile.ColorOldComboPoints.r, ArcHUD.db.profile.ColorOldComboPoints.g, ArcHUD.db.profile.ColorOldComboPoints.b = r, g, b
-						-- will change on next target change
-					end,
-				},
-				ResetColors = {
-					type		= "execute",
-					name		= L["TEXT"]["RESETCOLORS"],
-					desc		= L["TOOLTIP"]["RESETCOLORS"],
-					order		= 15,
-					func		= function ()
-						local defaults = ArcHUD.defaults.profile.ColorComboPoints
-						local defaultsold = ArcHUD.defaults.profile.ColorOldComboPoints
-						local color = ArcHUD.db.profile.ColorComboPoints
-						local colorold = ArcHUD.db.profile.ColorOldComboPoints
-						
-						color.r, color.g, color.b = defaults.r, defaults.g, defaults.b
-						colorold.r, colorold.g, colorold.b = defaultsold.r, defaultsold.g, defaultsold.b
-						ArcHUD.TargetHUD.Combo:SetTextColor(color.r, color.g, color.b)
-						AceConfigRegistry:NotifyChange("ArcHUD_Core")
-					end,
-				}
-			},
-			
+			},			
 		}, -- comboPoints
 		
 		misc = {

@@ -114,7 +114,7 @@ function module:OnModuleEnable()
 	end
 
 	-- Register the events we will use
-	self:RegisterUnitEvent("UNIT_POWER", "UpdatePowerEvent")
+	self:RegisterUnitEvent("UNIT_POWER_UPDATE", "UpdatePowerEvent")
 	self:RegisterUnitEvent("UNIT_MAXPOWER", "UpdatePowerEvent")
 	self:RegisterUnitEvent("UNIT_DISPLAYPOWER", "UpdatePowerType")
 	self:RegisterEvent("PLAYER_ALIVE", "UpdatePowerEvent")
@@ -204,7 +204,7 @@ function module:UpdatePowerType(event, arg1)
 		if(event == "UNIT_DISPLAYPOWER") then
 			self:UpdateColor(UnitPowerType(self.unit))
 			
-			info = self:GetPowerBarColorText(UnitPowerType(self.unit))
+			local info = self:GetPowerBarColorText(UnitPowerType(self.unit))
 			self.MPText:SetVertexColor(info.r, info.g, info.b)
 		end
 		self:UpdatePowerBar()

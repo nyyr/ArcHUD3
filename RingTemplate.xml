@@ -22,7 +22,7 @@
 	</Layers>
 	
 	<Frames>
-		<Frame name="$parentBG" frameLevel="0" parentKey="BG">
+		<Frame name="$parentBG" frameLevel="1" parentKey="BG">
 			<Size x="256" y="256"/>
 			
 			<Anchors>

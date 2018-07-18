@@ -9,7 +9,7 @@ ArcHUD = LibStub("AceAddon-3.0"):NewAddon("ArcHUD",
 
 -- Version
 ArcHUD.version = "@project-version@ (@project-abbreviated-hash@)"
-ArcHUD.codename = "Friendly Demons"
+ArcHUD.codename = "Bad Girl"
 ArcHUD.authors = "nyyr, Nenie"
 
 -- Locale object
@@ -73,17 +73,17 @@ ArcHUD.defaults = {
 		BlizzSpellActScale = 0.8,
 		BlizzSpellActOpacity = 1.0,
 		ShowPVP = true,
-		ShowComboPoints = true,
+		-- deprecated: ShowComboPoints = true,
 		Positions = {},
 		ShowResting = true,
-		ShowHolyPowerPoints = false,
-		ShowSoulShardPoints = false,
-		ShowChiPoints = false,
-		ShowRunePoints = false,
-		ShowSoulFragmentPoints = false,
-		ColorComboPoints = {r = 1, g = 1, b = 0},
-		ColorOldComboPoints = {r = 0.5, g = 0.5, b = 0.5},
-		OldComboPointsDecay = 10.0,
+		-- deprecated: ShowHolyPowerPoints = false,
+		-- deprecated: ShowSoulShardPoints = false,
+		-- deprecated: ShowChiPoints = false,
+		-- deprecated: ShowRunePoints = false,
+		-- deprecated: ShowSoulFragmentPoints = false,
+		-- deprecated: ColorComboPoints = {r = 1, g = 1, b = 0},
+		-- deprecated: ColorOldComboPoints = {r = 0.5, g = 0.5, b = 0.5},
+		-- deprecated: OldComboPointsDecay = 10.0,
 		CustomModules = {},
 	}
 }
@@ -301,18 +301,17 @@ function ArcHUD:OnProfileChanged(db, profile)
 		self:LevelDebug(d_notice, "Targetframe enabled. Registering unit events")
 		self:RegisterEvent("UNIT_HEALTH", 			"EventHandler")
 		self:RegisterEvent("UNIT_MAXHEALTH", 		"EventHandler")
-		self:RegisterEvent("UNIT_POWER", 			"EventHandler")
+		self:RegisterEvent("UNIT_POWER_UPDATE", 	"EventHandler")
 		self:RegisterEvent("UNIT_MAXPOWER",			"EventHandler")
 		self:RegisterEvent("UNIT_DISPLAYPOWER", 	"EventHandler")
 		if(self.db.profile.ShowBuffs) then
 			self:RegisterEvent("UNIT_AURA", 		"TargetAuras")
 		else
-			for i=1,16 do
+			for i=1,40 do
 				self.TargetHUD["Buff"..i]:Hide()
 				self.TargetHUD["Debuff"..i]:Hide()
 			end
 		end
-		self:UnregisterEvent("PLAYER_TARGET_CHANGED", "UpdateComboPoints")
 		self:RegisterEvent("PLAYER_TARGET_CHANGED",	  "TargetUpdate")
 		self:RegisterEvent("PLAYER_FOCUS_CHANGED", 	  "TargetUpdate")
 
@@ -350,14 +349,12 @@ function ArcHUD:OnProfileChanged(db, profile)
 		
 		self:UnregisterEvent("UNIT_HEALTH", 			"EventHandler")
 		self:UnregisterEvent("UNIT_MAXHEALTH", 			"EventHandler")
-		self:UnregisterEvent("UNIT_POWER", 				"EventHandler")
+		self:UnregisterEvent("UNIT_POWER_UPDATE", 				"EventHandler")
 		self:UnregisterEvent("UNIT_MAXPOWER",			"EventHandler")
 		self:UnregisterEvent("UNIT_DISPLAYPOWER", 		"EventHandler")
 		self:UnregisterEvent("UNIT_AURA", 				"TargetAuras")
 		self:UnregisterEvent("PLAYER_TARGET_CHANGED",	"TargetUpdate")
 		self:UnregisterEvent("PLAYER_FOCUS_CHANGED", 	"TargetUpdate")
-		
-		self:RegisterEvent("PLAYER_TARGET_CHANGED",	"UpdateComboPoints")
 	end
 
 	self:LevelDebug(d_notice, "Positioning ring anchors. Width: "..self.db.profile.Width)
@@ -387,9 +384,6 @@ function ArcHUD:OnProfileChanged(db, profile)
 
 	-- Enable nameplate updates
 	self:RestartNamePlateTimers()
-
-	-- Combo points frame
-	self:InitComboPointsFrame()
 	
 	-- Update target HUD
 	self:UpdateTargetHUD()
@@ -408,7 +402,7 @@ function ArcHUD:UnregisterAll()
 
 	self:UnregisterEvent("UNIT_HEALTH")
 	self:UnregisterEvent("UNIT_MAXHEALTH")
-	self:UnregisterEvent("UNIT_POWER")
+	self:UnregisterEvent("UNIT_POWER_UPDATE")
 	self:UnregisterEvent("UNIT_MAXPOWER")
 	self:UnregisterEvent("UNIT_DISPLAYPOWER")
 
@@ -424,7 +418,7 @@ function ArcHUD:UnregisterAll()
 	self:StopTimer("UpdateTargetPower")
 
 	self:LevelDebug(d_notice, "Hiding frames")
-	for i=1,16 do
+	for i=1,40 do
 		self.TargetHUD["Buff"..i]:Hide()
 		self.TargetHUD["Debuff"..i]:Hide()
 	end
@@ -445,23 +439,12 @@ end
 ----------------------------------------------
 function ArcHUD:UpdateTargetHUD()
 	self:TargetUpdate()
-
-	-- Show/Hide combopoints display and refresh it if necessary
-	if(self.db.profile.ShowComboPoints) then
-		self.TargetHUD.Combo:Show()
-		self:UpdateComboPoints()
-	else
-		self.TargetHUD.Combo:Hide()
-	end
 end
 
 ----------------------------------------------
 -- TargetUpdate()
 ----------------------------------------------
 function ArcHUD:TargetUpdate(event, arg1)
-	if (event == "PLAYER_TARGET_CHANGED") then
-		ArcHUD:UpdateComboPoints(event, arg1)
-	end
 	
 	-- Make sure we are targeting someone and that ArcHUD is enabled
 	if (UnitExists("target") and self.db.profile.TargetFrame) then
@@ -658,8 +641,8 @@ function ArcHUD:TargetAuras(event, arg1)
 	end
 	
 	-- buffs
-	for i = 1, 16 do
-		local _, _, buff, count, buffType, duration, expirationTime = UnitBuff(unit, i, filter)
+	for i = 1, 40 do
+		local _, buff, count, buffType, duration, expirationTime = UnitBuff(unit, i, filter)
 		button = self.TargetHUD["Buff"..i]
 		if (buff) then
 			button.Icon:SetTexture(buff)
@@ -691,8 +674,8 @@ function ArcHUD:TargetAuras(event, arg1)
 	end
 
 	-- debuffs
-	for i = 1, 16 do
-		local _, _, buff, count, buffType, duration, expirationTime = UnitDebuff(unit, i, filter)
+	for i = 1, 40 do
+		local _, buff, count, buffType, duration, expirationTime = UnitDebuff(unit, i, filter)
 		button = self.TargetHUD["Debuff"..i]
 		if (buff) then
 			button.Icon:SetTexture(buff)
@@ -732,8 +715,6 @@ function ArcHUD:TargetAuras(event, arg1)
 			button:Hide()
 		end
 	end
-
-	self:UpdateComboPoints(event, arg1)
 end
 
 ----------------------------------------------
@@ -1009,16 +990,6 @@ function ArcHUD:EventHandler(event, arg1)
 				info = PowerBarColor[UnitPowerType(arg1)]
 			end
 			self.TargetHUD.MPText:SetTextColor(info.r, info.g, info.b)
-
-		elseif (arg1 == "player") then
-			-- Affects Holy Power / Soul Shards / ...
-			self:UpdateComboPoints()
-		end
-
-	elseif (event == "UNIT_POWER") then
-		if (arg1 == "player") then
-			-- Affects Holy Power / Soul Shards / ...
-			self:UpdateComboPoints()
 		end
 
 	elseif (event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH") then
@@ -1033,23 +1004,6 @@ function ArcHUD:EventHandler(event, arg1)
 	elseif(event == "PLAYER_ENTERING_WORLD") then
 		self.PlayerIsInCombat = false
 		self.PlayerIsRegenOn = true
-		
-		-- This is the new bit of code that actually queries for the amount of combo points/chi/soul shards that the player has instead of assuming zero.
-		-- This is required because warlocks generally start off with 3 sould shards
-		-- Note: this could probably be refactored into its own function or, at the very least, some sort of hash type thing to make it pretty. I'm lazy and don't know lua so I'll leave the correction of my shortcomings to the open source community
-		local points = 0
-
-		if (UnitClass("player") == "Warlock") then
-			points = UnitPower("player", SPELL_POWER_SOUL_SHARDS)
-		elseif(UnitClass("player") == "Paladin") then
-			points = UnitPower("player", SPELL_POWER_HOLY_POWER)
-		elseif(UnitClass("player") == "Monk") then
-			points = UnitPower("player", SPELL_POWER_CHI)
-		elseif(UnitClass("player") == "Rogue" or UnitClass("player") == "Druid") then
-			points = UnitPower("player", SPELL_POWER_COMBO_POINTS)
-		end
-
-		self:SetComboPoints(points)
 
 	else
 		if (arg1 == "target") then
@@ -1090,8 +1044,6 @@ function ArcHUD:CombatStatus(event, arg1, arg2)
 	elseif(event == "PET_ATTACK_STOP") then
 		self.PetIsInCombat = false
 	end
-
-	self:UpdateComboPoints(event, arg1, arg2)
 end
 
 ----------------------------------------------

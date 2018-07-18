@@ -127,8 +127,8 @@ function module:OnModuleEnable()
 end
 
 function module:PLAYER_FOCUS_CHANGED()
-	local casting, _, _, _, _, _ = UnitCastingInfo(self.unit)
-	local channel, _, _, _, _, _ = UnitChannelInfo(self.unit)
+	local casting = UnitCastingInfo(self.unit)
+	local channel = UnitChannelInfo(self.unit)
 	if(casting) then
 		self:UNIT_SPELLCAST_START("PLAYER_FOCUS_CHANGED", self.unit)
 	elseif(channel) then
@@ -142,7 +142,7 @@ end
 function module:UNIT_SPELLCAST_START(event, arg1)
 	if (arg1 == self.unit) then
 		--self:Debug(3, "FocusCasting:UNIT_SPELLCAST_START("..tostring(arg1)..")")
-		local spell, rank, displayName, icon, startTime, endTime, _, _, notInterruptible = UnitCastingInfo(self.unit)
+		local spell, displayName, icon, startTime, endTime, _, _, notInterruptible = UnitCastingInfo(self.unit)
 		if (spell) then 
 			if(UnitIsFriend("player", self.unit)) then
 				self:UpdateColor(1)
@@ -177,7 +177,7 @@ end
 function module:UNIT_SPELLCAST_CHANNEL_START(event, arg1)
 	if (arg1 == self.unit) then
 		--self:Debug(3, "FocusCasting:UNIT_SPELLCAST_CHANNEL_START("..tostring(arg1)..")")
-		local spell, rank, displayName, icon, startTime, endTime, _, notInterruptible = UnitChannelInfo(self.unit)
+		local spell, displayName, icon, startTime, endTime, _, notInterruptible = UnitChannelInfo(self.unit)
 		if (spell) then 
 			if(UnitIsFriend("player", self.unit)) then
 				self:UpdateColor(1)
@@ -213,7 +213,7 @@ end
 function module:UNIT_SPELLCAST_CHANNEL_UPDATE(event, arg1)
 	if (arg1 == self.unit) then
 		--self:Debug(3, "FocusCasting:UNIT_SPELLCAST_CHANNEL_UPDATE("..tostring(arg1)..")")
-		local spell, rank, displayName, icon, startTime, endTime = UnitChannelInfo(arg1)
+		local spell, displayName, icon, startTime, endTime = UnitChannelInfo(arg1)
 		if (spell == nil) then
 			-- might be due to lag
 			-- SpellcastChannelStop resets all
@@ -228,7 +228,7 @@ end
 function module:UNIT_SPELLCAST_DELAYED(event, arg1)
 	if (arg1 == self.unit) then
 		--self:Debug(3, "FocusCasting:UNIT_SPELLCAST_DELAYED("..tostring(arg1)..")")
-		local spell, rank, displayName, icon, startTime, endTime = UnitCastingInfo(arg1)
+		local spell, displayName, icon, startTime, endTime = UnitCastingInfo(arg1)
 		if (spell == nil) then
 			-- might be due to lag
 			-- SpellcastChannelStop resets all

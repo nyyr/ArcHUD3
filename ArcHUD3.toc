@@ -1,4 +1,4 @@
-## Interface: 70300
+## Interface: 80000
 ## Title: ArcHUD3
 ## Notes: Smooth combat HUD based on ArcHUD2
 ## Author: nyyr, Nenie
@@ -18,7 +18,6 @@ Locales\Locales.xml
 # Core addon
 Core.lua
 Frames.xml
-ComboPoints.lua
 Nameplates.lua
 BlizzardFrames.lua
 Utils.lua

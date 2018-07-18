@@ -70,7 +70,7 @@ function module:OnModuleEnable()
 	end
 
 	-- Register the events we will use
-	self:RegisterUnitEvent("UNIT_POWER",	"UpdatePower")
+	self:RegisterUnitEvent("UNIT_POWER_UPDATE",	"UpdatePower")
 	self:RegisterUnitEvent("UNIT_MAXPOWER",	"UpdatePower")
 	self:RegisterUnitEvent("UNIT_DISPLAYPOWER")
 	self:RegisterEvent("PLAYER_FOCUS_CHANGED")

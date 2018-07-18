@@ -86,7 +86,7 @@ function module:OnModuleEnable()
 
 	-- Register the events we will use
 	self:RegisterEvent("PET_UI_UPDATE",		 "UpdatePet")
-	self:RegisterEvent("PET_BAR_CHANGED",	 "UpdatePet")
+	self:RegisterEvent("PET_BAR_UPDATE",	 "UpdatePet")
 	self:RegisterUnitEvent("UNIT_PET",		 "UpdatePet", "player")
 	self:RegisterUnitEvent("UNIT_HEALTH", 	 "UpdateHealth")
 	self:RegisterUnitEvent("UNIT_MAXHEALTH", "UpdateHealth")
