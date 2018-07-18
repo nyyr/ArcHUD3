@@ -1,6 +1,6 @@
 local moduleName = "Casting"
 local module = ArcHUD:NewModule(moduleName)
-module.version = "2.1 (@file-abbreviated-hash@)"
+module.version = "2.1 (01920a3)"
 
 module.unit = "player"
 module.noAutoAlpha = true
@@ -133,10 +133,10 @@ end
 
 function module:UNIT_SPELLCAST_START(event, arg1)
 	if (arg1 == self.unit) then
-		local spell, rank, displayName, icon, startTime, endTime = UnitCastingInfo(self.unit)
+		local spell, text, _, startTime, endTime = UnitCastingInfo(self.unit)
 		if (spell) then
 			self.f:UpdateColor({["r"] = 1.0, ["g"] = 0.7, ["b"] = 0})
-			self.Text:SetText(displayName)
+			self.Text:SetText(text)
 			self.channeling = 0
 			self.f.casting = 1
 			self.f:SetMax(endTime - startTime)
@@ -167,10 +167,10 @@ end
 
 function module:UNIT_SPELLCAST_CHANNEL_START(event, arg1)
 	if(arg1 == self.unit) then
-		local spell, rank, displayName, icon, startTime, endTime = UnitChannelInfo(self.unit)
+		local spell, text, _, startTime, endTime = UnitChannelInfo(self.unit)
 		if (spell) then
 			self.f:UpdateColor({["r"] = 0.3, ["g"] = 0.3, ["b"] = 1.0})
-			self.Text:SetText(displayName)
+			self.Text:SetText(text)
 			self.channeling = 1
 			self.f.casting = 1
 			self.f:SetMax(endTime - startTime)
@@ -196,7 +196,7 @@ end
 
 function module:UNIT_SPELLCAST_CHANNEL_UPDATE(event, arg1)
 	if(arg1 == self.unit) then
-		local spell, rank, displayName, icon, startTime, endTime = UnitChannelInfo(arg1)
+		local spell, text, _, startTime, endTime = UnitChannelInfo(arg1)
 		if (spell == nil) then
 			-- might be due to lag
 			-- SpellcastChannelStop resets all
@@ -210,7 +210,7 @@ end
 
 function module:UNIT_SPELLCAST_DELAYED(event, arg1)
 	if(arg1 == self.unit) then
-		local spell, rank, displayName, icon, startTime, endTime = UnitCastingInfo(arg1)
+		local spell, rank, _,  startTime, endTime = UnitCastingInfo(arg1)
 		if (spell == nil) then
 			-- might be due to lag
 			-- SpellcastChannelStop resets all
