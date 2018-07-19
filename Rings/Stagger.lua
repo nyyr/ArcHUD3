@@ -16,9 +16,9 @@ module.defaults = {
 		ShowText = true,
 		Side = 1,
 		Level = -1,
-		ColorLight = PowerBarColor["STAGGER"][0],
-		ColorModerate = PowerBarColor["STAGGER"][1],
-		ColorHeavy = PowerBarColor["STAGGER"][2],
+		ColorLight = PowerBarColor["STAGGER"][1],
+		ColorModerate = PowerBarColor["STAGGER"][2],
+		ColorHeavy = PowerBarColor["STAGGER"][3],
 		MaxPerc = 100, -- maximum value of ring in % of maximum health
 	}
 }
