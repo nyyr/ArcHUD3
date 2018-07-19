@@ -16,9 +16,9 @@ module.defaults = {
 		ShowText = true,
 		Side = 1,
 		Level = -1,
-		ColorLight = {r = 0, g = 1, b = 0},
-		ColorModerate = {r = 1, g = 1, b = 0},
-		ColorHeavy = {r = 1, g = 0, b = 0},
+		ColorLight = PowerBarColor["STAGGER"][0],
+		ColorModerate = PowerBarColor["STAGGER"][1],
+		ColorHeavy = PowerBarColor["STAGGER"][2],
 		MaxPerc = 100, -- maximum value of ring in % of maximum health
 	}
 }
@@ -148,7 +148,7 @@ function module:UpdateValue(event, arg1)
 		local name, iconTex, debuffType, duration, expirationTime, unitCaster, spellId, v1, v2, v3
 		local hasStagger
 		for i = 1,40 do
-			name, _, iconTex, _, debuffType, duration, expirationTime, unitCaster, _, _, spellId, _, _, _, v1, v2 = 
+			name, iconTex, _, debuffType, duration, expirationTime, unitCaster, _, _, spellId, _, _, _, v1, v2 = 
 				UnitDebuff(self.unit, i)
 			if spellId == LIGHT_STAGGER or spellId == MODERATE_STAGGER or spellId == HEAVY_STAGGER then
 				hasStagger = true
