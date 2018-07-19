@@ -217,7 +217,7 @@ LM["Eclipse"]		= "Druid: Eclipse"
 LM["Chi"]			= "Monk: Chi"
 LM["Stagger"]		= "Monk: Stagger"
 LM["Runes"]			= "Death Knight: Runes"
-LM["ShadowOrbs"]	= "Priest: Shadow Orbs"
+LM["ShadowPriestMana"]	= "Priest: Mana (Shadow Priest)"
 LM["ArcaneCharges"]	= "Mage: Arcane Charges"
 
 LM["TEXT"] = {

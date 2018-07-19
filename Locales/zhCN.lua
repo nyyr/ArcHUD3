@@ -215,7 +215,7 @@ LM["Eclipse"]		= "德鲁伊：日蚀"
 LM["Chi"]			= "武僧：真气"
 LM["Stagger"]		= "武僧：醉拳"
 LM["Runes"]			= "死亡骑士：符文"
-LM["ShadowOrbs"]	= "牧师：暗影宝珠"
+LM["ShadowPriestMana"]	= "牧师：Mana (Shadow Priest)"
 LM["ArcaneCharges"]	= "Mage: Arcane Charges"
 
 LM["TEXT"] = {

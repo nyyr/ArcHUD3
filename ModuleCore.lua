@@ -18,6 +18,14 @@ ArcHUD.modulePrototype = {
 	parent = ArcHUD
 }
 
+local basePowerTypeIsEmpty = {
+	[Enum.PowerType.Rage] = true,
+	[Enum.PowerType.RunicPower] = true,
+	[Enum.PowerType.Insanity] = true,
+	[Enum.PowerType.Fury] = true,
+	[Enum.PowerType.Pain] = true
+}
+
 ----------------------------------------------
 -- Debug function uses the core :Debug function
 ----------------------------------------------
@@ -416,7 +424,7 @@ function ArcHUD.modulePrototype:CheckAlpha()
 		else
 			local powerTypeId, _ = UnitPowerType(unit)
 			-- powerTypeId: 1 = rage, 6 = runic_power, 17 = fury
-			if (self.isPower and unit ~= "pet" and (powerTypeId == SPELL_POWER_RAGE or powerTypeId == SPELL_POWER_RUNIC_POWER or powerTypeId == SPELL_POWER_FURY) and self.f.maxValue > 0) then
+			if (self.isPower and (unit ~= "pet") and basePowerTypeIsEmpty[powerTypeId] and (self.f.maxValue > 0)) then
 				if(math.floor(self.f.startValue) > 0 or math.floor(self.f.startValue) ~= math.floor(self.f.endValue)) then
 					self.f:SetRingAlpha(AH_profile.FadeOOC)
 				elseif(math.floor(self.f.startValue) == 0) then

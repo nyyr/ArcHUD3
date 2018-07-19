@@ -21,7 +21,7 @@
 <Script file="ComboPointsDruid.lua" />
 <Script file="HolyPower.lua" />
 <Script file="SoulShards.lua" />
-<Script file="ShadowOrbs.lua" />
+<Script file="ShadowPriestMana.lua" />
 <Script file="Chi.lua" />
 <Script file="Eclipse.lua" />
 <Script file="Runes.lua" />
