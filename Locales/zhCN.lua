@@ -211,11 +211,12 @@ LM["ComboPoints"]	= "Rogue: 连击点"
 LM["ComboPointsDruid"] = "Druid: 连击点"
 LM["HolyPower"]		= "圣骑士：神圣能量"
 LM["SoulShards"]	= "术士：灵魂碎片,燃烧余烬,恶魔之怒"
-LM["Eclipse"]		= "德鲁伊：日蚀"
+-- deprecated: LM["Eclipse"]		= "德鲁伊：日蚀"
 LM["Chi"]			= "武僧：真气"
 LM["Stagger"]		= "武僧：醉拳"
 LM["Runes"]			= "死亡骑士：符文"
-LM["ShadowPriestMana"]	= "牧师：Mana (Shadow Priest)"
+LM["ManaShadowPriest"]	= "牧师：Mana (Shadow Priest)"
+LM["ManaBalanceDruid"]	= "德鲁伊：Mana (Balance Druid)"
 LM["ArcaneCharges"]	= "Mage: Arcane Charges"
 
 LM["TEXT"] = {
@@ -261,8 +262,8 @@ LM["TEXT"] = {
 	COLORRUNIC	= "符文能量弧形颜色",
 	COLORABSORBS = "主动吸收颜色",
 	
-	COLORLUNAR	= "月蚀能量颜色",
-	COLORSOLAR	= "日蚀能量颜色",
+	-- deprecated: COLORLUNAR	= "月蚀能量颜色",
+	-- deprecated: COLORSOLAR	= "日蚀能量颜色",
 	
 	STAGGER_MAX = "最大值(于最大生命的百分比)",
 	COLORSTAGGERL = "轻度醉拳颜色",

@@ -215,11 +215,12 @@ LM["ComboPoints"]	= "Schurke: Kombopunkte"
 LM["ComboPointsDruid"]	= "Druide: Kombopunkte"
 LM["HolyPower"]		= "Paladin: Heilige Kraft"
 LM["SoulShards"]	= "Hexenmeister: Seelensplitter etc."
-LM["Eclipse"]		= "Druide: Finsternis"
+-- deprecated: LM["Eclipse"]		= "Druide: Finsternis"
 LM["Chi"]			= "Mönch: Chi"
 LM["Stagger"]		= "Mönch: Staffelung"
 LM["Runes"]			= "Todesritter: Runen"
-LM["ShadowPriestMana"]	= "Priester: Mana (Schattenpriester)"
+LM["ManaShadowPriest"]	= "Priester: Mana (Schattenpriester)"
+LM["ManaBalanceDruid"]	= "Druide: Mana (Gleichgewichtsdruide)"
 LM["ArcaneCharges"]	= "Magier: Arkane Ladungen"
 
 LM["TEXT"] = {
@@ -265,8 +266,8 @@ LM["TEXT"] = {
 	COLORRUNIC	= "Runenmacht-Farbe",
 	COLORABSORBS = "Farbe für Absorptionen",
 	
-	COLORLUNAR	= "Farbe Lunarenergie",
-	COLORSOLAR	= "Farbe Solarenergie",
+	-- deprecated: COLORLUNAR	= "Farbe Lunarenergie",
+	-- deprecated: COLORSOLAR	= "Farbe Solarenergie",
 	
 	STAGGER_MAX = "Maximum value (in max. health %)",
 	COLORSTAGGERL = "Color for Light Stagger",

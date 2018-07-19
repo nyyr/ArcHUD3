@@ -213,11 +213,12 @@ LM["ComboPoints"]	= "Rogue: Пиемы в серии"
 LM["ComboPointsDruid"] = "Druid: Пиемы в серии"
 LM["HolyPower"]		= "Paladin: Энергия Света"
 LM["SoulShards"]	= "Warlock: Осколки душ"
-LM["Eclipse"]		= "Druid: Eclipse"
+-- deprecated: LM["Eclipse"]		= "Druid: Eclipse"
 LM["Chi"]			= "Monk: Chi"
 LM["Stagger"]		= "Monk: Stagger"
 LM["Runes"]			= "Death Knight: Runes"
-LM["ShadowPriestMana"]	= "Priest: Mana (Shadow Priest)"
+LM["ManaShadowPriest"]	= "Priest: Mana (Shadow Priest)"
+LM["ManaBalanceDruid"]	= "Druid: Mana (Balance Druid)"
 LM["ArcaneCharges"]	= "Mage: Arcane Charges"
 
 LM["TEXT"] = {
@@ -261,8 +262,8 @@ LM["TEXT"] = {
 	COLORENERGY	= "Цвет энергии",
 	COLORRUNIC	= "Цвет руническо энергии",
 
-	COLORLUNAR	= "Lunar power color",
-	COLORSOLAR	= "Solar power color",
+	-- deprecated: COLORLUNAR	= "Lunar power color",
+	-- deprecated: COLORSOLAR	= "Solar power color",
 	
 	STAGGER_MAX = "Maximum value (in max. health %)",
 	COLORSTAGGERL = "Color for Light Stagger",

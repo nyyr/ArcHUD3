@@ -210,11 +210,12 @@ LM["ComboPoints"]	= "Rogue: Combo Points"
 LM["ComboPointsDruid"] = "Druid: Combo Points"
 LM["HolyPower"]		= "Paladin: Holy Power"
 LM["SoulShards"]	= "Warlock: Soul Shards"
-LM["Eclipse"]		= "Druid: Eclipse"
+-- deprecated: LM["Eclipse"]		= "Druid: Eclipse"
 LM["Chi"]			= "Monk: Chi"
 LM["Stagger"]		= "Monk: Stagger"
 LM["Runes"]			= "Death Knight: Runes"
-LM["ShadowPriestMana"]	= "Priest: Mana (Shadow Priest)"
+LM["ManaShadowPriest"]	= "Priest: Mana (Shadow Priest)"
+LM["ManaBalanceDruid"]	= "Druid: Mana (Balance Druid)"
 LM["ArcaneCharges"]	= "Mage: Arcane Charges"
 
 LM["TEXT"] = {
@@ -260,8 +261,8 @@ LM["TEXT"] = {
 	COLORRUNIC	= "Runic power ring color",
 	COLORABSORBS = "Color for active absorbs",
 	
-	COLORLUNAR	= "Lunar power color",
-	COLORSOLAR	= "Solar power color",
+	-- deprecated: COLORLUNAR	= "Lunar power color",
+	-- deprecated: COLORSOLAR	= "Solar power color",
 	
 	STAGGER_MAX = "Maximum value (in max. health %)",
 	COLORSTAGGERL = "Color for Light Stagger",

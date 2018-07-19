@@ -1,3 +1,5 @@
+--[[ deprecated; leaving as example for more sophisticated rings
+
 local module = ArcHUD:NewModule("Eclipse")
 module.version = "2.0 (@file-abbreviated-hash@)"
 
@@ -158,3 +160,4 @@ function module:UpdatePower(event, arg1, arg2)
 	end
 end
 
+]]

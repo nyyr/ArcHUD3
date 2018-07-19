@@ -1,4 +1,4 @@
-local module = ArcHUD:NewModule("ShadowPriestMana")
+local module = ArcHUD:NewModule("ManaShadowPriest")
 module.version = "5.0 (@file-abbreviated-hash@)"
 
 module.unit = "player"
@@ -17,8 +17,7 @@ module.defaults = {
 	}
 }
 module.options = {
-	attach = true,
-	hasseparators = true,
+	attach = true
 }
 module.localized = true
 
