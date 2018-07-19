@@ -1,4 +1,4 @@
-local module = ArcHUD:NewModule("ManaBalanceDruid")
+local module = ArcHUD:NewModule("ManaElementalShaman")
 module.version = "5.0 (@file-abbreviated-hash@)"
 
 module.unit = "player"
@@ -21,7 +21,7 @@ module.options = {
 }
 module.localized = true
 
-module.class = "DRUID"
+module.class = "SHAMAN"
 module.specs = nil -- array of SPEC_... constants; nil if this ring is available for all specs
 module.powerType = Enum.PowerType.Mana
 module.powerTypeString = "MANA"
@@ -39,24 +39,9 @@ function module:Initialize()
 end
 
 --
--- Can be overridden in case more events must be registered (e.g., for detecting shapeshifts)
---
-function module:OnActiveChanged(oldState, newState)
-	if newState then
-		-- Register additional events
-		self:RegisterEvent("UPDATE_SHAPESHIFT_FORM", "UpdateActive")
-		self:RegisterEvent("UPDATE_SHAPESHIFT_FORMS", "UpdateActive")
-	else
-		-- Unregister additional events
-		self:UnregisterEvent("UPDATE_SHAPESHIFT_FORM")
-		self:UnregisterEvent("UPDATE_SHAPESHIFT_FORMS")
-	end
-end
-
---
 -- Can be overridden in case other conditions apply (e.g., shapeshift form)
 --
 function module:CheckVisible()
 	local powerType = UnitPowerType(self.unit)
-	return powerType == Enum.PowerType.LunarPower
+	return powerType == Enum.PowerType.Maelstrom
 end

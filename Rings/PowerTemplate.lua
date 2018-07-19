@@ -139,6 +139,7 @@ function module:UpdateActive(event, arg1)
 		if isActive then
 			-- Register the events we will use
 			self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdatePower")
+			self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", "UpdateActive")
 			self:RegisterUnitEvent("UNIT_POWER_FREQUENT", "UpdatePower", self.unit)
 			self:RegisterUnitEvent("UNIT_DISPLAYPOWER", "UpdatePower", self.unit)
 
@@ -147,6 +148,7 @@ function module:UpdateActive(event, arg1)
 		else
 			-- Unregister the events if we are in the wrong specialization
 			self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+			self:UnregisterEvent("PLAYER_SPECIALIZATION_CHANGED")
 			self:UnregisterUnitEvent("UNIT_POWER_FREQUENT")
 			self:UnregisterUnitEvent("UNIT_DISPLAYPOWER")
 

@@ -11,7 +11,7 @@ module.defaults = {
 		Flash = false,
 		Side = 2,
 		Level = 1,
-		ShowSeparators = true,
+		ShowSeparators = false,
 		Color = PowerBarColor["MANA"],
 		ShowTextHuge = false
 	}

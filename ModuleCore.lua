@@ -24,7 +24,8 @@ local basePowerTypeIsEmpty = {
 	[Enum.PowerType.Insanity] = true,
 	[Enum.PowerType.Fury] = true,
 	[Enum.PowerType.Pain] = true,
-	[Enum.PowerType.LunarPower] = true
+	[Enum.PowerType.LunarPower] = true,
+	[Enum.PowerType.Maelstrom] = true
 }
 
 ----------------------------------------------
