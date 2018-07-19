@@ -1,5 +1,5 @@
 local module = ArcHUD:NewModule("Chi")
-module.version = "2.1 (@file-abbreviated-hash@)"
+module.version = "5.0 (@file-abbreviated-hash@)"
 
 module.unit = "player"
 module.noAutoAlpha = nil
@@ -12,74 +12,32 @@ module.defaults = {
 		Side = 2,
 		Level = 1,
 		ShowSeparators = true,
-		Color = {r = 0.7, g = 1, b = 0.9},
+		Color = PowerBarColor["CHI"],
 		RingVisibility = 2, -- always fade out when out of combat, regardless of ring status
+		ShowTextHuge = false
 	}
 }
 module.options = {
 	{name = "Flash", text = "FLASH", tooltip = "FLASH"},
+	{name = "ShowTextHuge", text = "SHOWTEXTHUGE", tooltip = "SHOWTEXTHUGE"}, -- fka "combo points"
 	attach = true,
 	hasseparators = true,
 }
 module.localized = true
 
+module.class = "MONK"
+module.specs = { SPEC_MONK_WINDWALKER } -- array of SPEC_... constants; nil if this ring is available for all specs
+module.powerType = Enum.PowerType.Chi
+module.powerTypeString = "CHI"
+module.flashAt = nil
+
 function module:Initialize()
-	-- Setup the frame we need
-	self.f = self:CreateRing(true, ArcHUDFrame)
-	self.f:SetAlpha(0)
-	
-	self:CreateStandardModuleOptions(55)
-end
+	self.InitializePowerRing = ArcHUD.templatePowerRing.InitializePowerRing
+	self.OnModuleUpdate = ArcHUD.templatePowerRing.OnModuleUpdate
+	self.OnModuleEnable = ArcHUD.templatePowerRing.OnModuleEnable
+	self.UpdatePowerRing = ArcHUD.templatePowerRing.UpdatePowerRing
+	self.UpdatePower = ArcHUD.templatePowerRing.UpdatePower
+	self.UpdateActive = ArcHUD.templatePowerRing.UpdateActive
 
-function module:OnModuleUpdate()
-	self:UpdateColor()
-end
-
-function module:OnModuleEnable()
-	local _, class = UnitClass("player")
-	if (class ~= "MONK") then return end
-	
-	self.f.dirty = true
-	self.f.fadeIn = 0.25
-
-	self:UpdateColor()
-
-	-- Register the events we will use
-	self:RegisterEvent("PLAYER_ENTERING_WORLD",	"UpdatePower")
-	self:RegisterUnitEvent("UNIT_POWER_FREQUENT", "UpdatePower")
-	self:RegisterUnitEvent("UNIT_DISPLAYPOWER", "UpdatePower")
-
-	-- Activate ring timers
-	self:StartRingTimers()
-	
-	self:UpdateChi()
-
-	self.f:Show()
-end
-
-function module:UpdateChi()
-	local maxChi = UnitPowerMax(self.unit, SPELL_POWER_CHI)
-	local num = UnitPower(self.unit, SPELL_POWER_CHI)
-	self.f:SetMax(maxChi)
-	self.f:SetValue(num)
-	
-	if(num < maxChi and num >= 0) then
-		self.f:StopPulse()
-	else
-		if(self.db.profile.Flash) then
-			self.f:StartPulse()
-		else
-			self.f:StopPulse()
-		end
-	end
-end
-
-function module:UpdatePower(event, arg1, arg2)
-	if (event == "UNIT_POWER_FREQUENT") then
-		if (arg1 == self.unit and (arg2 == "CHI" or arg2 == "CHI")) then
-			self:UpdateChi()
-		end
-	else
-		self:UpdateChi()
-	end
+	self:InitializePowerRing()
 end
