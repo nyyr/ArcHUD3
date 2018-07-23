@@ -1035,8 +1035,10 @@ function ArcHUD:CombatStatus(event, arg1, arg2)
 			self.PlayerIsRegenOn = false
 		end
 	elseif(event == "PLAYER_LEAVE_COMBAT" or event == "PLAYER_REGEN_ENABLED") then
-		self.PlayerIsInCombat = false
-		if(event == "PLAYER_REGEN_ENABLED") then
+		if(event == "PLAYER_LEAVE_COMBAT" and self.PlayerIsRegenOn) then
+			self.PlayerIsInCombat = false
+		elseif(event == "PLAYER_REGEN_ENABLED") then
+			self.PlayerIsInCombat = false
 			self.PlayerIsRegenOn = true
 		end
 	elseif(event == "PET_ATTACK_START") then
