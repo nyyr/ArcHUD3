@@ -48,6 +48,11 @@ So use it at your own risk ;)
 * On [WowAce](https://www.wowace.com/projects/archud3)
 * On [CurseForge](https://www.curseforge.com/wow/addons/archud3)
 
+## Frequently Asked Questions
+
+* How do I add [a arc for a specific buff/debuff (remaining time & stacks)](https://github.com/nyyr/ArcHUD3/issues/36)?
+* Where is my [Combo Point/Soul Shard Numeric Indicator](https://github.com/nyyr/ArcHUD3/issues/35)?
+
 ## Developer Notes
 
 * [Change log](Docs/changelog.md)
