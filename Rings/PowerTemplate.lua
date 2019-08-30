@@ -139,7 +139,9 @@ function module:UpdateActive(event, arg1)
 		if isActive then
 			-- Register the events we will use
 			self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdatePower")
-			self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", "UpdateActive")
+			if (not ArcHUD.classic) then
+				self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", "UpdateActive")
+			end
 			self:RegisterUnitEvent("UNIT_POWER_FREQUENT", "UpdatePower", self.unit)
 			self:RegisterUnitEvent("UNIT_DISPLAYPOWER", "UpdatePower", self.unit)
 

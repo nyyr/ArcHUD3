@@ -1,4 +1,4 @@
-## Interface: 80200
+## Interface: 11302
 ## Title: ArcHUD3
 ## Notes: Smooth combat HUD based on ArcHUD2
 ## Author: nyyr, Nenie

@@ -15,17 +15,26 @@ module.defaults = {
 		ColorFoe = {r = 1, g = 0, b = 0},
 		Side = 1,
 		Level = 2,
-		IndicateInterruptible = true,
+		IndicateInterruptible = not ArcHUD.classic,
 		ColorInterruptible = {r = 1, g = 1, b = 0},
 	}
 }
-module.options = {
-	{name = "ShowSpell", text = "SHOWSPELL", tooltip = "SHOWSPELL"},
-	{name = "ShowTime", text = "SHOWTIME", tooltip = "SHOWTIME"},
-	{name = "IndicateInterruptible", text = "INDINTERRUPT", tooltip = "INDINTERRUPT"},
-	hasfriendfoe = true,
-	attach = true,
-}
+if (ArcHUD.classic) then
+	module.options = {
+		{name = "ShowSpell", text = "SHOWSPELL", tooltip = "SHOWSPELL"},
+		{name = "ShowTime", text = "SHOWTIME", tooltip = "SHOWTIME"},
+		hasfriendfoe = true,
+		attach = true,
+	}
+else
+	module.options = {
+		{name = "ShowSpell", text = "SHOWSPELL", tooltip = "SHOWSPELL"},
+		{name = "ShowTime", text = "SHOWTIME", tooltip = "SHOWTIME"},
+		{name = "IndicateInterruptible", text = "INDINTERRUPT", tooltip = "INDINTERRUPT"},
+		hasfriendfoe = true,
+		attach = true,
+	}
+end
 module.localized = true
 
 function module:Initialize()
@@ -109,8 +118,10 @@ function module:OnModuleEnable()
 	self:RegisterUnitEvent("UNIT_SPELLCAST_DELAYED")
 	self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START")
 	self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_UPDATE")
-	self:RegisterUnitEvent("UNIT_SPELLCAST_INTERRUPTIBLE")
-	self:RegisterUnitEvent("UNIT_SPELLCAST_NOT_INTERRUPTIBLE")
+	if (not ArcHUD.classic) then
+		self:RegisterUnitEvent("UNIT_SPELLCAST_INTERRUPTIBLE")
+		self:RegisterUnitEvent("UNIT_SPELLCAST_NOT_INTERRUPTIBLE")
+	end
 
 	self:RegisterUnitEvent("UNIT_SPELLCAST_STOP", 			"SpellcastStop")
 	self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_STOP", 	"SpellcastChannelStop")

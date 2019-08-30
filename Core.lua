@@ -9,8 +9,9 @@ ArcHUD = LibStub("AceAddon-3.0"):NewAddon("ArcHUD",
 
 -- Version
 ArcHUD.version = "@project-version@ (@project-abbreviated-hash@)"
-ArcHUD.codename = "Bad Girl"
+ArcHUD.codename = "Flashback"
 ArcHUD.authors = "nyyr, Nenie"
+ArcHUD.classic = true
 
 -- Locale object
 local L = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Core")
@@ -205,7 +206,9 @@ function ArcHUD:OnEnable()
 	self.PlayerIsRegenOn = true
 	self.PetIsInCombat = false
 
+	self:LevelDebug(d_warn, "OnProfileChanged() A")
 	self:OnProfileChanged()
+	self:LevelDebug(d_warn, "OnProfileChanged() B")
 
 	self.Enabled = true
 	
@@ -268,6 +271,7 @@ function ArcHUD:OnProfileChanged(db, profile)
 	self.updating = true
 
 	self:UnregisterAll()
+	self:LevelDebug(d_notice, "OnProfileChanged()")
 	
 	if(self.db.profile.BlizzPlayer and self.BlizzPlayerHidden or not self.db.profile.BlizzPlayer and not self.BlizzPlayerHidden) then
 		self:HideBlizzardPlayer(self.db.profile.BlizzPlayer)
@@ -279,15 +283,17 @@ function ArcHUD:OnProfileChanged(db, profile)
 		self:HideBlizzardFocus(self.db.profile.BlizzFocus)
 	end
 	
-	SpellActivationOverlayFrame:SetScale(self.db.profile.BlizzSpellActScale)
-	if self.db.profile.BlizzSpellActCenter then
-		SpellActivationOverlayFrame:ClearAllPoints()
-		SpellActivationOverlayFrame:SetPoint("CENTER", ArcHUDFrame, "CENTER", 0, -87)
-	else
-		SpellActivationOverlayFrame:ClearAllPoints()
-		SpellActivationOverlayFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+	if (SpellActivationOverlayFrame) then
+		SpellActivationOverlayFrame:SetScale(self.db.profile.BlizzSpellActScale)
+		if self.db.profile.BlizzSpellActCenter then
+			SpellActivationOverlayFrame:ClearAllPoints()
+			SpellActivationOverlayFrame:SetPoint("CENTER", ArcHUDFrame, "CENTER", 0, -87)
+		else
+			SpellActivationOverlayFrame:ClearAllPoints()
+			SpellActivationOverlayFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+		end
+		self:HookBlizzardSpellActivation((self.db.profile.BlizzSpellActOpacity < 1.0))
 	end
-	self:HookBlizzardSpellActivation((self.db.profile.BlizzSpellActOpacity < 1.0))
 	
 	if (self.db.profile.PlayerFrame) then
 		self.Nameplates.player:Show()
@@ -313,7 +319,9 @@ function ArcHUD:OnProfileChanged(db, profile)
 			end
 		end
 		self:RegisterEvent("PLAYER_TARGET_CHANGED",	  "TargetUpdate")
-		self:RegisterEvent("PLAYER_FOCUS_CHANGED", 	  "TargetUpdate")
+		if (not ArcHUD.classic) then
+			self:RegisterEvent("PLAYER_FOCUS_CHANGED", 	  "TargetUpdate")
+		end
 
 		-- Show target frame if we have a target
 		if(UnitExists("target")) then
@@ -354,7 +362,9 @@ function ArcHUD:OnProfileChanged(db, profile)
 		self:UnregisterEvent("UNIT_DISPLAYPOWER", 		"EventHandler")
 		self:UnregisterEvent("UNIT_AURA", 				"TargetAuras")
 		self:UnregisterEvent("PLAYER_TARGET_CHANGED",	"TargetUpdate")
-		self:UnregisterEvent("PLAYER_FOCUS_CHANGED", 	"TargetUpdate")
+		if (not ArcHUD.classic) then
+			self:UnregisterEvent("PLAYER_FOCUS_CHANGED", 	"TargetUpdate")
+		end
 	end
 
 	self:LevelDebug(d_notice, "Positioning ring anchors. Width: "..self.db.profile.Width)
@@ -392,6 +402,8 @@ function ArcHUD:OnProfileChanged(db, profile)
 	self:SendMessage("ARCHUD_MODULE_UPDATE")
 	
 	self.updating = false
+
+	self:LevelDebug(d_notice, "OnProfileChanged() done")
 end
 
 ----------------------------------------------
@@ -409,7 +421,9 @@ function ArcHUD:UnregisterAll()
 	self:UnregisterEvent("UNIT_AURA")
 	self:UnregisterEvent("UNIT_FACTION") 
 	self:UnregisterEvent("PLAYER_TARGET_CHANGED") 
-	self:UnregisterEvent("PLAYER_FOCUS_CHANGED") 
+	if (not ArcHUD.classic) then
+		self:UnregisterEvent("PLAYER_FOCUS_CHANGED") 
+	end
 
 	self:LevelDebug(d_notice, "Disabling timers")
 	self:StopTimer("UpdateTargetTarget")

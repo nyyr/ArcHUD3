@@ -17,8 +17,8 @@ module.defaults = {
 		ShowTextMax = true,
 		ShowPerc = true,
 		ShowDef = false,
-		ShowIncoming = true,
-		ShowAbsorbs = true,
+		ShowIncoming = not ArcHUD.classic,
+		ShowAbsorbs = not ArcHUD.classic,
 		SwapHealthPowerText = false,
 		ColorMode = "fade",
 		Color = {r = 0, g = 1, b = 0},
@@ -27,20 +27,35 @@ module.defaults = {
 		Level = 0,
 	}
 }
-module.options = {
-	{name = "ShowText", text = "SHOWTEXT", tooltip = "SHOWTEXT"},
-	{name = "ShowTextMax", text = "SHOWTEXTMAX", tooltip = "SHOWTEXTMAX"},
-	{name = "ShowPerc", text = "SHOWPERC", tooltip = "SHOWPERC"},
-	{name = "ShowDef", text = "DEFICIT", tooltip = "DEFICIT"},
-	{name = "ShowIncoming", text = "INCOMINGHEALS", tooltip = "INCOMINGHEALS"},
-	{name = "ShowAbsorbs", text = "SHOWABSORBS", tooltip = "SHOWABSORBS"},
-	{name = "SwapHealthPowerText", text = "SWAPHEALTHPOWERTEXT", tooltip = "SWAPHEALTHPOWERTEXT"},
-	hascolorfade = true,
-	attach = true,
-	customcolors = {
-		{name = "ColorAbsorbs", text = "COLORABSORBS"},
+if (ArcHUD.classic) then
+	module.options = {
+		{name = "ShowText", text = "SHOWTEXT", tooltip = "SHOWTEXT"},
+		{name = "ShowTextMax", text = "SHOWTEXTMAX", tooltip = "SHOWTEXTMAX"},
+		{name = "ShowPerc", text = "SHOWPERC", tooltip = "SHOWPERC"},
+		{name = "ShowDef", text = "DEFICIT", tooltip = "DEFICIT"},
+		{name = "SwapHealthPowerText", text = "SWAPHEALTHPOWERTEXT", tooltip = "SWAPHEALTHPOWERTEXT"},
+		hascolorfade = true,
+		attach = true,
+		customcolors = {
+			{name = "ColorAbsorbs", text = "COLORABSORBS"},
+		}
 	}
-}
+else
+	module.options = {
+		{name = "ShowText", text = "SHOWTEXT", tooltip = "SHOWTEXT"},
+		{name = "ShowTextMax", text = "SHOWTEXTMAX", tooltip = "SHOWTEXTMAX"},
+		{name = "ShowPerc", text = "SHOWPERC", tooltip = "SHOWPERC"},
+		{name = "ShowDef", text = "DEFICIT", tooltip = "DEFICIT"},
+		{name = "ShowIncoming", text = "INCOMINGHEALS", tooltip = "INCOMINGHEALS"},
+		{name = "ShowAbsorbs", text = "SHOWABSORBS", tooltip = "SHOWABSORBS"},
+		{name = "SwapHealthPowerText", text = "SWAPHEALTHPOWERTEXT", tooltip = "SWAPHEALTHPOWERTEXT"},
+		hascolorfade = true,
+		attach = true,
+		customcolors = {
+			{name = "ColorAbsorbs", text = "COLORABSORBS"},
+		}
+	}
+end
 
 module.localized = true
 
@@ -162,8 +177,10 @@ function module:OnModuleEnable()
 	-- Register the events we will use
 	self:RegisterUnitEvent("UNIT_HEALTH", "UpdateHealth")
 	self:RegisterUnitEvent("UNIT_MAXHEALTH", "UpdateHealth")
-	self:RegisterUnitEvent("UNIT_HEAL_PREDICTION", "UpdateHealthPrediction")
-	self:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", "UpdateAbsorbs")
+	if (not ArcHUD.classic) then
+		self:RegisterUnitEvent("UNIT_HEAL_PREDICTION", "UpdateHealthPrediction")
+		self:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", "UpdateAbsorbs")
+	end
 	self:RegisterEvent("PLAYER_LEVEL_UP")
 
 	-- Activate ring timers
@@ -226,9 +243,11 @@ function module:UpdateHealth(event, arg1)
 
 			self.f:SetMax(maxHealth)
 			
-			local totalAbsorbs = UnitGetTotalAbsorbs(self.unit)
-			if totalAbsorbs > 0 then
-				self.frames[2]:SetMax(maxHealth - health)
+			if (not ArcHUD.classic) then
+				local totalAbsorbs = UnitGetTotalAbsorbs(self.unit)
+				if totalAbsorbs > 0 then
+					self.frames[2]:SetMax(maxHealth - health)
+				end
 			end
 			
 			self.f:SetValue(health)

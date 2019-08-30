@@ -18,13 +18,22 @@ module.defaults = {
 		Attach = true, -- if false, do not attach to default anchors, attach to UF instead
 	}
 }
-module.options = {
-	{name = "ShowPerc", text = "SHOWPERC", tooltip = "SHOWPERC"},
-	{name = "ShowIncoming", text = "INCOMINGHEALS", tooltip = "INCOMINGHEALS"},
-	--{name = "Attach", text = "ATTACHRING", tooltip = "ATTACHRING"},
-	hasfriendfoe = true,
-	attach = true,
-}
+if (ArcHUD.classic) then
+	module.options = {
+		{name = "ShowPerc", text = "SHOWPERC", tooltip = "SHOWPERC"},
+		--{name = "Attach", text = "ATTACHRING", tooltip = "ATTACHRING"},
+		hasfriendfoe = true,
+		attach = true,
+	}
+else
+	module.options = {
+		{name = "ShowPerc", text = "SHOWPERC", tooltip = "SHOWPERC"},
+		{name = "ShowIncoming", text = "INCOMINGHEALS", tooltip = "INCOMINGHEALS"},
+		--{name = "Attach", text = "ATTACHRING", tooltip = "ATTACHRING"},
+		hasfriendfoe = true,
+		attach = true,
+	}
+end
 module.localized = true
 
 function module:Initialize()
@@ -114,7 +123,9 @@ function module:OnModuleEnable()
 	-- Register the events we will use
 	self:RegisterUnitEvent("UNIT_HEALTH", "UpdateHealth")
 	self:RegisterUnitEvent("UNIT_MAXHEALTH", "UpdateHealth")
-	self:RegisterUnitEvent("UNIT_HEAL_PREDICTION")
+	if (not ArcHUD.classic) then
+		self:RegisterUnitEvent("UNIT_HEAL_PREDICTION")
+	end
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
 
 	-- Activate ring timers

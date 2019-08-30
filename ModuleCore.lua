@@ -811,7 +811,9 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 			self.optionsTable.args.colorRage = colorOption(self, "COLORRAGE", "ColorRage")
 			self.optionsTable.args.colorFocus = colorOption(self, "COLORFOCUS", "ColorFocus")
 			self.optionsTable.args.colorEnergy = colorOption(self, "COLORENERGY", "ColorEnergy")
-			self.optionsTable.args.colorRunic = colorOption(self, "COLORRUNIC", "ColorRunic")
+			if (not ArcHUD.classic) then
+				self.optionsTable.args.colorRunic = colorOption(self, "COLORRUNIC", "ColorRunic")
+			end
 		
 		elseif (self.options.hasfriendfoe) then
 		
