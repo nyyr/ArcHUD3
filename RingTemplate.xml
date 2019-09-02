@@ -8,12 +8,12 @@
 	
 	<Layers>
 		<Layer level="ARTWORK">
-			<Texture name="$parentQ1"     parentKey="ringQuadrant1" file="Interface\Addons\ArcHUD3\Icons\Ring.tga"></Texture>
-			<Texture name="$parentQ2"     parentKey="ringQuadrant2" file="Interface\Addons\ArcHUD3\Icons\Ring.tga"></Texture>
-			<Texture name="$parentChip1"  parentKey="chip1"         file="Interface\Addons\ArcHUD3\Icons\Ring.tga"></Texture>
-			<Texture name="$parentChip2"  parentKey="chip2"         file="Interface\Addons\ArcHUD3\Icons\Ring.tga"></Texture>
-			<Texture name="$parentSlice1" parentKey="slice1"        file="Interface\Addons\ArcHUD3\Icons\Slice.tga"></Texture>
-			<Texture name="$parentSlice2" parentKey="slice2"        file="Interface\Addons\ArcHUD3\Icons\Slice.tga"></Texture>
+			<Texture name="$parentQ1"     parentKey="ringQuadrant1" file="Interface\Addons\ArcHUD3-classic\Icons\Ring.tga"></Texture>
+			<Texture name="$parentQ2"     parentKey="ringQuadrant2" file="Interface\Addons\ArcHUD3-classic\Icons\Ring.tga"></Texture>
+			<Texture name="$parentChip1"  parentKey="chip1"         file="Interface\Addons\ArcHUD3-classic\Icons\Ring.tga"></Texture>
+			<Texture name="$parentChip2"  parentKey="chip2"         file="Interface\Addons\ArcHUD3-classic\Icons\Ring.tga"></Texture>
+			<Texture name="$parentSlice1" parentKey="slice1"        file="Interface\Addons\ArcHUD3-classic\Icons\Slice.tga"></Texture>
+			<Texture name="$parentSlice2" parentKey="slice2"        file="Interface\Addons\ArcHUD3-classic\Icons\Slice.tga"></Texture>
 		</Layer>
 		<Layer level="OVERLAY">
 			<Texture name="$parentSpark"    parentKey="spark"    file="Interface\CastingBar\UI-CastingBar-Spark" alphaMode="ADD" hidden="true"></Texture>
@@ -31,12 +31,12 @@
 			
 			<Layers>
 				<Layer level="BACKGROUND">
-					<Texture name="$parentQ1"     parentKey="ringQuadrant1" file="Interface\Addons\ArcHUD3\Icons\RingBG.tga"></Texture>
-					<Texture name="$parentQ2"     parentKey="ringQuadrant2" file="Interface\Addons\ArcHUD3\Icons\RingBG.tga"></Texture>
-					<Texture name="$parentChip1"  parentKey="chip1"         file="Interface\Addons\ArcHUD3\Icons\RingBG.tga"></Texture>
-					<Texture name="$parentChip2"  parentKey="chip2"         file="Interface\Addons\ArcHUD3\Icons\RingBG.tga"></Texture>
-					<Texture name="$parentSlice1" parentKey="slice1"        file="Interface\Addons\ArcHUD3\Icons\Slice.tga"></Texture>
-					<Texture name="$parentSlice2" parentKey="slice2"        file="Interface\Addons\ArcHUD3\Icons\Slice.tga"></Texture>
+					<Texture name="$parentQ1"     parentKey="ringQuadrant1" file="Interface\Addons\ArcHUD3-classic\Icons\RingBG.tga"></Texture>
+					<Texture name="$parentQ2"     parentKey="ringQuadrant2" file="Interface\Addons\ArcHUD3-classic\Icons\RingBG.tga"></Texture>
+					<Texture name="$parentChip1"  parentKey="chip1"         file="Interface\Addons\ArcHUD3-classic\Icons\RingBG.tga"></Texture>
+					<Texture name="$parentChip2"  parentKey="chip2"         file="Interface\Addons\ArcHUD3-classic\Icons\RingBG.tga"></Texture>
+					<Texture name="$parentSlice1" parentKey="slice1"        file="Interface\Addons\ArcHUD3-classic\Icons\Slice.tga"></Texture>
+					<Texture name="$parentSlice2" parentKey="slice2"        file="Interface\Addons\ArcHUD3-classic\Icons\Slice.tga"></Texture>
 				</Layer>
 			</Layers>
 
