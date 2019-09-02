@@ -117,18 +117,28 @@ function module:OnModuleEnable()
 	self.f.dirty = true
 
 	-- Register the events we will use
-	self:RegisterUnitEvent("UNIT_SPELLCAST_START")
-	self:RegisterUnitEvent("UNIT_SPELLCAST_DELAYED")
-	self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START")
-	self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_UPDATE")
-	if (not ArcHUD.classic) then
+	if not ArcHUD.classic then
+		self:RegisterUnitEvent("UNIT_SPELLCAST_START")
+		self:RegisterUnitEvent("UNIT_SPELLCAST_DELAYED")
+		self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START")
+		self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_UPDATE")
 		self:RegisterUnitEvent("UNIT_SPELLCAST_INTERRUPTIBLE")
 		self:RegisterUnitEvent("UNIT_SPELLCAST_NOT_INTERRUPTIBLE")
+		self:RegisterUnitEvent("UNIT_SPELLCAST_STOP")
+		self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_STOP")
+	else
+		local LibCCCallback = function (event, ...)
+			return module[event](self, event, ...)
+		end
+		ArcHUD.LibClassicCasterino.RegisterCallback(self, "UNIT_SPELLCAST_START", LibCCCallback)
+		ArcHUD.LibClassicCasterino.RegisterCallback(self, "UNIT_SPELLCAST_DELAYED", LibCCCallback) -- only for player
+		ArcHUD.LibClassicCasterino.RegisterCallback(self, "UNIT_SPELLCAST_CHANNEL_START", LibCCCallback)
+		ArcHUD.LibClassicCasterino.RegisterCallback(self, "UNIT_SPELLCAST_CHANNEL_UPDATE", LibCCCallback) -- only for player
+		ArcHUD.LibClassicCasterino.RegisterCallback(self, "UNIT_SPELLCAST_STOP", LibCCCallback)
+		ArcHUD.LibClassicCasterino.RegisterCallback(self, "UNIT_SPELLCAST_CHANNEL_STOP", LibCCCallback)
+		--ArcHUD.LibClassicCasterino.RegisterCallback(self.f, "UNIT_SPELLCAST_FAILED", LibCCCallback)
+		--ArcHUD.LibClassicCasterino.RegisterCallback(self.f, "UNIT_SPELLCAST_INTERRUPTED", LibCCCallback)
 	end
-
-	self:RegisterUnitEvent("UNIT_SPELLCAST_STOP", 			"SpellcastStop")
-	self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_STOP", 	"SpellcastChannelStop")
-
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
 
 	-- Add update hook
@@ -138,6 +148,19 @@ function module:OnModuleEnable()
 	self:StartRingTimers()
 
 	self.f:Show()
+end
+
+function module:OnModuleDisable()
+	if ArcHUD.classic then
+		ArcHUD.LibClassicCasterino.UnregisterCallback(self, "UNIT_SPELLCAST_START")
+		ArcHUD.LibClassicCasterino.UnregisterCallback(self, "UNIT_SPELLCAST_DELAYED")
+		ArcHUD.LibClassicCasterino.UnregisterCallback(self, "UNIT_SPELLCAST_CHANNEL_START")
+		ArcHUD.LibClassicCasterino.UnregisterCallback(self, "UNIT_SPELLCAST_CHANNEL_UPDATE")
+		ArcHUD.LibClassicCasterino.UnregisterCallback(self, "UNIT_SPELLCAST_STOP")
+		ArcHUD.LibClassicCasterino.UnregisterCallback(self, "UNIT_SPELLCAST_CHANNEL_STOP")
+		--ArcHUD.LibClassicCasterino:UnregisterCallback(self.f, "UNIT_SPELLCAST_FAILED")
+		--ArcHUD.LibClassicCasterino:UnregisterCallback(self.f, "UNIT_SPELLCAST_INTERRUPTED")
+	end
 end
 
 function module:PLAYER_TARGET_CHANGED()
@@ -157,6 +180,7 @@ function module:UNIT_SPELLCAST_START(event, arg1)
 	if (arg1 == self.unit) then
 		--self:Debug(3, "TargetCasting:UNIT_SPELLCAST_START("..tostring(arg1)..")")
 		local spell, displayName, icon, startTime, endTime, _, _, notInterruptible = UnitCastingInfo(self.unit)
+		--self:Debug(3, "TargetCasting:UNIT_SPELLCAST_START("..tostring(arg1).."): "..tostring(spell)..", "..tostring(startTime)..", "..tostring(endTime - startTime))
 		if (spell) then 
 			if(UnitIsFriend("player", self.unit)) then
 				self:UpdateColor(1)
@@ -269,6 +293,14 @@ function module:UNIT_SPELLCAST_NOT_INTERRUPTIBLE(event, arg1)
 		self.Text:SetTextColor(1, 0, 0)
 		self.Time:SetTextColor(1, 0, 0)
 	end
+end
+
+function module:UNIT_SPELLCAST_STOP(event, arg1)
+	self:SpellcastStop(event, arg1, false)
+end
+
+function module:UNIT_SPELLCAST_CHANNEL_STOP(event, arg1)
+	self:SpellcastChannelStop(event, arg1, false)
 end
 
 function module:SpellcastStop(event, arg1, force)

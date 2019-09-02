@@ -214,7 +214,7 @@ function ArcHUD:OnEnable()
 	self:RegisterEvent("PLAYER_UPDATE_RESTING")
 
 	if ArcHUD.classic then
-		self:RegisterUnitEvent("UNIT_HAPPINESS", "UpdatePetNamePlate")
+		self:RegisterEvent("UNIT_HAPPINESS", "UpdatePetNamePlate")
 	end
 
 	self:RegisterMessage("ARCHUD_FRAME_MOVED", 	"CheckFrames")
@@ -272,6 +272,10 @@ function ArcHUD:OnDisable()
 
 	self:UnregisterEvent("PLAYER_FLAGS_CHANGED")
 	self:UnregisterEvent("PLAYER_UPDATE_RESTING")
+
+	if ArcHUD.classic then
+		self:UnregisterEvent("UNIT_HAPPINESS")
+	end
 
 	self:UnregisterMessage("ARCHUD_FRAME_MOVED")
 	

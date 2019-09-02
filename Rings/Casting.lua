@@ -137,6 +137,7 @@ end
 function module:UNIT_SPELLCAST_START(event, arg1)
 	if (arg1 == self.unit) then
 		local spell, displayName, icon, startTime, endTime = UnitCastingInfo(self.unit)
+		--self:Debug(3, "Casting:UNIT_SPELLCAST_START("..tostring(arg1).."): "..tostring(spell)..", "..tostring(startTime)..", "..tostring(endTime - startTime))
 		if (spell) then
 			self.f:UpdateColor({["r"] = 1.0, ["g"] = 0.7, ["b"] = 0})
 			self.Text:SetText(displayName)
