@@ -12,7 +12,4 @@
 <Include file="Libs\AceEvent-3.0\AceEvent-3.0.xml" />
 <Include file="Libs\AceTimer-3.0\AceTimer-3.0.xml" />
 
-<!-- classic-only -->
-<Script file="Libs\LibClassicCasterino\LibClassicCasterino.lua"/>
-
 </Ui>

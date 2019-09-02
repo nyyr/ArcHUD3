@@ -13,7 +13,7 @@ ArcHUD.codename = "Flashback"
 ArcHUD.authors = "nyyr, Nenie"
 
 -- Classic specifics
-ArcHUD.classic = true
+ArcHUD.classic = false
 ArcHUD.UnitCastingInfo = UnitCastingInfo
 ArcHUD.UnitChannelInfo = UnitChannelInfo
 
