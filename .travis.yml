@@ -11,3 +11,4 @@ script: curl -s https://raw.githubusercontent.com/BigWigsMods/packager/master/re
 branches:
   only:
   - /^(v|t)?\d+\.\d+(\.\d+)?(\.\d+)?(-\S*)?$/
+  - /^classic-(v|t)?\d+\.\d+(\.\d+)?(\.\d+)?(-\S*)?$/
