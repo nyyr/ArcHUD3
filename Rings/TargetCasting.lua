@@ -1,6 +1,6 @@
 local moduleName = "TargetCasting"
 local module = ArcHUD:NewModule(moduleName)
-module.version = "2.1 (@file-abbreviated-hash@)"
+module.version = "2.2 (@file-abbreviated-hash@)"
 
 module.unit = "target"
 module.noAutoAlpha = true
@@ -36,6 +36,9 @@ else
 	}
 end
 module.localized = true
+
+local UnitCastingInfo = ArcHUD.UnitCastingInfo
+local UnitChannelInfo = ArcHUD.UnitChannelInfo
 
 function module:Initialize()
 	-- Setup the frame we need

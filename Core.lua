@@ -11,7 +11,21 @@ ArcHUD = LibStub("AceAddon-3.0"):NewAddon("ArcHUD",
 ArcHUD.version = "@project-version@ (@project-abbreviated-hash@)"
 ArcHUD.codename = "Flashback"
 ArcHUD.authors = "nyyr, Nenie"
+
+-- Classic specifics
 ArcHUD.classic = true
+ArcHUD.UnitCastingInfo = UnitCastingInfo
+ArcHUD.UnitChannelInfo = UnitChannelInfo
+
+if ArcHUD.classic then
+	ArcHUD.LibClassicCasterino = LibStub("LibClassicCasterino", true)
+	ArcHUD.UnitCastingInfo = function(unit)
+        return ArcHUD.LibClassicCasterino:UnitCastingInfo(unit)
+    end
+    ArcHUD.UnitChannelInfo = function(unit)
+        return ArcHUD.LibClassicCasterino:UnitChannelInfo(unit)
+    end
+end
 
 -- Locale object
 local L = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Core")
@@ -198,6 +212,10 @@ function ArcHUD:OnEnable()
 
 	self:RegisterEvent("PLAYER_FLAGS_CHANGED")
 	self:RegisterEvent("PLAYER_UPDATE_RESTING")
+
+	if ArcHUD.classic then
+		self:RegisterUnitEvent("UNIT_HAPPINESS", "UpdatePetNamePlate")
+	end
 
 	self:RegisterMessage("ARCHUD_FRAME_MOVED", 	"CheckFrames")
 
@@ -839,11 +857,32 @@ function ArcHUD:UpdatePetNamePlate()
 	if(UnitExists("pet")) then
 		local color = "00ff00"
 		local alpha = self.db.profile.FadeFull
+		local happiness = ""
+		if ArcHUD.classic then
+			happiness, _, _ = GetPetHappiness()
+			if(happiness) then
+				if(happiness == 1) then
+					color = "ff0000"
+					happiness = "  :("
+					alpha = self.db.profile.FadeIC
+				elseif(happiness == 2) then
+					color = "ffff00"
+					happiness = "  :||"
+					alpha = self.db.profile.FadeOOC
+				elseif(happiness == 3) then
+					color = "00ff00"
+					happiness = "  :)"
+					alpha = self.db.profile.FadeFull
+				end
+			else
+				happiness = ""
+			end
+		end
 		self.Nameplates.pet.alpha = alpha
 		if ((not self.Nameplates.pet.state)) then
 			ArcHUDRingTemplate.SetRingAlpha(self.Nameplates.pet, alpha)
 		end
-		self.Nameplates.pet.Text:SetText("|cff"..color..UnitName("pet").."|r")
+		self.Nameplates.pet.Text:SetText("|cff"..color..UnitName("pet")..happiness.."|r")
 		self.Nameplates.pet.disabled = false
 	else
 		self.Nameplates.pet:Disable()

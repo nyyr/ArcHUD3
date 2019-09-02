@@ -1,6 +1,6 @@
 local moduleName = "Casting"
 local module = ArcHUD:NewModule(moduleName)
-module.version = "2.1 (@file-abbreviated-hash@)"
+module.version = "2.2 (@file-abbreviated-hash@)"
 
 module.unit = "player"
 module.noAutoAlpha = true
@@ -32,6 +32,9 @@ module.disableEvents = {
 														"UNIT_SPELLCAST_CHANNEL_START", "UNIT_SPELLCAST_CHANNEL_UPDATE",
 														"UNIT_SPELLCAST_CHANNEL_STOP", "PLAYER_ENTERING_WORLD"}},
 }
+
+local UnitCastingInfo = ArcHUD.UnitCastingInfo
+local UnitChannelInfo = ArcHUD.UnitChannelInfo
 
 function module:Initialize()
 	-- Setup the frame we need
