@@ -12,7 +12,9 @@ function ArcHUD:HideBlizzardPlayer(show)
 		PetFrame:UnregisterAllEvents()
 		PetFrame:Hide()
 		
-		RuneFrame:Hide()
+		if not ArcHUD.classic then
+			RuneFrame:Hide()
+		end
 	else
 		PlayerFrame:RegisterAllEvents()
 		PlayerFrame:Show()
@@ -21,9 +23,11 @@ function ArcHUD:HideBlizzardPlayer(show)
 		PetFrame:RegisterAllEvents()
 		PetFrame_Update(PetFrame, true)
 		
-		local _, class = UnitClass("player")
-		if ( class == "DEATHKNIGHT" ) then
-			RuneFrame:Show()
+		if not ArcHUD.classic then
+			local _, class = UnitClass("player")
+			if ( class == "DEATHKNIGHT" ) then
+				RuneFrame:Show()
+			end
 		end
 	end
 end
@@ -45,7 +49,7 @@ function ArcHUD:HideBlizzardTarget(show)
 		TargetFrame_Update(TargetFrame)
 		
 		ComboFrame:RegisterAllEvents()
-		ComboFrame_Update()
+		ComboFrame_Update(ComboFrame)
 	end
 end
 
