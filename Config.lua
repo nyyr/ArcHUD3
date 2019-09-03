@@ -1029,6 +1029,12 @@ function ArcHUD:InitConfig()
 	AceConfig:RegisterOptionsTable("ArcHUD", self.configOptionsTableCmd, {"archud", "ah"})
 	
 	-- Set up core config options
+	if ArcHUD.classic then
+		self.configOptionsTableCore.args.misc.args.blizzFocus = nil
+		self.configOptionsTableCore.args.misc.args.blizzSpellActCenter = nil
+		self.configOptionsTableCore.args.misc.args.blizzSpellActScale = nil
+		self.configOptionsTableCore.args.misc.args.blizzSpellActOpacity = nil
+	end
 	ArcHUD_adjustConfig(self.configOptionsTableCore)
 	AceConfig:RegisterOptionsTable("ArcHUD_Core", self.configOptionsTableCore)
 	self.configFrameCore = AceConfigDialog:AddToBlizOptions("ArcHUD_Core", "ArcHUD")
