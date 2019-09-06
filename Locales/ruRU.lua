@@ -230,6 +230,7 @@ LM["TEXT"] = {
 	SHOWTEXT	= "Показ текста",
 	SHOWTEXTMAX	= "Show maximum",
 	SHOWPERC	= "Показ проценты",
+	SHOWTEXTHUGE = "Show huge text",
 	FLASH		= "Вспышка при макс приемов в серии",
 	FLASH_HP	= "Flash when 3 Holy Power are gained",
 	SHOWSPELL	= "Показ применение заклинания",
@@ -262,6 +263,7 @@ LM["TEXT"] = {
 	COLORFOCUS 	= "Цвет фокуса",
 	COLORENERGY	= "Цвет энергии",
 	COLORRUNIC	= "Цвет руническо энергии",
+	COLORABSORBS = "Color for active absorbs",
 
 	-- deprecated: COLORLUNAR	= "Lunar power color",
 	-- deprecated: COLORSOLAR	= "Solar power color",
