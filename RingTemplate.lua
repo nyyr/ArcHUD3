@@ -972,7 +972,7 @@ function ArcHUDRingTemplate:RefreshSeparators()
 			for i=1,(self.maxValue-1) do
 				if (not self.sep[i]) then
 					self.sep[i] = self:CreateTexture(nil, "OVERLAY")
-					self.sep[i]:SetTexture("Interface\\Addons\\ArcHUD3\\Icons\\Separator")
+					self.sep[i]:SetTexture("Interface\\Addons\\ArcHUD3-classic\\Icons\\Separator")
 					self.sep[i]:SetVertexColor(0, 0, 0)
 				end
 				self:SetTextureAngle(self.sep[i], angle, 12, true, true)
