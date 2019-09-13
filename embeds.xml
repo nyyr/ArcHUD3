@@ -14,5 +14,6 @@
 
 <!-- classic-only -->
 <Script file="Libs\LibClassicCasterino\LibClassicCasterino.lua"/>
+<Include file="Libs\LibClassicDurations\LibClassicDurations.xml"/>
 
 </Ui>
