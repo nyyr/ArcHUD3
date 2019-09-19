@@ -72,7 +72,7 @@ function module:OnModuleEnable()
 	self.f.fadeIn = 0.25
 
 	-- If we are limited to certain specs, make sure we look for spec changes
-	if self.specs then
+	if self.specs and not ArcHUD.classic then
 		self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", "UpdateActive")
 	end
 
@@ -150,7 +150,9 @@ function module:UpdateActive(event, arg1)
 		else
 			-- Unregister the events if we are in the wrong specialization
 			self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-			self:UnregisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+			if (not ArcHUD.classic) then
+				self:UnregisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+			end
 			self:UnregisterUnitEvent("UNIT_POWER_FREQUENT")
 			self:UnregisterUnitEvent("UNIT_DISPLAYPOWER")
 
