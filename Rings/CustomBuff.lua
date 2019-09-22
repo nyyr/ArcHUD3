@@ -5,6 +5,9 @@ local AceAddon = LibStub("AceAddon-3.0")
 local AceConfigRegistry = LibStub("AceConfigRegistry-3.0")
 
 local LibClassicDurations = nil
+
+-- classic/retail differences
+local UnitAura = UnitAura	-- on retail this improves performance, on classic it prevents tainting the global
 if ArcHUD.classic then
 	LibClassicDurations = LibStub("LibClassicDurations", true)
 	LibClassicDurations:Register("ArcHUD_CustomBuffModule")
