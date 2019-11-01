@@ -217,6 +217,7 @@ LM["Stagger"]		= "武僧：醉拳"
 LM["Runes"]			= "死亡骑士：符文"
 LM["ManaShadowPriest"]	= "牧师：Mana (Shadow Priest)"
 LM["ManaBalanceDruid"]	= "德鲁伊：Mana (Balance Druid)"
+LM["ManaDruid"]	= "德鲁伊：Mana (Cat/Bear Forms)"
 LM["ManaElementalShaman"]	= "Shaman: Mana (Elemental/Enhancement Shaman)"
 LM["ArcaneCharges"]	= "Mage: Arcane Charges"
 

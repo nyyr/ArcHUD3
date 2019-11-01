@@ -221,6 +221,7 @@ LM["Stagger"]		= "Mönch: Staffelung"
 LM["Runes"]			= "Todesritter: Runen"
 LM["ManaShadowPriest"]	= "Priester: Mana (Schattenpriester)"
 LM["ManaBalanceDruid"]	= "Druide: Mana (Gleichgewichtsdruide)"
+LM["ManaDruid"]	= "Druide: Mana (Katzen-/Bärengestalt)"
 LM["ManaElementalShaman"]	= "Schamane: Mana (Elementar-/Verstärkerschamane)"
 LM["ArcaneCharges"]	= "Magier: Arkane Ladungen"
 
