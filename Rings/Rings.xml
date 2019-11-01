@@ -23,6 +23,7 @@
 <!-- Script file="SoulShards.lua" /-->
 <!-- Script file="ManaShadowPriest.lua" /-->
 <!-- Script file="ManaBalanceDruid.lua" /-->
+<Script file="ManaDruid.lua" />
 <!-- Script file="ManaElementalShaman.lua" /-->
 <!-- Script file="Chi.lua" /-->
 <!-- Script file="Runes.lua" /-->

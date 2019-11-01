@@ -216,6 +216,7 @@ LM["Stagger"]		= "Monk: Stagger"
 LM["Runes"]			= "Death Knight: Runes"
 LM["ManaShadowPriest"]	= "Priest: Mana (Shadow Priest)"
 LM["ManaBalanceDruid"]	= "Druid: Mana (Balance Druid)"
+LM["ManaDruid"]	= "Druid: Mana (Cat/Bear Forms)"
 LM["ManaElementalShaman"]	= "Shaman: Mana (Elemental/Enhancement Shaman)"
 LM["ArcaneCharges"]	= "Mage: Arcane Charges"
 

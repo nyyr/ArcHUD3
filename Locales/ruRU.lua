@@ -219,6 +219,7 @@ LM["Stagger"]		= "Монах: Пошатывание"
 LM["Runes"]			= "Рыцарь смерти: Руны"
 LM["ManaShadowPriest"]	= "Жрец: мана (для жрецов тьмы)"
 LM["ManaBalanceDruid"]	= "Друид: мана (для сов)"
+LM["ManaDruid"]	= "Друид: мана (Cat/Bear Forms)"
 LM["ManaElementalShaman"]	= "Шаман: мана (для элем\энх шаманов)"
 LM["ArcaneCharges"]	= "Маг: чародейский заряд"
 
