@@ -8,9 +8,9 @@ ArcHUD = LibStub("AceAddon-3.0"):NewAddon("ArcHUD",
 	"AceTimer-3.0")
 
 -- Version
-ArcHUD.version = "v5.0.13 (2bf8b28)"
-ArcHUD.codename = "Flashback"
-ArcHUD.authors = "nyyr, Nenie"
+ArcHUD.version = "v5.1.0"
+ArcHUD.codename = "Lightshot"
+ArcHUD.authors = "nyyr, Nenie, Keyla Darkmoore"
 
 -- Classic specifics
 ArcHUD.classic = false
