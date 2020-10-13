@@ -19,7 +19,7 @@ ArcHUD.customModules = {}
 
 local CustomBuffRingTemplate = {}
 
-CustomBuffRingTemplate.version = "1.4 (@file-abbreviated-hash@)"
+CustomBuffRingTemplate.version = "1.4 (65f7344)"
 
 CustomBuffRingTemplate.unit = "player"
 CustomBuffRingTemplate.noAutoAlpha = true

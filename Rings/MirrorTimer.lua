@@ -3,7 +3,7 @@ local LM = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Module")
 
 local moduleName = "MirrorTimer"
 local module = ArcHUD:NewModule(moduleName)
-module.version = "1.1 (@file-abbreviated-hash@)"
+module.version = "1.1 (01920a3)"
 
 module.unit = "player"
 module.noAutoAlpha = true

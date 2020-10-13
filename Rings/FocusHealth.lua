@@ -1,6 +1,6 @@
 local moduleName = "FocusHealth"
 local module = ArcHUD:NewModule(moduleName)
-module.version = "2.1 (@file-abbreviated-hash@)"
+module.version = "2.1 (01920a3)"
 
 module.unit = "focus"
 module.isHealth = true

@@ -1,7 +1,7 @@
 --[[ deprecated; leaving as example for more sophisticated rings
 
 local module = ArcHUD:NewModule("Eclipse")
-module.version = "2.0 (@file-abbreviated-hash@)"
+module.version = "2.0 (ede58a8)"
 
 module.unit = "player"
 module.noAutoAlpha = nil

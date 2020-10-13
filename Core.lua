@@ -8,7 +8,7 @@ ArcHUD = LibStub("AceAddon-3.0"):NewAddon("ArcHUD",
 	"AceTimer-3.0")
 
 -- Version
-ArcHUD.version = "@project-version@ (@project-abbreviated-hash@)"
+ArcHUD.version = "v5.0.13 (2bf8b28)"
 ArcHUD.codename = "Flashback"
 ArcHUD.authors = "nyyr, Nenie"
 

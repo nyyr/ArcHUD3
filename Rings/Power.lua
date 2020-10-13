@@ -3,7 +3,7 @@ local LM = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Module")
 
 local moduleName = "Power"
 local module = ArcHUD:NewModule(moduleName)
-module.version = "2.0 (@file-abbreviated-hash@)"
+module.version = "2.0 (243459a)"
 module.unit = "player"
 module.isPower = true
 module.defaults = {

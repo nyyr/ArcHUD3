@@ -1,6 +1,6 @@
 local moduleName = "TargetCasting"
 local module = ArcHUD:NewModule(moduleName)
-module.version = "2.2 (@file-abbreviated-hash@)"
+module.version = "2.2 (c6c2e41)"
 
 module.unit = "target"
 module.noAutoAlpha = true

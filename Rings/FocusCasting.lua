@@ -1,6 +1,6 @@
 local moduleName = "FocusCasting"
 local module = ArcHUD:NewModule(moduleName)
-module.version = "2.1 (@file-abbreviated-hash@)"
+module.version = "2.1 (8456d64)"
 
 module.unit = "focus"
 module.noAutoAlpha = true

@@ -2,7 +2,7 @@
 ArcHUD.templatePowerRing = {}
 local module = ArcHUD.templatePowerRing
 
-module.version = "5.0 (@file-abbreviated-hash@)"
+module.version = "5.0 (690aac9)"
 
 module.unit = "player"
 module.noAutoAlpha = nil

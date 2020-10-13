@@ -185,10 +185,11 @@ local function AH_CreateMoverFrame(parent, name, size, point, origpoint)
 		end
 	end
 
-	f:SetBackdrop({bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-			tile = true, tileSize = 16,
-			insets = { left = 4, right = 4, top = 4, bottom = 4 }})
-	f:SetBackdropColor(0,0,0,0.5)
+	local frame = CreateFrame("Frame", nil, UIParent, BackdropTemplateMixin and "BackdropTemplate");
+frame:SetBackdrop({bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		tile = true, tileSize = 16,
+		insets = { left = 4, right = 4, top = 4, bottom = 4 }});
+    frame:SetBackdropColor(0,0,0,0.5)
 
 	f:Hide()
 

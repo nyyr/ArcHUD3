@@ -1,5 +1,5 @@
 local module = ArcHUD:NewModule("ComboPointsDruid")
-module.version = "5.0 (@file-abbreviated-hash@)"
+module.version = "5.0 (243459a)"
 
 module.unit = "player"
 module.noAutoAlpha = nil

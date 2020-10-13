@@ -1,5 +1,5 @@
 local module = ArcHUD:NewModule("ManaDruid")
-module.version = "5.0 (@file-abbreviated-hash@)"
+module.version = "5.0 (2bf8b28)"
 
 module.unit = "player"
 module.noAutoAlpha = nil

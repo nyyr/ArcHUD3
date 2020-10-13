@@ -1,6 +1,6 @@
 local moduleName = "PetHealth"
 local module = ArcHUD:NewModule(moduleName)
-module.version = "2.0 (@file-abbreviated-hash@)"
+module.version = "2.0 (aadecab)"
 
 module.unit = "pet"
 module.isHealth = true

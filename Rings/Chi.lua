@@ -1,5 +1,5 @@
 local module = ArcHUD:NewModule("Chi")
-module.version = "5.0 (@file-abbreviated-hash@)"
+module.version = "5.0 (9492398)"
 
 module.unit = "player"
 module.noAutoAlpha = nil

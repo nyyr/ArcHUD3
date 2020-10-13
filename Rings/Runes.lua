@@ -1,5 +1,5 @@
 local module = ArcHUD:NewModule("Runes")
-module.version = "4.0 (@file-abbreviated-hash@)"
+module.version = "4.0 (19d7aa8)"
 
 module.unit = "player"
 module.noAutoAlpha = nil

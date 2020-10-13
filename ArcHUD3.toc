@@ -1,10 +1,10 @@
-## Interface: 80205
-## Title: ArcHUD3
-## Notes: Smooth combat HUD based on ArcHUD2
-## Author: nyyr, Nenie
+## Interface: 90000
+## Title: ArcHUD3 (Keyla Darkmoore Fix)
+## Notes: Smooth combat HUD based on ArcHUD2 and 3 
+## Author: Keyla Darkmoore, Nyyr, Nenie
 ## SavedVariables: ArcHUD3DB
-## Version: @project-version@
-## X-Date: @project-date-iso@
+## Version: v5.0.13
+## X-Date: 2019-11-01T14:46:09Z
 ## X-Category: HUDs
 ## X-WoWI-ID: 24629
 ## X-Curse-Project-ID: 26891

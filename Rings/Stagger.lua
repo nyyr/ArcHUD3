@@ -3,7 +3,7 @@ local LM = LibStub("AceLocale-3.0"):GetLocale("ArcHUD_Module")
 
 local moduleName = "Stagger"
 local module = ArcHUD:NewModule(moduleName)
-module.version = "2.3 (@file-abbreviated-hash@)"
+module.version = "2.3 (0375fe9)"
 
 module.unit = "player"
 module.isHealth = true
