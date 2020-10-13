@@ -1,4 +1,4 @@
-
+[![Build Status](https://travis-ci.org/nyyr/ArcHUD3.svg)](https://travis-ci.org/nyyr/ArcHUD3)
 
 # ArcHUD3
 
@@ -45,8 +45,27 @@ So use it at your own risk ;)
 
 For current retail version of WoW:
 
+* On Github under [releases](https://github.com/nyyr/ArcHUD3/releases)
+* On [WoW Interface](http://www.wowinterface.com/downloads/info24629-ArcHUD3.html)
+* On [WowAce](https://www.wowace.com/projects/archud3)
+* On [CurseForge](https://www.curseforge.com/wow/addons/archud3)
 
 For current WoW Classic:
 
+* On Github under [releases](https://github.com/nyyr/ArcHUD3/releases)
+* On [WoW Interface](https://www.wowinterface.com/downloads/info25227-ArcHUD3Classic.html)
+* On [WowAce](https://www.wowace.com/projects/archud3-classic)
+* On [CurseForge](https://www.curseforge.com/wow/addons/archud3-classic)
+
 ## Frequently Asked Questions
 
+* How do I add [a arc for a specific buff/debuff (remaining time & stacks)](https://github.com/nyyr/ArcHUD3/issues/36)?
+* Where is my [Combo Point/Soul Shard Numeric Indicator](https://github.com/nyyr/ArcHUD3/issues/35)?
+
+## Developer Notes
+
+* [Change log](Docs/changelog.md)
+* [Ring Prototypes](Docs/ring-prototypes.txt) (a bit outdated)
+* [Maths behind the rings](Docs/statrings.txt)
+* [History](Docs/history.txt)
+* [Publishing via Travis CI](http://www.wowinterface.com/forums/showthread.php?t=55801)
