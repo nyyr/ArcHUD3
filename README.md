@@ -45,17 +45,8 @@ So use it at your own risk ;)
 
 For current retail version of WoW:
 
-* On Github under [releases](https://github.com/nyyr/ArcHUD3/releases)
-* On [WoW Interface](http://www.wowinterface.com/downloads/info24629-ArcHUD3.html)
-* On [WowAce](https://www.wowace.com/projects/archud3)
-* On [CurseForge](https://www.curseforge.com/wow/addons/archud3)
 
 For current WoW Classic:
-
-* On Github under [releases](https://github.com/nyyr/ArcHUD3/releases)
-* On [WoW Interface](https://www.wowinterface.com/downloads/info25227-ArcHUD3Classic.html)
-* On [WowAce](https://www.wowace.com/projects/archud3-classic)
-* On [CurseForge](https://www.curseforge.com/wow/addons/archud3-classic)
 
 ## Frequently Asked Questions
 
