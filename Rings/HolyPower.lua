@@ -26,7 +26,7 @@ module.options = {
 module.localized = true
 
 module.class = "PALADIN"
-module.specs = { SPEC_PALADIN_RETRIBUTION } -- array of SPEC_... constants; nil if this ring is available for all specs
+module.specs = nil -- array of SPEC_... constants; nil if this ring is available for all specs
 module.powerType = Enum.PowerType.HolyPower
 module.powerTypeString = "HOLY_POWER"
 module.flashAt = 3
