@@ -1,4 +1,4 @@
-## Interface: 11302
+## Interface: 11305
 ## Title: ArcHUD3 Classic
 ## Notes: Smooth combat HUD based on ArcHUD2
 ## Author: nyyr, Nenie
