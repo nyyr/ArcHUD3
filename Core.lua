@@ -9,7 +9,7 @@ ArcHUD = LibStub("AceAddon-3.0"):NewAddon("ArcHUD",
 
 -- Version
 ArcHUD.version = "@project-version@ (@project-abbreviated-hash@)"
-ArcHUD.codename = "Flashback"
+ArcHUD.codename = "Pandemic"
 ArcHUD.authors = "nyyr, Nenie"
 
 -- Classic specifics

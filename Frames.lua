@@ -123,7 +123,7 @@ local function AH_CreateNameplate(parent, unit, size, point)
 end
 
 local function AH_CreateMoverFrame(parent, name, size, point, origpoint)
-	local f = CreateFrame("Button", nil, parent)
+	local f = CreateFrame("Button", nil, parent, BackdropTemplateMixin and "BackdropTemplate")
 	local width, height = unpack(size)
 
 	f:SetWidth(width)
