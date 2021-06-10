@@ -8,7 +8,7 @@ local LibClassicDurations = nil
 
 -- classic/retail differences
 local UnitAura = UnitAura	-- on retail this improves performance, on classic it prevents tainting the global
-if ArcHUD.classic then
+if ArcHUD.isClassicWoW then
 	LibClassicDurations = LibStub("LibClassicDurations", true)
 	LibClassicDurations:Register("ArcHUD_CustomBuffModule")
 	UnitAura = LibClassicDurations.UnitAuraWrapper
