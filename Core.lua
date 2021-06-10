@@ -13,11 +13,13 @@ ArcHUD.codename = "Pandemic"
 ArcHUD.authors = "nyyr, Nenie"
 
 -- Classic specifics
-ArcHUD.classic = true
+ArcHUD.isClassicWoW = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC)
+ArcHUD.isClassicTbc = (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC)
+ArcHUD.classic = ArcHUD.isClassicWoW or ArcHUD.isClassicTbc
 ArcHUD.UnitCastingInfo = UnitCastingInfo
 ArcHUD.UnitChannelInfo = UnitChannelInfo
 
-if ArcHUD.classic then
+if ArcHUD.isClassicWoW then
 	ArcHUD.LibClassicCasterino = LibStub("LibClassicCasterino", true)
 	ArcHUD.UnitCastingInfo = function(unit)
         return ArcHUD.LibClassicCasterino:UnitCastingInfo(unit)
