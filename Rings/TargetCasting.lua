@@ -117,16 +117,7 @@ function module:OnModuleEnable()
 	self.f.dirty = true
 
 	-- Register the events we will use
-	if not ArcHUD.classic then
-		self:RegisterUnitEvent("UNIT_SPELLCAST_START")
-		self:RegisterUnitEvent("UNIT_SPELLCAST_DELAYED")
-		self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START")
-		self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_UPDATE")
-		self:RegisterUnitEvent("UNIT_SPELLCAST_INTERRUPTIBLE")
-		self:RegisterUnitEvent("UNIT_SPELLCAST_NOT_INTERRUPTIBLE")
-		self:RegisterUnitEvent("UNIT_SPELLCAST_STOP")
-		self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_STOP")
-	else
+	if ArcHUD.isClassicWoW then
 		local LibCCCallback = function (event, ...)
 			return module[event](self, event, ...)
 		end
@@ -138,6 +129,17 @@ function module:OnModuleEnable()
 		ArcHUD.LibClassicCasterino.RegisterCallback(self, "UNIT_SPELLCAST_CHANNEL_STOP", LibCCCallback)
 		--ArcHUD.LibClassicCasterino.RegisterCallback(self.f, "UNIT_SPELLCAST_FAILED", LibCCCallback)
 		--ArcHUD.LibClassicCasterino.RegisterCallback(self.f, "UNIT_SPELLCAST_INTERRUPTED", LibCCCallback)
+	else
+		self:RegisterUnitEvent("UNIT_SPELLCAST_START")
+		self:RegisterUnitEvent("UNIT_SPELLCAST_DELAYED")
+		self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START")
+		self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_UPDATE")
+		if not (ArcHUD.isClassicWoW or ArcHUD.isClassicTbc) then
+			self:RegisterUnitEvent("UNIT_SPELLCAST_INTERRUPTIBLE")
+			self:RegisterUnitEvent("UNIT_SPELLCAST_NOT_INTERRUPTIBLE")
+		end
+		self:RegisterUnitEvent("UNIT_SPELLCAST_STOP")
+		self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_STOP")
 	end
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
 
