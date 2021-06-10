@@ -13,13 +13,9 @@ ArcHUD.codename = "Pandemic"
 ArcHUD.authors = "nyyr, Nenie"
 
 -- Classic specifics
-<<<<<<< HEAD
-ArcHUD.classic = false
-=======
 ArcHUD.isClassicWoW = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC)
 ArcHUD.isClassicTbc = (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC)
 ArcHUD.classic = ArcHUD.isClassic or ArcHUD.isClassicTbc
->>>>>>> 7efde2d... classic-tbc changes
 ArcHUD.UnitCastingInfo = UnitCastingInfo
 ArcHUD.UnitChannelInfo = UnitChannelInfo
 
