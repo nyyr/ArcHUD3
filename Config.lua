@@ -107,9 +107,10 @@ ArcHUD.configOptionsTableCmd = {
 				return debugLevels[ArcHUD:GetDebugLevel() or 4]
 			end,
 			set			= function(info, v)
-				if (v == 1) then 
+				if (v == 4) then
 					ArcHUD:SetDebugLevel(nil)
 					ArcHUD.db.profile.Debug = nil
+					ArcHUD:Printf(L["CMD_OPTS_DEBUG_SET"], "off")
 				else 
 					ArcHUD:SetDebugLevel(v)
 					ArcHUD.db.profile.Debug = v
