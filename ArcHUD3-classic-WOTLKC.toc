@@ -1,0 +1,39 @@
+## Interface: 30400
+## Title: ArcHUD3 Classic
+## Notes: Smooth combat HUD based on ArcHUD2
+## Author: nyyr, Nenie
+## SavedVariables: ArcHUD3DB
+## Version: @project-version@
+## X-Date: @project-date-iso@
+## X-Category: HUDs
+## X-WoWI-ID: 25227
+## X-Curse-Project-ID: 339870
+
+# Libraries
+embeds.xml
+
+# Locales
+Locales\Locales.xml
+
+# Core addon
+Core.lua
+Frames.xml
+Nameplates.lua
+BlizzardFrames.lua
+Utils.lua
+
+# Module core
+RingTemplate.xml
+ModuleCore.lua
+
+# Config
+Config.lua
+
+# Rings
+Rings\Rings.xml
+
+# Extensions
+#Extensions\Extensions.xml
+
+# Unit frames
+#UnitFrames\UnitFrames.xml
