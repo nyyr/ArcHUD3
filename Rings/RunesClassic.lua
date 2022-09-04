@@ -14,7 +14,7 @@ module.defaults = {
 		Side = 2,
 		Level = 1,
 		ShowSeparators = true,
-		SortRunes = false,
+		--SortRunes = false,
 		-- Color = {r = 0.3, g = 0.4, b = 0.8},
 		-- PartialColor = {r = 0.3 * shadingFactor, g = 0.4 * shadingFactor, b = 0.8 * shadingFactor},
 		-- PartialColor = {r = 0, g = 0.5, b = 0.6},
@@ -25,7 +25,7 @@ module.defaults = {
 module.options = {
 	attach = true,
 	hasseparators = true,
-	{name = "SortRunes", text = "SORTRUNES", tooltip = "SORTRUNES"},
+	--{name = "SortRunes", text = "SORTRUNES", tooltip = "SORTRUNES"},
 	customcolors = {}
 }
 module.localized = true
@@ -35,15 +35,15 @@ local MAX_RING_VALUE = 100
 
 local runeColors = {
 	[1] = {r = 0.7, g = 0,   b = 0},
-	[2] = {r = 0,   g = 0.6, b = 0},
-	[3] = {r = 0,   g = 0.6, b = 0.7},
+	[3] = {r = 0,   g = 0.6, b = 0},
+	[2] = {r = 0,   g = 0.6, b = 0.7},
 	[4] = {r = 0.8, g = 0.1, b = 1},
 }
 
 local runeColorsPartial = {
 	[1] = {r = 0.7 * shadingFactor, g = 0 * shadingFactor,   b = 0 * shadingFactor},
-	[2] = {r = 0 * shadingFactor,   g = 0.6 * shadingFactor, b = 0 * shadingFactor},
-	[3] = {r = 0 * shadingFactor,   g = 0.6 * shadingFactor, b = 0.7 * shadingFactor},
+	[3] = {r = 0 * shadingFactor,   g = 0.6 * shadingFactor, b = 0 * shadingFactor},
+	[2] = {r = 0 * shadingFactor,   g = 0.6 * shadingFactor, b = 0.7 * shadingFactor},
 	[4] = {r = 0.8 * shadingFactor, g = 0.1 * shadingFactor, b = 1 * shadingFactor},
 }
 
@@ -54,6 +54,15 @@ local RuneLastState = {
 	[4] = true,
 	[5] = true,
 	[6] = true,
+}
+
+local gameRuneOrder = {
+	[1] = 1,
+	[2] = 2,
+	[3] = 5,
+	[4] = 6,
+	[5] = 3,
+	[6] = 4,
 }
 
 function module:Initialize()
@@ -70,9 +79,9 @@ function module:OnModuleUpdate()
 
 	self:UpdateRunes()
 
-	if self.db.profile.SortRunes then
+	--[[if self.db.profile.SortRunes then
 		self:UpdateRuneCooldown(arg1, arg2)
-	end
+	end]]
 
 	self:RefreshRuneRings()
 end
@@ -134,19 +143,21 @@ function module:UpdateRunes()
 	-- update all runes
 	if (self.frames) then
 		for i=1,MAX_RUNES do
+			local runeIndex = gameRuneOrder[i]
 			local start, duration, runeReady = GetRuneCooldown(i)
 			local runeType = GetRuneType(i)
 			if not runeReady and start then
 				--self.frames[i]:UpdateColor(self.db.profile.PartialColor)
-				self.frames[i]:UpdateColor(runeColorsPartial[runeType])
+				self.frames[runeIndex]:UpdateColor(runeColorsPartial[runeType])
 			else
 				--self.frames[i]:UpdateColor(self.db.profile.Color)
-				self.frames[i]:UpdateColor(runeColors[runeType])
+				self.frames[runeIndex]:UpdateColor(runeColors[runeType])
 			end
 		end
 	end
 end
 
+-- FIXME: There is a bug in one of the sorted rune functions. These are unused for now
 function module:GetRuneOrder()
 
 	local RemainingTime = {}
@@ -158,7 +169,7 @@ function module:GetRuneOrder()
 		local start, duration, runeReady = GetRuneCooldown(i)
 		if duration and start then
 			RemainingTime[i] = duration - start
-			RuneOrder [i] = i
+			RuneOrder [gameRuneOrder[i]] = i
 		end
 	end
 
@@ -174,9 +185,10 @@ function module:GetRuneOrder()
 				RemainingTime[i] = RemainingTime[i+1]
 				RemainingTime[i+1] = tempval
 
-				local tempval = RuneOrder[i];
-				RuneOrder[i] = RuneOrder[i+1]
-				RuneOrder[i+1] = tempval
+				local runeIndex = gameRuneOrder[i]
+				local tempval = RuneOrder[runeIndex];
+				RuneOrder[runeIndex] = RuneOrder[runeIndex+1]
+				RuneOrder[runeIndex+1] = tempval
 
 				issorted = false
 			end
@@ -190,6 +202,7 @@ function module:GetRuneOrder()
 
 end
 
+-- FIXME: There is a bug in one of the sorted rune functions. These are unused for now
 function module:UpdateSortedRuneCooldown(runeIndex)
 
 	for i=1,MAX_RUNES do
@@ -200,21 +213,22 @@ function module:UpdateSortedRuneCooldown(runeIndex)
 		if runeIndex then
 			local start, duration, runeReady = GetRuneCooldown(runeIndex)
 			local runeType = GetRuneType(i)
+			local nonGameRuneIndex = gameRuneOrder[i]
 			if not runeReady then
 				if start then
 					--self.frames[i]:UpdateColor(self.db.profile.PartialColor)
-					self.frames[i]:UpdateColor(runeColorsPartial[runeType])
-					self.frames[i]:SetValue(MAX_RING_VALUE, duration, start, 0)
-					RuneLastState[i] = false
+					self.frames[nonGameRuneIndex]:UpdateColor(runeColorsPartial[runeType])
+					self.frames[nonGameRuneIndex]:SetValue(MAX_RING_VALUE, duration, start, 0)
+					RuneLastState[nonGameRuneIndex] = false
 				end
 			else
 				--self.frames[i]:UpdateColor(self.db.profile.Color)
-				self.frames[i]:UpdateColor(runeColors[runeType])
-				self.frames[i]:SetValue(MAX_RING_VALUE, 0)
-				if RuneLastState[i] == false then
-					self.frames[i]:DoShine()
+				self.frames[nonGameRuneIndex]:UpdateColor(runeColors[runeType])
+				self.frames[nonGameRuneIndex]:SetValue(MAX_RING_VALUE, 0)
+				if RuneLastState[nonGameRuneIndex] == false then
+					self.frames[nonGameRuneIndex]:DoShine()
 				end
-				RuneLastState[i] = true
+				RuneLastState[nonGameRuneIndex] = true
 			end
 		end
 	end
@@ -234,41 +248,42 @@ function module:UpdateUnsortedRuneCooldown(runeIndex)
 
 	--self:Debug(1, "R %s, S %s, D %s, RR %s", tostring(runeIndex), tostring(start), tostring(duration), tostring(runeReady))
 	local runeType = GetRuneType(runeIndex)
+	local nonGameRuneIndex = gameRuneOrder[runeIndex]
 	if not runeReady then
 		if start then
 			--self.frames[runeIndex]:UpdateColor(self.db.profile.PartialColor)
-			self.frames[runeIndex]:UpdateColor(runeColorsPartial[runeType])
-			self.frames[runeIndex]:SetValue(MAX_RING_VALUE, duration, start, 0)
-			RuneLastState[runeIndex] = false
+			self.frames[nonGameRuneIndex]:UpdateColor(runeColorsPartial[runeType])
+			self.frames[nonGameRuneIndex]:SetValue(MAX_RING_VALUE, duration, start, 0)
+			RuneLastState[nonGameRuneIndex] = false
 		end
 	else
 		--self.frames[runeIndex]:UpdateColor(self.db.profile.Color)
-		self.frames[runeIndex]:UpdateColor(runeColors[runeType])
-		self.frames[runeIndex]:SetValue(MAX_RING_VALUE, 0)
-		if RuneLastState[runeIndex] == false then
-			self.frames[runeIndex]:DoShine()
+		self.frames[nonGameRuneIndex]:UpdateColor(runeColors[runeType])
+		self.frames[nonGameRuneIndex]:SetValue(MAX_RING_VALUE, 0)
+		if RuneLastState[nonGameRuneIndex] == false then
+			self.frames[nonGameRuneIndex]:DoShine()
 		end
-		RuneLastState[runeIndex] = true
+		RuneLastState[nonGameRuneIndex] = true
 	end
 
 end
 
 function module:UpdateRuneCooldown(runeIndex, isEnergize)
 
-	if self.db.profile.SortRunes then
+	--[[if self.db.profile.SortRunes then
 		-- update and sort all runes
 		self:UpdateSortedRuneCooldown()
-	else
-		if not runeIndex then
-			-- update all runes
-			for i=1,MAX_RUNES do
-				self:UpdateUnsortedRuneCooldown(i)
-			end
-		else
-			-- just update the current rune
-			self:UpdateUnsortedRuneCooldown(runeIndex)
+	else]]
+	if not runeIndex then
+		-- update all runes
+		for i=1,MAX_RUNES do
+			self:UpdateUnsortedRuneCooldown(i)
 		end
+	else
+		-- just update the current rune
+		self:UpdateUnsortedRuneCooldown(runeIndex)
 	end
+	--end
 
 end
 
