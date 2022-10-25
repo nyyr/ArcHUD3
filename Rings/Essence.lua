@@ -1,5 +1,5 @@
 local module = ArcHUD:NewModule("Essence")
-module.version = "5.0 (9492398)"
+module.version = "5.0 (@file-abbreviated-hash@)"
 
 module.unit = "player"
 module.noAutoAlpha = nil
@@ -13,7 +13,7 @@ module.defaults = {
 		Level = 1,
 		ShowSeparators = true,
 		--Color = PowerBarColor["ESSENCE"],
-		Color = { r = 0.71, g = 1.0, b = 0.92 },
+		Color = { r = 0.71, g = 1.0, b = 0.92 }, --the real essence color is NYI. this reuses chi's for now
 		RingVisibility = 2, -- always fade out when out of combat, regardless of ring status
 		ShowTextHuge = false
 	}
