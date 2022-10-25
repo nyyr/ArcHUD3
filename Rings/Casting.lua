@@ -27,7 +27,7 @@ module.options = {
 }
 module.localized = true
 module.disableEvents = {
-	{frame = "CastingBarFrame", hide = TRUE, events = {"UNIT_SPELLCAST_START", "UNIT_SPELLCAST_STOP", "UNIT_SPELLCAST_DELAYED",
+	{frame = "PlayerCastingBarFrame", hide = TRUE, events = {"UNIT_SPELLCAST_START", "UNIT_SPELLCAST_STOP", "UNIT_SPELLCAST_DELAYED",
 														"UNIT_SPELLCAST_FAILED", "UNIT_SPELLCAST_INTERRUPTED",
 														"UNIT_SPELLCAST_CHANNEL_START", "UNIT_SPELLCAST_CHANNEL_UPDATE",
 														"UNIT_SPELLCAST_CHANNEL_STOP", "PLAYER_ENTERING_WORLD"}},
