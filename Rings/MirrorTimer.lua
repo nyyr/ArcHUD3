@@ -112,6 +112,20 @@ function module:OnModuleEnable()
 		self.timer = 0
 	end
 
+	self.MirrorTimerColors = { };
+	self.MirrorTimerColors["EXHAUSTION"] = {
+		r = 1.00, g = 0.90, b = 0.00
+	};
+	self.MirrorTimerColors["BREATH"] = {
+		r = 0.00, g = 0.50, b = 1.00
+	};
+	self.MirrorTimerColors["DEATH"] = {
+		r = 1.00, g = 0.70, b = 0.00
+	};
+	self.MirrorTimerColors["FEIGNDEATH"] = {
+		r = 1.00, g = 0.70, b = 0.00
+	};
+
 	self.f:Show()
 end
 
@@ -144,7 +158,7 @@ function module:MIRROR_TIMER_START(event, arg1, arg2, arg3, arg4, arg5, arg6)
 			label = arg6,
 		}
 		-- Switch ring color to the new timer
-		self.f:UpdateColor(MirrorTimerColors[arg1])
+		self.f:UpdateColor(self.MirrorTimerColors[arg1])
 		self.timer = newTimer
 		self.timers.count = self.timers.count + 1
 		--self:Msg("Adding new timer %d: %s, %d, %d, %d, %d, %s", newTimer, arg1, arg2, arg3, arg4, arg5, arg6)
@@ -196,7 +210,7 @@ function module:MIRROR_TIMER_STOP(event, arg1)
 			for i=MIRRORTIMER_NUMTIMERS,1,-1 do
 				if(self.timers[i]) then
 					self.timer = i
-					self.f:UpdateColor(MirrorTimerColors[self.timers[i].timer])
+					self.f:UpdateColor(self.MirrorTimerColors[self.timers[i].timer])
 					break
 				end
 			end
