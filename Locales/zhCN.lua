@@ -153,7 +153,8 @@ L["TOOLTIP"] = {
 	CHICOMBO 	= "切换显示真气作为连击点(连击点必须启用)",
 	RUNECOMBO 	= "切换显示符文作为连击点(连击点必须启用)",
 	SOULFRAGMENTCOMBO = "切换显示灵魂残片作为连击点(连击点必须启用)",
-	CHICOMBO 	= "切换显示精华作为连击点(连击点必须启用)",
+	ESSENCECOMBO 	= "切换显示精华作为连击点(连击点必须启用)",
+
 	CPCOLOR		= "设置连击点文本的颜色",
 	CPCOLORDECAY = "设置连击点衰变的颜色",
 	RESETCOLORS	= "重置颜色为默认值",
