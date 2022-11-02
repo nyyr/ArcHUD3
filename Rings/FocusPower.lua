@@ -53,7 +53,7 @@ function module:OnModuleUpdate()
 		self.MPPerc:SetPoint("TOP", self.f, "BOTTOMLEFT", 20, -130)
 	end
 	if(UnitExists(self.unit)) then
-		self.f:SetValue(UnitMana(self.unit))
+		self.f:SetValue(UnitPower(self.unit))
 		self:UpdateColor(UnitPowerType(self.unit))
 	end
 end
