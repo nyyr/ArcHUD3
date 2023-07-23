@@ -24,11 +24,12 @@ module.options = {
 }
 module.localized = true
 module.disableEvents = {
-	{frame = "MirrorTimer1", hide = TRUE, events = {"MIRROR_TIMER_PAUSE", "MIRROR_TIMER_STOP", "PLAYER_ENTERING_WORLD"}},
-	{frame = "MirrorTimer2", hide = TRUE, events = {"MIRROR_TIMER_PAUSE", "MIRROR_TIMER_STOP", "PLAYER_ENTERING_WORLD"}},
-	{frame = "MirrorTimer3", hide = TRUE, events = {"MIRROR_TIMER_PAUSE", "MIRROR_TIMER_STOP", "PLAYER_ENTERING_WORLD"}},
+	{frame = "MirrorTimerContainer", hide = TRUE, events = {"MIRROR_TIMER_START", "MIRROR_TIMER_PAUSE", "MIRROR_TIMER_STOP", "PLAYER_ENTERING_WORLD"}},
 	{frame = "UIParent", hide = FALSE, events = {"MIRROR_TIMER_START"}},
 }
+
+-- ideally, source directly from FrameXML/MirrorTimer.lua
+local numMirrorTimerTypes = 3;
 
 function module:Initialize()
 	-- Setup the frame we need
@@ -57,7 +58,7 @@ end
 
 local function MirrorTimer_UpdateTimers(frame, elapsed)
 	local self = frame.module
-	for i=1,MIRRORTIMER_NUMTIMERS do
+	for i=1,numMirrorTimerTypes do
 		if(self.timers[i] and not self.timers[i].paused) then
 			self.timers[i].value = self.timers[i].value + self.timers[i].scale * elapsed*1000
 			if(self.timers[i].value > self.timers[i].maxvalue) then
@@ -132,14 +133,14 @@ end
 function module:MIRROR_TIMER_START(event, arg1, arg2, arg3, arg4, arg5, arg6)
 	-- Find a free timer table
 	local updTimer, newTimer
-	for i=1,MIRRORTIMER_NUMTIMERS do
+	for i=1,numMirrorTimerTypes do
 		if(self.timers[i] and self.timers[i].timer == arg1) then
 			updTimer = i
 			break
 		end
 	end
 	if(not updTimer) then
-		for i=1,MIRRORTIMER_NUMTIMERS do
+		for i=1,numMirrorTimerTypes do
 			if(not self.timers[i]) then
 				newTimer = i
 				break
@@ -182,7 +183,7 @@ function module:MIRROR_TIMER_START(event, arg1, arg2, arg3, arg4, arg5, arg6)
 end
 
 function module:MIRROR_TIMER_PAUSE(event, arg1)
-	for i=1,MIRRORTIMER_NUMTIMERS do
+	for i=1,numMirrorTimerTypes do
 		if(self.timers[i]) then
 			self.timers[i].paused = (arg1 > 0 and 1 or nil)
 		end
@@ -190,7 +191,7 @@ function module:MIRROR_TIMER_PAUSE(event, arg1)
 end
 
 function module:MIRROR_TIMER_STOP(event, arg1)
-	for i=1,MIRRORTIMER_NUMTIMERS do
+	for i=1,numMirrorTimerTypes do
 		if(self.timers[i] and self.timers[i].timer == arg1) then
 			if(self.timers[i+1]) then
 				self.timers[i] = self.timers[i+1]
@@ -207,7 +208,7 @@ function module:MIRROR_TIMER_STOP(event, arg1)
 		self.f:SetRingAlpha(0)
 	else
 		if(not self.timers[self.timer]) then
-			for i=MIRRORTIMER_NUMTIMERS,1,-1 do
+			for i=numMirrorTimerTypes,1,-1 do
 				if(self.timers[i]) then
 					self.timer = i
 					self.f:UpdateColor(self.MirrorTimerColors[self.timers[i].timer])
@@ -219,7 +220,7 @@ function module:MIRROR_TIMER_STOP(event, arg1)
 end
 
 function module:PLAYER_ENTERING_WORLD()
-	for i=1,MIRRORTIMER_NUMTIMERS do
+	for i=1,numMirrorTimerTypes do
 		self.timers[i] = nil
 	end
 	self.timers.count = 0
