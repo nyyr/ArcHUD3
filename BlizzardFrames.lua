@@ -12,7 +12,7 @@ function ArcHUD:HideBlizzardPlayer(show)
 		PetFrame:UnregisterAllEvents()
 		PetFrame:Hide()
 		
-		if not ArcHUD.classic then
+		if not ArcHUD.isClassicWoW or ArcHUD.isClassicTbc then
 			RuneFrame:Hide()
 		end
 	else
@@ -23,7 +23,7 @@ function ArcHUD:HideBlizzardPlayer(show)
 		PetFrame:RegisterAllEvents()
 		PetFrame_Update(PetFrame, true)
 		
-		if not ArcHUD.classic then
+		if not ArcHUD.isClassicWoW or ArcHUD.isClassicTbc then
 			local _, class = UnitClass("player")
 			if ( class == "DEATHKNIGHT" ) then
 				RuneFrame:Show()

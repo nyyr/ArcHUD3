@@ -176,6 +176,7 @@ function module:OnModuleEnable()
 
 	-- Register the events we will use
 	self:RegisterUnitEvent("UNIT_HEALTH", "UpdateHealth")
+	self:RegisterUnitEvent("UNIT_HEALTH_FREQUENT", "UpdateHealth")
 	self:RegisterUnitEvent("UNIT_MAXHEALTH", "UpdateHealth")
 	if (not ArcHUD.classic) then
 		self:RegisterUnitEvent("UNIT_HEAL_PREDICTION", "UpdateHealthPrediction")
