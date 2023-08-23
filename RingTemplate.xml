@@ -61,7 +61,7 @@
 		<Frame name="$parentFillUpdateFrame" parentKey="fillUpdateFrame">
 			<Animations>
 				<AnimationGroup parentKey="fillUpdate" looping="REPEAT">
-					<Animation duration="1" maxFramerate="30" order="1">
+					<Animation duration="1" order="1">
 						<Scripts>
 							<OnLoad>
 								self.ring = self:GetParent():GetParent():GetParent();
@@ -78,7 +78,7 @@
 
 	<Animations>
 		<AnimationGroup parentKey="applyAlpha">
-			<Alpha parentKey="alphaAnim" change="0" duration="0.5" order="1" />
+			<Alpha parentKey="alphaAnim" duration="0.5" order="1" />
 			<Scripts>
 				<OnLoad>
 					self.ring = self:GetParent();
@@ -98,7 +98,7 @@
 		
 		<!-- (more or less) synchronized pulse -->
 		<AnimationGroup parentKey="syncPulse" looping="REPEAT">
-			<Animation change="0" duration="1" order="1">
+			<Animation duration="1" order="1">
 				<Scripts>
 					<OnLoad>
 						self.ring = self:GetParent():GetParent();

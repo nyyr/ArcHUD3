@@ -150,12 +150,12 @@ end
 -- Set debug level
 ----------------------------------------------
 function ArcHUD:SetDebugLevel(level)
-	if (level == nil) or (level >= 0 and level < 4) then
+	if (level == nil) or (level > 0 and level <= 4) then
 		local levelName = "off"
 		if (level ~= nil) then
 			levelName = debugLevels[level]
+			self:Printf(L["CMD_OPTS_DEBUG_SET"], levelName)
 		end
-		self:Printf(L["CMD_OPTS_DEBUG_SET"], levelName)
 		self.db.global.debugLevel = level
 	else
 		self:Print("Invalid debug level: "..level)

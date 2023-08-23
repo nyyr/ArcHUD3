@@ -157,6 +157,8 @@ L["TOOLTIP"] = {
 	CHICOMBO	= "Schaltet Anzeige von Chi (Mönch) als Kombopunkte ein/aus (die Anzeige von Kombopunkten muss aktiviert sein)",
 	RUNECOMBO 	= "Schaltet Anzeige von Runen (Todesritter) als Kombopunkte ein/aus (die Anzeige von Kombopunkten muss aktiviert sein)",
 	SOULFRAGMENTCOMBO = "Schaltet Anzeige von Seelenfragmenten (Dämonenjäger) als Kombopunkte ein/aus (die Anzeige von Kombopunkten muss aktiviert sein)",
+	ESSENCECOMBO 	= "Schaltet Anzeige von Essenz (Rufer) als Kombopunkte ein/aus (die Anzeige von Kombopunkten muss aktiviert sein)",
+
 	CPCOLOR		= "Setzt die Textfarbe für Kombopunkte",
 	CPCOLORDECAY = "Setzt die Farbe von verfallenden Kombopunkten des letzten Ziels",
 	RESETCOLORS	= "Setzt die Farben auf ihre Standardeinstellungen zurück",
@@ -219,6 +221,7 @@ LM["SoulShards"]	= "Hexenmeister: Seelensplitter etc."
 LM["Chi"]			= "Mönch: Chi"
 LM["Stagger"]		= "Mönch: Staffelung"
 LM["Runes"]			= "Todesritter: Runen"
+LM["Essence"]       = "Rufer: Essenz"
 LM["ManaShadowPriest"]	= "Priester: Mana (Schattenpriester)"
 LM["ManaBalanceDruid"]	= "Druide: Mana (Gleichgewichtsdruide)"
 LM["ManaDruid"]	= "Druide: Mana (Katzen-/Bärengestalt)"
