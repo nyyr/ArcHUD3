@@ -968,9 +968,6 @@ function ArcHUDRingTemplate:RefreshSeparators()
 		end
 		if (self.maxValue > 1) and (self.maxValue <= 20) then
 			local texturePath = "Interface\\Addons\\ArcHUD3\\Icons\\Separator"
-			if ArcHUD.classic then
-				texturePath = "Interface\\Addons\\ArcHUD3-classic\\Icons\\Separator"
-			end
 			local anglestep = (self.endAngle-self.startAngle)/self.maxValue
 			local angle = self.startAngle + anglestep
 			for i=1,(self.maxValue-1) do

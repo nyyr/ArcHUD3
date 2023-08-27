@@ -1,4 +1,4 @@
-package-as: ArcHUD3-classic
+package-as: ArcHUD3
 enable-nolib-creation: no
 
 externals:
