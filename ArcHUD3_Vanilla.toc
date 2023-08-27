@@ -10,7 +10,7 @@
 ## X-Curse-Project-ID: 26891
 
 # Libraries
-embeds-classic.xml
+embeds-vanilla.xml
 
 # Locales
 Locales\Locales.xml
