@@ -20,14 +20,14 @@ jobs:
       - name: Package and release (Retail)
         uses: BigWigsMods/packager@v2
         with:
-          args: -g retail -m .pkgmeta.yml
+          args: -g retail -m .pkgmeta
 
       - name: Package and release (Wrath)
         uses: BigWigsMods/packager@v2
         with:
-          args: -g wrath -m .pkgmeta-classic.yml
+          args: -g wrath -m .pkgmeta-classic
 
       - name: Package and release (Classic)
         uses: BigWigsMods/packager@v2
         with:
-          args: -g classic -m .pkgmeta-classic.yml
+          args: -g classic -m .pkgmeta-classic
