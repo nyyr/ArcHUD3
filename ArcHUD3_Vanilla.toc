@@ -1,7 +1,7 @@
-## Interface: 11307
+## Interface: 11404
 ## Title: ArcHUD3
 ## Notes: Smooth combat HUD based on ArcHUD2
-## Author: nyyr, Nenie
+## Author: nyyr, Nenie, rookdorf
 ## SavedVariables: ArcHUD3DB
 ## Version: @project-version@
 ## X-Date: @project-date-iso@
