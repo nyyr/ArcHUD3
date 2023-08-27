@@ -1,0 +1,36 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+
+<Script file="Anchors.lua" />
+<Script file="MirrorTimer.lua" />
+
+<Script file="Health.lua" />
+<Script file="Power.lua" />
+<Script file="Casting.lua" />
+<Script file="TargetHealth.lua" />
+<Script file="TargetPower.lua" />
+<Script file="TargetCasting.lua" />
+<Script file="PetHealth.lua" />
+<Script file="PetPower.lua" />
+<!-- Script file="FocusHealth.lua" /-->
+<!-- Script file="FocusPower.lua" /-->
+<!-- Script file="FocusCasting.lua" /-->
+
+<Script file="PowerTemplate.lua" />
+<!-- Script file="ArcaneCharges.lua" /-->
+<Script file="ComboPoints.lua" />
+<Script file="ComboPointsDruid.lua" />
+<!-- Script file="HolyPower.lua" /-->
+<!-- Script file="SoulShards.lua" /-->
+<!-- Script file="ManaShadowPriest.lua" /-->
+<!-- Script file="ManaBalanceDruid.lua" /-->
+<Script file="ManaDruid.lua" />
+<!-- Script file="ManaElementalShaman.lua" /-->
+<!-- Script file="Chi.lua" /-->
+<!-- Script file="Runes.lua" /-->
+<Script file="RunesClassic.lua" />
+<!-- Script file="Stagger.lua" /-->
+<!-- Script file="Essence.lua" /-->
+
+<Script file="CustomBuff.lua" />
+
+</Ui>

@@ -15,7 +15,8 @@ ArcHUD.authors = "nyyr, Nenie"
 -- Classic specifics
 ArcHUD.isClassicWoW = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC)
 ArcHUD.isClassicTbc = (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC)
-ArcHUD.classic = ArcHUD.isClassic or ArcHUD.isClassicTbc
+ArcHUD.isClassicWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
+ArcHUD.classic = ArcHUD.isClassicWoW or ArcHUD.isClassicTbc or ArcHUD.isClassicWrath
 ArcHUD.UnitCastingInfo = UnitCastingInfo
 ArcHUD.UnitChannelInfo = UnitChannelInfo
 

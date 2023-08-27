@@ -134,7 +134,7 @@ function module:OnModuleEnable()
 		self:RegisterUnitEvent("UNIT_SPELLCAST_DELAYED")
 		self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START")
 		self:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_UPDATE")
-		if not (ArcHUD.isClassicWoW or ArcHUD.isClassicTbc) then
+		if not (ArcHUD.classic) then
 			self:RegisterUnitEvent("UNIT_SPELLCAST_INTERRUPTIBLE")
 			self:RegisterUnitEvent("UNIT_SPELLCAST_NOT_INTERRUPTIBLE")
 		end
