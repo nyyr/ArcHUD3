@@ -26,8 +26,12 @@ module.options = {
 	attach = true,
 }
 module.localized = true
+local frameName = "PlayerCastingBarFrame"
+if ArcHUD.classic then
+	frameName = "CastingBarFrame"
+end
 module.disableEvents = {
-	{frame = "PlayerCastingBarFrame", hide = TRUE, events = {"UNIT_SPELLCAST_START", "UNIT_SPELLCAST_STOP", "UNIT_SPELLCAST_DELAYED",
+	{frame = frameName, hide = TRUE, events = {"UNIT_SPELLCAST_START", "UNIT_SPELLCAST_STOP", "UNIT_SPELLCAST_DELAYED",
 														"UNIT_SPELLCAST_FAILED", "UNIT_SPELLCAST_INTERRUPTED",
 														"UNIT_SPELLCAST_CHANNEL_START", "UNIT_SPELLCAST_CHANNEL_UPDATE",
 														"UNIT_SPELLCAST_CHANNEL_STOP", "PLAYER_ENTERING_WORLD"}},
