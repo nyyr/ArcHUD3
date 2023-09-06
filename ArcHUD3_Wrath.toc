@@ -1,4 +1,4 @@
-## Interface: 100107
+## Interface: 30402
 ## Title: ArcHUD3
 ## Notes: Smooth combat HUD based on ArcHUD2
 ## Author: nyyr, Nenie, rookdorf
@@ -30,7 +30,7 @@ ModuleCore.lua
 Config.lua
 
 # Rings
-Rings\Rings.xml
+Rings\Rings-classic.xml
 
 # Extensions
 #Extensions\Extensions.xml
