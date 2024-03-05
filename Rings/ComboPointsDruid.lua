@@ -62,5 +62,6 @@ end
 --
 function module:CheckVisible()
 	local formId = GetShapeshiftFormID()
-	return formId == CAT_FORM
+	-- 1 for CAT_FORM
+	return formId == 1
 end
