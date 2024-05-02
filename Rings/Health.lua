@@ -17,8 +17,8 @@ module.defaults = {
 		ShowTextMax = true,
 		ShowPerc = true,
 		ShowDef = false,
-		ShowIncoming = not ArcHUD.classic,
-		ShowAbsorbs = not ArcHUD.classic,
+		ShowIncoming = ArcHUD.hasHealPrediction,
+		ShowAbsorbs = ArcHUD.hasAbsorbs,
 		SwapHealthPowerText = false,
 		ColorMode = "fade",
 		Color = {r = 0, g = 1, b = 0},
@@ -27,7 +27,7 @@ module.defaults = {
 		Level = 0,
 	}
 }
-if (ArcHUD.classic) then
+if (not ArcHUD.hasAbsorbs) then
 	module.options = {
 		{name = "ShowText", text = "SHOWTEXT", tooltip = "SHOWTEXT"},
 		{name = "ShowTextMax", text = "SHOWTEXTMAX", tooltip = "SHOWTEXTMAX"},
@@ -180,8 +180,10 @@ function module:OnModuleEnable()
 		self:RegisterUnitEvent("UNIT_HEALTH_FREQUENT", "UpdateHealth")
 	end
 	self:RegisterUnitEvent("UNIT_MAXHEALTH", "UpdateHealth")
-	if (not ArcHUD.classic) then
+	if (ArcHUD.hasHealPrediction) then
 		self:RegisterUnitEvent("UNIT_HEAL_PREDICTION", "UpdateHealthPrediction")
+	end
+	if (ArcHUD.hasAbsorbs) then
 		self:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", "UpdateAbsorbs")
 	end
 	self:RegisterEvent("PLAYER_LEVEL_UP")
@@ -246,7 +248,7 @@ function module:UpdateHealth(event, arg1)
 
 			self.f:SetMax(maxHealth)
 			
-			if (not ArcHUD.classic) then
+			if (ArcHUD.hasAbsorbs) then
 				local totalAbsorbs = UnitGetTotalAbsorbs(self.unit)
 				if totalAbsorbs > 0 then
 					self.frames[2]:SetMax(maxHealth - health)
