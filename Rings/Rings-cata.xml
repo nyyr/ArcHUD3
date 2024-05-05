@@ -16,12 +16,12 @@
 <Script file="FocusCasting.lua" />
 
 <Script file="PowerTemplate.lua" />
-<Script file="ArcaneCharges.lua" />
+<!-- <Script file="ArcaneCharges.lua" /-->
 <Script file="ComboPoints.lua" />
 <Script file="ComboPointsDruid.lua" />
 <Script file="HolyPower.lua" />
 <Script file="SoulShards.lua" />
-<Script file="ManaShadowPriest.lua" />
+<!-- <Script file="ManaShadowPriest.lua" /-->
 <Script file="ManaBalanceDruid.lua" />
 <Script file="ManaDruid.lua" />
 <Script file="ManaElementalShaman.lua" />
