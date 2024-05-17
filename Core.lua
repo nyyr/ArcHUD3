@@ -581,11 +581,15 @@ function ArcHUD:TargetUpdate(event, arg1)
 		end
 
 		-- Color the targets hp and mana text correctly
-		local info = {}
-		if (UnitPowerType("target") == 0) then
-			info = { r = 0.00, g = 1.00, b = 1.00 }
-		else
-			info = PowerBarColor[UnitPowerType("target")]
+		local info = { r = 0.00, g = 1.00, b = 1.00 } -- alternate Mana color
+		local powerType, powerToken, altR, altG, altB = UnitPowerType("target")
+		if (powerType > 0) then -- anything else then Mana
+			info = PowerBarColor[powerType]
+			if info == nil then
+				if not (altR == nil or altG == nil or altB == nil) then
+					info = { r = altR, g = altG, b = altB }
+				end
+			end
 		end
 		self.TargetHUD.MPText:SetTextColor(info.r, info.g, info.b)
 
