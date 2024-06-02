@@ -27,7 +27,7 @@ module.options = {
 }
 module.localized = true
 local frameName = "PlayerCastingBarFrame"
-if ArcHUD.classic then
+if ArcHUD.classic or ArcHUD.isClassicCata then
 	frameName = "CastingBarFrame"
 end
 module.disableEvents = {
