@@ -26,8 +26,8 @@
 <Script file="ManaDruid.lua" />
 <Script file="ManaElementalShaman.lua" />
 <!-- Script file="Chi.lua" /-->
-<Script file="Runes.lua" />
-<!-- Script file="RunesClassic.lua" /-->
+<!-- Script file="Runes.lua" /-->
+<Script file="RunesClassic.lua" />
 <!-- Script file="Stagger.lua" /-->
 <!-- Script file="Essence.lua" /-->
 
