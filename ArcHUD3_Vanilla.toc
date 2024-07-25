@@ -1,7 +1,8 @@
-## Interface: 11501
+## Interface: 11503
 ## Title: ArcHUD3
 ## Notes: Smooth combat HUD based on ArcHUD2
 ## Author: nyyr, Nenie, rookdorf
+## IconTexture: Interface/Icons/spell_arcane_studentofmagic
 ## SavedVariables: ArcHUD3DB
 ## Version: @project-version@
 ## X-Date: @project-date-iso@
