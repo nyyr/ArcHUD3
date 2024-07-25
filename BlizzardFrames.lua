@@ -21,7 +21,11 @@ function ArcHUD:HideBlizzardPlayer(show)
 		PlayerFrame_Update()
 		
 		PetFrame:RegisterAllEvents()
-		PetFrame_Update(PetFrame, true)
+		if ArcHUD.classic then
+			PetFrame_Update(PetFrame, true)
+		else
+			UnitFrame_Update(PetFrame, true)
+		end
 
 		if not ArcHUD.isClassicWoW or ArcHUD.isClassicTbc then
 			local _, class = UnitClass("player")
@@ -46,8 +50,12 @@ function ArcHUD:HideBlizzardTarget(show)
 		ComboFrame:Hide()
 	else
 		TargetFrame:RegisterAllEvents()
-		TargetFrame_Update(TargetFrame)
-		
+		if ArcHUD.classic then
+			TargetFrame_Update(TargetFrame)
+		else
+			UnitFrame_Update(TargetFrame, false)
+		end
+
 		ComboFrame:RegisterAllEvents()
 		ComboFrame_Update(ComboFrame)
 	end
