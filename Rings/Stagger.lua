@@ -148,8 +148,8 @@ function module:UpdateValue(event, arg1)
 		local name, iconTex, debuffType, duration, expirationTime, unitCaster, spellId, v1, v2, v3
 		local hasStagger
 		for i = 1,40 do
-			name, iconTex, _, debuffType, duration, expirationTime, unitCaster, _, _, spellId, _, _, _, v1, v2 = 
-				UnitDebuff(self.unit, i)
+			name, iconTex, _, debuffType, duration, expirationTime, unitCaster, _, _, spellId, _, _, _, v1, v2 =
+				C_UnitAuras.GetDebuffDataByIndex(self.unit, i)
 			if spellId == LIGHT_STAGGER or spellId == MODERATE_STAGGER or spellId == HEAVY_STAGGER then
 				hasStagger = true
 				break

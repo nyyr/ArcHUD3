@@ -692,7 +692,7 @@ function ArcHUD:TargetAuras(event, arg1)
 	
 	-- buffs
 	for i = 1, 40 do
-		local _, buff, count, buffType, duration, expirationTime = UnitBuff(unit, i, filter)
+		local _, buff, count, buffType, duration, expirationTime = C_UnitAuras.GetBuffDataByIndex(unit, i, filter)
 		button = self.TargetHUD["Buff"..i]
 		if (buff) then
 			button.Icon:SetTexture(buff)
@@ -725,7 +725,7 @@ function ArcHUD:TargetAuras(event, arg1)
 
 	-- debuffs
 	for i = 1, 40 do
-		local _, buff, count, buffType, duration, expirationTime = UnitDebuff(unit, i, filter)
+		local _, buff, count, buffType, duration, expirationTime = C_UnitAuras.GetDebuffDataByIndex(unit, i, filter)
 		button = self.TargetHUD["Debuff"..i]
 		if (buff) then
 			button.Icon:SetTexture(buff)
