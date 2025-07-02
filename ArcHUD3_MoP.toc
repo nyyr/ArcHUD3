@@ -1,22 +1,11 @@
-## Interface: 110107
+## Interface: 50500
 ## Title: ArcHUD3
 ## Notes: Smooth combat HUD based on ArcHUD2
 ## Author: nyyr, Nenie, rookdorf
 ## IconTexture: Interface/Icons/spell_arcane_studentofmagic
-## Category-enUS: User Interface
-## Category-deDE: Benutzerinterface
-## Category-esES: Interfaz de usuario
-## Category-esMX: Interfaz de usuario
-## Category-frFR: Interface utilisateur
-## Category-itIT: Interfaccia utente
-## Category-koKR: 사용자 인터페이스
-## Category-ptBR: Interface do usuário
-## Category-ruRU: Интерфейс пользователя
-## Category-zhCN: 用户界面
-## Category-zhTW: 使用者介面
 ## SavedVariables: ArcHUD3DB
-## Version: @project-version@
-## X-Date: @project-date-iso@
+## Version: v7.0.9
+## X-Date: 2024-08-18T03:44:38Z
 ## X-Category: HUDs
 ## X-WoWI-ID: 24629
 ## X-Curse-Project-ID: 26891
@@ -42,7 +31,7 @@ ModuleCore.lua
 Config.lua
 
 # Rings
-Rings\Rings.xml
+Rings\Rings-mop.xml
 
 # Extensions
 #Extensions\Extensions.xml
