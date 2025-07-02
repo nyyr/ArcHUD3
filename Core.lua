@@ -17,6 +17,7 @@ ArcHUD.isClassicWoW = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC)
 ArcHUD.isClassicTbc = (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC)
 ArcHUD.isClassicWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
 ArcHUD.isClassicCata = (WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC)
+ArcHUD.isClassicMop = (WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC)
 -- generic classic only up to Wrath
 ArcHUD.classic = ArcHUD.isClassicWoW or ArcHUD.isClassicTbc or ArcHUD.isClassicWrath
 -- generic feature switches based on expansion

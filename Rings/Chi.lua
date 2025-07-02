@@ -26,7 +26,11 @@ module.options = {
 module.localized = true
 
 module.class = "MONK"
-module.specs = { SPEC_MONK_WINDWALKER } -- array of SPEC_... constants; nil if this ring is available for all specs
+if ArcHUD.isClassicMop then
+	module.specs = nil -- array of SPEC_... constants; nil if this ring is available for all specs
+else
+	module.specs = { SPEC_MONK_WINDWALKER } -- array of SPEC_... constants; nil if this ring is available for all specs
+end
 module.powerType = Enum.PowerType.Chi
 module.powerTypeString = "CHI"
 module.flashAt = nil
