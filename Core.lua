@@ -684,18 +684,22 @@ end
 function ArcHUD:TargetAuras(event, arg1)
 	if(not arg1 == "target") then return end
 	local unit = "target"
-	local i, icon, buff, count, buffType, color, duration, expirationTime
+	local i, color
 	local filter = ""
-	
+
 	if (self.db.profile.ShowOnlyBuffsCastByPlayer) then
 		filter = "PLAYER"
 	end
-	
+
 	-- buffs
 	for i = 1, 40 do
-		local _, buff, count, buffType, duration, expirationTime = C_UnitAuras.GetBuffDataByIndex(unit, i, filter)
+		local aura = C_UnitAuras.GetBuffDataByIndex(unit, i, filter)
 		button = self.TargetHUD["Buff"..i]
-		if (buff) then
+		if (aura) then
+			local buff = aura.icon
+			local count = aura.applications
+			local duration = aura.duration
+			local expirationTime = aura.expirationTime
 			button.Icon:SetTexture(buff)
 			button:Show()
 			button.unit = unit
@@ -707,7 +711,7 @@ function ArcHUD:TargetAuras(event, arg1)
 			else
 				button.Count:Hide()
 			end
-			
+
 			if(duration) then
 				if(duration > 0) then
 					button.Cooldown:Show()
@@ -726,22 +730,27 @@ function ArcHUD:TargetAuras(event, arg1)
 
 	-- debuffs
 	for i = 1, 40 do
-		local _, buff, count, buffType, duration, expirationTime = C_UnitAuras.GetDebuffDataByIndex(unit, i, filter)
+		local aura = C_UnitAuras.GetDebuffDataByIndex(unit, i, filter)
 		button = self.TargetHUD["Debuff"..i]
-		if (buff) then
+		if (aura) then
+			local buff = aura.icon
+			local count = aura.applications
+			local buffType = aura.dispelType
+			local duration = aura.duration
+			local expirationTime = aura.expirationTime
 			button.Icon:SetTexture(buff)
 			button:Show()
 			button.Border:Show()
 			button.isdebuff = 1
 			button.unit = unit
-			
+
 			if ( buffType ) then
 				color = DebuffTypeColor[buffType]
 			else
 				color = DebuffTypeColor["none"]
 			end
 			button.Border:SetVertexColor(color.r, color.g, color.b)
-			
+
 			if (count > 1) then
 				button.Count:SetText(count)
 				button.Count:Show()
