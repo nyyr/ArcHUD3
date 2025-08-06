@@ -171,20 +171,18 @@ local function CustomBuff_UpdateBuff(frame, elapsed)
 end
 
 local function CustomBuff_UnitAuraByName(unit, auraName, isDebuff)
-	local name, iconTex, count, duration, expirationTime, unitCaster
-	
 	local filter = "HELPFUL"
 	if isDebuff then
 		filter = "HARMFUL"
 	end
 
 	for i = 1, 40 do
-		name, iconTex, count, _, duration, expirationTime, unitCaster = UnitAura(unit, i, filter)
-		if not name then
+		local aura = C_UnitAuras.GetAuraDataByIndex(unit, i, filter)
+		if not aura then
 			return nil
 		end
 		if name == auraName then
-			return name, iconTex, count, duration, expirationTime, unitCaster
+			return aura.name, aura.icon, aura.applications, aura.duration, aura.expirationTime, aura.sourceUnit
 		end
 	end
 end
