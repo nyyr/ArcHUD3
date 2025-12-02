@@ -126,7 +126,7 @@ function module:UpdateActive(event, arg1)
 	if not self.specs then
 		isActive = true
 	else
-		local spec = GetSpecialization()
+		local spec = C_SpecializationInfo.GetSpecialization()
 		for i,s in ipairs(self.specs) do
 			if s == spec then
 				isActive = true

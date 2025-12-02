@@ -1,4 +1,4 @@
-## Interface: 11506
+## Interface: 11508
 ## Title: ArcHUD3
 ## Notes: Smooth combat HUD based on ArcHUD2
 ## Author: nyyr, Nenie, rookdorf
