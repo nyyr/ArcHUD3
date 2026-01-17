@@ -48,6 +48,7 @@ L["TEXT"] = {
 	SHOWONLYBUFFSCASTBYPLAYER = "Отображать только свои (де)баффы",
 	SHOWBUFFTT 	= "Отображать подсказки (де)баффов",
 	HIDEBUFFTTIC = "Скрыть подсказки (де)баффов в бою",
+	HIDEBUFFTIMERTEXT = "Скрыть текст таймера (де)баффов",
 	BUFFICONSIZE= "Размер иконок (де)баффов",
 	SHOWPVP		= "Отображать PVP статус игрока",
 	SHOWTEXTMAX	= "Отображать макс. здоровье/силу",

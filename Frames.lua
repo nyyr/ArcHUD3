@@ -86,6 +86,7 @@ local function AH_CreateBuffButton(parent, id, point)
 
 	f.Cooldown = CreateFrame("Cooldown", nil, f, "CooldownFrameTemplate")
 	f.Cooldown:SetPoint("CENTER", 0, -1)
+	f.Cooldown:SetHideCountdownNumbers(ArcHUD.db.profile.HideBuffTimerText)
 
 	f:SetScript("OnEnter", function(this) ArcHUD:SetAuraTooltip(this) end)
 	f:SetScript("OnLeave", function() GameTooltip:Hide() end)

@@ -88,6 +88,7 @@ ArcHUD.defaults = {
 		ShowOnlyBuffsCastByPlayer = false,
 		ShowBuffTooltips = true,
 		HideBuffTooltipsIC = false,
+		HideBuffTimerText = false,
 		BuffIconSize = 20,
 		ShowHealthPowerTextMax = true,
 		BlizzPlayer = true,

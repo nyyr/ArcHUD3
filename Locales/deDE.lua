@@ -49,6 +49,7 @@ L["TEXT"] = {
 	SHOWONLYBUFFSCASTBYPLAYER = "Zeige nur eigene (De-)Buffs",
 	SHOWBUFFTT 	= "Zeige (De-)Buff-Tooltips",
 	HIDEBUFFTTIC= "Verstecke (De-)Buff-Tooltips im Kampf",
+	HIDEBUFFTIMERTEXT = "Verstecke (De-)Buff Timer-Text",
 	BUFFICONSIZE= "(De-)Buff-Größe",
 	SHOWPVP		= "Zeige Spieler-PvP-Status",
 	SHOWTEXTMAX	= "Zeige Maximalgesundheit/-energie",

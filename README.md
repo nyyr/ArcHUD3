@@ -2,6 +2,8 @@
 
 # ArcHUD3
 
+**Midnight Changes**: With the API changes in 12.0, it is no longer possible to create the kind of smooth arcs used here. There's some potential extremely janky and bad looking solutions, which for now I am not pursuing. If you feel like taking a crack at it anyway, feel free to open a PR to the GitHub project. I'll try to keep an eye out for Classic API updates, but you can report any I miss as an Issue on GitHub!
+
 ArcHUD displays smooth arcs around your character in the middle of the screen to inform you about the health and power (mana, rage, ...) of you, your pet, and your target. In addition, it shows casts, combo points, holy power, soul shards, and a couple of other things. It discretely fades when you are out of combat and at full health/power.
 
 This is a continuation of ArcHUD2 which managed to survive various patches... until the Cataclysm. Thanks to Nenie, the original author of ArcHUD2, for supporting me with this new version.

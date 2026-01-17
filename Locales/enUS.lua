@@ -46,6 +46,7 @@ L["TEXT"] = {
 	SHOWONLYBUFFSCASTBYPLAYER = "Show only your (de)buffs",
 	SHOWBUFFTT 	= "Show (de)buff tooltips",
 	HIDEBUFFTTIC = "Hide (de)buff tooltips in combat",
+	HIDEBUFFTIMERTEXT = "Hide (de)buff timer text",
 	BUFFICONSIZE= "(De)buff icon size",
 	SHOWPVP		= "Show player PvP status flag",
 	SHOWTEXTMAX	= "Show health/power maximum text",
