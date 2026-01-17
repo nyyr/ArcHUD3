@@ -408,6 +408,19 @@ ArcHUD.configOptionsTableCore = {
 						ArcHUD.db.profile.HideBuffTooltipsIC = v
 					end,
 				},
+				-- Hide Buff timer text
+				hideBuffTimerText = {
+					type		= "toggle",
+					name		= L["TEXT"]["HIDEBUFFTIMERTEXT"],
+					desc		= L["TOOLTIP"]["HIDEBUFFTIMERTEXT"],
+					order		= 10,
+					get			= function ()
+						return ArcHUD.db.profile.HideBuffTimerText
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.HideBuffTimerText = v
+					end,
+				},
 				-- Buff icon size
 				buffIconSize = {
 					type		= "range",
@@ -416,7 +429,7 @@ ArcHUD.configOptionsTableCore = {
 					min			= 16,
 					max			= 40,
 					step		= 4,
-					order		= 10,
+					order		= 11,
 					get			= function ()
 						return ArcHUD.db.profile.BuffIconSize
 					end,
@@ -438,7 +451,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["SHOWPVP"],
 					desc		= L["TOOLTIP"]["SHOWPVP"],
-					order		= 11,
+					order		= 12,
 					get			= function ()
 						return ArcHUD.db.profile.ShowPVP
 					end,
@@ -452,7 +465,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["SHOWTEXTMAX"],
 					desc		= L["TOOLTIP"]["SHOWTEXTMAX"],
-					order		= 12,
+					order		= 13,
 					get			= function ()
 						return ArcHUD.db.profile.ShowHealthPowerTextMax
 					end,
@@ -466,7 +479,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["TOT"],
 					desc		= L["TOOLTIP"]["TOT"],
-					order		= 13,
+					order		= 14,
 					get			= function ()
 						return ArcHUD.db.profile.TargetTarget
 					end,
@@ -480,7 +493,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["TOTOT"],
 					desc		= L["TOOLTIP"]["TOTOT"],
-					order		= 14,
+					order		= 15,
 					get			= function ()
 						return ArcHUD.db.profile.TargetTargetTarget
 					end,

@@ -126,6 +126,7 @@ L["TOOLTIP"] = {
 	SHOWONLYBUFFSCASTBYPLAYER = "只显示你施放的增(减)益效果。必须启用“显示增益效果和减益效果”。",
 	SHOWBUFFTT 	= "切换显示增益效果或减益效果提示",
 	HIDEBUFFTTIC = "切换显示战斗中增益效果或减益效果提示",
+	HIDEBUFFTIMERTEXT = "隐藏 (de)buff 计时器文本",
 	BUFFICONSIZE= "设置增(减)益效果图标大小(像素单位)",
 	SHOWPVP		= "切换显示玩家姓名板上的PVP状态标志",
 	SHOWTEXTMAX	= "切换显示生命/能量最大值文本",
