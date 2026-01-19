@@ -653,7 +653,7 @@ function ArcHUD.modulePrototype:StartRingTimers()
 		for i,f in pairs(self.frames) do
 			f.fillUpdate:Play()
 		end
-	elseif (self.f and self.f:GetAlpha() > 0) then
+	elseif (self.f) then
 		-- module with single or no frame
 		self.f.fillUpdate:Play()
 	end

@@ -388,36 +388,25 @@ function ArcHUD:CreateStatusBarArc(parent, maskTexture, moduleName)
 	-- StatusBar should inherit parent's size, position, and scale
 	sb:SetAllPoints(parent)
 	
-	sb:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
+	-- Use the original ArcHUD arc texture directly
+	local texturePath = "Interface\\AddOns\\ArcHUD3\\Icons\\RingFullLeft.png"
+	if side == 2 then
+		texturePath = "Interface\\AddOns\\ArcHUD3\\Icons\\RingFullRight.png"
+	end
+
+	sb:SetStatusBarTexture(texturePath)
 	sb:SetMinMaxValues(0, 1)
 	sb:SetValue(0)
 	sb:SetOrientation("VERTICAL")
-	
+
 	-- StatusBar inherits parent's scale automatically via SetAllPoints
 	-- Don't set scale manually to avoid double-scaling
-	
+
 	-- Set frame level to be above background but below text
 	sb:SetFrameLevel(parent:GetFrameLevel() + 1)
-	
+
 	-- Store reference to parent ring for alpha syncing
 	sb.parentRing = parent
-	
-	-- Create mask texture using arc outline (default if not provided)
-	-- The mask should show only the arc portion of the ring
-	local maskPath = maskTexture or "Interface\\AddOns\\ArcHUD3\\Icons\\arc_filled_left.png"
-	if side == 2 then
-		maskPath = maskTexture or "Interface\\AddOns\\ArcHUD3\\Icons\\arc_filled_right.png"
-	end
-	local mask = sb:CreateMaskTexture()
-	if mask then
-		mask:SetAllPoints(sb)
-		mask:SetTexture(maskPath, "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
-		local statusBarTexture = sb:GetStatusBarTexture()
-		if statusBarTexture then
-			statusBarTexture:AddMaskTexture(mask)
-		end
-		sb.mask = mask
-	end
 	
 	sb:Hide()
 	return sb
