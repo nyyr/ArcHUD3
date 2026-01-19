@@ -352,36 +352,207 @@ end
 --
 -- alpha - Alpha value to set
 -- alpha2 - If not nil and ring not full/empty, use alpha2 instead of alpha
+-- In 12.0.0+, values may be secret - protect operations
 -----------------------------------------------------------
 function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2)
 	if (self.frames) then
 		-- module with multiple frames
 		for i,f in pairs(self.frames) do
-			if (f.maxValue == 0) or f.isHidden then
+			-- Check if values are secret (12.0.0+)
+			local maxValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(f.maxValue)
+			local startValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(f.startValue)
+			local endValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(f.endValue)
+			
+			if maxValueSecret or f.isHidden then
+				f:SetRingAlpha(0)
+			elseif not maxValueSecret and (f.maxValue == 0) then
 				f:SetRingAlpha(0)
 			elseif (alpha2) then
+				-- In Midnight, use CurveObject to determine alpha based on percentage
+				-- The ring frame values are kept at 1/0 (not secret), so we must check actual unit health/power
+				if ArcHUD.isMidnight and self.unit and (self.isHealth or self.isPower) then
+					local unit = self.unit
+				if not self.alphaCurve then
+					-- Create Step curve: alpha2 for < 0.999, alpha for >= 1.0
+					self.alphaCurve = C_CurveUtil.CreateCurve()
+					if self.alphaCurve then
+						self.alphaCurve:SetType(Enum.LuaCurveType.Step)
+						-- Store alpha values in the module for reuse
+						self.alphaCurve.alpha2 = alpha2
+						self.alphaCurve.alpha = alpha
+						-- Add points immediately when creating the curve
+						self.alphaCurve:AddPoint(0.9999, alpha2)
+						self.alphaCurve:AddPoint(1.0, alpha)
+					end
+				end
+				if self.alphaCurve then
+					-- Update curve points if alpha values changed
+					if self.alphaCurve.alpha2 ~= alpha2 or self.alphaCurve.alpha ~= alpha then
+						self.alphaCurve:ClearPoints()
+						self.alphaCurve:AddPoint(0.9999, alpha2)
+						self.alphaCurve:AddPoint(1.0, alpha)
+						self.alphaCurve.alpha2 = alpha2
+						self.alphaCurve.alpha = alpha
+					end
+				end
+					
+					-- Determine if this is health or power
+					if self.isHealth then
+						-- Use UnitHealthPercent with curve
+						if self.alphaCurve then
+							local secretAlpha = UnitHealthPercent(unit, true, self.alphaCurve)
+							-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
+							if secretAlpha ~= nil then
+								f:SetRingAlpha(secretAlpha)
+								if f.statusBarArc then
+									f.statusBarArc:SetAlpha(secretAlpha)
+								end
+							else
+								f:SetRingAlpha(alpha2)
+							end
+						else
+							f:SetRingAlpha(alpha2)
+						end
+					elseif self.isPower then
+						-- Use UnitPowerPercent with curve
+						local powerType = UnitPowerType(unit)
+						if self.alphaCurve then
+							local secretAlpha = UnitPowerPercent(unit, powerType, nil, self.alphaCurve)
+							-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
+							if secretAlpha ~= nil then
+								f:SetRingAlpha(secretAlpha)
+								if f.statusBarArc then
+									f.statusBarArc:SetAlpha(secretAlpha)
+								end
+							else
+								f:SetRingAlpha(alpha2)
+							end
+						else
+							f:SetRingAlpha(alpha2)
+						end
+					else
+						-- Not health or power - fallback
+						f:SetRingAlpha(alpha2)
+					end
+				elseif not startValueSecret and not maxValueSecret and not endValueSecret then
+					-- Legacy: check ring frame values directly
+					if(f.startValue < f.maxValue or math.floor(f.startValue) ~= math.floor(f.endValue)) then
+						f:SetRingAlpha(alpha2)
+					elseif(self.f.startValue == self.f.maxValue) then
+						f:SetRingAlpha(alpha)
+					end
+				else
+					-- Values are secret but not in Midnight health/power mode - fallback
+					f:SetRingAlpha(alpha2)
+				end
+			else
+				-- No alpha2: set alpha directly (e.g., when in combat)
+				-- Force instant update to ensure it works even if previous alpha was secret
+				f:SetRingAlpha(alpha, true)
+				-- Also sync StatusBar alpha if it exists (Midnight mode)
+				if ArcHUD.isMidnight and f.statusBarArc then
+					f.statusBarArc:SetAlpha(alpha)
+				end
+			end
+		end
+	elseif (self.f) then
+		-- single/no frame
+		local f = self.f
+		-- Check if values are secret (12.0.0+)
+		local maxValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(f.maxValue)
+		local startValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(f.startValue)
+		local endValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(f.endValue)
+		
+		if maxValueSecret or f.isHidden then
+			f:SetRingAlpha(0)
+		elseif not maxValueSecret and (f.maxValue == 0) then
+			f:SetRingAlpha(0)
+		elseif (alpha2) then
+			-- In Midnight, use CurveObject to determine alpha based on percentage
+			-- The ring frame values are kept at 1/0 (not secret), so we must check actual unit health/power
+			if ArcHUD.isMidnight and self.unit and (self.isHealth or self.isPower) then
+				local unit = self.unit
+				if not self.alphaCurve then
+					-- Create Step curve: alpha2 for < 0.999, alpha for >= 1.0
+					self.alphaCurve = C_CurveUtil.CreateCurve()
+					if self.alphaCurve then
+						self.alphaCurve:SetType(Enum.LuaCurveType.Step)
+						-- Store alpha values in the module for reuse
+						self.alphaCurve.alpha2 = alpha2
+						self.alphaCurve.alpha = alpha
+						-- Add points immediately when creating the curve
+						self.alphaCurve:AddPoint(0.9999, alpha2)
+						self.alphaCurve:AddPoint(1.0, alpha)
+					end
+				end
+				if self.alphaCurve then
+					-- Update curve points if alpha values changed
+					if self.alphaCurve.alpha2 ~= alpha2 or self.alphaCurve.alpha ~= alpha then
+						self.alphaCurve:ClearPoints()
+						self.alphaCurve:AddPoint(0.9999, alpha2)
+						self.alphaCurve:AddPoint(1.0, alpha)
+						self.alphaCurve.alpha2 = alpha2
+						self.alphaCurve.alpha = alpha
+					end
+				end
+				
+				-- Determine if this is health or power
+				if self.isHealth then
+					-- Use UnitHealthPercent with curve
+					if self.alphaCurve then
+						local secretAlpha = UnitHealthPercent(unit, true, self.alphaCurve)
+						-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
+						if secretAlpha ~= nil then
+							f:SetRingAlpha(secretAlpha)
+							if f.statusBarArc then
+								f.statusBarArc:SetAlpha(secretAlpha)
+							end
+						else
+							f:SetRingAlpha(alpha2)
+						end
+					else
+						f:SetRingAlpha(alpha2)
+					end
+				elseif self.isPower then
+					-- Use UnitPowerPercent with curve
+					local powerType = UnitPowerType(unit)
+					if self.alphaCurve then
+						local secretAlpha = UnitPowerPercent(unit, powerType, nil, self.alphaCurve)
+						-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
+						if secretAlpha ~= nil then
+							f:SetRingAlpha(secretAlpha)
+							if f.statusBarArc then
+								f.statusBarArc:SetAlpha(secretAlpha)
+							end
+						else
+							f:SetRingAlpha(alpha2)
+						end
+					else
+						f:SetRingAlpha(alpha2)
+					end
+				else
+					-- Not health or power - fallback
+					f:SetRingAlpha(alpha2)
+				end
+			elseif not startValueSecret and not maxValueSecret and not endValueSecret then
+				-- Legacy: check ring frame values directly
 				if(f.startValue < f.maxValue or math.floor(f.startValue) ~= math.floor(f.endValue)) then
 					f:SetRingAlpha(alpha2)
 				elseif(self.f.startValue == self.f.maxValue) then
 					f:SetRingAlpha(alpha)
 				end
 			else
-				f:SetRingAlpha(alpha)
-			end
-		end
-	elseif (self.f) then
-		-- single/no frame
-		local f = self.f
-		if (f.maxValue == 0) or f.isHidden then
-			f:SetRingAlpha(0)
-		elseif (alpha2) then
-			if(f.startValue < f.maxValue or math.floor(f.startValue) ~= math.floor(f.endValue)) then
+				-- Values are secret but not in Midnight health/power mode - fallback
 				f:SetRingAlpha(alpha2)
-			elseif(self.f.startValue == self.f.maxValue) then
-				f:SetRingAlpha(alpha)
 			end
 		else
-			f:SetRingAlpha(alpha)
+			-- No alpha2: set alpha directly (e.g., when in combat)
+			-- Force instant update to ensure it works even if previous alpha was secret
+			f:SetRingAlpha(alpha, true)
+			-- Also sync StatusBar alpha if it exists (Midnight mode)
+			if ArcHUD.isMidnight and f.statusBarArc then
+				f.statusBarArc:SetAlpha(alpha)
+			end
 		end
 	end
 end
@@ -414,8 +585,13 @@ function ArcHUD.modulePrototype:CheckAlpha()
 		RingVisibility = AH_profile.RingVisibility -- global config
 	end
 	if (RingVisibility == 1 or RingVisibility == 3) then
+		-- Check if maxValue is secret (12.0.0+)
+		local maxValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(self.f.maxValue)
+		local startValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(self.f.startValue)
+		local endValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(self.f.endValue)
+		
 		if (RingVisibility == 3 and isInCombat) then
-			if (not UnitExists(unit)) or (self.isPower and (UnitIsDead(unit) or self.f.maxValue == 0)) then
+			if (not UnitExists(unit)) or (self.isPower and (UnitIsDead(unit) or (not maxValueSecret and self.f.maxValue == 0))) then
 				self.f:SetRingAlpha(0)
 			elseif (self.isHealth and UnitIsDead(unit)) then
 				self.f:SetRingAlpha(AH_profile.FadeFull)
@@ -426,14 +602,18 @@ function ArcHUD.modulePrototype:CheckAlpha()
 		else
 			local powerTypeId, _ = UnitPowerType(unit)
 			-- powerTypeId: 1 = rage, 6 = runic_power, 17 = fury
-			if (self.isPower and (unit ~= "pet") and basePowerTypeIsEmpty[powerTypeId] and (self.f.maxValue > 0)) then
-				if(math.floor(self.f.startValue) > 0 or math.floor(self.f.startValue) ~= math.floor(self.f.endValue)) then
-					self.f:SetRingAlpha(AH_profile.FadeOOC)
-				elseif(math.floor(self.f.startValue) == 0) then
+			if (self.isPower and (unit ~= "pet") and basePowerTypeIsEmpty[powerTypeId] and (not maxValueSecret and self.f.maxValue > 0)) then
+				if not startValueSecret and not endValueSecret then
+					if(math.floor(self.f.startValue) > 0 or math.floor(self.f.startValue) ~= math.floor(self.f.endValue)) then
+						self.f:SetRingAlpha(AH_profile.FadeOOC)
+					elseif(math.floor(self.f.startValue) == 0) then
+						self.f:SetRingAlpha(AH_profile.FadeFull)
+					end
+				else
 					self.f:SetRingAlpha(AH_profile.FadeFull)
 				end
 			else
-				if (not UnitExists(unit)) or (self.isPower and (UnitIsDead(unit) or self.f.maxValue == 0)) then
+				if (not UnitExists(unit)) or (self.isPower and (UnitIsDead(unit) or (not maxValueSecret and self.f.maxValue == 0))) then
 					self.f:SetRingAlpha(0)
 				elseif (self.isHealth and UnitIsDead(unit)) then
 					self.f:SetRingAlpha(AH_profile.FadeFull)
@@ -445,8 +625,10 @@ function ArcHUD.modulePrototype:CheckAlpha()
 		end
 
 	elseif (RingVisibility == 2) then
+		-- Check if maxValue is secret (12.0.0+)
+		local maxValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(self.f.maxValue)
 	
-		if ((not UnitExists(unit)) or (self.isPower and (UnitIsDead(unit) or self.f.maxValue == 0))) then
+		if ((not UnitExists(unit)) or (self.isPower and (UnitIsDead(unit) or (not maxValueSecret and self.f.maxValue == 0)))) then
 			self.f:SetRingAlpha(0)
 		elseif (self.isHealth and UnitIsDead(unit)) then
 			self.f:SetRingAlpha(AH_profile.FadeFull)

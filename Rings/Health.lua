@@ -71,6 +71,17 @@ function module:Initialize()
 	self.HPPerc = self:CreateFontString(self.f, "BACKGROUND", {70, 14}, 12, "RIGHT", {1.0, 1.0, 1.0}, {"TOPRIGHT", self.HPText, "BOTTOMRIGHT", 0, 0})
 	self.DefText = self:CreateFontString(self.f, "BACKGROUND", {70, 14}, 11, "RIGHT", {1.0, 0.2, 0.2}, {"BOTTOMRIGHT", self.HPText, "TOPRIGHT", 0, 0})
 	
+		-- Create StatusBar arc for 12.0.0+ (Midnight)
+		if ArcHUD.isMidnight then
+			-- Note: Mask texture path needs to be created - using placeholder for now
+			-- The mask should show only the arc portion of the ring
+			-- Health is left side (Side=1), pass module name to determine positioning
+			self.statusBarArc = self.parent:CreateStatusBarArc(self.f, nil, self.name) -- TODO: Add mask texture path
+		if self.statusBarArc then
+			self.statusBarArc:Hide() -- Hide by default, show when we have valid data
+		end
+	end
+	
 	self:CreateStandardModuleOptions(5)
 end
 
@@ -143,19 +154,62 @@ end
 function module:OnModuleEnable()
 	-- Initial setup
 	self:UpdateColor()
-	self.f:SetMax(UnitHealthMax(self.unit))
+	
+	if ArcHUD.isMidnight then
+		-- 12.0.0+ (Midnight): Initialize StatusBar arc
+		local health, maxHealth = UnitHealth(self.unit), UnitHealthMax(self.unit)
+		local healthSecret = self.parent:IsSecretValue(health)
+		local maxHealthSecret = self.parent:IsSecretValue(maxHealth)
+		local canCalculate = not healthSecret and not maxHealthSecret
+		
+		self.f.pulse = false
 
-	self.f.pulse = false
-
-	if(UnitIsGhost(self.unit)) then
-		self.f:GhostMode(true, self.unit)
+		if(UnitIsGhost(self.unit)) then
+			self.f:GhostMode(true, self.unit)
+			if self.statusBarArc then
+				self.statusBarArc:Hide()
+			end
+		else
+			self.f:GhostMode(false, self.unit)
+			
+			-- Update StatusBar arc
+			if self.statusBarArc then
+				self.parent:UpdateStatusBarArcHealth(self.statusBarArc, self.unit)
+				-- Update color from unit using ColorCurveObject
+				-- Returns ColorMixin object (may contain secret values)
+				local color = self.parent:GetHealthColorFromUnit(self.unit)
+				self.parent:SetStatusBarArcColor(self.statusBarArc, color)
+			end
+			
+			-- Update percentage text immediately (same time as StatusBar) to avoid lag
+			self.HPPerc:SetText(self.parent:FormatHealthPercent(self.unit))
+			
+			-- Update text - display actual values, including secret values
+			if canCalculate then
+				self.HPText:SetText(self.parent:FormatHealthText(self.unit))
+				self.DefText:SetText("0")
+			else
+				-- Secret values - show formatted text directly
+				self.HPText:SetText(self.parent:FormatHealthText(self.unit))
+				self.DefText:SetText("")
+			end
+			self.HPText:SetTextColor(0, 1, 0)
+		end
 	else
-		self.f:GhostMode(false, self.unit)
-		self.f:SetValue(UnitHealth(self.unit))
-		self.HPText:SetText(self.parent:fint(UnitHealth(self.unit)).."/"..self.parent:fint(UnitHealthMax(self.unit)))
-		self.HPText:SetTextColor(0, 1, 0)
-		self.HPPerc:SetText(floor((UnitHealth(self.unit)/UnitHealthMax(self.unit))*100).."%")
-		self.DefText:SetText("0")
+		-- Pre-12.0.0: Use original system
+		self.f:SetMax(UnitHealthMax(self.unit))
+		self.f.pulse = false
+
+		if(UnitIsGhost(self.unit)) then
+			self.f:GhostMode(true, self.unit)
+		else
+			self.f:GhostMode(false, self.unit)
+			self.f:SetValue(UnitHealth(self.unit))
+			self.HPText:SetText(self.parent:fint(UnitHealth(self.unit)).."/"..self.parent:fint(UnitHealthMax(self.unit)))
+			self.HPText:SetTextColor(0, 1, 0)
+			self.HPPerc:SetText(floor((UnitHealth(self.unit)/UnitHealthMax(self.unit))*100).."%")
+			self.DefText:SetText("0")
+		end
 	end
 	
 	if (not self.frames) then
@@ -198,7 +252,13 @@ end
 -- PLAYER_LEVEL_UP
 ----------------------------------------------
 function module:PLAYER_LEVEL_UP()
-	self.f:SetMax(UnitHealthMax(self.unit))
+	if ArcHUD.isMidnight then
+		-- On Midnight, max health may be secret - StatusBar handles this via percentage
+		-- No need to update max explicitly
+	else
+		-- Pre-12.0.0: Update max normally
+		self.f:SetMax(UnitHealthMax(self.unit))
+	end
 end
 
 ----------------------------------------------
@@ -206,64 +266,178 @@ end
 ----------------------------------------------
 function module:UpdateHealth(event, arg1)
 	if(arg1 == self.unit) then
-		local health, maxHealth = UnitHealth(self.unit), UnitHealthMax(self.unit)
-		local p = health/maxHealth
-		local r, g = 1, 1
-		if ( p > 0.5 ) then
-			r = (1.0 - p) * 2
-			g = 1.0
-		else
-			r = 1.0
-			g = p * 2
-		end
-		if ( r < 0 ) then r = 0 elseif ( r > 1 ) then r = 1 end
-		if ( g < 0 ) then g = 0 elseif ( g > 1 ) then g = 1 end
-
-		if(UnitIsGhost(self.unit)) then
-			self.f:GhostMode(true, self.unit)
-		else
-			self.f:GhostMode(false, self.unit)
-
+		if ArcHUD.isMidnight then
+			-- 12.0.0+ (Midnight): Use StatusBar approach
+			local health, maxHealth = UnitHealth(self.unit), UnitHealthMax(self.unit)
+			local healthSecret = self.parent:IsSecretValue(health)
+			local maxHealthSecret = self.parent:IsSecretValue(maxHealth)
+			local canCalculate = not healthSecret and not maxHealthSecret
+			
+			-- Update percentage text FIRST to ensure it updates on every event (including first)
+			self.HPPerc:SetText(self.parent:FormatHealthPercent(self.unit))
+			
+			-- Update StatusBar arc
+			if self.statusBarArc then
+				self.parent:UpdateStatusBarArcHealth(self.statusBarArc, self.unit)
+				-- Update color from unit using ColorCurveObject
+				-- Returns ColorMixin object (may contain secret values)
+				local color = self.parent:GetHealthColorFromUnit(self.unit)
+				self.parent:SetStatusBarArcColor(self.statusBarArc, color)
+			end
+			
+			-- Update text display - display actual values, including secret values
+			
+			if canCalculate then
+				if self.db.profile.ShowTextMax then
+					self.HPText:SetText(self.parent:FormatHealthText(self.unit))
+				else
+					-- Use fint to format current health (will use AbbreviateNumbers with precision: 1)
+					local healthStr = self.parent:fint(health)
+					self.HPText:SetText(healthStr)
+				end
+				-- Deficit calculation
+				local deficit = maxHealth - health
+				if deficit <= 0 then
+					self.DefText:SetText("")
+				else
+					self.DefText:SetText("-" .. self.parent:fint(deficit))
+				end
+			else
+				-- Values are secret - show formatted text directly
+				self.HPText:SetText(self.parent:FormatHealthText(self.unit))
+				self.DefText:SetText("")
+			end
+			
+			-- Color text
 			if(self.ColorMode == "fade") then
-				self:UpdateColor({r = r, g = g, b = 0.0})
-				self.HPText:SetTextColor(r, g, 0)
+				local color = self.parent:GetHealthColorFromUnit(self.unit)
+				-- ColorMixin has GetRGB() method - use it directly
+				-- GetRGB() may return secret values, but SetTextColor can handle them
+				if color and type(color) == "table" and color.GetRGB then
+					-- Use GetRGB() directly - SetTextColor can handle secret values
+					self.HPText:SetTextColor(color:GetRGB())
+					-- For UpdateColor on the ring, we need to extract values
+					-- Try to get RGB for UpdateColor, but handle secret values gracefully
+					local r, g, b = color:GetRGB()
+					-- Check if we can use these values for UpdateColor
+					-- If they're secret, UpdateColor might not work, so skip it
+					if not self.parent:IsSecretValue(r) and not self.parent:IsSecretValue(g) and
+					   type(r) == "number" and type(g) == "number" then
+						self:UpdateColor({r = r, g = g, b = b or 0})
+					else
+						-- Secret values - can't use for UpdateColor, but text color is already set
+						-- Keep default ring color
+					end
+				else
+					-- Legacy mode or fallback - should not happen in Midnight
+					self.HPText:SetTextColor(1, 1, 0)
+					self:UpdateColor({r = 1, g = 1, b = 0})
+				end
 			else
 				self.HPText:SetTextColor(0, 1, 0)
 				self:UpdateColor()
 			end
-			if self.db.profile.ShowTextMax then
-				self.HPText:SetText(self.parent:fint(health).."/"..self.parent:fint(maxHealth))
-			else
-				self.HPText:SetText(self.parent:fint(health))
-			end
-			self.HPPerc:SetText(floor((health/maxHealth)*100).."%")
-
-			local deficit = maxHealth - health
-			if deficit <= 0 then
-				deficit = ""
-			else
-				deficit = "-" .. self.parent:fint(deficit)
-			end
-			self.DefText:SetText(deficit)
-
-			self.f:SetMax(maxHealth)
 			
-			if (ArcHUD.hasAbsorbs) then
+			-- Ghost mode handling
+			if(UnitIsGhost(self.unit)) then
+				self.f:GhostMode(true, self.unit)
+				if self.statusBarArc then
+					self.statusBarArc:Hide()
+				end
+			else
+				self.f:GhostMode(false, self.unit)
+			end
+			
+			-- Absorbs (only if we can calculate)
+			if (ArcHUD.hasAbsorbs) and canCalculate then
 				local totalAbsorbs = UnitGetTotalAbsorbs(self.unit)
-				if totalAbsorbs > 0 then
+				if totalAbsorbs and totalAbsorbs > 0 then
+					if not self.frames then
+						-- create frame for absorbs
+						self.frames = {}
+						self.frames[1] = self.f
+						self.frames[2] = self:CreateRing(false, ArcHUDFrame)
+						self.frames[1].nextRingPart = self.frames[2]
+						self.frames[2]:SetStartAngle(self.frames[1].angle)
+						self.frames[2]:SetMax(10)
+						self.frames[2]:SetValue(0, 0)
+						self.frames[2]:UpdateColor(self.db.profile.ColorAbsorbs)
+						self.frames[2]:SetRingAlpha(0)
+						self.frames[2].dirty = true
+					end
 					self.frames[2]:SetMax(maxHealth - health)
 				end
 			end
 			
-			self.f:SetValue(health)
-		end
-		
-		if self.healPrediction > 0 then
-			local ih = self.healPrediction
-			if health + ih >= maxHealth then
-				ih = maxHealth - health - 1 -- spark will be hidden if <= 0 or >= max
+			-- Heal prediction (only if we can calculate)
+			if self.healPrediction > 0 and canCalculate then
+				local ih = self.healPrediction
+				if health + ih >= maxHealth then
+					ih = maxHealth - health - 1
+				end
+				-- Note: Spark positioning may not work with StatusBar - may need alternative
 			end
-			self.f:SetSpark(health + ih)
+		else
+			-- Pre-12.0.0: Use original ring system
+			local health, maxHealth = UnitHealth(self.unit), UnitHealthMax(self.unit)
+			local p = health/maxHealth
+			local r, g = 1, 1
+			if ( p > 0.5 ) then
+				r = (1.0 - p) * 2
+				g = 1.0
+			else
+				r = 1.0
+				g = p * 2
+			end
+			if ( r < 0 ) then r = 0 elseif ( r > 1 ) then r = 1 end
+			if ( g < 0 ) then g = 0 elseif ( g > 1 ) then g = 1 end
+
+			if(UnitIsGhost(self.unit)) then
+				self.f:GhostMode(true, self.unit)
+			else
+				self.f:GhostMode(false, self.unit)
+
+				if(self.ColorMode == "fade") then
+					self:UpdateColor({r = r, g = g, b = 0.0})
+					self.HPText:SetTextColor(r, g, 0)
+				else
+					self.HPText:SetTextColor(0, 1, 0)
+					self:UpdateColor()
+				end
+				if self.db.profile.ShowTextMax then
+					self.HPText:SetText(self.parent:fint(health).."/"..self.parent:fint(maxHealth))
+				else
+					self.HPText:SetText(self.parent:fint(health))
+				end
+				self.HPPerc:SetText(floor((health/maxHealth)*100).."%")
+
+				local deficit = maxHealth - health
+				if deficit <= 0 then
+					deficit = ""
+				else
+					deficit = "-" .. self.parent:fint(deficit)
+				end
+				self.DefText:SetText(deficit)
+
+				self.f:SetMax(maxHealth)
+				
+				if (ArcHUD.hasAbsorbs) then
+					local totalAbsorbs = UnitGetTotalAbsorbs(self.unit)
+					if totalAbsorbs > 0 then
+						self.frames[2]:SetMax(maxHealth - health)
+					end
+				end
+				
+				self.f:SetValue(health)
+			end
+			
+			if self.healPrediction > 0 then
+				local ih = self.healPrediction
+				if health + ih >= maxHealth then
+					ih = maxHealth - health - 1 -- spark will be hidden if <= 0 or >= max
+				end
+				self.f:SetSpark(health + ih)
+			end
 		end
 	end
 end
@@ -275,17 +449,33 @@ function module:UpdateHealthPrediction(event, arg1)
 	if self.db.profile.ShowIncoming and (arg1 == self.unit) then
 		local ih = UnitGetIncomingHeals(self.unit)
 		--self:Debug(1, "ih: %s", tostring(ih))
-		if (not ih) or (ih == 0) then
+		-- Protect against secret values in comparison
+		local ihSecret = self.parent:IsSecretValue(ih)
+		if ihSecret then
+			-- Secret value - can't compare, skip spark
 			self.healPrediction = 0
-			self.f:SetSpark(0) -- hide
+			if not ArcHUD.isMidnight then
+				self.f:SetSpark(0) -- hide
+			end
+		elseif (not ih) or (ih == 0) then
+			self.healPrediction = 0
+			if not ArcHUD.isMidnight then
+				self.f:SetSpark(0) -- hide
+			end
 		else
 			self.healPrediction = ih
-			local health, maxHealth = self.f.endValue, self.f.maxValue
-			if health + ih >= maxHealth then
-				ih = maxHealth - health - 1 -- spark will be hidden if <= 0 or >= max
+			if ArcHUD.isMidnight then
+				-- On Midnight, spark positioning may not work with StatusBar
+				-- Skip spark for now - may need alternative visualization
+			else
+				-- Pre-12.0.0: Use original spark system
+				local health, maxHealth = self.f.endValue, self.f.maxValue
+				if health + ih >= maxHealth then
+					ih = maxHealth - health - 1 -- spark will be hidden if <= 0 or >= max
+				end
+				--self:Debug(1, "spark: %s", tostring(health+ih))
+				self.f:SetSpark(health + ih)
 			end
-			--self:Debug(1, "spark: %s", tostring(health+ih))
-			self.f:SetSpark(health + ih)
 		end
 	end
 end
@@ -296,20 +486,52 @@ end
 function module:UpdateAbsorbs(event, arg1)
 	if self.db.profile.ShowAbsorbs and (arg1 == self.unit) then
 		local totalAbsorbs = UnitGetTotalAbsorbs(self.unit)
+		local totalAbsorbsSecret = self.parent:IsSecretValue(totalAbsorbs)
 		
-		if totalAbsorbs == 0 then
-			self.frames[2].isHidden = true
-			self.frames[2]:SetValue(0)
-			self.frames[2]:SetRingAlpha(0)
+		-- Check if absorbs are zero or nil - protect against secret value comparison
+		local hasAbsorbs = true
+		if not totalAbsorbs then
+			hasAbsorbs = false
+		elseif not totalAbsorbsSecret then
+			-- Only compare if not secret
+			if totalAbsorbs == 0 then
+				hasAbsorbs = false
+			end
+		end
+		-- If secret, assume hasAbsorbs (let StatusBar/ring handle it)
+		
+		if not hasAbsorbs then
+			if self.frames and self.frames[2] then
+				self.frames[2].isHidden = true
+				self.frames[2]:SetValue(0)
+				self.frames[2]:SetRingAlpha(0)
+			end
 		else
 			local health, maxHealth = UnitHealth(self.unit), UnitHealthMax(self.unit)
-			self.frames[2].isHidden = nil
-			self.frames[2]:SetMax(maxHealth - health)
-			self.frames[2]:SetValue(totalAbsorbs)
-			if(ArcHUD.db.profile.FadeIC > ArcHUD.db.profile.FadeOOC) then
-				self.frames[2]:SetRingAlpha(ArcHUD.db.profile.FadeIC)
-			else
-				self.frames[2]:SetRingAlpha(ArcHUD.db.profile.FadeOOC)
+			local healthSecret = self.parent:IsSecretValue(health)
+			local maxHealthSecret = self.parent:IsSecretValue(maxHealth)
+			
+			if self.frames and self.frames[2] then
+				self.frames[2].isHidden = nil
+				
+				-- Only calculate max if values are not secret
+				if not healthSecret and not maxHealthSecret then
+					self.frames[2]:SetMax(maxHealth - health)
+				elseif not totalAbsorbsSecret then
+					-- Fallback: use a reasonable estimate (only if totalAbsorbs is not secret)
+					self.frames[2]:SetMax(totalAbsorbs * 2)
+				else
+					-- All values are secret - use a default max
+					self.frames[2]:SetMax(100)
+				end
+				
+				-- SetValue can handle secret values directly
+				self.frames[2]:SetValue(totalAbsorbs)
+				if(ArcHUD.db.profile.FadeIC > ArcHUD.db.profile.FadeOOC) then
+					self.frames[2]:SetRingAlpha(ArcHUD.db.profile.FadeIC)
+				else
+					self.frames[2]:SetRingAlpha(ArcHUD.db.profile.FadeOOC)
+				end
 			end
 		end
 	end

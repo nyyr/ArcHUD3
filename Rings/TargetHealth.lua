@@ -44,6 +44,16 @@ function module:Initialize()
 	self.HPPerc = self:CreateFontString(self.f, "BACKGROUND", {40, 12}, 10, "CENTER", {1.0, 1.0, 1.0}, {"TOP", self.f, "BOTTOMLEFT", 20, -130})
 	--{"TOPLEFT", self.f, "BOTTOMLEFT", -100, -115})
 	
+	-- Create StatusBar arc for 12.0.0+ (Midnight)
+	if ArcHUD.isMidnight then
+		-- Note: Mask texture path needs to be created - using placeholder for now
+		-- TargetHealth is left side (Side=1), pass module name to determine positioning
+		self.statusBarArc = self.parent:CreateStatusBarArc(self.f, nil, self.name) -- TODO: Add mask texture path
+		if self.statusBarArc then
+			self.statusBarArc:Hide() -- Hide by default
+		end
+	end
+	
 	self:CreateStandardModuleOptions(20)
 end
 
@@ -110,14 +120,41 @@ function module:OnModuleUpdate()
 end
 
 function module:OnModuleEnable()
-	if not UnitExists(self.unit) then
-		self.f:SetMax(100)
-		self.f:SetValue(0)
-		self.HPPerc:SetText("")
+	if ArcHUD.isMidnight then
+		-- 12.0.0+ (Midnight): Initialize StatusBar arc
+		if not UnitExists(self.unit) then
+			self.HPPerc:SetText("")
+			if self.statusBarArc then
+				self.statusBarArc:Hide()
+			end
+		else
+			-- Update StatusBar arc
+			if self.statusBarArc then
+				self.parent:UpdateStatusBarArcHealth(self.statusBarArc, self.unit)
+				-- Set color based on friend/foe
+				if UnitIsFriend("player", self.unit) then
+					local color = self.db.profile.ColorFriend
+					self.parent:SetStatusBarArcColor(self.statusBarArc, color.r, color.g, color.b, 1)
+				else
+					local color = self.db.profile.ColorFoe
+					self.parent:SetStatusBarArcColor(self.statusBarArc, color.r, color.g, color.b, 1)
+				end
+			end
+			
+			-- Update text - display actual values, including secret values
+			self.HPPerc:SetText(self.parent:FormatHealthPercent(self.unit))
+		end
 	else
-		self.f:SetMax(UnitHealthMax(self.unit))
-		self.f:SetValue(UnitHealth(self.unit))
-		self.HPPerc:SetText(floor((UnitHealth(self.unit) / UnitHealthMax(self.unit)) * 100).."%")
+		-- Pre-12.0.0: Use original system
+		if not UnitExists(self.unit) then
+			self.f:SetMax(100)
+			self.f:SetValue(0)
+			self.HPPerc:SetText("")
+		else
+			self.f:SetMax(UnitHealthMax(self.unit))
+			self.f:SetValue(UnitHealth(self.unit))
+			self.HPPerc:SetText(floor((UnitHealth(self.unit) / UnitHealthMax(self.unit)) * 100).."%")
+		end
 	end
 
 	-- Register the events we will use
@@ -137,78 +174,185 @@ end
 
 function module:PLAYER_TARGET_CHANGED()
 	self.f.alphaState = -1
-	if not UnitExists(self.unit) then
-		self.f.pulse = false
-		self.f:SetMax(100)
-		self.f:SetValue(0)
-		self.HPPerc:SetText("")
-	else
-		self.f.pulse = false
-		self.tapped = false
-		self.friend = false
-		self.f:SetMax(UnitHealthMax(self.unit))
-		if(UnitIsDead(self.unit)) then
-			self.f:GhostMode(false, self.unit)
-			self.f:SetValue(0)
-			self.HPPerc:SetText("Dead")
-		elseif(UnitIsGhost(self.unit)) then
-			self.f:GhostMode(true, self.unit)
-		else
-			self.f:GhostMode(false, self.unit)
-			if UnitIsTapDenied(self.unit) then
-				self.f:UpdateColor({["r"] = 0.5, ["g"] = 0.5, ["b"] = 0.5})
-				self.tapped = true
-			elseif (UnitIsFriend("player", self.unit)) then
-				self:UpdateColor(1)
-				self.friend = true
-			else
-				self:UpdateColor(2)
+	if ArcHUD.isMidnight then
+		-- 12.0.0+ (Midnight): Use StatusBar approach
+		if not UnitExists(self.unit) then
+			self.f.pulse = false
+			self.HPPerc:SetText("")
+			if self.statusBarArc then
+				self.statusBarArc:Hide()
 			end
-			self.f:SetValue(UnitHealth(self.unit))
-			self.HPPerc:SetText(floor((UnitHealth(self.unit) / UnitHealthMax(self.unit)) * 100).."%")
-			
-			self:UNIT_HEAL_PREDICTION(nil, self.unit)
+		else
+			self.f.pulse = false
+			self.tapped = false
+			self.friend = false
+			if(UnitIsDead(self.unit)) then
+				self.f:GhostMode(false, self.unit)
+				if self.statusBarArc then
+					self.statusBarArc:Hide()
+				end
+				self.HPPerc:SetText("Dead")
+			elseif(UnitIsGhost(self.unit)) then
+				self.f:GhostMode(true, self.unit)
+				if self.statusBarArc then
+					self.statusBarArc:Hide()
+				end
+			else
+				self.f:GhostMode(false, self.unit)
+				
+				-- Update StatusBar arc
+				if self.statusBarArc then
+					self.parent:UpdateStatusBarArcHealth(self.statusBarArc, self.unit)
+					if UnitIsTapDenied(self.unit) then
+						self.parent:SetStatusBarArcColor(self.statusBarArc, 0.5, 0.5, 0.5, 1)
+						self.tapped = true
+					elseif (UnitIsFriend("player", self.unit)) then
+						local color = self.db.profile.ColorFriend
+						self.parent:SetStatusBarArcColor(self.statusBarArc, color.r, color.g, color.b, 1)
+						self.friend = true
+					else
+						local color = self.db.profile.ColorFoe
+						self.parent:SetStatusBarArcColor(self.statusBarArc, color.r, color.g, color.b, 1)
+					end
+				end
+				
+				-- Update text
+				local p = self.parent:GetHealthPercent(self.unit)
+				local pctInt = math.floor(p * 100)
+				self.HPPerc:SetText(pctInt.."%")
+				
+				self:UNIT_HEAL_PREDICTION(nil, self.unit)
+			end
+		end
+	else
+		-- Pre-12.0.0: Use original system
+		if not UnitExists(self.unit) then
+			self.f.pulse = false
+			self.f:SetMax(100)
+			self.f:SetValue(0)
+			self.HPPerc:SetText("")
+		else
+			self.f.pulse = false
+			self.tapped = false
+			self.friend = false
+			self.f:SetMax(UnitHealthMax(self.unit))
+			if(UnitIsDead(self.unit)) then
+				self.f:GhostMode(false, self.unit)
+				self.f:SetValue(0)
+				self.HPPerc:SetText("Dead")
+			elseif(UnitIsGhost(self.unit)) then
+				self.f:GhostMode(true, self.unit)
+			else
+				self.f:GhostMode(false, self.unit)
+				if UnitIsTapDenied(self.unit) then
+					self.f:UpdateColor({["r"] = 0.5, ["g"] = 0.5, ["b"] = 0.5})
+					self.tapped = true
+				elseif (UnitIsFriend("player", self.unit)) then
+					self:UpdateColor(1)
+					self.friend = true
+				else
+					self:UpdateColor(2)
+				end
+				self.f:SetValue(UnitHealth(self.unit))
+				self.HPPerc:SetText(floor((UnitHealth(self.unit) / UnitHealthMax(self.unit)) * 100).."%")
+				
+				self:UNIT_HEAL_PREDICTION(nil, self.unit)
+			end
 		end
 	end
 end
 
 function module:UpdateHealth(event, arg1)
 	if(arg1 == self.unit) then
-		if(UnitIsDead(self.unit)) then
-			self.f:GhostMode(false, self.unit)
-			self.f:SetValue(0)
-			self.HPPerc:SetText("Dead")
-		elseif(UnitIsGhost(self.unit)) then
-			self.f:GhostMode(true, self.unit)
-		else
-			self.f:GhostMode(false, self.unit)
-
-			-- Update ring color based on target status
-			if (not self.tapped and UnitIsTapDenied(self.unit)) then
-				self.f:UpdateColor({["r"] = 0.5, ["g"] = 0.5, ["b"] = 0.5})
-				self.tapped = true
-			elseif(not self.friend and UnitIsFriend("player", self.unit)) then
-				self:UpdateColor(1)
-				self.friend = true
-			elseif(self.friend and not UnitIsFriend("player", self.unit)) then
-				self:UpdateColor(2)
-				self.friend = false
-			end
-
-			local health, maxHealth = UnitHealth(self.unit), UnitHealthMax(self.unit)
-			self.HPPerc:SetText(floor((health / maxHealth) * 100).."%")
-			if (event == "UNIT_MAXHEALTH") then
-				self.f:SetMax(maxHealth)
-			else
-				self.f:SetValue(health)
-			end
-			
-			if self.healPrediction > 0 then
-				local ih = self.healPrediction
-				if health + ih >= maxHealth then
-					ih = maxHealth - health - 1 -- spark will be hidden if <= 0 or >= max
+		if ArcHUD.isMidnight then
+			-- 12.0.0+ (Midnight): Use StatusBar approach
+			if(UnitIsDead(self.unit)) then
+				self.f:GhostMode(false, self.unit)
+				if self.statusBarArc then
+					self.statusBarArc:Hide()
 				end
-				self.f:SetSpark(health + ih)
+				self.HPPerc:SetText("Dead")
+			elseif(UnitIsGhost(self.unit)) then
+				self.f:GhostMode(true, self.unit)
+				if self.statusBarArc then
+					self.statusBarArc:Hide()
+				end
+			else
+				self.f:GhostMode(false, self.unit)
+
+				-- Update StatusBar arc
+				if self.statusBarArc then
+					self.parent:UpdateStatusBarArcHealth(self.statusBarArc, self.unit)
+					-- Update color based on target status
+					if (not self.tapped and UnitIsTapDenied(self.unit)) then
+						self.parent:SetStatusBarArcColor(self.statusBarArc, 0.5, 0.5, 0.5, 1)
+						self.tapped = true
+					elseif(not self.friend and UnitIsFriend("player", self.unit)) then
+						local color = self.db.profile.ColorFriend
+						self.parent:SetStatusBarArcColor(self.statusBarArc, color.r, color.g, color.b, 1)
+						self.friend = true
+					elseif(self.friend and not UnitIsFriend("player", self.unit)) then
+						local color = self.db.profile.ColorFoe
+						self.parent:SetStatusBarArcColor(self.statusBarArc, color.r, color.g, color.b, 1)
+						self.friend = false
+					end
+				end
+
+				-- Update text - display actual values, including secret values
+				self.HPPerc:SetText(self.parent:FormatHealthPercent(self.unit))
+				
+				-- Heal prediction (only if we can calculate)
+				if self.healPrediction > 0 then
+					local health, maxHealth = UnitHealth(self.unit), UnitHealthMax(self.unit)
+					local healthSecret = self.parent:IsSecretValue(health)
+					local maxHealthSecret = self.parent:IsSecretValue(maxHealth)
+					if not healthSecret and not maxHealthSecret then
+						local ih = self.healPrediction
+						if health + ih >= maxHealth then
+							ih = maxHealth - health - 1
+						end
+						-- Note: Spark positioning may not work with StatusBar
+					end
+				end
+			end
+		else
+			-- Pre-12.0.0: Use original system
+			if(UnitIsDead(self.unit)) then
+				self.f:GhostMode(false, self.unit)
+				self.f:SetValue(0)
+				self.HPPerc:SetText("Dead")
+			elseif(UnitIsGhost(self.unit)) then
+				self.f:GhostMode(true, self.unit)
+			else
+				self.f:GhostMode(false, self.unit)
+
+				-- Update ring color based on target status
+				if (not self.tapped and UnitIsTapDenied(self.unit)) then
+					self.f:UpdateColor({["r"] = 0.5, ["g"] = 0.5, ["b"] = 0.5})
+					self.tapped = true
+				elseif(not self.friend and UnitIsFriend("player", self.unit)) then
+					self:UpdateColor(1)
+					self.friend = true
+				elseif(self.friend and not UnitIsFriend("player", self.unit)) then
+					self:UpdateColor(2)
+					self.friend = false
+				end
+
+				local health, maxHealth = UnitHealth(self.unit), UnitHealthMax(self.unit)
+				self.HPPerc:SetText(floor((health / maxHealth) * 100).."%")
+				if (event == "UNIT_MAXHEALTH") then
+					self.f:SetMax(maxHealth)
+				else
+					self.f:SetValue(health)
+				end
+				
+				if self.healPrediction > 0 then
+					local ih = self.healPrediction
+					if health + ih >= maxHealth then
+						ih = maxHealth - health - 1 -- spark will be hidden if <= 0 or >= max
+					end
+					self.f:SetSpark(health + ih)
+				end
 			end
 		end
 	end
@@ -223,15 +367,23 @@ function module:UNIT_HEAL_PREDICTION(event, arg1)
 		--self:Debug(1, "ih: %s", tostring(ih))
 		if (not ih) or (ih == 0) then
 			self.healPrediction = 0
-			self.f:SetSpark(0) -- hide
+			if not ArcHUD.isMidnight then
+				self.f:SetSpark(0) -- hide
+			end
 		else
 			self.healPrediction = ih
-			local health, maxHealth = self.f.endValue, self.f.maxValue
-			if health + ih >= maxHealth then
-				ih = maxHealth - health - 1 -- spark will be hidden if <= 0 or >= max
+			if ArcHUD.isMidnight then
+				-- On Midnight, spark positioning may not work with StatusBar
+				-- Skip spark for now - may need alternative visualization
+			else
+				-- Pre-12.0.0: Use original spark system
+				local health, maxHealth = self.f.endValue, self.f.maxValue
+				if health + ih >= maxHealth then
+					ih = maxHealth - health - 1 -- spark will be hidden if <= 0 or >= max
+				end
+				--self:Debug(1, "spark: %s", tostring(health+ih))
+				self.f:SetSpark(health + ih)
 			end
-			--self:Debug(1, "spark: %s", tostring(health+ih))
-			self.f:SetSpark(health + ih)
 		end
 	end
 end

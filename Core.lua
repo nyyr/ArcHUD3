@@ -23,6 +23,9 @@ ArcHUD.classic = ArcHUD.isClassicWoW or ArcHUD.isClassicTbc or ArcHUD.isClassicW
 -- generic feature switches based on expansion
 ArcHUD.hasHealPrediction = not ArcHUD.classic
 ArcHUD.hasAbsorbs = not ArcHUD.classic and not ArcHUD.isClassicCata
+
+-- Detect 12.0.0+ (Midnight) - check for secret value API
+ArcHUD.isMidnight = (issecretvalue ~= nil) or (UnitHealthPercent ~= nil) or (C_CurveUtil ~= nil)
 ArcHUD.UnitCastingInfo = UnitCastingInfo
 ArcHUD.UnitChannelInfo = UnitChannelInfo
 
@@ -511,24 +514,83 @@ function ArcHUD:TargetUpdate(event, arg1)
 		if(UnitIsDead("target") or UnitIsGhost("target")) then
 			self.TargetHUD.HPText:SetText("Dead")
 		else
-			if self.db.profile.ShowHealthPowerTextMax then
-				self.TargetHUD.HPText:SetText(self:fint(UnitHealth("target")).."/"..self:fint(UnitHealthMax("target")))
+			if ArcHUD.isMidnight then
+				-- 12.0.0+ (Midnight): Protect secret values
+				local health, maxHealth = UnitHealth("target"), UnitHealthMax("target")
+				local healthSecret = self:IsSecretValue(health)
+				local maxHealthSecret = self:IsSecretValue(maxHealth)
+				if not healthSecret and not maxHealthSecret then
+					if self.db.profile.ShowHealthPowerTextMax then
+						self.TargetHUD.HPText:SetText(self:fint(health).."/"..self:fint(maxHealth))
+					else
+						self.TargetHUD.HPText:SetText(self:fint(health))
+					end
+				else
+					-- Values are secret - show percentage only
+					local p = self:GetHealthPercent("target")
+					local pctInt = math.floor(p * 100)
+					self.TargetHUD.HPText:SetText(pctInt.."%")
+				end
 			else
-				self.TargetHUD.HPText:SetText(self:fint(UnitHealth("target")))
+				-- Pre-12.0.0: Use original system
+				if self.db.profile.ShowHealthPowerTextMax then
+					self.TargetHUD.HPText:SetText(self:fint(UnitHealth("target")).."/"..self:fint(UnitHealthMax("target")))
+				else
+					self.TargetHUD.HPText:SetText(self:fint(UnitHealth("target")))
+				end
 			end
 		end
 
 		-- Does the unit have power? If so we want to show it
-		if (UnitPowerMax("target") > 0) then
-			if self.db.profile.ShowHealthPowerTextMax then
-				self.TargetHUD.MPText:SetText(self:fint(UnitPower("target")).."/"..self:fint(UnitPowerMax("target")))
+		if ArcHUD.isMidnight then
+			-- 12.0.0+ (Midnight): Protect secret values
+			local maxPower = UnitPowerMax("target")
+			local maxPowerSecret = self:IsSecretValue(maxPower)
+			if not maxPowerSecret and maxPower > 0 then
+				local power = UnitPower("target")
+				local powerSecret = self:IsSecretValue(power)
+				if not powerSecret then
+					if self.db.profile.ShowHealthPowerTextMax then
+						self.TargetHUD.MPText:SetText(self:fint(power).."/"..self:fint(maxPower))
+					else
+						self.TargetHUD.MPText:SetText(self:fint(power))
+					end
+				else
+					local p = self:GetPowerPercent("target")
+					local pctInt = math.floor(p * 100)
+					self.TargetHUD.MPText:SetText(pctInt.."%")
+				end
+				self:StartTimer("UpdateTargetPower")
 			else
-				self.TargetHUD.MPText:SetText(self:fint(UnitPower("target")))
+				-- Try to show percentage if possible
+				local p = self:GetPowerPercent("target")
+				if p and not self:IsSecretValue(p) then
+					local pctInt = math.floor(p * 100)
+					if pctInt > 0 then
+						self.TargetHUD.MPText:SetText(pctInt.."%")
+						self:StartTimer("UpdateTargetPower")
+					else
+						self.TargetHUD.MPText:SetText(" ")
+						self:StopTimer("UpdateTargetPower")
+					end
+				else
+					self.TargetHUD.MPText:SetText(" ")
+					self:StopTimer("UpdateTargetPower")
+				end
 			end
-			self:StartTimer("UpdateTargetPower")
 		else
-			self.TargetHUD.MPText:SetText(" ")
-			self:StopTimer("UpdateTargetPower")
+			-- Pre-12.0.0: Use original system
+			if (UnitPowerMax("target") > 0) then
+				if self.db.profile.ShowHealthPowerTextMax then
+					self.TargetHUD.MPText:SetText(self:fint(UnitPower("target")).."/"..self:fint(UnitPowerMax("target")))
+				else
+					self.TargetHUD.MPText:SetText(self:fint(UnitPower("target")))
+				end
+				self:StartTimer("UpdateTargetPower")
+			else
+				self.TargetHUD.MPText:SetText(" ")
+				self:StopTimer("UpdateTargetPower")
+			end
 		end
 
 		local addtolevel = ""
@@ -705,7 +767,9 @@ function ArcHUD:TargetAuras(event, arg1)
 			button:Show()
 			button.unit = unit
 
-			if (count > 1) then
+			-- Protect against secret value comparison (12.0.0+)
+			local countSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(count)
+			if not countSecret and count and count > 1 then
 				button.Count:SetText(count)
 				button.Count:Show()
 				button.Count:SetPoint("CENTER", button, "CENTER", 2, 0)
@@ -745,14 +809,22 @@ function ArcHUD:TargetAuras(event, arg1)
 			button.isdebuff = 1
 			button.unit = unit
 
-			if ( buffType ) then
-				color = DebuffTypeColor[buffType]
+			-- DebuffTypeColor may not exist in Midnight
+			if DebuffTypeColor then
+				if ( buffType ) then
+					color = DebuffTypeColor[buffType]
+				else
+					color = DebuffTypeColor["none"]
+				end
 			else
-				color = DebuffTypeColor["none"]
+				-- Fallback color if DebuffTypeColor doesn't exist
+				color = {r = 1, g = 0, b = 0} -- Red as default
 			end
 			button.Border:SetVertexColor(color.r, color.g, color.b)
 
-			if (count > 1) then
+			-- Protect against secret value comparison (12.0.0+)
+			local countSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(count)
+			if not countSecret and count and count > 1 then
 				button.Count:SetText(count)
 				button.Count:Show()
 				button.Count:SetPoint("CENTER", button, "CENTER", 2, 0)
@@ -798,10 +870,30 @@ end
 -- UpdateTargetPower()
 ----------------------------------------------
 function ArcHUD:UpdateTargetPower()
-	if self.db.profile.ShowHealthPowerTextMax then
-		self.TargetHUD.MPText:SetText(self:fint(UnitPower("target")).."/"..self:fint(UnitPowerMax("target")))
+	if ArcHUD.isMidnight then
+		-- 12.0.0+ (Midnight): Protect secret values
+		local power, maxPower = UnitPower("target"), UnitPowerMax("target")
+		local powerSecret = self:IsSecretValue(power)
+		local maxPowerSecret = self:IsSecretValue(maxPower)
+		if not powerSecret and not maxPowerSecret then
+			if self.db.profile.ShowHealthPowerTextMax then
+				self.TargetHUD.MPText:SetText(self:fint(power).."/"..self:fint(maxPower))
+			else
+				self.TargetHUD.MPText:SetText(self:fint(power))
+			end
+		else
+			-- Values are secret - show percentage only
+			local p = self:GetPowerPercent("target")
+			local pctInt = math.floor(p * 100)
+			self.TargetHUD.MPText:SetText(pctInt.."%")
+		end
 	else
-		self.TargetHUD.MPText:SetText(self:fint(UnitPower("target")))
+		-- Pre-12.0.0: Use original system
+		if self.db.profile.ShowHealthPowerTextMax then
+			self.TargetHUD.MPText:SetText(self:fint(UnitPower("target")).."/"..self:fint(UnitPowerMax("target")))
+		else
+			self.TargetHUD.MPText:SetText(self:fint(UnitPower("target")))
+		end
 	end
 end
 
@@ -959,13 +1051,45 @@ function ArcHUD:UpdateTargetTarget()
 		if(UnitIsDead("targettarget") or UnitIsGhost("targettarget")) then
 			self.TargetHUD.Target.HPText:SetText("Dead")
 		else
-			self.TargetHUD.Target.HPText:SetText(math.floor(UnitHealth("targettarget")/UnitHealthMax("targettarget")*100).."%")
+			if ArcHUD.isMidnight then
+				-- 12.0.0+ (Midnight): Protect secret values
+				local p = self:GetHealthPercent("targettarget")
+				local pctInt = math.floor(p * 100)
+				self.TargetHUD.Target.HPText:SetText(pctInt.."%")
+			else
+				-- Pre-12.0.0: Use original system
+				self.TargetHUD.Target.HPText:SetText(math.floor(UnitHealth("targettarget")/UnitHealthMax("targettarget")*100).."%")
+			end
 		end
 
-		if (UnitPowerMax("targettarget") > 0) then
-			self.TargetHUD.Target.MPText:SetText(math.floor(UnitPower("targettarget")/UnitPowerMax("targettarget")*100).."%")
+		if ArcHUD.isMidnight then
+			-- 12.0.0+ (Midnight): Protect secret values
+			local maxPower = UnitPowerMax("targettarget")
+			local maxPowerSecret = self:IsSecretValue(maxPower)
+			if not maxPowerSecret and maxPower > 0 then
+				local p = self:GetPowerPercent("targettarget")
+				local pctInt = math.floor(p * 100)
+				self.TargetHUD.Target.MPText:SetText(pctInt.."%")
+			else
+				local p = self:GetPowerPercent("targettarget")
+				if p and not self:IsSecretValue(p) then
+					local pctInt = math.floor(p * 100)
+					if pctInt > 0 then
+						self.TargetHUD.Target.MPText:SetText(pctInt.."%")
+					else
+						self.TargetHUD.Target.MPText:SetText(" ")
+					end
+				else
+					self.TargetHUD.Target.MPText:SetText(" ")
+				end
+			end
 		else
-			self.TargetHUD.Target.MPText:SetText(" ")
+			-- Pre-12.0.0: Use original system
+			if (UnitPowerMax("targettarget") > 0) then
+				self.TargetHUD.Target.MPText:SetText(math.floor(UnitPower("targettarget")/UnitPowerMax("targettarget")*100).."%")
+			else
+				self.TargetHUD.Target.MPText:SetText(" ")
+			end
 		end
 		self.TargetHUD.Target:SetAlpha(1)
 		self.Nameplates.targettarget:Enable()
@@ -1011,13 +1135,45 @@ function ArcHUD:UpdateTargetTarget()
 		if(UnitIsDead("targettargettarget") or UnitIsGhost("targettargettarget")) then
 			self.TargetHUD.TargetTarget.HPText:SetText("Dead")
 		else
-			self.TargetHUD.TargetTarget.HPText:SetText(math.floor(UnitHealth("targettargettarget")/UnitHealthMax("targettargettarget")*100).."%")
+			if ArcHUD.isMidnight then
+				-- 12.0.0+ (Midnight): Protect secret values
+				local p = self:GetHealthPercent("targettargettarget")
+				local pctInt = math.floor(p * 100)
+				self.TargetHUD.TargetTarget.HPText:SetText(pctInt.."%")
+			else
+				-- Pre-12.0.0: Use original system
+				self.TargetHUD.TargetTarget.HPText:SetText(math.floor(UnitHealth("targettargettarget")/UnitHealthMax("targettargettarget")*100).."%")
+			end
 		end
 
-		if (UnitPowerMax("targettargettarget") > 0) then
-			self.TargetHUD.TargetTarget.MPText:SetText(math.floor(UnitPower("targettargettarget")/UnitPowerMax("targettargettarget")*100).."%")
+		if ArcHUD.isMidnight then
+			-- 12.0.0+ (Midnight): Protect secret values
+			local maxPower = UnitPowerMax("targettargettarget")
+			local maxPowerSecret = self:IsSecretValue(maxPower)
+			if not maxPowerSecret and maxPower > 0 then
+				local p = self:GetPowerPercent("targettargettarget")
+				local pctInt = math.floor(p * 100)
+				self.TargetHUD.TargetTarget.MPText:SetText(pctInt.."%")
+			else
+				local p = self:GetPowerPercent("targettargettarget")
+				if p and not self:IsSecretValue(p) then
+					local pctInt = math.floor(p * 100)
+					if pctInt > 0 then
+						self.TargetHUD.TargetTarget.MPText:SetText(pctInt.."%")
+					else
+						self.TargetHUD.TargetTarget.MPText:SetText(" ")
+					end
+				else
+					self.TargetHUD.TargetTarget.MPText:SetText(" ")
+				end
+			end
 		else
-			self.TargetHUD.TargetTarget.MPText:SetText(" ")
+			-- Pre-12.0.0: Use original system
+			if (UnitPowerMax("targettargettarget") > 0) then
+				self.TargetHUD.TargetTarget.MPText:SetText(math.floor(UnitPower("targettargettarget")/UnitPowerMax("targettargettarget")*100).."%")
+			else
+				self.TargetHUD.TargetTarget.MPText:SetText(" ")
+			end
 		end
 		self.TargetHUD.TargetTarget:SetAlpha(1)
 		self.Nameplates.targettargettarget:Enable()
@@ -1076,10 +1232,30 @@ function ArcHUD:EventHandler(event, arg1)
 
 	elseif (event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH") then
 		if (arg1 == "target") then
-			if self.db.profile.ShowHealthPowerTextMax then
-				self.TargetHUD.HPText:SetText(self:fint(UnitHealth(arg1)).."/"..self:fint(UnitHealthMax(arg1)))
+			if ArcHUD.isMidnight then
+				-- 12.0.0+ (Midnight): Protect secret values
+				local health, maxHealth = UnitHealth(arg1), UnitHealthMax(arg1)
+				local healthSecret = self:IsSecretValue(health)
+				local maxHealthSecret = self:IsSecretValue(maxHealth)
+				if not healthSecret and not maxHealthSecret then
+					if self.db.profile.ShowHealthPowerTextMax then
+						self.TargetHUD.HPText:SetText(self:fint(health).."/"..self:fint(maxHealth))
+					else
+						self.TargetHUD.HPText:SetText(self:fint(health))
+					end
+				else
+					-- Values are secret - show percentage only
+					local p = self:GetHealthPercent(arg1)
+					local pctInt = math.floor(p * 100)
+					self.TargetHUD.HPText:SetText(pctInt.."%")
+				end
 			else
-				self.TargetHUD.HPText:SetText(self:fint(UnitHealth(arg1)))
+				-- Pre-12.0.0: Use original system
+				if self.db.profile.ShowHealthPowerTextMax then
+					self.TargetHUD.HPText:SetText(self:fint(UnitHealth(arg1)).."/"..self:fint(UnitHealthMax(arg1)))
+				else
+					self.TargetHUD.HPText:SetText(self:fint(UnitHealth(arg1)))
+				end
 			end
 		end
 
@@ -1089,7 +1265,23 @@ function ArcHUD:EventHandler(event, arg1)
 
 	else
 		if (arg1 == "target") then
-			self.TargetHUD.MPText:SetText(self:fint(UnitPower(arg1)).."/"..self:fint(UnitPowerMax(arg1)))
+			if ArcHUD.isMidnight then
+				-- 12.0.0+ (Midnight): Protect secret values
+				local power, maxPower = UnitPower(arg1), UnitPowerMax(arg1)
+				local powerSecret = self:IsSecretValue(power)
+				local maxPowerSecret = self:IsSecretValue(maxPower)
+				if not powerSecret and not maxPowerSecret then
+					self.TargetHUD.MPText:SetText(self:fint(power).."/"..self:fint(maxPower))
+				else
+					-- Values are secret - show percentage only
+					local p = self:GetPowerPercent(arg1)
+					local pctInt = math.floor(p * 100)
+					self.TargetHUD.MPText:SetText(pctInt.."%")
+				end
+			else
+				-- Pre-12.0.0: Use original system
+				self.TargetHUD.MPText:SetText(self:fint(UnitPower(arg1)).."/"..self:fint(UnitPowerMax(arg1)))
+			end
 		end
 	end
 end

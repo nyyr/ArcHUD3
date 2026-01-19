@@ -44,7 +44,20 @@ function module:Initialize()
 
 	self.MPText = self:CreateFontString(self.f, "BACKGROUND", {150, 15}, 14, "LEFT", {1.0, 1.0, 0.0}, {"TOPLEFT", ArcHUDFrameCombo, "TOPRIGHT", 0, 0})
 	self.MPPerc = self:CreateFontString(self.f, "BACKGROUND", {70, 14}, 12, "LEFT", {1.0, 1.0, 1.0}, {"TOPLEFT", self.MPText, "BOTTOMLEFT", 0, 0})
-	self:RegisterTimer("UpdatePowerBar", self.UpdatePowerBar, 0.1, self, true)
+	
+		-- Create StatusBar arc for 12.0.0+ (Midnight)
+		if ArcHUD.isMidnight then
+			-- Note: Mask texture path needs to be created - using placeholder for now
+			-- Power is right side (Side=2), pass module name to determine positioning
+			self.statusBarArc = self.parent:CreateStatusBarArc(self.f, nil, self.name) -- TODO: Add mask texture path
+		if self.statusBarArc then
+			self.statusBarArc:Hide() -- Hide by default
+		end
+	end
+	
+	if not ArcHUD.isMidnight then
+		self:RegisterTimer("UpdatePowerBar", self.UpdatePowerBar, 0.1, self, true)
+	end
 	
 	self:CreateStandardModuleOptions(10)
 end
@@ -99,22 +112,63 @@ end
 function module:OnModuleEnable()
 	self.f.pulse = false
 
-	if(UnitIsGhost(self.unit)) then
-		self.f:GhostMode(true, self.unit)
+	if ArcHUD.isMidnight then
+		-- 12.0.0+ (Midnight): Initialize StatusBar arc
+		if(UnitIsGhost(self.unit)) then
+			self.f:GhostMode(true, self.unit)
+			if self.statusBarArc then
+				self.statusBarArc:Hide()
+			end
+		else
+			self.f:GhostMode(false, self.unit)
+			
+			local powerType = UnitPowerType(self.unit)
+			local info = self:GetPowerBarColorText(powerType)
+			self.MPText:SetVertexColor(info.r, info.g, info.b)
+			
+			-- Update StatusBar arc
+			if self.statusBarArc then
+				self.parent:UpdateStatusBarArcPower(self.statusBarArc, self.unit, powerType)
+				-- Use GetPowerBarColor (not GetPowerBarColorText) for StatusBar color
+				-- GetPowerBarColorText returns light colors for text readability, but bar should use actual power color
+				local barColor = self:GetPowerBarColor(powerType)
+				self.parent:SetStatusBarArcColor(self.statusBarArc, barColor.r, barColor.g, barColor.b, 1)
+			end
+			
+			-- Update text - display actual values, including secret values
+			local power, maxPower = UnitPower(self.unit), UnitPowerMax(self.unit)
+			local powerSecret = self.parent:IsSecretValue(power)
+			local maxPowerSecret = self.parent:IsSecretValue(maxPower)
+			local canCalculate = not powerSecret and not maxPowerSecret
+			
+			if canCalculate then
+				self.MPText:SetText(self.parent:FormatPowerText(self.unit, powerType))
+			else
+				-- Secret values - show formatted text directly
+				self.MPText:SetText(self.parent:FormatPowerText(self.unit, powerType))
+			end
+			self.MPPerc:SetText(self.parent:FormatPowerPercent(self.unit, powerType))
+		end
 	else
-		self.f:GhostMode(false, self.unit)
+		-- Pre-12.0.0: Use original system
+		if(UnitIsGhost(self.unit)) then
+			self.f:GhostMode(true, self.unit)
+		else
+			self.f:GhostMode(false, self.unit)
 
-		info = self:GetPowerBarColorText(UnitPowerType(self.unit))
-		self.MPText:SetVertexColor(info.r, info.g, info.b)
+			local info = self:GetPowerBarColorText(UnitPowerType(self.unit))
+			self.MPText:SetVertexColor(info.r, info.g, info.b)
 
-		self.f:SetMax(UnitPowerMax(self.unit))
-		self.f:SetValue(UnitPower(self.unit))
-		self.MPText:SetText(self.parent:fint(UnitPower(self.unit)).."/"..self.parent:fint(UnitPowerMax(self.unit)))
-		self.MPPerc:SetText(floor((UnitPower(self.unit)/UnitPowerMax(self.unit))*100).."%")
+			self.f:SetMax(UnitPowerMax(self.unit))
+			self.f:SetValue(UnitPower(self.unit))
+			self.MPText:SetText(self.parent:fint(UnitPower(self.unit)).."/"..self.parent:fint(UnitPowerMax(self.unit)))
+			self.MPPerc:SetText(floor((UnitPower(self.unit)/UnitPowerMax(self.unit))*100).."%")
+		end
 	end
 
 	-- Register the events we will use
 	self:RegisterUnitEvent("UNIT_POWER_UPDATE", "UpdatePowerEvent")
+	self:RegisterUnitEvent("UNIT_POWER_FREQUENT", "UpdatePowerEvent") -- For smoother updates
 	self:RegisterUnitEvent("UNIT_MAXPOWER", "UpdatePowerEvent")
 	self:RegisterUnitEvent("UNIT_DISPLAYPOWER", "UpdatePowerType")
 	self:RegisterEvent("PLAYER_ALIVE", "UpdatePowerEvent")
@@ -130,7 +184,13 @@ end
 -- PLAYER_LEVEL_UP
 ----------------------------------------------
 function module:PLAYER_LEVEL_UP()
-	self.f:SetMax(UnitPowerMax(self.unit))
+	if ArcHUD.isMidnight then
+		-- On Midnight, max power may be secret - StatusBar handles this via percentage
+		-- No need to update max explicitly
+	else
+		-- Pre-12.0.0: Update max normally
+		self.f:SetMax(UnitPowerMax(self.unit))
+	end
 end
 
 ----------------------------------------------
@@ -138,42 +198,43 @@ end
 ----------------------------------------------
 function module:UpdatePowerBar()
 	if (not UnitIsGhost(self.unit)) then
-		local power = UnitPower(self.unit)
-		local maxPower = UnitPowerMax(self.unit)
-		
-		if (maxPower > 0) then
-			if self.db.profile.ShowTextMax then
-				self.MPText:SetText(self.parent:fint(power).."/"..self.parent:fint(maxPower))
-			else
-				self.MPText:SetText(self.parent:fint(power))
-			end
-			self.MPPerc:SetText(floor((power/maxPower)*100).."%")
-		else
-			self.MPText:SetText("")
-			self.MPPerc:SetText("")
-		end
-		
-		self.f:SetMax(maxPower)
-		self.f:SetValue(power)
+		if ArcHUD.isMidnight then
+			-- 12.0.0+ (Midnight): Use StatusBar approach
+			local powerType = UnitPowerType(self.unit)
+			local power, maxPower = UnitPower(self.unit), UnitPowerMax(self.unit)
+			local powerSecret = self.parent:IsSecretValue(power)
+			local maxPowerSecret = self.parent:IsSecretValue(maxPower)
+			local canCalculate = not powerSecret and not maxPowerSecret
 			
-		if (power == maxPower or power == 0) then
-			self:StopTimer("UpdatePowerBar")
-		end
-	end
-end
-
-----------------------------------------------
--- Update Power (event)
-----------------------------------------------
-function module:UpdatePowerEvent(event, arg1)
-	if (arg1 == self.unit) then
-		local power = UnitPower(self.unit)
-		local maxPower = UnitPowerMax(self.unit)
-		
-		if(UnitIsGhost(self.unit) or (UnitIsDead(self.unit) and event == "PLAYER_ALIVE")) then
-			self.f:GhostMode(true, self.unit)
+			-- Update StatusBar arc
+			if self.statusBarArc then
+				self.parent:UpdateStatusBarArcPower(self.statusBarArc, self.unit, powerType)
+			end
+			
+			-- Update text
+			-- Update text - display actual values, including secret values
+			if canCalculate and maxPower > 0 then
+				if self.db.profile.ShowTextMax then
+					self.MPText:SetText(self.parent:FormatPowerText(self.unit, powerType))
+				else
+					local powerStr = self.parent:IsSecretValue(power) and tostring(power) or self.parent:fint(power)
+					self.MPText:SetText(powerStr)
+				end
+				self.MPPerc:SetText(self.parent:FormatPowerPercent(self.unit, powerType))
+				
+				-- Stop timer when at full or empty
+				if power == maxPower or power == 0 then
+					self:StopTimer("UpdatePowerBar")
+				end
+			else
+				-- Secret values - show formatted text directly
+				self.MPText:SetText(self.parent:FormatPowerText(self.unit, powerType))
+				self.MPPerc:SetText(self.parent:FormatPowerPercent(self.unit, powerType))
+			end
 		else
-			self.f:GhostMode(false, self.unit)
+			-- Pre-12.0.0: Use original system
+			local power = UnitPower(self.unit)
+			local maxPower = UnitPowerMax(self.unit)
 			
 			if (maxPower > 0) then
 				if self.db.profile.ShowTextMax then
@@ -186,15 +247,100 @@ function module:UpdatePowerEvent(event, arg1)
 				self.MPText:SetText("")
 				self.MPPerc:SetText("")
 			end
-
+			
 			self.f:SetMax(maxPower)
 			self.f:SetValue(power)
+				
+			if (power == maxPower or power == 0) then
+				self:StopTimer("UpdatePowerBar")
+			end
 		end
-		
-		if (power == maxPower or power == 0) then
-			self:StopTimer("UpdatePowerBar")
+	end
+end
+
+----------------------------------------------
+-- Update Power (event)
+----------------------------------------------
+function module:UpdatePowerEvent(event, arg1)
+	if (arg1 == self.unit) then
+		if ArcHUD.isMidnight then
+			-- 12.0.0+ (Midnight): Use StatusBar approach
+			local powerType = UnitPowerType(self.unit)
+			local power, maxPower = UnitPower(self.unit), UnitPowerMax(self.unit)
+			local powerSecret = self.parent:IsSecretValue(power)
+			local maxPowerSecret = self.parent:IsSecretValue(maxPower)
+			local canCalculate = not powerSecret and not maxPowerSecret
+			
+			if(UnitIsGhost(self.unit) or (UnitIsDead(self.unit) and event == "PLAYER_ALIVE")) then
+				self.f:GhostMode(true, self.unit)
+				if self.statusBarArc then
+					self.statusBarArc:Hide()
+				end
+			else
+				self.f:GhostMode(false, self.unit)
+				
+				-- Update StatusBar arc
+				if self.statusBarArc then
+					self.parent:UpdateStatusBarArcPower(self.statusBarArc, self.unit, powerType)
+					-- Use GetPowerBarColor (not GetPowerBarColorText) for StatusBar color
+					-- GetPowerBarColorText returns light colors for text readability, but bar should use actual power color
+					local barColor = self:GetPowerBarColor(powerType)
+					self.parent:SetStatusBarArcColor(self.statusBarArc, barColor.r, barColor.g, barColor.b, 1)
+				end
+				
+				-- Update text - display actual values, including secret values
+				if canCalculate and maxPower > 0 then
+					if self.db.profile.ShowTextMax then
+						self.MPText:SetText(self.parent:FormatPowerText(self.unit, powerType))
+					else
+						local powerStr = self.parent:IsSecretValue(power) and tostring(power) or self.parent:fint(power)
+						self.MPText:SetText(powerStr)
+					end
+					self.MPPerc:SetText(self.parent:FormatPowerPercent(self.unit, powerType))
+					
+					-- Timer management
+					if power == maxPower or power == 0 then
+						self:StopTimer("UpdatePowerBar")
+					else
+						self:StartTimer("UpdatePowerBar")
+					end
+				else
+					-- Secret values - show formatted text directly
+					self.MPText:SetText(self.parent:FormatPowerText(self.unit, powerType))
+					self.MPPerc:SetText(self.parent:FormatPowerPercent(self.unit, powerType))
+				end
+			end
 		else
-			self:StartTimer("UpdatePowerBar")
+			-- Pre-12.0.0: Use original system
+			local power = UnitPower(self.unit)
+			local maxPower = UnitPowerMax(self.unit)
+			
+			if(UnitIsGhost(self.unit) or (UnitIsDead(self.unit) and event == "PLAYER_ALIVE")) then
+				self.f:GhostMode(true, self.unit)
+			else
+				self.f:GhostMode(false, self.unit)
+				
+				if (maxPower > 0) then
+					if self.db.profile.ShowTextMax then
+						self.MPText:SetText(self.parent:fint(power).."/"..self.parent:fint(maxPower))
+					else
+						self.MPText:SetText(self.parent:fint(power))
+					end
+					self.MPPerc:SetText(floor((power/maxPower)*100).."%")
+				else
+					self.MPText:SetText("")
+					self.MPPerc:SetText("")
+				end
+
+				self.f:SetMax(maxPower)
+				self.f:SetValue(power)
+			end
+			
+			if (power == maxPower or power == 0) then
+				self:StopTimer("UpdatePowerBar")
+			else
+				self:StartTimer("UpdatePowerBar")
+			end
 		end
 	end
 end
