@@ -367,14 +367,15 @@ function ArcHUD:CreateStatusBarArc(parent, maskTexture, moduleName)
 	
 	-- Determine side: health modules are left (Side=1), power modules are right (Side=2)
 	local side = 1 -- default to left
-	if moduleName then
+	if parent.module and parent.module.db and parent.module.db.profile then
+		-- Try to get side from module
+		side = parent.module.db.profile.Side or 1
+	elseif moduleName then
 		-- Check module name for "Power" to determine right side
 		if string.find(moduleName, "Power") then
 			side = 2
 		end
-	elseif parent.module and parent.module.db and parent.module.db.profile then
-		-- Try to get side from module
-		side = parent.module.db.profile.Side or 1
+	
 	elseif parent.module and parent.module.name then
 		-- Check module name
 		if string.find(parent.module.name, "Power") then
