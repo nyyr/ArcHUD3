@@ -305,7 +305,8 @@ function ArcHUD:CreateArcFillCurve()
 	local ringFactor = 0.94 -- matches ArcHUD default
 	local steps = 180 -- number of curve points for smooth mapping
 
-	for i = 0, steps do
+	curve:AddPoint(0, 0) -- explicitly specify 0,0
+	for i = 1, steps-1 do
 		local percent = i / steps
 		local angle_degrees = percent * 180 -- arc covers 180 degrees
 		local angle_radians = math.rad(angle_degrees)
@@ -331,6 +332,7 @@ function ArcHUD:CreateArcFillCurve()
 
 		curve:AddPoint(percent, normalized_y)
 	end
+	curve:AddPoint(1, 1) -- explicitly specify 1,1
 
 	-- Cache the curve globally
 	self.arcFillCurve = curve

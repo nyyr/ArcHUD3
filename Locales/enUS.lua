@@ -279,7 +279,7 @@ LM["TEXT"] = {
 	
 	INNERANCHOR = "Attach ring to inner ('pet') anchor",
 	
-	CUSTOM		= "Custom Buff Arcs",
+	CUSTOM		= "Custom Buff Arcs (Probably not Midnight compatible)",
 	CUSTNEW		= "New custom arc",
 	CUSTRING	= "Arc options",
 	

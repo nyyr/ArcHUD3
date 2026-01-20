@@ -285,7 +285,7 @@ LM["TEXT"] = {
 	
 	INNERANCHOR = "Am inneren ('Begleiter') Anker befestigen",
 	
-	CUSTOM		= "Benutzerdef. Buff-Ring",
+	CUSTOM		= "Benutzerdef. Buff-Ring (Wahrscheinlich nicht Midnight-kompatibel)",
 	CUSTNEW		= "Neuer benutzerdef. Ring",
 	CUSTRING	= "Ringoptionen",
 	

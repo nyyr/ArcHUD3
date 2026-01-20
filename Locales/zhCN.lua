@@ -281,7 +281,7 @@ LM["TEXT"] = {
 	
 	INNERANCHOR = "附着弧形到内部(“宠物”)锚点",
 	
-	CUSTOM		= "自定增益效果弧形",
+	CUSTOM		= "自定增益效果弧形 (可能不兼容午夜)",
 	CUSTNEW		= "新的自定弧形",
 	CUSTRING	= "弧形选项",
 	
