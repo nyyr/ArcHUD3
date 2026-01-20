@@ -274,6 +274,7 @@ LM["TEXT"] = {
 	COLORSTAGGERL = "Color for Light Stagger",
 	COLORSTAGGERM = "Color for Moderate Stagger",
 	COLORSTAGGERH = "Color for Heavy Stagger",
+	COLORSTAGGERE = "Color for Extreme Stagger",
 
 	SORTRUNES   = "Sort Runes",
 	
@@ -340,6 +341,7 @@ LM["TOOLTIP"] = {
 	COLORSTAGGERL = "Change ring color for Light Stagger",
 	COLORSTAGGERM = "Change ring color for Moderate Stagger",
 	COLORSTAGGERH = "Change ring color for Heavy Stagger",
+	COLORSTAGGERE = "Change ring color for Extreme Stagger",
 
 	SORTRUNES   = "Sort the Runes according to their status",
 	
