@@ -2,7 +2,7 @@
 
 # ArcHUD3
 
-**Midnight Changes**: With the API changes in 12.0, it is no longer possible to create the kind of smooth arcs used here. There's some potential extremely janky and bad looking solutions, which for now I am not pursuing. If you feel like taking a crack at it anyway, feel free to open a PR to the GitHub project. I'll try to keep an eye out for Classic API updates, but you can report any I miss as an Issue on GitHub!
+**Midnight Changes**: I have created a version of ArcHUD3 that is compatible with Midnight!! With the API changes in 12.0, it is no longer possible to create the exact smooth arcs used here, but I've made the closest approximation I could. There is some polish that is no longer possible for arcs that rely on secret values (health, power, etc), like the spark, smooth animations, angled tips, etc. If you notice any issues (there are likely several), feel free to open an issue on GitHub.
 
 ArcHUD displays smooth arcs around your character in the middle of the screen to inform you about the health and power (mana, rage, ...) of you, your pet, and your target. In addition, it shows casts, combo points, holy power, soul shards, and a couple of other things. It discretely fades when you are out of combat and at full health/power.
 
@@ -71,3 +71,4 @@ For current WoW Classic:
 * [Maths behind the rings](Docs/statrings.txt)
 * [History](Docs/history.txt)
 * [Publishing via Travis CI](http://www.wowinterface.com/forums/showthread.php?t=55801)
+
