@@ -34,13 +34,13 @@ function module:Initialize()
 	self.MPPerc = self:CreateFontString(self.f, "BACKGROUND", {40, 12}, 10, "CENTER", {1.0, 1.0, 1.0}, {"TOP", self.f, "BOTTOMLEFT", 20, -130})
 	--{"TOPLEFT", self.f, "BOTTOMLEFT", -100, -115})
 	
-	-- Create StatusBar arc for 12.0.0+ (Midnight)
-	if ArcHUD.isMidnight then
-		-- Note: Mask texture path needs to be created - using placeholder for now
-		-- TargetPower is left side (Side=1), pass module name to determine positioning
-		self.statusBarArc = self.parent:CreateStatusBarArc(self.f, self.name)
+		-- Create StatusBar arc for 12.0.0+ (Midnight)
+		if ArcHUD.isMidnight then
+			self.statusBarArc = self.parent:CreateStatusBarArc(self.f, self.name)
+			self.zeroAlphaCurve = self.parent:CreateZeroAlphaCurve()
 		if self.statusBarArc then
 			self.statusBarArc:Hide() -- Hide by default
+			self.f:HideAllButOutline()
 		end
 	end
 	
@@ -66,6 +66,9 @@ function module:OnModuleUpdate()
 	else
 		-- Attach to right side
 		self.MPPerc:SetPoint("TOP", self.f, "BOTTOMLEFT", 20, -130)
+	end
+	if self.db.profile.Side and self.statusBarArc then
+		self.parent:UpdateStatusBarSide(self.statusBarArc, self.db.profile.Side)
 	end
 	if(UnitExists(self.unit)) then
 		self.f:SetValue(UnitPower(self.unit))
@@ -147,14 +150,15 @@ function module:PLAYER_TARGET_CHANGED()
 			end
 			
 			if(UnitIsDead(self.unit) or UnitIsGhost(self.unit) or (not maxPowerSecret and maxPower == 0)) then
-				if self.statusBarArc then
-					self.statusBarArc:Hide()
-				end
+				-- Use zero alpha curve to hide text when power is 0
+				local alpha = UnitPowerPercent(self.unit, powerType, false, self.zeroAlphaCurve)
+				self.MPPerc:SetAlpha(alpha)
 				self.MPPerc:SetText("")
 			else
-				local p = self.parent:GetPowerPercent(self.unit, powerType)
-				local pctInt = math.floor(p * 100)
-				self.MPPerc:SetText(pctInt.."%")
+				-- Use zero alpha curve to show/hide text based on power
+				local alpha = UnitPowerPercent(self.unit, powerType, false, self.zeroAlphaCurve)
+				self.MPPerc:SetAlpha(alpha)
+				self.MPPerc:SetText(self.parent:FormatPowerPercent(self.unit, powerType))
 			end
 		end
 	else
@@ -197,13 +201,7 @@ function module:UpdateDisplayPower(event, arg1)
 		end
 		
 		-- Update text
-		local p = self.parent:GetPowerPercent(self.unit, powerType)
-		local pctInt = math.floor(p * 100)
-		if pctInt > 0 then
-			self.MPPerc:SetText(pctInt.."%")
-		else
-			self.MPPerc:SetText("")
-		end
+		self.MPPerc:SetText(self.parent:FormatPowerPercent(self.unit, powerType))
 	else
 		-- Pre-12.0.0: Use original system
 		local power = UnitPower(self.unit)
@@ -231,36 +229,27 @@ function module:UpdatePower(event, arg1)
 		local powerSecret = self.parent:IsSecretValue(power)
 		local maxPowerSecret = self.parent:IsSecretValue(maxPower)
 		local canCalculate = not powerSecret and not maxPowerSecret
-		
+
 		-- Update StatusBar arc
 		if self.statusBarArc then
 			self.parent:UpdateStatusBarArcPower(self.statusBarArc, self.unit, powerType)
 			local info = self:GetPowerBarColorText(powerType)
 			self.parent:SetStatusBarArcColor(self.statusBarArc, info.r, info.g, info.b, 1)
 		end
-		
+
 		-- Update text
-		local p = self.parent:GetPowerPercent(self.unit, powerType)
-		local pctInt = math.floor(p * 100)
-		
+		self.MPPerc:SetText(self.parent:FormatPowerPercent(self.unit, powerType))
+
+		-- Use zero alpha curve to show/hide text based on power
+		local alpha = UnitPowerPercent(self.unit, powerType, false, self.zeroAlphaCurve)
+		self.MPPerc:SetAlpha(alpha)
+
 		if canCalculate and maxPower > 0 then
-			if pctInt > 0 then
-				self.MPPerc:SetText(pctInt.."%")
-			else
-				self.MPPerc:SetText("")
-			end
-			
 			-- Timer management
 			if power == maxPower or power == 0 then
 				self:StopTimer("UpdatePowerBar")
 			else
 				self:StartTimer("UpdatePowerBar")
-			end
-		else
-			if pctInt > 0 then
-				self.MPPerc:SetText(pctInt.."%")
-			else
-				self.MPPerc:SetText("")
 			end
 		end
 	else

@@ -976,7 +976,19 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 			desc		= LM["TOOLTIP"][caption],
 			order		= 41,
 			get			= function ()
-				return self.db.profile[colorName].r, self.db.profile[colorName].g, self.db.profile[colorName].b
+				local color = self.db.profile[colorName]
+				if color and type(color) == "table" and color.r and color.g and color.b then
+					return color.r, color.g, color.b
+				else
+					-- Fallback to default color if profile color is invalid
+					local defaultColor = self.defaults and self.defaults.profile and self.defaults.profile[colorName]
+					if defaultColor and type(defaultColor) == "table" and defaultColor.r and defaultColor.g and defaultColor.b then
+						return defaultColor.r, defaultColor.g, defaultColor.b
+					else
+						-- Ultimate fallback: white
+						return 1, 1, 1
+					end
+				end
 			end,
 			set			= function (info, r, g, b, a)
 				self.db.profile[colorName] = {["r"] = r, ["g"] = g, ["b"] = b}

@@ -40,11 +40,10 @@ function module:Initialize()
 	
 	-- Create StatusBar arc for 12.0.0+ (Midnight)
 	if ArcHUD.isMidnight then
-		-- Note: Mask texture path needs to be created - using placeholder for now
-		-- PetPower is right side (Side=2), pass module name to determine positioning
 		self.statusBarArc = self.parent:CreateStatusBarArc(self.f, self.name)
 		if self.statusBarArc then
 			self.statusBarArc:Hide() -- Hide by default
+			self.f:HideAllButOutline()
 		end
 	end
 	
@@ -56,6 +55,10 @@ function module:OnModuleUpdate()
 		self.MPPerc:Show()
 	else
 		self.MPPerc:Hide()
+	end
+
+	if self.db.profile.Side and self.statusBarArc then
+		self.parent:UpdateStatusBarSide(self.statusBarArc, self.db.profile.Side)
 	end
 
 	if not self.db.profile.InnerAnchor then

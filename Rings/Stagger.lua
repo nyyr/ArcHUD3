@@ -16,9 +16,9 @@ module.defaults = {
 		ShowText = true,
 		Side = 1,
 		Level = -1,
-		ColorLight = PowerBarColor["STAGGER"][1],
-		ColorModerate = PowerBarColor["STAGGER"][2],
-		ColorHeavy = PowerBarColor["STAGGER"][3],
+		ColorLight = PowerBarColor and PowerBarColor["STAGGER"] and PowerBarColor["STAGGER"][1] or {r = 0.52, g = 1.0, b = 0.52}, -- Light green
+		ColorModerate = PowerBarColor and PowerBarColor["STAGGER"] and PowerBarColor["STAGGER"][2] or {r = 1.0, g = 0.98, b = 0.72}, -- Yellow
+		ColorHeavy = PowerBarColor and PowerBarColor["STAGGER"] and PowerBarColor["STAGGER"][3] or {r = 1.0, g = 0.42, b = 0.42}, -- Red
 		MaxPerc = 100, -- maximum value of ring in % of maximum health
 	}
 }
@@ -34,6 +34,18 @@ module.options = {
 
 module.localized = true
 
+-- Ensure color settings are properly initialized
+function module:InitializeColors()
+	local colorNames = {"ColorLight", "ColorModerate", "ColorHeavy"}
+	for _, colorName in ipairs(colorNames) do
+		local color = self.db.profile[colorName]
+		if not color or type(color) ~= "table" or not color.r or not color.g or not color.b then
+			-- Reset to default
+			self.db.profile[colorName] = self.defaults.profile[colorName]
+		end
+	end
+end
+
 -- Buff IDs
 local LIGHT_STAGGER = 124275
 local MODERATE_STAGGER = 124274
@@ -47,7 +59,7 @@ function module:Initialize()
 	-- Setup the frame we need
 	self.f = self:CreateRing(true, ArcHUDFrame)
 	self.f:SetAlpha(0)
-	
+
 	self.BuffButton = CreateFrame("Button", nil, self.f)
 	self.BuffButton:SetWidth(15)
 	self.BuffButton:SetHeight(15)
@@ -62,10 +74,10 @@ function module:Initialize()
 	self.BuffButton.Icon:Show()
 
 	self.BuffButton:Show()
-	
+
 	self.Text = self:CreateFontString(self.BuffButton, "OVERLAY", {40, 12}, 10, "CENTER", {1.0, 1.0, 1.0}, {"TOP", self.BuffButton, "TOP", 1, -2})
 	self.Text:Show()
-	
+
 	self:CreateStandardModuleOptions(55)
 	
 	-- additional options
@@ -122,6 +134,9 @@ end
 function module:OnModuleEnable()
 	local _, class = UnitClass(self.unit)
 	if (class ~= "MONK") then return end
+
+	-- Ensure color settings are properly initialized
+	self:InitializeColors()
 
 	-- Initial setup
 	self:UpdateColor()
