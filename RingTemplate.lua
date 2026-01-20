@@ -708,8 +708,22 @@ end
 
 -----------------------------------------------------------
 -- Calculate angle for given value
+-- In 12.0.0+, values may be secret - return default angle if so
 -----------------------------------------------------------
 function ArcHUDRingTemplate:GetAngle(value)
+	-- Check if values are secret (12.0.0+)
+	local startValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(self.startValue)
+	local maxValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(self.maxValue)
+	
+	if startValueSecret or maxValueSecret then
+		-- Can't calculate angle with secret values - return middle angle
+		return (self.startAngle + self.endAngle) / 2
+	end
+	
+	if self.maxValue == 0 then
+		return (self.startAngle + self.endAngle) / 2
+	end
+	
 	local angle
 	if self.inverseFill then
 		angle = self.endAngle - self.startValue / self.maxValue * (self.endAngle - self.startAngle)
@@ -744,20 +758,36 @@ end
 
 -----------------------------------------------------------
 -- Set maximum value for ring (i.e., value equivalent to 100%)
+-- In 12.0.0+, max may be secret - protect operations
 -----------------------------------------------------------
 function ArcHUDRingTemplate:SetMax(max)
 	if max == nil then max = 1 end
-	if max <= 0 then max = 1 end
-	if (self.startValue > max) then
-		self.startValue = max
-	end
-	if (self.endValue > max) then
-		self.endValue = max
-	end
-	if (max ~= self.maxValue) then
-		self.maxValue = max
-		self:RefreshSeparators()
+	
+	-- Check if max is secret (12.0.0+)
+	local maxSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(max)
+	
+	if not maxSecret then
+		-- Normal operations if not secret
+		if max <= 0 then max = 1 end
+		local startValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(self.startValue)
+		local endValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(self.endValue)
+		
+		if not startValueSecret and (self.startValue > max) then
+			self.startValue = max
+		end
+		if not endValueSecret and (self.endValue > max) then
+			self.endValue = max
+		end
+		
+		local maxValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(self.maxValue)
+		if not maxValueSecret and (max ~= self.maxValue) then
+			self.maxValue = max
+			self:RefreshSeparators()
+		else
+			self.maxValue = max
+		end
 	else
+		-- Secret value - just store it directly, skip comparisons
 		self.maxValue = max
 	end
 end
@@ -772,15 +802,26 @@ end
 --				else: time in seconds (linear fade)
 -- startFadeTime - Absolute time when fade should have started / is going to start
 -- startValue - Start value to use if startFadeTime is set
+-- In 12.0.0+, value may be secret - protect operations
 -----------------------------------------------------------
 function ArcHUDRingTemplate:SetValue(value, fadeTime, startFadeTime, startValue)
 	if value == nil then value = 0 end
-	if value > self.maxValue then
-		value = self.maxValue
+	
+	-- Check if values are secret (12.0.0+)
+	local valueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(value)
+	local maxValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(self.maxValue)
+	
+	if not valueSecret and not maxValueSecret then
+		-- Normal operations if not secret
+		if value > self.maxValue then
+			value = self.maxValue
+		end
+		if value <= 0 then
+			value = self.maxValue / 10000 -- "small", not 0
+		end
 	end
-	if value <= 0 then
-		value = self.maxValue / 10000 -- "small", not 0
-	end
+	-- If value is secret, skip bounds checking and use directly
+	
 	if (self.casting == 1) or (fadeTime == 0) then
 		self.startValue = value
 	end
@@ -793,13 +834,20 @@ function ArcHUDRingTemplate:SetValue(value, fadeTime, startFadeTime, startValue)
 	if startFadeTime then
 		self.fadeTime = GetTime() - startFadeTime
 		if startValue then
-			if self.fadeTime > 0 then
-				-- compute start offset
-				local diff = (self.endValue - startValue) / self.maxFadeTime * self.fadeTime
-				self.startValue = startValue + diff
+			local startValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(startValue)
+			local endValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(self.endValue)
+			
+			if not startValueSecret and not endValueSecret then
+				if self.fadeTime > 0 then
+					-- compute start offset (only if values are not secret)
+					local diff = (self.endValue - startValue) / self.maxFadeTime * self.fadeTime
+					self.startValue = startValue + diff
+				else
+					self.startValue = startValue
+					self:SetAngle(self:GetAngle(startValue))
+				end
 			else
 				self.startValue = startValue
-				self:SetAngle(self:GetAngle(startValue))
 			end
 		end
 	else
@@ -808,7 +856,9 @@ function ArcHUDRingTemplate:SetValue(value, fadeTime, startFadeTime, startValue)
 	
 	if (fadeTime == 0) then
 		self.fadeTime = self.maxFadeTime
-		self:SetAngle(self:GetAngle(self.endValue))
+		if not valueSecret and not maxValueSecret then
+			self:SetAngle(self:GetAngle(self.endValue))
+		end
 	end
 end
 
@@ -885,11 +935,21 @@ end
 --   value - value on arc
 --   red   - true: set red spark, false: set yellow spark
 --   scale - scaling factor for size of spark
+-- In 12.0.0+, values may be secret - hide spark if so
 -----------------------------------------------------------
 function ArcHUDRingTemplate:SetSpark(value, red, scale)
 	local spark = self.spark
 	if (red) then
 		spark = self.sparkRed
+	end
+	
+	-- Check if values are secret (12.0.0+)
+	local valueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(value)
+	local maxValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(self.maxValue)
+	
+	if valueSecret or maxValueSecret then
+		spark:Hide()
+		return
 	end
 	
 	if (value <= 0 or value >= self.maxValue) then
@@ -953,6 +1013,7 @@ end
 
 ----------------------------------------------
 -- Shows separators if needed
+-- In 12.0.0+, maxValue may be secret - skip separators when that happens
 ----------------------------------------------
 function ArcHUDRingTemplate:RefreshSeparators()
 	if (self.sep) then
@@ -963,6 +1024,12 @@ function ArcHUDRingTemplate:RefreshSeparators()
 	end
 	
 	if (self.showSeparators) then
+		-- Check if maxValue is secret (12.0.0+)
+		local maxValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(self.maxValue)
+		if maxValueSecret then
+			return -- Can't calculate separators with secret values
+		end
+		
 		if (not self.sep) then
 			self.sep = {}
 		end
@@ -986,10 +1053,18 @@ end
 -----------------------------------------------------------
 -- Update ring filling towards set value
 -- Should be called at least every 40ms for smooth animation
+-- In 12.0.0+, values may be secret - skip fade animation when that happens
 -----------------------------------------------------------
 function ArcHUDRingTemplate:DoFadeUpdate(tdelta)
 	if (self.UpdateHook) then
 		self:UpdateHook(tdelta)
+	end
+	
+	-- Check if values are secret (12.0.0+)
+	local startValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(self.startValue)
+	local endValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(self.endValue)
+	if startValueSecret or endValueSecret then
+		return -- Can't do fade math on secret values
 	end
 	
 	if self.fadeTime < self.maxFadeTime then
@@ -1021,26 +1096,47 @@ end
 -- Set ring alpha value
 -----------------------------------------------------------
 function ArcHUDRingTemplate:SetRingAlpha(destAlpha, instant)
-	if (destAlpha < 0) then
-		destAlpha = 0.0
-	elseif (destAlpha > 1) then
-		destAlpha = 1.0
+	-- Check if destAlpha is a secret value (12.0.0+)
+	local destAlphaSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(destAlpha)
+	
+	if not destAlphaSecret then
+		-- Only perform bounds checking and formatting if not secret
+		if (destAlpha < 0) then
+			destAlpha = 0.0
+		elseif (destAlpha > 1) then
+			destAlpha = 1.0
+		end
+		-- cut decimals
+		destAlpha = math.floor(destAlpha*100 + 0.5)/100
 	end
-	-- cut decimals
-	destAlpha = math.floor(destAlpha*100 + 0.5)/100
+	-- If secret, use destAlpha directly without modifications
 
-	if (instant or not self.applyAlpha) then
+	-- For secret values, always use instant mode (can't compare to detect changes)
+	if (instant or not self.applyAlpha or destAlphaSecret) then
 		self:SetAlpha(destAlpha)
-		self.destAlpha = destAlpha
+		-- Only store destAlpha if it's not secret (can't compare secret values)
+		if not destAlphaSecret then
+			self.destAlpha = destAlpha
+		end
+		-- Sync StatusBar alpha if it exists (Midnight mode)
+		if ArcHUD.isMidnight and self.statusBarArc then
+			self.statusBarArc:SetAlpha(destAlpha)
+		end
 		return
 		
-	elseif (self.destAlpha ~= destAlpha) then
+	elseif not destAlphaSecret and (self.destAlpha ~= destAlpha) then
 		--ArcHUD:LevelDebug(1, "ArcHUDRingTemplate:SetRingAlpha("..tostring(destAlpha).."), current "..tostring(self.destAlpha)..", name "..tostring(self:GetName()))
 		self.destAlpha = destAlpha
 		if (self.applyAlpha:IsPlaying()) then
 			self.applyAlpha:Stop()
 		end
-		self.applyAlpha.alphaAnim:SetFromAlpha(self:GetAlpha())
+		local fromAlpha = self:GetAlpha()
+		-- Check if fromAlpha is secret (SetFromAlpha doesn't accept secret values)
+		local fromAlphaSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(fromAlpha)
+		if not fromAlphaSecret then
+			self.applyAlpha.alphaAnim:SetFromAlpha(fromAlpha)
+		end
+		-- SetToAlpha can accept secret values, so always set it
 		self.applyAlpha.alphaAnim:SetToAlpha(destAlpha)
 		self.applyAlpha:Play()
 	end
@@ -1050,23 +1146,43 @@ end
 -- Pulsing if necessary
 -----------------------------------------------------------
 function ArcHUDRingTemplate:applyAlpha_OnFinished()
-	local curAlpha = math.floor(self:GetAlpha()*100 + 0.5)/100
+	local curAlpha = self:GetAlpha()
+	-- Check if curAlpha is a secret value (12.0.0+)
+	local curAlphaSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(curAlpha)
+	
+	-- Sync StatusBar alpha if it exists (Midnight mode) - always sync, even if secret
+	if ArcHUD.isMidnight and self.statusBarArc then
+		self.statusBarArc:SetAlpha(curAlpha)
+	end
+	
+	-- If curAlpha is secret, we can't do arithmetic or comparisons
+	-- Just ensure StatusBar is synced and return (don't do pulsing/comparison logic)
+	if curAlphaSecret then
+		return
+	end
+	
+	-- Format curAlpha for comparisons (only if not secret)
+	-- Store formatted curAlpha for use in SetFromAlpha (we know it's not secret at this point)
+	local formattedCurAlpha = math.floor(curAlpha*100 + 0.5)/100
+	
 	if (self.pulse) then
 		--self.module:Debug(1, "%s:applyAlpha pulsing", self.module:GetName())
 		local pulseMax = 1.0
 		local pulseMin = 0.25
-		if (curAlpha < pulseMax) then
-			self.applyAlpha.alphaAnim:SetFromAlpha(self:GetAlpha())
+		if (formattedCurAlpha < pulseMax) then
+			-- Use formattedCurAlpha (we know it's not secret) instead of calling GetAlpha() again
+			self.applyAlpha.alphaAnim:SetFromAlpha(formattedCurAlpha)
 			self.applyAlpha.alphaAnim:SetToAlpha(pulseMax)
 		else
-			self.applyAlpha.alphaAnim:SetFromAlpha(self:GetAlpha())
+			self.applyAlpha.alphaAnim:SetFromAlpha(formattedCurAlpha)
 			self.applyAlpha.alphaAnim:SetToAlpha(pulseMin)
 		end
 		self.applyAlpha:Play()
 	else
-		--ArcHUD:LevelDebug(1, "curAlpha "..curAlpha..", destAlpha "..self.destAlpha)
-		if (curAlpha ~= self.destAlpha) then
-			self.applyAlpha.alphaAnim:SetFromAlpha(self:GetAlpha())
+		--ArcHUD:LevelDebug(1, "curAlpha "..formattedCurAlpha..", destAlpha "..self.destAlpha)
+		if (formattedCurAlpha ~= self.destAlpha) then
+			-- Use formattedCurAlpha (we know it's not secret) instead of calling GetAlpha() again
+			self.applyAlpha.alphaAnim:SetFromAlpha(formattedCurAlpha)
 			self.applyAlpha.alphaAnim:SetToAlpha(self.destAlpha)
 			self.applyAlpha:Play()
 		else
@@ -1085,14 +1201,27 @@ function ArcHUDRingTemplate:StartPulse()
 	self.pulse = true
 	if (not self.applyAlpha:IsPlaying()) then
 		--self.module:Debug(1, "StartPulse()")
+		local curAlpha = self:GetAlpha()
+		-- Check if curAlpha is a secret value (12.0.0+)
+		local curAlphaSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(curAlpha)
+		
+		-- If curAlpha is secret, we can't do arithmetic or comparisons, so skip pulsing
+		if curAlphaSecret then
+			return
+		end
+		
+		-- Format curAlpha for comparisons (only if not secret)
+		-- Store formatted curAlpha for use in SetFromAlpha (we know it's not secret at this point)
+		local formattedCurAlpha = math.floor(curAlpha*100 + 0.5)/100
+		
 		local pulseMax = 1.0
 		local pulseMin = 0.25
-		local curAlpha = math.floor(self:GetAlpha()*100 + 0.5)/100
-		if (curAlpha < pulseMax) then
-			self.applyAlpha.alphaAnim:SetFromAlpha(self:GetAlpha())
+		if (formattedCurAlpha < pulseMax) then
+			-- Use formattedCurAlpha (we know it's not secret) instead of calling GetAlpha() again
+			self.applyAlpha.alphaAnim:SetFromAlpha(formattedCurAlpha)
 			self.applyAlpha.alphaAnim:SetToAlpha(pulseMax)
 		else
-			self.applyAlpha.alphaAnim:SetFromAlpha(self:GetAlpha())
+			self.applyAlpha.alphaAnim:SetFromAlpha(formattedCurAlpha)
 			self.applyAlpha.alphaAnim:SetToAlpha(pulseMin)
 		end
 		self.applyAlpha:Play()
@@ -1164,14 +1293,30 @@ function ArcHUDRingTemplate:GhostMode(state, unit)
 	else
 		if(fh and fh.f.syncPulse:IsPlaying()) then
 			fh.f.syncPulse:Stop()
-			fh.f:SetMax(UnitHealthMax(unit))
-			fh.f:SetValue(UnitHealth(unit))
+			if ArcHUD.isMidnight then
+				-- In Midnight, keep original rings empty - StatusBar handles display
+				-- Don't fill the original rings, they should stay at 0
+				fh.f:SetMax(1)
+				fh.f:SetValue(0)
+			else
+				-- Pre-12.0.0: Normal operations
+				fh.f:SetMax(UnitHealthMax(unit))
+				fh.f:SetValue(UnitHealth(unit))
+			end
 		end
 		if(fm and fm.f.syncPulse:IsPlaying()) then
 			fm.f.syncPulse:Stop()
-			fm.f:SetMax(UnitPowerMax(unit))
-			fm.f:SetValue(UnitPower(unit))
-			fm.f:UpdateColor(PowerBarColor[UnitPowerType(unit)])
+			if ArcHUD.isMidnight then
+				-- In Midnight, keep original rings empty - StatusBar handles display
+				-- Don't fill the original rings, they should stay at 0
+				fm.f:SetMax(1)
+				fm.f:SetValue(0)
+			else
+				-- Pre-12.0.0: Normal operations
+				fm.f:SetMax(UnitPowerMax(unit))
+				fm.f:SetValue(UnitPower(unit))
+				fm.f:UpdateColor(PowerBarColor[UnitPowerType(unit)])
+			end
 		end
 	end
 end

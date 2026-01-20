@@ -31,6 +31,16 @@ function module:Initialize()
 
 	self.HPPerc = self:CreateFontString(self.f, "BACKGROUND", {100, 17}, 16, "RIGHT", {1.0, 1.0, 1.0}, {"BOTTOMLEFT", self.f, "BOTTOMLEFT", -165, -125})
 	
+	-- Create StatusBar arc for 12.0.0+ (Midnight)
+	if ArcHUD.isMidnight then
+		-- Note: Mask texture path needs to be created - using placeholder for now
+		-- PetHealth is left side (Side=1), pass module name to determine positioning
+		self.statusBarArc = self.parent:CreateStatusBarArc(self.f, self.name)
+		if self.statusBarArc then
+			self.statusBarArc:Hide() -- Hide by default
+		end
+	end
+	
 	self:CreateStandardModuleOptions(35)
 end
 
@@ -74,14 +84,47 @@ end
 
 function module:OnModuleEnable()
 	self:UpdateColor(self.db.profile.Color)
-	if(UnitExists(self.unit) and UnitHealthMax(self.unit) > 0) then
-		self.HPPerc:SetText(floor((UnitHealth(self.unit) / UnitHealthMax(self.unit)) * 100).."%")
-		self.f:SetMax(UnitHealthMax(self.unit))
-		self.f:SetValue(UnitHealth(self.unit))
+	
+	if ArcHUD.isMidnight then
+		-- 12.0.0+ (Midnight): Initialize StatusBar arc
+		if(UnitExists(self.unit)) then
+			local maxHealth = UnitHealthMax(self.unit)
+			local maxHealthSecret = self.parent:IsSecretValue(maxHealth)
+			
+			if not maxHealthSecret and maxHealth > 0 then
+				-- Update StatusBar arc
+				if self.statusBarArc then
+					self.parent:UpdateStatusBarArcHealth(self.statusBarArc, self.unit)
+					-- Returns ColorMixin object (may contain secret values)
+					local color = self.parent:GetHealthColorFromUnit(self.unit)
+					self.parent:SetStatusBarArcColor(self.statusBarArc, color)
+				end
+				
+			-- Update text - display actual values, including secret values
+			self.HPPerc:SetText(self.parent:FormatHealthPercent(self.unit))
+			else
+				if self.statusBarArc then
+					self.statusBarArc:Hide()
+				end
+				self.HPPerc:SetText("")
+			end
+		else
+			if self.statusBarArc then
+				self.statusBarArc:Hide()
+			end
+			self.HPPerc:SetText("")
+		end
 	else
-		self.HPPerc:SetText("")
-		self.f:SetMax(0)
-		self.f:SetValue(0)
+		-- Pre-12.0.0: Use original system
+		if(UnitExists(self.unit) and UnitHealthMax(self.unit) > 0) then
+			self.HPPerc:SetText(floor((UnitHealth(self.unit) / UnitHealthMax(self.unit)) * 100).."%")
+			self.f:SetMax(UnitHealthMax(self.unit))
+			self.f:SetValue(UnitHealth(self.unit))
+		else
+			self.HPPerc:SetText("")
+			self.f:SetMax(0)
+			self.f:SetValue(0)
+		end
 	end
 
 	-- Register the events we will use
@@ -100,58 +143,133 @@ end
 function module:UpdatePet(event, arg1)
 	if(event == "UNIT_PET" and arg1 ~= "player") then return end
 	if(UnitExists(self.unit)) then
-		--self:Debug(3, "PetHealth:UpdatePet("..event..", "..tostring(arg1).."): max = "..
-		--	tostring(UnitHealthMax(self.unit))..", health = "..tostring(UnitHealth(self.unit)))
-		self:UpdateColor()
-		self.f:SetMax(UnitHealthMax(self.unit))
-		self.f:SetValue(UnitHealth(self.unit))
-		if (UnitHealthMax(self.unit) > 0) then
-			self.HPPerc:SetText(floor((UnitHealth(self.unit) / UnitHealthMax(self.unit)) * 100).."%")
-			self.f:Show()
+		if ArcHUD.isMidnight then
+			-- 12.0.0+ (Midnight): Use StatusBar approach
+			--self:Debug(3, "PetHealth:UpdatePet("..event..", "..tostring(arg1).."): max = "..
+			--	tostring(UnitHealthMax(self.unit))..", health = "..tostring(UnitHealth(self.unit)))
+			self:UpdateColor()
+			
+			-- Update StatusBar arc
+			if self.statusBarArc then
+				self.parent:UpdateStatusBarArcHealth(self.statusBarArc, self.unit)
+				local r, g, b, a = self.parent:GetHealthColorFromUnit(self.unit)
+				self.parent:SetStatusBarArcColor(self.statusBarArc, r, g, b, a)
+			end
+			
+			-- Update text
+			local maxHealth = UnitHealthMax(self.unit)
+			local maxHealthSecret = self.parent:IsSecretValue(maxHealth)
+			if not maxHealthSecret and maxHealth > 0 then
+				local p = self.parent:GetHealthPercent(self.unit)
+				local pctInt = math.floor(p * 100)
+				self.HPPerc:SetText(pctInt.."%")
+				self.f:Show()
+			else
+				self.HPPerc:SetText("")
+				if self.statusBarArc then
+					self.statusBarArc:Hide()
+				end
+				self.f:Hide()
+			end
 		else
-			self.HPPerc:SetText("")
-			self.f:Hide()
+			-- Pre-12.0.0: Use original system
+			--self:Debug(3, "PetHealth:UpdatePet("..event..", "..tostring(arg1).."): max = "..
+			--	tostring(UnitHealthMax(self.unit))..", health = "..tostring(UnitHealth(self.unit)))
+			self:UpdateColor()
+			self.f:SetMax(UnitHealthMax(self.unit))
+			self.f:SetValue(UnitHealth(self.unit))
+			if (UnitHealthMax(self.unit) > 0) then
+				self.HPPerc:SetText(floor((UnitHealth(self.unit) / UnitHealthMax(self.unit)) * 100).."%")
+				self.f:Show()
+			else
+				self.HPPerc:SetText("")
+				self.f:Hide()
+			end
 		end
 	else
 		self.parent.PetIsInCombat = false
+		if self.statusBarArc then
+			self.statusBarArc:Hide()
+		end
 		self.f:Hide()
 	end
 end
 
 function module:UpdateHealth(event, arg1)
 	if(arg1 == self.unit) then
-		local p=UnitHealth(self.unit)/UnitHealthMax(self.unit)
-		local r, g = 1, 1
-		if ( p > 0.5 ) then
-			r = (1.0 - p) * 2
-			g = 1.0
-		else
-			r = 1.0
-			g = p * 2
-		end
-		if ( r < 0 ) then r = 0 elseif ( r > 1 ) then r = 1 end
-		if ( g < 0 ) then g = 0 elseif ( g > 1 ) then g = 1 end
-		if(self.ColorMode == "fade") then
-			self:UpdateColor({r = r, g = g, b = 0})
-		else
-			self:UpdateColor()
-		end
-
-		--self:Debug(3, "PetHealth:UpdateHealth("..event..", "..arg1.."): max = "..
-		--	tostring(UnitHealthMax(self.unit))..", health = "..tostring(UnitHealth(self.unit)))
-		
-		if (event == "UNIT_MAXHEALTH") then
-			self.f:SetMax(UnitHealthMax(self.unit))
-		else
-			if (self.f.maxValue ~= UnitHealthMax(self.unit)) then
-				-- might happen that UNIT_HEALTH and UNIT_MAXHEALTH arrive in the wrong order
-				self.f:SetMax(UnitHealthMax(self.unit))
+		if ArcHUD.isMidnight then
+			-- 12.0.0+ (Midnight): Use StatusBar approach
+			local health, maxHealth = UnitHealth(self.unit), UnitHealthMax(self.unit)
+			local healthSecret = self.parent:IsSecretValue(health)
+			local maxHealthSecret = self.parent:IsSecretValue(maxHealth)
+			local canCalculate = not healthSecret and not maxHealthSecret
+			
+			-- Get percentage using safe API - display actual values
+			
+			-- Update StatusBar arc
+			if self.statusBarArc then
+				self.parent:UpdateStatusBarArcHealth(self.statusBarArc, self.unit)
+				local r, g, b, a = self.parent:GetHealthColorFromUnit(self.unit)
+				self.parent:SetStatusBarArcColor(self.statusBarArc, r, g, b, a)
 			end
-			self.f:SetValue(UnitHealth(self.unit))
-			if (UnitHealthMax(self.unit) > 0) then
-				self.HPPerc:SetText(floor((UnitHealth(self.unit) / UnitHealthMax(self.unit)) * 100).."%")
+			
+			-- Color calculation (only if we can calculate)
+			local r, g = 1, 1
+			if canCalculate and not self.parent:IsSecretValue(p) then
+				if ( p > 0.5 ) then
+					r = (1.0 - p) * 2
+					g = 1.0
+				else
+					r = 1.0
+					g = p * 2
+				end
+				if ( r < 0 ) then r = 0 elseif ( r > 1 ) then r = 1 end
+				if ( g < 0 ) then g = 0 elseif ( g > 1 ) then g = 1 end
+			end
+			
+			if(self.ColorMode == "fade") then
+				self:UpdateColor({r = r, g = g, b = 0})
 			else
-				self.HPPerc:SetText("")
+				self:UpdateColor()
+			end
+			
+			-- Update text - use FormatHealthPercent to handle secret values
+			self.HPPerc:SetText(self.parent:FormatHealthPercent(self.unit))
+		else
+			-- Pre-12.0.0: Use original system
+			local p=UnitHealth(self.unit)/UnitHealthMax(self.unit)
+			local r, g = 1, 1
+			if ( p > 0.5 ) then
+				r = (1.0 - p) * 2
+				g = 1.0
+			else
+				r = 1.0
+				g = p * 2
+			end
+			if ( r < 0 ) then r = 0 elseif ( r > 1 ) then r = 1 end
+			if ( g < 0 ) then g = 0 elseif ( g > 1 ) then g = 1 end
+			if(self.ColorMode == "fade") then
+				self:UpdateColor({r = r, g = g, b = 0})
+			else
+				self:UpdateColor()
+			end
+
+			--self:Debug(3, "PetHealth:UpdateHealth("..event..", "..arg1.."): max = "..
+			--	tostring(UnitHealthMax(self.unit))..", health = "..tostring(UnitHealth(self.unit)))
+			
+			if (event == "UNIT_MAXHEALTH") then
+				self.f:SetMax(UnitHealthMax(self.unit))
+			else
+				if (self.f.maxValue ~= UnitHealthMax(self.unit)) then
+					-- might happen that UNIT_HEALTH and UNIT_MAXHEALTH arrive in the wrong order
+					self.f:SetMax(UnitHealthMax(self.unit))
+				end
+				self.f:SetValue(UnitHealth(self.unit))
+				if (UnitHealthMax(self.unit) > 0) then
+					self.HPPerc:SetText(floor((UnitHealth(self.unit) / UnitHealthMax(self.unit)) * 100).."%")
+				else
+					self.HPPerc:SetText("")
+				end
 			end
 		end
 	end

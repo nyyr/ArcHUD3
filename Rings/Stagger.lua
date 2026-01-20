@@ -125,7 +125,14 @@ function module:OnModuleEnable()
 
 	-- Initial setup
 	self:UpdateColor()
-	self.f:SetMax(UnitHealthMax(self.unit))
+	
+	if ArcHUD.isMidnight then
+		-- 12.0.0+ (Midnight): Max health may be secret - handle in UpdateValue
+		-- No need to set max explicitly here
+	else
+		-- Pre-12.0.0: Set max normally
+		self.f:SetMax(UnitHealthMax(self.unit))
+	end
 
 	-- Register the events we will use
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateValue")
@@ -158,7 +165,21 @@ function module:UpdateValue(event, arg1)
 		
 		if hasStagger then
 			local maxHealth = UnitHealthMax(self.unit)
-			self.f:SetMax(maxHealth * self.db.profile.MaxPerc / 100)
+			local maxHealthSecret = self.parent:IsSecretValue(maxHealth)
+			local v2Secret = self.parent:IsSecretValue(v2)
+			
+			-- Only calculate max if values are not secret
+			if not maxHealthSecret then
+				self.f:SetMax(maxHealth * self.db.profile.MaxPerc / 100)
+			else
+				-- Fallback: use a reasonable estimate
+				if not v2Secret and v2 then
+					self.f:SetMax(v2 * 2)
+				else
+					self.f:SetMax(1000) -- Default fallback
+				end
+			end
+			
 			self.f.isHidden = nil
 			
 			--self:Debug(1, "SpellId: "..tostring(spellId)..", Amount: "..tostring(v1).."/"..tostring(v2)..", Duration: "..tostring(duration))
@@ -169,7 +190,12 @@ function module:UpdateValue(event, arg1)
 				self.f:SetRingAlpha(ArcHUD.db.profile.FadeOOC)
 			end
 			
-			self.f:SetValue(v2)
+			-- Only set value if not secret
+			if not v2Secret then
+				self.f:SetValue(v2)
+			else
+				self.f:SetValue(0)
+			end
 			
 			if spellId == LIGHT_STAGGER then
 				self:UpdateColor(self.db.profile.ColorLight)

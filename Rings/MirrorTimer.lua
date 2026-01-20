@@ -102,16 +102,17 @@ function module:OnModuleEnable()
 	self:RegisterEvent("MIRROR_TIMER_STOP")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	
+	-- Initialize timers first
+	if(not self.timers) then
+		self.timers = {count = 0}
+		self.timer = 0
+	end
+
 	-- Add update hook
 	self.f.UpdateHook = MirrorTimer_UpdateTimers
 
 	-- Activate ring timers
 	self:StartRingTimers()
-
-	if(not self.timers) then
-		self.timers = {count = 0}
-		self.timer = 0
-	end
 
 	self.MirrorTimerColors = { };
 	self.MirrorTimerColors["EXHAUSTION"] = {
