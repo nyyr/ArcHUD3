@@ -288,6 +288,55 @@ function ArcHUD:FormatPowerText(unit, powerType)
 	return powerStr .. "/" .. maxPowerStr
 end
 
+-- Create arc fill curve for StatusBar (global, created once)
+-- Maps 0-1 percentages to vertical fill amounts that match arc geometry
+function ArcHUD:CreateArcFillCurve()
+	if not ArcHUD.isMidnight or not C_CurveUtil then return nil end
+
+	-- Return cached curve if it already exists
+	if self.arcFillCurve then return self.arcFillCurve end
+
+	local curveType = Enum.LuaCurveType or Enum.CurveType
+	if not curveType then return nil end
+
+	local curve = C_CurveUtil.CreateCurve(curveType.Linear)
+	if not curve then return nil end
+
+	local ringFactor = 0.94 -- matches ArcHUD default
+	local steps = 180 -- number of curve points for smooth mapping
+
+	for i = 0, steps do
+		local percent = i / steps
+		local angle_degrees = percent * 180 -- arc covers 180 degrees
+		local angle_radians = math.rad(angle_degrees)
+		local cos_a = math.cos(angle_radians)
+
+		-- Calculate correction factor (from DoQuadrant)
+		local corr1 = cos_a / 128
+
+		-- Calculate outer and inner Y positions
+		local Oy = cos_a
+		local Iy = Oy * ringFactor - corr1
+
+		-- Center Y between inner and outer edges
+		local center_y = (Iy + Oy) / 2
+
+		-- Normalize to 0-1 range (Oy ranges from 1 to -1, so shift and scale)
+		-- At 0%: center_y = (1*0.94 - 1/128 + 1) / 2 = ~0.97 -> map to 0
+		-- At 100%: center_y = (-1*0.94 - (-1)/128 + -1) / 2 = ~-0.97 -> map to 1
+		local normalized_y = (-center_y + 1) / 2 -- flip and normalize
+
+		-- Ensure within 0-1 bounds
+		normalized_y = math.max(0, math.min(1, normalized_y))
+
+		curve:AddPoint(percent, normalized_y)
+	end
+
+	-- Cache the curve globally
+	self.arcFillCurve = curve
+	return curve
+end
+
 -- Get health color using ColorCurveObject (12.0.0+)
 -- Returns r, g, b, a values
 -- Get health color - returns ColorMixin object in Midnight, or r, g, b, a in legacy
@@ -388,6 +437,10 @@ function ArcHUD:CreateStatusBarArc(parent, moduleName)
 	local sb = CreateFrame("StatusBar", frameName, parent)
 	parent.statusBar = sb
 	sb.side = side
+
+	-- Use global arc fill curve for proper percentage mapping
+	sb.arcFillCurve = self:CreateArcFillCurve()
+
 	sb:ClearAllPoints()
 
 	-- Position StatusBar to match the quadrant positioning
@@ -422,7 +475,7 @@ function ArcHUD:CreateStatusBarArc(parent, moduleName)
 
 	-- Store reference to parent ring for alpha syncing
 	sb.parentRing = parent
-	
+
 	sb:Hide()
 	return sb
 end
@@ -434,7 +487,9 @@ function ArcHUD:UpdateStatusBarArcHealth(sb, unit)
 	-- Try to get percentage - can be secret value
 	local pct
 	if UnitHealthPercent then
-		pct = UnitHealthPercent(unit)
+		-- Use arc fill curve if available for proper arc geometry mapping
+		local curve = sb.arcFillCurve
+		pct = UnitHealthPercent(unit, true, curve)
 	else
 		pct = self:GetHealthPercent(unit)
 	end
@@ -450,7 +505,9 @@ function ArcHUD:UpdateStatusBarArcPower(sb, unit, powerType)
 	-- Try to get percentage - can be secret value
 	local pct
 	if UnitPowerPercent then
-		pct = UnitPowerPercent(unit, powerType)
+		-- Use arc fill curve if available for proper arc geometry mapping
+		local curve = sb.arcFillCurve
+		pct = UnitPowerPercent(unit, powerType, false, curve)
 	else
 		pct = self:GetPowerPercent(unit, powerType)
 	end
