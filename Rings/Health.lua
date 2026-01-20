@@ -76,7 +76,7 @@ function module:Initialize()
 			-- Note: Mask texture path needs to be created - using placeholder for now
 			-- The mask should show only the arc portion of the ring
 			-- Health is left side (Side=1), pass module name to determine positioning
-			self.statusBarArc = self.parent:CreateStatusBarArc(self.f, nil, self.name) -- TODO: Add mask texture path
+			self.statusBarArc = self.parent:CreateStatusBarArc(self.f, self.name)
 		if self.statusBarArc then
 			self.statusBarArc:Hide() -- Hide by default, show when we have valid data
 		end

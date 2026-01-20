@@ -359,10 +359,9 @@ end
 
 -- Create a StatusBar-based arc for a ring frame
 -- parent: The ring frame to attach to
--- maskTexture: Path to mask texture (optional, defaults to arc_outline.png)
 -- moduleName: Optional module name to determine side (defaults to checking parent.module)
 -- Returns: StatusBar frame
-function ArcHUD:CreateStatusBarArc(parent, maskTexture, moduleName)
+function ArcHUD:CreateStatusBarArc(parent, moduleName)
 	if not ArcHUD.isMidnight then return nil end
 	
 	-- Determine side: health modules are left (Side=1), power modules are right (Side=2)
@@ -375,20 +374,35 @@ function ArcHUD:CreateStatusBarArc(parent, maskTexture, moduleName)
 		if string.find(moduleName, "Power") then
 			side = 2
 		end
-	
 	elseif parent.module and parent.module.name then
 		-- Check module name
 		if string.find(parent.module.name, "Power") then
 			side = 2
 		end
 	end
-	
-	local sb = CreateFrame("StatusBar", nil, parent)
+
+	local frameName = "ArcHUD_StatusBar"
+	if moduleName then
+		frameName = moduleName.."_StatusBar"
+	end
+	local sb = CreateFrame("StatusBar", frameName, parent)
+	parent.statusBar = sb
+	sb.side = side
 	sb:ClearAllPoints()
-	-- Match the parent ring frame exactly
-	-- StatusBar should inherit parent's size, position, and scale
-	sb:SetAllPoints(parent)
-	
+
+	-- Position StatusBar to match the quadrant positioning
+	if side == 1 then
+		sb:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", -parent.radius, parent.radius)
+		sb:SetPoint("BOTTOMRIGHT", parent, "BOTTOMLEFT", 0, -parent.radius)
+		sb:SetPoint("TOPRIGHT", parent, "BOTTOMLEFT", 0, parent.radius)
+		sb:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", -parent.radius, -parent.radius)
+	elseif side == 2 then
+	 	sb:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 0, parent.radius)
+	 	sb:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", 0, -parent.radius)
+		sb:SetPoint("TOPRIGHT", parent, "BOTTOMLEFT", parent.radius, parent.radius)
+		sb:SetPoint("BOTTOMRIGHT", parent, "BOTTOMLEFT", parent.radius, -parent.radius)
+	end
+
 	-- Use the original ArcHUD arc texture directly
 	local texturePath = "Interface\\AddOns\\ArcHUD3\\Icons\\RingFullLeft.png"
 	if side == 2 then

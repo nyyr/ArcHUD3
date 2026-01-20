@@ -52,7 +52,7 @@ function module:Initialize()
 	
 	-- Create StatusBar for Midnight (12.0.0+)
 	if ArcHUD.isMidnight then
-		self.statusBar = self.parent:CreateStatusBarArc(self.f, nil, self.name)
+		self.statusBar = self.parent:CreateStatusBarArc(self.f, self.name)
 		if self.statusBar then
 			self.statusBar:Hide()
 		end
