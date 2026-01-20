@@ -132,7 +132,9 @@ function module:PLAYER_TARGET_CHANGED()
 			if self.statusBarArc then
 				self.statusBarArc:Hide()
 			end
+			self.f:Hide()
 		else
+			self.f:Show()
 			local powerType = UnitPowerType(self.unit)
 			local power, maxPower = UnitPower(self.unit), UnitPowerMax(self.unit)
 			local maxPowerSecret = self.parent:IsSecretValue(maxPower)

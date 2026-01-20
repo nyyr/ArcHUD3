@@ -47,6 +47,7 @@ function module:Initialize()
 	-- Create StatusBar arc for 12.0.0+ (Midnight)
 	if ArcHUD.isMidnight then
 		self.statusBarArc = self.parent:CreateStatusBarArc(self.f, self:GetName())
+		self.zeroAlphaCurve = self.parent:CreateZeroAlphaCurve()
 		if self.statusBarArc then
 			self.statusBarArc:Hide() -- Hide by default
 			self.f:HideAllButOutline()
@@ -185,7 +186,9 @@ function module:PLAYER_TARGET_CHANGED()
 			if self.statusBarArc then
 				self.statusBarArc:Hide()
 			end
+			self.f:Hide()
 		else
+			self.f:Show()
 			self.f.pulse = false
 			self.tapped = false
 			self.friend = false
@@ -303,7 +306,11 @@ function module:UpdateHealth(event, arg1)
 
 				-- Update text - display actual values, including secret values
 				self.HPPerc:SetText(self.parent:FormatHealthPercent(self.unit))
-				
+
+				-- Use zero alpha curve to show/hide text based on health
+				local alpha = UnitHealthPercent(self.unit, false, self.zeroAlphaCurve)
+				self.HPPerc:SetAlpha(alpha)
+
 				-- Heal prediction (only if we can calculate)
 				if self.healPrediction > 0 then
 					local health, maxHealth = UnitHealth(self.unit), UnitHealthMax(self.unit)

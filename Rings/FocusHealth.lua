@@ -136,7 +136,9 @@ function module:PLAYER_FOCUS_CHANGED()
 			if self.statusBarArc then
 				self.statusBarArc:Hide()
 			end
+			self.f:Hide()
 		else
+			self.f:Show()
 			self.f.pulse = false
 			self.tapped = false
 			self.friend = false
