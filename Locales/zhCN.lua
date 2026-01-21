@@ -276,12 +276,13 @@ LM["TEXT"] = {
 	COLORSTAGGERL = "轻度醉拳颜色",
 	COLORSTAGGERM = "中度醉拳颜色",
 	COLORSTAGGERH = "重度醉拳颜色",
+	COLORSTAGGERE = "极端度醉拳颜色",
 
 	SORTRUNES   = "Sort Runes",
 	
 	INNERANCHOR = "附着弧形到内部(“宠物”)锚点",
 	
-	CUSTOM		= "自定增益效果弧形",
+	CUSTOM		= "自定增益效果弧形 (可能不兼容午夜)",
 	CUSTNEW		= "新的自定弧形",
 	CUSTRING	= "弧形选项",
 	
@@ -342,6 +343,7 @@ LM["TOOLTIP"] = {
 	COLORSTAGGERL = "更改轻度醉拳弧形颜色",
 	COLORSTAGGERM = "更改中度醉拳弧形颜色",
 	COLORSTAGGERH = "更改重度醉拳弧形颜色",
+	COLORSTAGGERH = "更改极端度醉拳弧形颜色",
 
 	SORTRUNES   = "Sort the Runes according to their status",
 	

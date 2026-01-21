@@ -280,12 +280,13 @@ LM["TEXT"] = {
 	COLORSTAGGERL = "Color for Light Stagger",
 	COLORSTAGGERM = "Color for Moderate Stagger",
 	COLORSTAGGERH = "Color for Heavy Stagger",
+	COLORSTAGGERE = "Color for Extreme Stagger",
 
 	SORTRUNES   = "Runen sortieren",
 	
 	INNERANCHOR = "Am inneren ('Begleiter') Anker befestigen",
 	
-	CUSTOM		= "Benutzerdef. Buff-Ring",
+	CUSTOM		= "Benutzerdef. Buff-Ring (Wahrscheinlich nicht Midnight-kompatibel)",
 	CUSTNEW		= "Neuer benutzerdef. Ring",
 	CUSTRING	= "Ringoptionen",
 	
@@ -346,6 +347,7 @@ LM["TOOLTIP"] = {
 	COLORSTAGGERL = "Setzt eine benutzerdefinierte Farbe des Rings bei leichter Staffelung",
 	COLORSTAGGERM = "Setzt eine benutzerdefinierte Farbe des Rings bei moderater Staffelung",
 	COLORSTAGGERH = "Setzt eine benutzerdefinierte Farbe des Rings bei schwerer Staffelung",
+	COLORSTAGGERE = "Setzt eine benutzerdefinierte Farbe des Rings bei extrem Staffelung",
 
 	SORTRUNES   = "Runen nach ihrem Status sortieren",
 	

@@ -55,6 +55,7 @@ function module:Initialize()
 		self.statusBar = self.parent:CreateStatusBarArc(self.f, self.name)
 		if self.statusBar then
 			self.statusBar:Hide()
+			self.f:HideAllButOutline()
 		end
 	end
 	
@@ -74,6 +75,10 @@ function module:OnModuleUpdate()
 		self.Time:Show()
 	else
 		self.Time:Hide()
+	end
+
+	if self.db.profile.Side and self.statusBar then
+		self.parent:UpdateStatusBarSide(self.statusBar, self.db.profile.Side)
 	end
 end
 
@@ -171,6 +176,17 @@ function module:OnModuleEnable()
 end
 
 function module:OnModuleDisable()
+	-- Clean up any active casting state
+	if self.f.casting == 1 then
+		self:SpellcastStop("OnModuleDisable", self.unit, true)
+		self:SpellcastChannelStop("OnModuleDisable", self.unit, true)
+	end
+
+	-- Hide StatusBar in Midnight mode
+	if ArcHUD.isMidnight and self.statusBar then
+		self.statusBar:Hide()
+	end
+
 	if ArcHUD.classic then
 		ArcHUD.LibClassicCasterino.UnregisterCallback(self, "UNIT_SPELLCAST_START")
 		ArcHUD.LibClassicCasterino.UnregisterCallback(self, "UNIT_SPELLCAST_DELAYED")
@@ -191,8 +207,14 @@ function module:PLAYER_TARGET_CHANGED()
 	elseif(channel) then
 		self:UNIT_SPELLCAST_CHANNEL_START("PLAYER_TARGET_CHANGED", self.unit)
 	else
+		-- Clean up any existing casting/channeling state
 		self:SpellcastStop("PLAYER_TARGET_CHANGED", self.unit, true)
 		self:SpellcastChannelStop("PLAYER_TARGET_CHANGED", self.unit, true)
+
+		-- Ensure StatusBar is hidden when target changes and no casting
+		if ArcHUD.isMidnight and self.statusBar then
+			self.statusBar:Hide()
+		end
 	end
 end
 

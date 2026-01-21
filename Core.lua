@@ -670,7 +670,7 @@ function ArcHUD:TargetUpdate(event, arg1)
 		local _, class = UnitClass("target")
 		local color = self.ClassColor[class]
 		local decoration_l, decoration_r = "", ""
-		if(UnitIsUnit("target", "focus")) then
+		if(not self:IsSecretValue("target") and not self:IsSecretValue("focus") and UnitIsUnit("target", "focus")) then
 			decoration_l = "|cffffffff>>|r "
 			decoration_r = " |cffffffff<<|r"
 		end
@@ -762,14 +762,12 @@ function ArcHUD:TargetAuras(event, arg1)
 			local buff = aura.icon
 			local count = aura.applications
 			local duration = aura.duration
-			local expirationTime = aura.expirationTime
 			button.Icon:SetTexture(buff)
 			button:Show()
 			button.unit = unit
 
-			-- Protect against secret value comparison (12.0.0+)
-			local countSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(count)
-			if not countSecret and count and count > 1 then
+			if count then
+				if ArcHUD.isMidnight then button.Count:SetAlpha(count) end -- this clamps to [0, 1] automatically
 				button.Count:SetText(count)
 				button.Count:Show()
 				button.Count:SetPoint("CENTER", button, "CENTER", 2, 0)
@@ -778,13 +776,7 @@ function ArcHUD:TargetAuras(event, arg1)
 			end
 
 			if(duration) then
-				if(duration > 0) then
-					button.Cooldown:Show()
-					startCooldownTime = expirationTime - duration
-					button.Cooldown:SetCooldown(startCooldownTime, duration)
-				else
-					button.Cooldown:Hide()
-				end
+				button.Cooldown:SetCooldownDuration(duration)
 			else
 				button.Cooldown:Hide()
 			end
@@ -802,7 +794,6 @@ function ArcHUD:TargetAuras(event, arg1)
 			local count = aura.applications
 			local buffType = aura.dispelType
 			local duration = aura.duration
-			local expirationTime = aura.expirationTime
 			button.Icon:SetTexture(buff)
 			button:Show()
 			button.Border:Show()
@@ -822,9 +813,8 @@ function ArcHUD:TargetAuras(event, arg1)
 			end
 			button.Border:SetVertexColor(color.r, color.g, color.b)
 
-			-- Protect against secret value comparison (12.0.0+)
-			local countSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(count)
-			if not countSecret and count and count > 1 then
+			if count then
+				if ArcHUD.isMidnight then button.Count:SetAlpha(count) end -- this clamps to [0, 1] automatically
 				button.Count:SetText(count)
 				button.Count:Show()
 				button.Count:SetPoint("CENTER", button, "CENTER", 2, 0)
@@ -833,13 +823,7 @@ function ArcHUD:TargetAuras(event, arg1)
 			end
 
 			if(duration) then
-				if(duration > 0) then
-					button.Cooldown:Show()
-					startCooldownTime = expirationTime - duration
-					button.Cooldown:SetCooldown(startCooldownTime, duration)
-				else
-					button.Cooldown:Hide()
-				end
+				button.Cooldown:SetCooldownDuration(duration)
 			else
 				button.Cooldown:Hide()
 			end
@@ -1021,7 +1005,7 @@ function ArcHUD:UpdateTargetTarget()
 		local _, class = UnitClass("targettarget")
 		local color = self.ClassColor[class]
 		local decoration = ""
-		if(UnitIsUnit("targettarget", "focus")) then
+		if(not self:IsSecretValue("targettarget") and not self:IsSecretValue("focus") and UnitIsUnit("targettarget", "focus")) then
 			decoration = "|cffffffff>|r "
 		end
 		if (color and UnitIsPlayer("targettarget")) then
@@ -1105,7 +1089,7 @@ function ArcHUD:UpdateTargetTarget()
 		local _, class = UnitClass("targettargettarget")
 		local color = self.ClassColor[class]
 		local decoration = ""
-		if(UnitIsUnit("targettargettarget", "focus")) then
+		if(not self:IsSecretValue("targettargettarget") and not self:IsSecretValue("focus") and UnitIsUnit("targettargettarget", "focus")) then
 			decoration = "|cffffffff>|r "
 		end
 		if (color and UnitIsPlayer("targettargettarget")) then

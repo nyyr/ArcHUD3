@@ -73,12 +73,10 @@ function module:Initialize()
 	
 		-- Create StatusBar arc for 12.0.0+ (Midnight)
 		if ArcHUD.isMidnight then
-			-- Note: Mask texture path needs to be created - using placeholder for now
-			-- The mask should show only the arc portion of the ring
-			-- Health is left side (Side=1), pass module name to determine positioning
 			self.statusBarArc = self.parent:CreateStatusBarArc(self.f, self.name)
 		if self.statusBarArc then
 			self.statusBarArc:Hide() -- Hide by default, show when we have valid data
+			self.f:HideAllButOutline()
 		end
 	end
 	
@@ -106,6 +104,10 @@ function module:OnModuleUpdate()
 		self.DefText:Show()
 	else
 		self.DefText:Hide()
+	end
+
+	if self.db.profile.Side and self.statusBarArc then
+		self.parent:UpdateStatusBarSide(self.statusBarArc, self.db.profile.Side)
 	end
 	
 	if self.db.profile.SwapHealthPowerText then

@@ -1119,8 +1119,13 @@ function ArcHUDRingTemplate:SetRingAlpha(destAlpha, instant)
 			self.destAlpha = destAlpha
 		end
 		-- Sync StatusBar alpha if it exists (Midnight mode)
-		if ArcHUD.isMidnight and self.statusBarArc then
-			self.statusBarArc:SetAlpha(destAlpha)
+		-- Check both statusBarArc (legacy) and statusBar (current) naming
+		if ArcHUD.isMidnight then
+			if self.statusBarArc then
+				self.statusBarArc:SetAlpha(destAlpha)
+			elseif self.statusBar then
+				self.statusBar:SetAlpha(destAlpha)
+			end
 		end
 		return
 		
@@ -1140,6 +1145,18 @@ function ArcHUDRingTemplate:SetRingAlpha(destAlpha, instant)
 		self.applyAlpha.alphaAnim:SetToAlpha(destAlpha)
 		self.applyAlpha:Play()
 	end
+end
+
+-- Hide all but Outline (Quadrants)
+function ArcHUDRingTemplate:HideAllButOutline()
+	self.chip1:Hide()
+	self.chip1:ClearAllPoints()
+	self.slice1:Hide()
+	self.slice1:ClearAllPoints()
+	self.chip2:Hide()
+	self.chip2:ClearAllPoints()
+	self.slice2:Hide()
+	self.slice2:ClearAllPoints()
 end
 
 -----------------------------------------------------------
@@ -1362,6 +1379,7 @@ function ArcHUDRingTemplate:OnLoad(frame)
 	frame.GhostMode					= self.GhostMode
 	frame.StartPulse				= self.StartPulse
 	frame.StopPulse					= self.StopPulse
+	frame.HideAllButOutline         = self.HideAllButOutline
 	frame.applyAlpha_OnFinished		= self.applyAlpha_OnFinished
 	frame.SetSpark					= self.SetSpark
 	frame.OnEvent					= self.OnEvent

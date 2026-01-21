@@ -263,7 +263,7 @@ function ArcHUD:FormatPowerPercent(unit, powerType)
 	if pct and not self:IsSecretValue(pct) and type(pct) == "number" then
 		return string.format("%.0f%%", pct * 100)
 	end
-	return "100%"
+	return ""
 end
 
 -- Format health text (current/max) - handles secret values
@@ -305,7 +305,8 @@ function ArcHUD:CreateArcFillCurve()
 	local ringFactor = 0.94 -- matches ArcHUD default
 	local steps = 180 -- number of curve points for smooth mapping
 
-	for i = 0, steps do
+	curve:AddPoint(0, 0) -- explicitly specify 0,0
+	for i = 1, steps-1 do
 		local percent = i / steps
 		local angle_degrees = percent * 180 -- arc covers 180 degrees
 		local angle_radians = math.rad(angle_degrees)
@@ -331,9 +332,34 @@ function ArcHUD:CreateArcFillCurve()
 
 		curve:AddPoint(percent, normalized_y)
 	end
+	curve:AddPoint(1, 1) -- explicitly specify 1,1
 
 	-- Cache the curve globally
 	self.arcFillCurve = curve
+	return curve
+end
+
+-- Create zero alpha curve for hiding elements when value is 0 (global, created once)
+-- Maps secret values directly to alpha: 0 = 0 alpha, >= 0.0001 = 1 alpha
+function ArcHUD:CreateZeroAlphaCurve()
+	if not ArcHUD.isMidnight or not C_CurveUtil then return nil end
+
+	-- Return cached curve if it already exists
+	if self.zeroAlphaCurve then return self.zeroAlphaCurve end
+
+	local curveType = Enum.LuaCurveType or Enum.CurveType
+	if not curveType then return nil end
+
+	local curve = C_CurveUtil.CreateCurve(curveType.Linear)
+	if not curve then return nil end
+
+	-- Point 0: value 0 = alpha 0 (hidden)
+	curve:AddPoint(0, 0)
+	-- Point 1: value >= 0.0001 = alpha 1 (visible)
+	curve:AddPoint(0.0001, 1)
+
+	-- Cache the curve globally
+	self.zeroAlphaCurve = curve
 	return curve
 end
 
@@ -413,21 +439,10 @@ end
 function ArcHUD:CreateStatusBarArc(parent, moduleName)
 	if not ArcHUD.isMidnight then return nil end
 	
-	-- Determine side: health modules are left (Side=1), power modules are right (Side=2)
 	local side = 1 -- default to left
 	if parent.module and parent.module.db and parent.module.db.profile then
 		-- Try to get side from module
 		side = parent.module.db.profile.Side or 1
-	elseif moduleName then
-		-- Check module name for "Power" to determine right side
-		if string.find(moduleName, "Power") then
-			side = 2
-		end
-	elseif parent.module and parent.module.name then
-		-- Check module name
-		if string.find(parent.module.name, "Power") then
-			side = 2
-		end
 	end
 
 	local frameName = "ArcHUD_StatusBar"
@@ -436,33 +451,14 @@ function ArcHUD:CreateStatusBarArc(parent, moduleName)
 	end
 	local sb = CreateFrame("StatusBar", frameName, parent)
 	parent.statusBar = sb
-	sb.side = side
+	-- Store reference to parent ring for alpha syncing
+	sb.parentRing = parent
+
+	self:UpdateStatusBarSide(sb, side)
 
 	-- Use global arc fill curve for proper percentage mapping
 	sb.arcFillCurve = self:CreateArcFillCurve()
 
-	sb:ClearAllPoints()
-
-	-- Position StatusBar to match the quadrant positioning
-	if side == 1 then
-		sb:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", -parent.radius, parent.radius)
-		sb:SetPoint("BOTTOMRIGHT", parent, "BOTTOMLEFT", 0, -parent.radius)
-		sb:SetPoint("TOPRIGHT", parent, "BOTTOMLEFT", 0, parent.radius)
-		sb:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", -parent.radius, -parent.radius)
-	elseif side == 2 then
-	 	sb:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 0, parent.radius)
-	 	sb:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", 0, -parent.radius)
-		sb:SetPoint("TOPRIGHT", parent, "BOTTOMLEFT", parent.radius, parent.radius)
-		sb:SetPoint("BOTTOMRIGHT", parent, "BOTTOMLEFT", parent.radius, -parent.radius)
-	end
-
-	-- Use the original ArcHUD arc texture directly
-	local texturePath = "Interface\\AddOns\\ArcHUD3\\Icons\\RingFullLeft.png"
-	if side == 2 then
-		texturePath = "Interface\\AddOns\\ArcHUD3\\Icons\\RingFullRight.png"
-	end
-
-	sb:SetStatusBarTexture(texturePath)
 	sb:SetMinMaxValues(0, 1)
 	sb:SetValue(0)
 	sb:SetOrientation("VERTICAL")
@@ -473,11 +469,34 @@ function ArcHUD:CreateStatusBarArc(parent, moduleName)
 	-- Set frame level to be above background but below text
 	sb:SetFrameLevel(parent:GetFrameLevel() + 1)
 
-	-- Store reference to parent ring for alpha syncing
-	sb.parentRing = parent
 
 	sb:Hide()
 	return sb
+end
+
+function ArcHUD:UpdateStatusBarSide(sb, side)
+	if not ArcHUD.isMidnight or not sb then return end
+	sb.side = side
+	sb:ClearAllPoints()
+	if side == 1 then
+		sb:SetPoint("TOPLEFT", sb.parentRing, "BOTTOMLEFT", -sb.parentRing.radius, sb.parentRing.radius)
+		sb:SetPoint("BOTTOMRIGHT", sb.parentRing, "BOTTOMLEFT", 0, -sb.parentRing.radius)
+		sb:SetPoint("TOPRIGHT", sb.parentRing, "BOTTOMLEFT", 0, sb.parentRing.radius)
+		sb:SetPoint("BOTTOMLEFT", sb.parentRing, "BOTTOMLEFT", -sb.parentRing.radius, -sb.parentRing.radius)
+	elseif side == 2 then
+	 	sb:SetPoint("TOPLEFT", sb.parentRing, "BOTTOMLEFT", 0, sb.parentRing.radius)
+	 	sb:SetPoint("BOTTOMLEFT", sb.parentRing, "BOTTOMLEFT", 0, -sb.parentRing.radius)
+		sb:SetPoint("TOPRIGHT", sb.parentRing, "BOTTOMLEFT", sb.parentRing.radius, sb.parentRing.radius)
+		sb:SetPoint("BOTTOMRIGHT", sb.parentRing, "BOTTOMLEFT", sb.parentRing.radius, -sb.parentRing.radius)
+	end
+
+	-- Use the original ArcHUD arc texture directly
+	local texturePath = "Interface\\AddOns\\ArcHUD3\\Icons\\RingFullLeft.png"
+	if side == 2 then
+		texturePath = "Interface\\AddOns\\ArcHUD3\\Icons\\RingFullRight.png"
+	end
+
+	sb:SetStatusBarTexture(texturePath)
 end
 
 -- Update StatusBar arc value from unit health
