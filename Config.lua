@@ -382,12 +382,26 @@ ArcHUD.configOptionsTableCore = {
 						ArcHUD:UpdateTargetHUD()
 					end,
 				},
+				-- Reverse buff cooldowns
+				reverseBuffCooldowns = {
+					type		= "toggle",
+					name		= L["TEXT"]["REVERSEBUFFCOOLDOWNS"],
+					desc		= L["TOOLTIP"]["REVERSEBUFFCOOLDOWNS"],
+					order		= 8,
+					get			= function ()
+						return ArcHUD.db.profile.ReverseBuffCooldowns
+					end,
+					set			= function (info, v)
+						ArcHUD.db.profile.ReverseBuffCooldowns = v
+						ArcHUD:UpdateTargetHUD()
+					end,
+				},
 				-- Show Buff tooltips
 				showBuffTooltips = {
 					type		= "toggle",
 					name		= L["TEXT"]["SHOWBUFFTT"],
 					desc		= L["TOOLTIP"]["SHOWBUFFTT"],
-					order		= 8,
+					order		= 9,
 					get			= function ()
 						return ArcHUD.db.profile.ShowBuffTooltips
 					end,
@@ -400,7 +414,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["HIDEBUFFTTIC"],
 					desc		= L["TOOLTIP"]["HIDEBUFFTTIC"],
-					order		= 9,
+					order		= 10,
 					get			= function ()
 						return ArcHUD.db.profile.HideBuffTooltipsIC
 					end,
@@ -413,7 +427,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["HIDEBUFFTIMERTEXT"],
 					desc		= L["TOOLTIP"]["HIDEBUFFTIMERTEXT"],
-					order		= 10,
+					order		= 11,
 					get			= function ()
 						return ArcHUD.db.profile.HideBuffTimerText
 					end,
@@ -429,7 +443,7 @@ ArcHUD.configOptionsTableCore = {
 					min			= 16,
 					max			= 40,
 					step		= 4,
-					order		= 11,
+					order		= 12,
 					get			= function ()
 						return ArcHUD.db.profile.BuffIconSize
 					end,
@@ -451,7 +465,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["SHOWPVP"],
 					desc		= L["TOOLTIP"]["SHOWPVP"],
-					order		= 12,
+					order		= 13,
 					get			= function ()
 						return ArcHUD.db.profile.ShowPVP
 					end,
@@ -465,7 +479,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["SHOWTEXTMAX"],
 					desc		= L["TOOLTIP"]["SHOWTEXTMAX"],
-					order		= 13,
+					order		= 14,
 					get			= function ()
 						return ArcHUD.db.profile.ShowHealthPowerTextMax
 					end,
@@ -479,7 +493,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["TOT"],
 					desc		= L["TOOLTIP"]["TOT"],
-					order		= 14,
+					order		= 15,
 					get			= function ()
 						return ArcHUD.db.profile.TargetTarget
 					end,
@@ -493,7 +507,7 @@ ArcHUD.configOptionsTableCore = {
 					type		= "toggle",
 					name		= L["TEXT"]["TOTOT"],
 					desc		= L["TOOLTIP"]["TOTOT"],
-					order		= 15,
+					order		= 16,
 					get			= function ()
 						return ArcHUD.db.profile.TargetTargetTarget
 					end,

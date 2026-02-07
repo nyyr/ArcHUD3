@@ -449,9 +449,9 @@ function ArcHUD:CreateStatusBarArc(parent, moduleName)
 	if moduleName then
 		frameName = moduleName.."_StatusBar"
 	end
-	local sb = CreateFrame("StatusBar", frameName, parent)
+	local sb = CreateFrame("StatusBar", frameName, ArcHUDFrame)
 	parent.statusBar = sb
-	-- Store reference to parent ring for alpha syncing
+	-- Store reference to parent ring for positioning
 	sb.parentRing = parent
 
 	self:UpdateStatusBarSide(sb, side)

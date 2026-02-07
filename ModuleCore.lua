@@ -365,8 +365,10 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2)
 			
 			if maxValueSecret or f.isHidden then
 				f:SetRingAlpha(0)
+				if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(0) end
 			elseif not maxValueSecret and (f.maxValue == 0) then
 				f:SetRingAlpha(0)
+				if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(0) end
 			elseif (alpha2) then
 				-- In Midnight, use CurveObject to determine alpha based on percentage
 				-- The ring frame values are kept at 1/0 (not secret), so we must check actual unit health/power
@@ -409,9 +411,11 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2)
 								end
 							else
 								f:SetRingAlpha(alpha2)
+								if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
 							end
 						else
 							f:SetRingAlpha(alpha2)
+							if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
 						end
 					elseif self.isPower then
 						-- Use UnitPowerPercent with curve
@@ -426,24 +430,30 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2)
 								end
 							else
 								f:SetRingAlpha(alpha2)
+								if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
 							end
 						else
 							f:SetRingAlpha(alpha2)
+							if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
 						end
 					else
 						-- Not health or power - fallback
 						f:SetRingAlpha(alpha2)
+						if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
 					end
 				elseif not startValueSecret and not maxValueSecret and not endValueSecret then
 					-- Legacy: check ring frame values directly
 					if(f.startValue < f.maxValue or math.floor(f.startValue) ~= math.floor(f.endValue)) then
 						f:SetRingAlpha(alpha2)
+						if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
 					elseif(self.f.startValue == self.f.maxValue) then
 						f:SetRingAlpha(alpha)
+						if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha) end
 					end
 				else
 					-- Values are secret but not in Midnight health/power mode - fallback
 					f:SetRingAlpha(alpha2)
+					if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
 				end
 			else
 				-- No alpha2: set alpha directly (e.g., when in combat)
@@ -465,8 +475,10 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2)
 		
 		if maxValueSecret or f.isHidden then
 			f:SetRingAlpha(0)
+			if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(0) end
 		elseif not maxValueSecret and (f.maxValue == 0) then
 			f:SetRingAlpha(0)
+			if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(0) end
 		elseif (alpha2) then
 			-- In Midnight, use CurveObject to determine alpha based on percentage
 			-- The ring frame values are kept at 1/0 (not secret), so we must check actual unit health/power
@@ -526,24 +538,30 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2)
 							end
 						else
 							f:SetRingAlpha(alpha2)
+							if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
 						end
 					else
 						f:SetRingAlpha(alpha2)
+						if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
 					end
 				else
 					-- Not health or power - fallback
 					f:SetRingAlpha(alpha2)
+					if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
 				end
 			elseif not startValueSecret and not maxValueSecret and not endValueSecret then
 				-- Legacy: check ring frame values directly
 				if(f.startValue < f.maxValue or math.floor(f.startValue) ~= math.floor(f.endValue)) then
 					f:SetRingAlpha(alpha2)
+					if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
 				elseif(self.f.startValue == self.f.maxValue) then
 					f:SetRingAlpha(alpha)
+					if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha) end
 				end
 			else
 				-- Values are secret but not in Midnight health/power mode - fallback
 				f:SetRingAlpha(alpha2)
+				if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
 			end
 		else
 			-- No alpha2: set alpha directly (e.g., when in combat)
