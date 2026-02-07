@@ -1167,7 +1167,7 @@ function ArcHUDRingTemplate:applyAlpha_OnFinished()
 	-- Check if curAlpha is a secret value (12.0.0+)
 	local curAlphaSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(curAlpha)
 	
-	-- Sync StatusBar alpha if it exists (Midnight mode) - always sync, even if secret
+	-- Sync StatusBar alpha if it exists (Midnight mode)
 	if ArcHUD.isMidnight and self.statusBarArc then
 		self.statusBarArc:SetAlpha(curAlpha)
 	end

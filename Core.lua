@@ -432,6 +432,10 @@ function ArcHUD:OnProfileChanged(db, profile)
 	
 	-- Update target HUD
 	self:UpdateTargetHUD()
+	-- Apply ToT/ToTToT visibility and interactivity immediately when options change
+	if self.db.profile.TargetFrame then
+		self:UpdateTargetTarget()
+	end
 	
 	-- Modules
 	self:SendMessage("ARCHUD_MODULE_UPDATE")
@@ -670,9 +674,13 @@ function ArcHUD:TargetUpdate(event, arg1)
 		local _, class = UnitClass("target")
 		local color = self.ClassColor[class]
 		local decoration_l, decoration_r = "", ""
-		if(not self:IsSecretValue("target") and not self:IsSecretValue("focus") and UnitIsUnit("target", "focus")) then
-			decoration_l = "|cffffffff>>|r "
-			decoration_r = " |cffffffff<<|r"
+		if not self:IsSecretValue("target") and not self:IsSecretValue("focus") then
+			local ok = pcall(function()
+				if UnitIsUnit("target", "focus") then
+					decoration_l = "|cffffffff>>|r "
+					decoration_r = " |cffffffff<<|r"
+				end
+			end)
 		end
 		if (color and UnitIsPlayer("target")) then
 			-- Is target in a guild?
@@ -776,7 +784,13 @@ function ArcHUD:TargetAuras(event, arg1)
 			end
 
 			if(duration) then
-				button.Cooldown:SetCooldownDuration(duration)
+				local durationObject = C_UnitAuras.GetAuraDuration(unit, aura.auraInstanceID)
+				if durationObject then
+					button.Cooldown:SetCooldownFromDurationObject(durationObject)
+					button.Cooldown:SetReverse(true)
+				else
+					button.Cooldown:Hide()
+				end
 			else
 				button.Cooldown:Hide()
 			end
@@ -823,7 +837,13 @@ function ArcHUD:TargetAuras(event, arg1)
 			end
 
 			if(duration) then
-				button.Cooldown:SetCooldownDuration(duration)
+				local durationObject = C_UnitAuras.GetAuraDuration(unit, aura.auraInstanceID)
+				if durationObject then
+					button.Cooldown:SetCooldownFromDurationObject(durationObject)
+					button.Cooldown:SetReverse(true)
+				else
+					button.Cooldown:Hide()
+				end
 			else
 				button.Cooldown:Hide()
 			end
@@ -1000,13 +1020,22 @@ end
 -- UpdateTargetTarget()
 ----------------------------------------------
 function ArcHUD:UpdateTargetTarget()
+	-- Refresh main target frame when we have a target (catches missed PLAYER_TARGET_CHANGED)
+	if UnitExists("target") and self.db.profile.TargetFrame then
+		self:TargetUpdate()
+	end
+
 	-- Handle Target's Target
 	if(UnitExists("targettarget") and self.db.profile.TargetTarget) then
 		local _, class = UnitClass("targettarget")
 		local color = self.ClassColor[class]
 		local decoration = ""
-		if(not self:IsSecretValue("targettarget") and not self:IsSecretValue("focus") and UnitIsUnit("targettarget", "focus")) then
-			decoration = "|cffffffff>|r "
+		if not self:IsSecretValue("targettarget") and not self:IsSecretValue("focus") then
+			local ok = pcall(function()
+				if UnitIsUnit("targettarget", "focus") then
+					decoration = "|cffffffff>|r "
+				end
+			end)
 		end
 		if (color and UnitIsPlayer("targettarget")) then
 				self.TargetHUD.Target.Name:SetText(decoration.."|cff"..color..UnitName("targettarget").."|r")
@@ -1076,11 +1105,14 @@ function ArcHUD:UpdateTargetTarget()
 			end
 		end
 		self.TargetHUD.Target:SetAlpha(1)
+		self.Nameplates.targettarget:Show()
 		self.Nameplates.targettarget:Enable()
 	else
-		if(self.TargetHUD.Target.locked) then
-			self.TargetHUD.Target:SetAlpha(0)
-		end
+		-- Always hide and disable when TargetTarget is off so no ghost tooltip/click
+		self.TargetHUD.Target:SetAlpha(0)
+		self.Nameplates.targettarget:EnableMouse(false)
+		self.Nameplates.targettarget:SetAlpha(0)
+		self.Nameplates.targettarget:Hide()
 		self.Nameplates.targettarget:Disable()
 	end
 
@@ -1089,8 +1121,12 @@ function ArcHUD:UpdateTargetTarget()
 		local _, class = UnitClass("targettargettarget")
 		local color = self.ClassColor[class]
 		local decoration = ""
-		if(not self:IsSecretValue("targettargettarget") and not self:IsSecretValue("focus") and UnitIsUnit("targettargettarget", "focus")) then
-			decoration = "|cffffffff>|r "
+		if not self:IsSecretValue("targettargettarget") and not self:IsSecretValue("focus") then
+			local ok = pcall(function()
+				if UnitIsUnit("targettargettarget", "focus") then
+					decoration = "|cffffffff>|r "
+				end
+			end)
 		end
 		if (color and UnitIsPlayer("targettargettarget")) then
 				self.TargetHUD.TargetTarget.Name:SetText(decoration.."|cff"..color..UnitName("targettargettarget").."|r")
@@ -1160,11 +1196,14 @@ function ArcHUD:UpdateTargetTarget()
 			end
 		end
 		self.TargetHUD.TargetTarget:SetAlpha(1)
+		self.Nameplates.targettargettarget:Show()
 		self.Nameplates.targettargettarget:Enable()
 	else
-		if(self.TargetHUD.TargetTarget.locked) then
-			self.TargetHUD.TargetTarget:SetAlpha(0)
-		end
+		-- Always hide and disable when TargetTargetTarget is off so no ghost tooltip/click
+		self.TargetHUD.TargetTarget:SetAlpha(0)
+		self.Nameplates.targettargettarget:EnableMouse(false)
+		self.Nameplates.targettargettarget:SetAlpha(0)
+		self.Nameplates.targettargettarget:Hide()
 		self.Nameplates.targettargettarget:Disable()
 	end
 end
