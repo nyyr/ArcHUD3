@@ -89,6 +89,7 @@ ArcHUD.defaults = {
 		AttachTop = false,
 		ShowBuffs = true,
 		ShowOnlyBuffsCastByPlayer = false,
+		ReverseBuffCooldowns = false,
 		ShowBuffTooltips = true,
 		HideBuffTooltipsIC = false,
 		HideBuffTimerText = false,
@@ -787,7 +788,7 @@ function ArcHUD:TargetAuras(event, arg1)
 				local durationObject = C_UnitAuras.GetAuraDuration(unit, aura.auraInstanceID)
 				if durationObject then
 					button.Cooldown:SetCooldownFromDurationObject(durationObject)
-					button.Cooldown:SetReverse(true)
+					button.Cooldown:SetReverse(not self.db.profile.ReverseBuffCooldowns)
 				else
 					button.Cooldown:Hide()
 				end
@@ -840,7 +841,7 @@ function ArcHUD:TargetAuras(event, arg1)
 				local durationObject = C_UnitAuras.GetAuraDuration(unit, aura.auraInstanceID)
 				if durationObject then
 					button.Cooldown:SetCooldownFromDurationObject(durationObject)
-					button.Cooldown:SetReverse(true)
+					button.Cooldown:SetReverse(not self.db.profile.ReverseBuffCooldowns)
 				else
 					button.Cooldown:Hide()
 				end
