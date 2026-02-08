@@ -34,20 +34,38 @@ module.powerType = 0
 module.powerTypeString = ""
 module.flashAt = nil -- flash when full
 
-function module:InitializePowerRing()
+function module:InitializePowerRing(powerType)
 	-- Setup the frame we need
 	self.f = self:CreateRing(true, ArcHUDFrame)
 	self.f:SetAlpha(0)
 	self.f:Hide()
 
-	self.TextHuge = self:CreateFontString(self.f, "BACKGROUND", {40, 30}, 30, "CENTER", 
-						{ self.defaults.profile.Color.r, self.defaults.profile.Color.g, self.defaults.profile.Color.b },
-						{ "BOTTOM", ArcHUDFrame, "BOTTOM" })
+	self.isPower = true
+	self.powerType = powerType
+
+	self.TextHuge = self:CreateFontString(self.f, "BACKGROUND", {40, 30}, 30, "CENTER",
+			{ self.defaults.profile.Color.r, self.defaults.profile.Color.g, self.defaults.profile.Color.b },
+			{ "BOTTOM", ArcHUDFrame, "BOTTOM" })
 	self.TextHuge:Hide()
-	
+
 	self:CreateStandardModuleOptions(55)
 
 	self.active = false
+
+	-- Check secrecy of power type
+	self.isSecret = ArcHUD.isMidnight and C_Secrets.GetPowerTypeSecrecy(powerType) ~= 0
+
+	-- Create StatusBar arc for 12.0.0+ (Midnight) if not already created
+	if ArcHUD.isMidnight and self.isSecret and not self.statusBarArc then
+		self.statusBarArc = self.parent:CreateStatusBarArc(self.f, self.name)
+		self.f.statusBarArc = self.statusBarArc
+		self.zeroAlphaCurve = self.parent:CreateZeroAlphaCurve()
+		if self.statusBarArc then
+			self.statusBarArc:Hide() -- Hide by default
+			self.statusBarArc:SetAlpha(0)
+			self.f:HideAllButOutline()
+		end
+	end
 end
 
 function module:OnModuleUpdate()
@@ -58,6 +76,10 @@ function module:OnModuleUpdate()
 		self.TextHuge:Show()
 	else
 		self.TextHuge:Hide()
+	end
+
+	if self.db.profile.Side and self.statusBarArc then
+		self.parent:UpdateStatusBarSide(self.statusBarArc, self.db.profile.Side)
 	end
 
 	self.f:StopPulse()
@@ -81,23 +103,40 @@ function module:OnModuleEnable()
 
 	-- Refresh settings
 	self:OnModuleUpdate()
+
+	-- Initialize status bar
+	if ArcHUD.isMidnight and self.isSecret and self.statusBarArc then
+		local powerType = self.powerType or UnitPowerType(self.unit)
+		self.parent:UpdateStatusBarArcPower(self.statusBarArc, self.unit, powerType)
+		local barColor = self.db.profile.Color
+		local r, g, b = barColor.r or barColor[1], barColor.g or barColor[2], barColor.b or barColor[3]
+		self.parent:SetStatusBarArcColor(self.statusBarArc, r, g, b, 1)
+	end
 end
 
 function module:UpdatePowerRing()
+	if ArcHUD.isMidnight and self.isSecret and self.statusBarArc and self.f:IsShown() then
+		local powerType = self.powerType or UnitPowerType(self.unit)
+		self.parent:UpdateStatusBarArcPower(self.statusBarArc, self.unit, powerType)
+		local barColor = self.db.profile.Color
+		local r, g, b = barColor.r or barColor[1], barColor.g or barColor[2], barColor.b or barColor[3]
+		self.parent:SetStatusBarArcColor(self.statusBarArc, r, g, b, 1)
+	end
+
 	local maxPower = UnitPowerMax(self.unit, self.powerType);
 	local num = UnitPower(self.unit, self.powerType)
 	self.f:SetMax(maxPower)
 	self.f:SetValue(num)
 
-	if self.db.profile.ShowTextHuge then
+	if self.db.profile.ShowTextHuge and not self.isSecret then
 		if (num > 0) then
 			self.TextHuge:SetText(num)
 		else
 			self.TextHuge:SetText("")
 		end
 	end
-	
-	if self.db.profile.Flash then
+
+	if self.db.profile.Flash and not self.isSecret then
 		local flashAt = self.flashAt or maxPower
 		if (num >= flashAt) then
 			self.f:StartPulse()
@@ -164,15 +203,25 @@ function module:UpdateActive(event, arg1)
 		end
 		self.active = isActive
 	end
-	
-	self.f:SetShown(isActive and ((not self.CheckVisible) or self:CheckVisible()))
+
+	if isActive and ((not self.CheckVisible) or self:CheckVisible()) then
+		self.f:Show()
+		if self.statusBarArc then
+			self.statusBarArc:Show()
+		end
+	else
+		self.f:Hide()
+		if self.statusBarArc then
+			self.statusBarArc:Hide()
+		end
+	end
 end
 
 --
 -- Can be overridden in case more events must be registered (e.g., for detecting shapeshifts)
 --
 function module:OnActiveChanged(oldState, newState)
-	
+
 end
 
 --
