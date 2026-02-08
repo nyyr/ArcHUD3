@@ -44,12 +44,12 @@ function ArcHUD.modulePrototype:InitConfigOptions()
 	if (self.isCustom) then
 		-- Custom buff module
 		self:Debug(d_notice, "Initializing custom buff module options")
-		
+
 		-- Register options
 		if (self.optionsTable and type(self.optionsTable) == "table") then
 			self.parent:AddCustomModuleOptionsTable(self.name, self.optionsTable)
 		end
-		
+
 	elseif (self.defaults and type(self.defaults) == "table") then
 		-- Add defaults to ArcHUD defaults table
 		self:Debug(d_notice, "Acquiring ring DB namespace")
@@ -62,7 +62,7 @@ function ArcHUD.modulePrototype:InitConfigOptions()
 		if (self.optionsTable and type(self.optionsTable) == "table") then
 			self.parent:AddModuleOptionsTable(self.name, self.optionsTable)
 		end
-		
+
 	end
 end
 
@@ -74,7 +74,7 @@ function ArcHUD.modulePrototype:OnInitialize()
 	-- This might happen for custom modules loaded after the ADDON_LOADED event
 	if (self.isInitialized) then return end
 	self.isInitialized = true
-	
+
 	if(self.Initialize) then
 		self:Initialize()
 		self:Debug(d_notice, "Ring initialized")
@@ -84,7 +84,7 @@ function ArcHUD.modulePrototype:OnInitialize()
 		self:Debug(d_warn, "Missing Initialize(). Aborting")
 		return
 	end
-	
+
 	self:InitConfigOptions()
 
 	-- Add metadata for module if it doesn't exist
@@ -97,12 +97,12 @@ function ArcHUD.modulePrototype:OnInitialize()
 	if(not self.date) then
 		self.date = self.parent.date
 	end
-	
+
 	-- Check for necessary alpha updates
 	if (not self.noAutoAlpha) then
 		self:RegisterTimer("CheckAlpha", ArcHUD.modulePrototype.CheckAlpha, 0.1, self, true)
 	end
-	
+
 	self:Debug(d_info, "Ring loaded")
 end
 
@@ -206,7 +206,7 @@ function ArcHUD.modulePrototype:ARCHUD_MODULE_UPDATE(message, module)
 				self.parent:LevelDebug(d_warn, "Frame for "..module.." not defined")
 				return
 			end
-			
+
 			if(self.f.BG) then
 				if(self.db.profile.Outline) then
 					self.f.BG:Show()
@@ -243,7 +243,7 @@ function ArcHUD.modulePrototype:CreateRing(hasBG, parent)
 	-- Create frame
 	local f = CreateFrame("Frame", "ArcHUD_"..self:GetName().."_Ring", parent, "ArcHUDRingTemplate")
 	f.module = self
-	
+
 	if not hasBG then
 		f.BG:Hide()
 		f.oldBG = f.BG -- if needed later again
@@ -264,7 +264,7 @@ function ArcHUD.modulePrototype:AttachRing(ring)
 	ring:SetValue(0)
 	-- Clear all points for the ring
 	ring:ClearAllPoints()
-	
+
 	if(self.db.profile.Side == 1) then
 		-- Attach to left side
 		if self.db.profile.InnerAnchor then
@@ -295,13 +295,13 @@ function ArcHUD.modulePrototype:AttachRing(ring)
 	if(ring.BG) then
 		ring.BG:SetAngle(180)
 	end
-	
+
 	-- separators
 	if (self.db.profile.ShowSeparators) then
 		ring.showSeparators = true
 	end
 	ring:RefreshSeparators()
-	
+
 	ring:SetValue(oldValue)
 end
 
@@ -362,7 +362,7 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2)
 			local maxValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(f.maxValue)
 			local startValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(f.startValue)
 			local endValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(f.endValue)
-			
+
 			if maxValueSecret or f.isHidden then
 				f:SetRingAlpha(0)
 				if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(0) end
@@ -374,30 +374,30 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2)
 				-- The ring frame values are kept at 1/0 (not secret), so we must check actual unit health/power
 				if ArcHUD.isMidnight and self.unit and (self.isHealth or self.isPower) then
 					local unit = self.unit
-				if not self.alphaCurve then
-					-- Create Step curve: alpha2 for < 0.999, alpha for >= 1.0
-					self.alphaCurve = C_CurveUtil.CreateCurve()
+					if not self.alphaCurve then
+						-- Create Step curve: alpha2 for < 0.999, alpha for >= 1.0
+						self.alphaCurve = C_CurveUtil.CreateCurve()
+						if self.alphaCurve then
+							self.alphaCurve:SetType(Enum.LuaCurveType.Step)
+							-- Store alpha values in the module for reuse
+							self.alphaCurve.alpha2 = alpha2
+							self.alphaCurve.alpha = alpha
+							-- Add points immediately when creating the curve
+							self.alphaCurve:AddPoint(0.9999, alpha2)
+							self.alphaCurve:AddPoint(1.0, alpha)
+						end
+					end
 					if self.alphaCurve then
-						self.alphaCurve:SetType(Enum.LuaCurveType.Step)
-						-- Store alpha values in the module for reuse
-						self.alphaCurve.alpha2 = alpha2
-						self.alphaCurve.alpha = alpha
-						-- Add points immediately when creating the curve
-						self.alphaCurve:AddPoint(0.9999, alpha2)
-						self.alphaCurve:AddPoint(1.0, alpha)
+						-- Update curve points if alpha values changed
+						if self.alphaCurve.alpha2 ~= alpha2 or self.alphaCurve.alpha ~= alpha then
+							self.alphaCurve:ClearPoints()
+							self.alphaCurve:AddPoint(0.9999, alpha2)
+							self.alphaCurve:AddPoint(1.0, alpha)
+							self.alphaCurve.alpha2 = alpha2
+							self.alphaCurve.alpha = alpha
+						end
 					end
-				end
-				if self.alphaCurve then
-					-- Update curve points if alpha values changed
-					if self.alphaCurve.alpha2 ~= alpha2 or self.alphaCurve.alpha ~= alpha then
-						self.alphaCurve:ClearPoints()
-						self.alphaCurve:AddPoint(0.9999, alpha2)
-						self.alphaCurve:AddPoint(1.0, alpha)
-						self.alphaCurve.alpha2 = alpha2
-						self.alphaCurve.alpha = alpha
-					end
-				end
-					
+
 					-- Determine if this is health or power
 					if self.isHealth then
 						-- Use UnitHealthPercent with curve
@@ -419,7 +419,7 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2)
 						end
 					elseif self.isPower then
 						-- Use UnitPowerPercent with curve
-						local powerType = UnitPowerType(unit)
+						local powerType = self.powerType or UnitPowerType(unit)
 						if self.alphaCurve then
 							local secretAlpha = UnitPowerPercent(unit, powerType, nil, self.alphaCurve)
 							-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
@@ -472,7 +472,7 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2)
 		local maxValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(f.maxValue)
 		local startValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(f.startValue)
 		local endValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(f.endValue)
-		
+
 		if maxValueSecret or f.isHidden then
 			f:SetRingAlpha(0)
 			if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(0) end
@@ -480,34 +480,33 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2)
 			f:SetRingAlpha(0)
 			if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(0) end
 		elseif (alpha2) then
+			if not self.alphaCurve then
+				-- Create Step curve: alpha2 for < 0.999, alpha for >= 1.0
+				self.alphaCurve = C_CurveUtil.CreateCurve()
+				if self.alphaCurve then
+					self.alphaCurve:SetType(Enum.LuaCurveType.Step)
+					-- Store alpha values in the module for reuse
+					self.alphaCurve.alpha2 = alpha2
+					self.alphaCurve.alpha = alpha
+					-- Add points immediately when creating the curve
+					self.alphaCurve:AddPoint(0.9999, alpha2)
+					self.alphaCurve:AddPoint(1.0, alpha)
+				end
+			end
+			if self.alphaCurve then
+				-- Update curve points if alpha values changed
+				if self.alphaCurve.alpha2 ~= alpha2 or self.alphaCurve.alpha ~= alpha then
+					self.alphaCurve:ClearPoints()
+					self.alphaCurve:AddPoint(0.9999, alpha2)
+					self.alphaCurve:AddPoint(1.0, alpha)
+					self.alphaCurve.alpha2 = alpha2
+					self.alphaCurve.alpha = alpha
+				end
+			end
 			-- In Midnight, use CurveObject to determine alpha based on percentage
 			-- The ring frame values are kept at 1/0 (not secret), so we must check actual unit health/power
 			if ArcHUD.isMidnight and self.unit and (self.isHealth or self.isPower) then
 				local unit = self.unit
-				if not self.alphaCurve then
-					-- Create Step curve: alpha2 for < 0.999, alpha for >= 1.0
-					self.alphaCurve = C_CurveUtil.CreateCurve()
-					if self.alphaCurve then
-						self.alphaCurve:SetType(Enum.LuaCurveType.Step)
-						-- Store alpha values in the module for reuse
-						self.alphaCurve.alpha2 = alpha2
-						self.alphaCurve.alpha = alpha
-						-- Add points immediately when creating the curve
-						self.alphaCurve:AddPoint(0.9999, alpha2)
-						self.alphaCurve:AddPoint(1.0, alpha)
-					end
-				end
-				if self.alphaCurve then
-					-- Update curve points if alpha values changed
-					if self.alphaCurve.alpha2 ~= alpha2 or self.alphaCurve.alpha ~= alpha then
-						self.alphaCurve:ClearPoints()
-						self.alphaCurve:AddPoint(0.9999, alpha2)
-						self.alphaCurve:AddPoint(1.0, alpha)
-						self.alphaCurve.alpha2 = alpha2
-						self.alphaCurve.alpha = alpha
-					end
-				end
-				
 				-- Determine if this is health or power
 				if self.isHealth then
 					-- Use UnitHealthPercent with curve
@@ -527,7 +526,7 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2)
 					end
 				elseif self.isPower then
 					-- Use UnitPowerPercent with curve
-					local powerType = UnitPowerType(unit)
+					local powerType = self.powerType or UnitPowerType(unit)
 					if self.alphaCurve then
 						local secretAlpha = UnitPowerPercent(unit, powerType, nil, self.alphaCurve)
 						-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
@@ -559,9 +558,47 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2)
 					if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha) end
 				end
 			else
-				-- Values are secret but not in Midnight health/power mode - fallback
-				f:SetRingAlpha(alpha2)
-				if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
+				-- Determine if this is health or power
+				if self.isHealth then
+					-- Use UnitHealthPercent with curve
+					if self.alphaCurve then
+						local secretAlpha = UnitHealthPercent(unit, true, self.alphaCurve)
+						-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
+						if secretAlpha ~= nil then
+							f:SetRingAlpha(secretAlpha)
+							if f.statusBarArc then
+								f.statusBarArc:SetAlpha(secretAlpha)
+							end
+						else
+							f:SetRingAlpha(alpha2)
+						end
+					else
+						f:SetRingAlpha(alpha2)
+					end
+				elseif self.isPower then
+					-- Use UnitPowerPercent with curve
+					local powerType = self.powerType or UnitPowerType(unit)
+					if self.alphaCurve then
+						local secretAlpha = UnitPowerPercent(unit, powerType, nil, self.alphaCurve)
+						-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
+						if secretAlpha ~= nil then
+							f:SetRingAlpha(secretAlpha)
+							if f.statusBarArc then
+								f.statusBarArc:SetAlpha(secretAlpha)
+							end
+						else
+							f:SetRingAlpha(alpha2)
+							if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
+						end
+					else
+						f:SetRingAlpha(alpha2)
+						if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
+					end
+				else
+					-- Not health or power - fallback
+					f:SetRingAlpha(alpha2)
+					if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
+				end
 			end
 		else
 			-- No alpha2: set alpha directly (e.g., when in combat)
@@ -607,7 +644,7 @@ function ArcHUD.modulePrototype:CheckAlpha()
 		local maxValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(self.f.maxValue)
 		local startValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(self.f.startValue)
 		local endValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(self.f.endValue)
-		
+
 		if (RingVisibility == 3 and isInCombat) then
 			if (not UnitExists(unit)) or (self.isPower and (UnitIsDead(unit) or (not maxValueSecret and self.f.maxValue == 0))) then
 				self.f:SetRingAlpha(0)
@@ -615,10 +652,10 @@ function ArcHUD.modulePrototype:CheckAlpha()
 				self.f:SetRingAlpha(AH_profile.FadeFull)
 			else
 				-- all other frames
-				self:SetFramesAlpha(AH_profile.FadeIC) 
+				self:SetFramesAlpha(AH_profile.FadeIC)
 			end
 		else
-			local powerTypeId, _ = UnitPowerType(unit)
+			local powerTypeId, _ = self.powerType or UnitPowerType(unit)
 			-- powerTypeId: 1 = rage, 6 = runic_power, 17 = fury
 			if (self.isPower and (unit ~= "pet") and basePowerTypeIsEmpty[powerTypeId] and (not maxValueSecret and self.f.maxValue > 0)) then
 				if not startValueSecret and not endValueSecret then
@@ -645,7 +682,7 @@ function ArcHUD.modulePrototype:CheckAlpha()
 	elseif (RingVisibility == 2) then
 		-- Check if maxValue is secret (12.0.0+)
 		local maxValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(self.f.maxValue)
-	
+
 		if ((not UnitExists(unit)) or (self.isPower and (UnitIsDead(unit) or (not maxValueSecret and self.f.maxValue == 0)))) then
 			self.f:SetRingAlpha(0)
 		elseif (self.isHealth and UnitIsDead(unit)) then
@@ -658,7 +695,7 @@ function ArcHUD.modulePrototype:CheckAlpha()
 				self:SetFramesAlpha(AH_profile.FadeFull)
 			end
 		end
-		
+
 	end
 end
 
@@ -795,31 +832,31 @@ function ArcHUD.modulePrototype:RegisterUnitEvent(event, callback, unit)
 		self:Debug(1, "No frame to register a unit event on!")
 		return
 	end
-	
+
 	if (not self.f.unitEvents) then
 		self.f.unitEvents = {}
 	end
-	
+
 	if (self.f.unitEvents[event]) then
 		self:Debug(1, "Unit event %s already registered!", tostring(event))
 		return
 	end
-	
+
 	if (not callback) then
 		callback = event
 	end
-	
+
 	if (not unit) then
 		unit = self.unit
 	end
-	
+
 	local unit2 = nil
 	if (unit == "player") then
 		unit2 = "vehicle"
 	end
-	
+
 	self.f.unitEvents[event] = { cb = callback, module = self }
-	
+
 	if (self.f.RegisterUnitEvent) then
 		-- introduced in WoW 5.x
 		self.f:RegisterUnitEvent(event, unit, unit2)
@@ -837,17 +874,17 @@ function ArcHUD.modulePrototype:UnregisterUnitEvent(event)
 		self:Debug(1, "No frame to unregister a unit event from!")
 		return
 	end
-	
+
 	if (not self.f.unitEvents) then
 		self:Debug(1, "UnregisterUnitEvent(): No unit events registered yet!")
 		return
 	end
-	
+
 	if (not self.f.unitEvents[event]) then
 		self:Debug(1, "UnregisterUnitEvent(): Unit event %s not registered!", tostring(event))
 		return
 	end
-	
+
 	self.f:UnregisterEvent(event)
 	self.f.unitEvents[event] = nil
 end
@@ -858,13 +895,13 @@ end
 function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 	local t
 	local name
-	
+
 	if (self.isCustom) then
 		name = self.db.profile.BuffName .. " (" .. self.db.profile.Unit .. ")"
 	else
 		name = LM[self:GetName()]
 	end
-	
+
 	self.optionsTable = {
 		type		= "group",
 		name		= name,
@@ -950,7 +987,7 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 			},
 		},
 	}
-	
+
 	if (self.options.hasseparators) then
 		t = {
 			type		= "toggle",
@@ -967,7 +1004,7 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 		}
 		self.optionsTable.args.ShowSeparators = t
 	end
-	
+
 	for k,v in ipairs(self.options) do
 		if(type(v) == "table") then
 			t = {
@@ -986,7 +1023,7 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 			self.optionsTable.args[v.name] = t
 		end
 	end
-	
+
 	local colorOption = function(self, caption, colorName)
 		return {
 			type		= "color",
@@ -1014,11 +1051,11 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 			end,
 		}
 	end
-	
+
 	if (not self.options.nocolor) then
-	
+
 		if (self.options.hasmanabar) then
-			
+
 			self.optionsTable.args.colorMana = colorOption(self, "COLORMANA", "ColorMana")
 			self.optionsTable.args.colorRage = colorOption(self, "COLORRAGE", "ColorRage")
 			self.optionsTable.args.colorFocus = colorOption(self, "COLORFOCUS", "ColorFocus")
@@ -1026,14 +1063,14 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 			if (not ArcHUD.classic) then
 				self.optionsTable.args.colorRunic = colorOption(self, "COLORRUNIC", "ColorRunic")
 			end
-		
+
 		elseif (self.options.hasfriendfoe) then
-		
+
 			self.optionsTable.args.colorFriend = colorOption(self, "COLORFRIEND", "ColorFriend")
 			self.optionsTable.args.colorFoe = colorOption(self, "COLORFOE", "ColorFoe")
-		
+
 		elseif (self.options.hascolorfade) then
-		
+
 			-- Color mode
 			t = {
 				type		= "select",
@@ -1053,23 +1090,23 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 				end,
 			}
 			self.optionsTable.args.colormode = t
-		
+
 			-- Color
 			self.optionsTable.args.color = colorOption(self, "COLORSETFADE", "Color")
-			
+
 		elseif (self.options.customcolors) then
-		
+
 			for i,v in ipairs(self.options.customcolors) do
 				self.optionsTable.args[v.name] = colorOption(self, v.text, v.name)
 			end
-		
+
 		else
-			
+
 			-- Color
 			self.optionsTable.args.color = colorOption(self, "COLORSET", "Color")
-			
+
 		end
-		
+
 		-- Reset to default
 		t = {
 			type		= "execute",
@@ -1082,7 +1119,7 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 						color.r, color.g, color.b = default.r, default.g, default.b
 					end
 				end
-				
+
 				for k,v in pairs(self.db.profile) do
 					if (k ~= "ColorMode") and (strsub(k, 1, 5) == "Color") then
 						resetColor(self.db.profile[k], self.defaults.profile[k])
@@ -1092,7 +1129,7 @@ function ArcHUD.modulePrototype:CreateStandardModuleOptions(order)
 				if (self.db.profile.ColorMode) then
 					self.db.profile.ColorMode = self.defaults.profile.ColorMode
 				end
-				
+
 				self:SendMessage("ARCHUD_MODULE_UPDATE", self:GetName())
 				AceConfigRegistry:NotifyChange("ArcHUD_Modules")
 			end,

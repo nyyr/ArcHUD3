@@ -39,5 +39,5 @@ function module:Initialize()
 	self.UpdatePower = ArcHUD.templatePowerRing.UpdatePower
 	self.UpdateActive = ArcHUD.templatePowerRing.UpdateActive
 
-	self:InitializePowerRing()
+	self:InitializePowerRing(module.powerType)
 end
