@@ -47,7 +47,7 @@ L["TEXT"] = {
 	SHOWCLASS	= "Zeige Klasse des Ziels",
 	SHOWBUFFS 	= "Zeige (De-)Buffs",
 	SHOWONLYBUFFSCASTBYPLAYER = "Zeige nur eigene (De-)Buffs",
-	REVERSEBUFFCOOLDOWNS = "(De-)Buff-Abklingzeiten umkehren"
+	REVERSEBUFFCOOLDOWNS = "(De-)Buff-Abklingzeiten umkehren",
 	SHOWBUFFTT 	= "Zeige (De-)Buff-Tooltips",
 	HIDEBUFFTTIC= "Verstecke (De-)Buff-Tooltips im Kampf",
 	HIDEBUFFTIMERTEXT = "Verstecke (De-)Buff Timer-Text",
@@ -370,3 +370,4 @@ LM["SIDE"] = {
 	LEFT		= "Linker Anker",
 	RIGHT		= "Rechter Anker",
 }
+
