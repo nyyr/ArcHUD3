@@ -478,16 +478,20 @@ function ArcHUD:UpdateStatusBarSide(sb, side)
 	if not ArcHUD.isMidnight or not sb then return end
 	sb.side = side
 	sb:ClearAllPoints()
+	local radius = sb.parentRing.radius
+	if sb.parentRing.module and sb.parentRing.module.db and sb.parentRing.module.db.profile and sb.parentRing.module.db.profile.InnerAnchor then
+		radius = radius * 0.6
+	end
 	if side == 1 then
-		sb:SetPoint("TOPLEFT", sb.parentRing, "BOTTOMLEFT", -sb.parentRing.radius, sb.parentRing.radius)
-		sb:SetPoint("BOTTOMRIGHT", sb.parentRing, "BOTTOMLEFT", 0, -sb.parentRing.radius)
-		sb:SetPoint("TOPRIGHT", sb.parentRing, "BOTTOMLEFT", 0, sb.parentRing.radius)
-		sb:SetPoint("BOTTOMLEFT", sb.parentRing, "BOTTOMLEFT", -sb.parentRing.radius, -sb.parentRing.radius)
+		sb:SetPoint("TOPLEFT", sb.parentRing, "BOTTOMLEFT", -radius, radius)
+		sb:SetPoint("BOTTOMRIGHT", sb.parentRing, "BOTTOMLEFT", 0, -radius)
+		sb:SetPoint("TOPRIGHT", sb.parentRing, "BOTTOMLEFT", 0, radius)
+		sb:SetPoint("BOTTOMLEFT", sb.parentRing, "BOTTOMLEFT", -radius, -radius)
 	elseif side == 2 then
-	 	sb:SetPoint("TOPLEFT", sb.parentRing, "BOTTOMLEFT", 0, sb.parentRing.radius)
-	 	sb:SetPoint("BOTTOMLEFT", sb.parentRing, "BOTTOMLEFT", 0, -sb.parentRing.radius)
-		sb:SetPoint("TOPRIGHT", sb.parentRing, "BOTTOMLEFT", sb.parentRing.radius, sb.parentRing.radius)
-		sb:SetPoint("BOTTOMRIGHT", sb.parentRing, "BOTTOMLEFT", sb.parentRing.radius, -sb.parentRing.radius)
+	 	sb:SetPoint("TOPLEFT", sb.parentRing, "BOTTOMLEFT", 0, radius)
+	 	sb:SetPoint("BOTTOMLEFT", sb.parentRing, "BOTTOMLEFT", 0, -radius)
+		sb:SetPoint("TOPRIGHT", sb.parentRing, "BOTTOMLEFT", radius, radius)
+		sb:SetPoint("BOTTOMRIGHT", sb.parentRing, "BOTTOMLEFT", radius, -radius)
 	end
 
 	-- Use the original ArcHUD arc texture directly
