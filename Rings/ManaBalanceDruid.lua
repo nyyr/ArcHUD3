@@ -22,7 +22,7 @@ module.options = {
 module.localized = true
 
 module.class = "DRUID"
-module.specs = nil -- array of SPEC_... constants; nil if this ring is available for all specs
+module.specs = { SPEC_DRUID_BALANCE } -- array of SPEC_... constants; nil if this ring is available for all specs
 module.powerType = Enum.PowerType.Mana
 module.powerTypeString = "MANA"
 module.flashAt = nil
