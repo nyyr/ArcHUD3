@@ -746,6 +746,9 @@ function ArcHUD:TargetUpdate(event, arg1)
 		self.TargetHUD.Model:Hide()
 
 		self:StopTimer("UpdateTargetPower")
+		self.Nameplates.target:EnableMouse(false)
+		self.Nameplates.target:SetAlpha(0)
+		self.Nameplates.target:Hide()
 		self.Nameplates.target:Disable()
 	end
 end
