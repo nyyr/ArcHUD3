@@ -746,7 +746,7 @@ function ArcHUD:TargetUpdate(event, arg1)
 		self.TargetHUD.Model:Hide()
 
 		self:StopTimer("UpdateTargetPower")
-		self.Nameplates.target:EnableMouse(false)
+		--self.Nameplates.target:EnableMouse(false)
 		self.Nameplates.target:SetAlpha(0)
 		self.Nameplates.target:Hide()
 		self.Nameplates.target:Disable()
@@ -1114,7 +1114,7 @@ function ArcHUD:UpdateTargetTarget()
 	else
 		-- Always hide and disable when TargetTarget is off so no ghost tooltip/click
 		self.TargetHUD.Target:SetAlpha(0)
-		self.Nameplates.targettarget:EnableMouse(false)
+		--self.Nameplates.targettarget:EnableMouse(false)
 		self.Nameplates.targettarget:SetAlpha(0)
 		self.Nameplates.targettarget:Hide()
 		self.Nameplates.targettarget:Disable()
@@ -1205,7 +1205,7 @@ function ArcHUD:UpdateTargetTarget()
 	else
 		-- Always hide and disable when TargetTargetTarget is off so no ghost tooltip/click
 		self.TargetHUD.TargetTarget:SetAlpha(0)
-		self.Nameplates.targettargettarget:EnableMouse(false)
+		--self.Nameplates.targettargettarget:EnableMouse(false)
 		self.Nameplates.targettargettarget:SetAlpha(0)
 		self.Nameplates.targettargettarget:Hide()
 		self.Nameplates.targettargettarget:Disable()
