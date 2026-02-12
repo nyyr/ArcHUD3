@@ -354,7 +354,7 @@ end
 -- alpha2 - If not nil and ring not full/empty, use alpha2 instead of alpha
 -- In 12.0.0+, values may be secret - protect operations
 -----------------------------------------------------------
-function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2)
+function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2, invertCurve)
 	if (self.frames) then
 		-- module with multiple frames
 		for i,f in pairs(self.frames) do
@@ -397,12 +397,42 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2)
 							self.alphaCurve.alpha = alpha
 						end
 					end
+					if invertCurve then
+						if not self.invertedAlphaCurve then
+							-- Create Step curve: alpha2 for < 0.999, alpha for >= 1.0
+							self.invertedAlphaCurve = C_CurveUtil.CreateCurve()
+							if self.invertedAlphaCurve then
+								self.invertedAlphaCurve:SetType(Enum.LuaCurveType.Step)
+								-- Store alpha values in the module for reuse
+								self.invertedAlphaCurve.alpha2 = alpha2
+								self.invertedAlphaCurve.alpha = alpha
+								-- Add points immediately when creating the curve
+								self.invertedAlphaCurve:AddPoint(0.001, alpha2)
+								self.invertedAlphaCurve:AddPoint(0.000, alpha)
+							end
+						end
+						if self.invertedAlphaCurve then
+							-- Update curve points if alpha values changed
+							if self.invertedAlphaCurve.alpha2 ~= alpha2 or self.invertedAlphaCurve.alpha ~= alpha then
+								self.invertedAlphaCurve:ClearPoints()
+								self.invertedAlphaCurve:AddPoint(0.001, alpha2)
+								self.invertedAlphaCurve:AddPoint(0.000, alpha)
+								self.invertedAlphaCurve.alpha2 = alpha2
+								self.invertedAlphaCurve.alpha = alpha
+							end
+						end
+					end
 
 					-- Determine if this is health or power
 					if self.isHealth then
 						-- Use UnitHealthPercent with curve
 						if self.alphaCurve then
-							local secretAlpha = UnitHealthPercent(unit, true, self.alphaCurve)
+							local secretAlpha
+							if invertCurve then
+								secretAlpha = UnitHealthPercent(unit, true, self.invertedAlphaCurve)
+							else
+								secretAlpha = UnitHealthPercent(unit, true, self.alphaCurve)
+							end
 							-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
 							if secretAlpha ~= nil then
 								f:SetRingAlpha(secretAlpha)
@@ -421,7 +451,12 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2)
 						-- Use UnitPowerPercent with curve
 						local powerType = self.powerType or UnitPowerType(unit)
 						if self.alphaCurve then
-							local secretAlpha = UnitPowerPercent(unit, powerType, nil, self.alphaCurve)
+							local secretAlpha
+							if invertCurve then
+								secretAlpha = UnitPowerPercent(unit, powerType, nil, self.invertedAlphaCurve)
+							else
+								secretAlpha = UnitPowerPercent(unit, powerType, nil, self.alphaCurve)
+							end
 							-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
 							if secretAlpha ~= nil then
 								f:SetRingAlpha(secretAlpha)
@@ -503,6 +538,31 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2)
 					self.alphaCurve.alpha = alpha
 				end
 			end
+			if invertCurve then
+				if not self.invertedAlphaCurve then
+					-- Create Step curve: alpha2 for < 0.999, alpha for >= 1.0
+					self.invertedAlphaCurve = C_CurveUtil.CreateCurve()
+					if self.invertedAlphaCurve then
+						self.invertedAlphaCurve:SetType(Enum.LuaCurveType.Step)
+						-- Store alpha values in the module for reuse
+						self.invertedAlphaCurve.alpha2 = alpha2
+						self.invertedAlphaCurve.alpha = alpha
+						-- Add points immediately when creating the curve
+						self.invertedAlphaCurve:AddPoint(0.001, alpha2)
+						self.invertedAlphaCurve:AddPoint(0.000, alpha)
+					end
+				end
+				if self.invertedAlphaCurve then
+					-- Update curve points if alpha values changed
+					if self.invertedAlphaCurve.alpha2 ~= alpha2 or self.invertedAlphaCurve.alpha ~= alpha then
+						self.invertedAlphaCurve:ClearPoints()
+						self.invertedAlphaCurve:AddPoint(0.001, alpha2)
+						self.invertedAlphaCurve:AddPoint(0.000, alpha)
+						self.invertedAlphaCurve.alpha2 = alpha2
+						self.invertedAlphaCurve.alpha = alpha
+					end
+				end
+			end
 			-- In Midnight, use CurveObject to determine alpha based on percentage
 			-- The ring frame values are kept at 1/0 (not secret), so we must check actual unit health/power
 			if ArcHUD.isMidnight and self.unit and (self.isHealth or self.isPower) then
@@ -511,7 +571,12 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2)
 				if self.isHealth then
 					-- Use UnitHealthPercent with curve
 					if self.alphaCurve then
-						local secretAlpha = UnitHealthPercent(unit, true, self.alphaCurve)
+						local secretAlpha
+						if invertCurve then
+							secretAlpha = UnitHealthPercent(unit, true, self.invertedAlphaCurve)
+						else
+							secretAlpha = UnitHealthPercent(unit, true, self.alphaCurve)
+						end
 						-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
 						if secretAlpha ~= nil then
 							f:SetRingAlpha(secretAlpha)
@@ -528,7 +593,12 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2)
 					-- Use UnitPowerPercent with curve
 					local powerType = self.powerType or UnitPowerType(unit)
 					if self.alphaCurve then
-						local secretAlpha = UnitPowerPercent(unit, powerType, nil, self.alphaCurve)
+						local secretAlpha
+						if invertCurve then
+							secretAlpha = UnitPowerPercent(unit, powerType, nil, self.invertedAlphaCurve)
+						else
+							secretAlpha = UnitPowerPercent(unit, powerType, nil, self.alphaCurve)
+						end
 						-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
 						if secretAlpha ~= nil then
 							f:SetRingAlpha(secretAlpha)
@@ -562,7 +632,12 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2)
 				if self.isHealth then
 					-- Use UnitHealthPercent with curve
 					if self.alphaCurve then
-						local secretAlpha = UnitHealthPercent(unit, true, self.alphaCurve)
+						local secretAlpha
+						if invertCurve then
+							secretAlpha = UnitHealthPercent(unit, true, self.invertedAlphaCurve)
+						else
+							secretAlpha = UnitHealthPercent(unit, true, self.alphaCurve)
+						end
 						-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
 						if secretAlpha ~= nil then
 							f:SetRingAlpha(secretAlpha)
@@ -579,7 +654,12 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2)
 					-- Use UnitPowerPercent with curve
 					local powerType = self.powerType or UnitPowerType(unit)
 					if self.alphaCurve then
-						local secretAlpha = UnitPowerPercent(unit, powerType, nil, self.alphaCurve)
+						local secretAlpha
+						if invertCurve then
+							secretAlpha = UnitPowerPercent(unit, powerType, nil, self.invertedAlphaCurve)
+						else
+							secretAlpha = UnitPowerPercent(unit, powerType, nil, self.alphaCurve)
+						end
 						-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
 						if secretAlpha ~= nil then
 							f:SetRingAlpha(secretAlpha)
@@ -659,7 +739,7 @@ function ArcHUD.modulePrototype:CheckAlpha()
 			-- powerTypeId: 1 = rage, 6 = runic_power, 17 = fury
 			if (self.isPower and (unit ~= "pet") and basePowerTypeIsEmpty[powerTypeId] and (not maxValueSecret and self.f.maxValue > 0)) then
 				if ArcHUD.isMidnight then
-					self:SetFramesAlpha(AH_profile.FadeFull, AH_profile.FadeOOC)
+					self:SetFramesAlpha(AH_profile.FadeFull, AH_profile.FadeOOC, true)
 				elseif not startValueSecret and not endValueSecret then
 					if(math.floor(self.f.startValue) > 0 or math.floor(self.f.startValue) ~= math.floor(self.f.endValue)) then
 						self.f:SetRingAlpha(AH_profile.FadeOOC)
@@ -667,7 +747,7 @@ function ArcHUD.modulePrototype:CheckAlpha()
 						self.f:SetRingAlpha(AH_profile.FadeFull)
 					end
 				else
-					self.f:SetRingAlpha(AH_profile.FadeFull)
+					self:SetFramesAlpha(AH_profile.FadeFull, AH_profile.FadeOOC, true)
 				end
 			else
 				if (not UnitExists(unit)) or (self.isPower and (UnitIsDead(unit) or (not maxValueSecret and self.f.maxValue == 0))) then
