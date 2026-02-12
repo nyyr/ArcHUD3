@@ -658,7 +658,9 @@ function ArcHUD.modulePrototype:CheckAlpha()
 			local powerTypeId, _ = self.powerType or UnitPowerType(unit)
 			-- powerTypeId: 1 = rage, 6 = runic_power, 17 = fury
 			if (self.isPower and (unit ~= "pet") and basePowerTypeIsEmpty[powerTypeId] and (not maxValueSecret and self.f.maxValue > 0)) then
-				if not startValueSecret and not endValueSecret then
+				if ArcHUD.isMidnight then
+					self:SetFramesAlpha(AH_profile.FadeFull, AH_profile.FadeOOC)
+				elseif not startValueSecret and not endValueSecret then
 					if(math.floor(self.f.startValue) > 0 or math.floor(self.f.startValue) ~= math.floor(self.f.endValue)) then
 						self.f:SetRingAlpha(AH_profile.FadeOOC)
 					elseif(math.floor(self.f.startValue) == 0) then
