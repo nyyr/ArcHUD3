@@ -752,6 +752,7 @@ function ArcHUD.modulePrototype:CheckAlpha()
 			else
 				if (not UnitExists(unit)) or (self.isPower and (UnitIsDead(unit) or (not maxValueSecret and self.f.maxValue == 0))) then
 					self.f:SetRingAlpha(0)
+					if ArcHUD.isMidnight and self.f.statusBar then self.f.statusBar:SetAlpha(0) end
 				elseif (self.isHealth and UnitIsDead(unit)) then
 					self.f:SetRingAlpha(AH_profile.FadeFull)
 				else
