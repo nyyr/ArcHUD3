@@ -59,7 +59,7 @@ end
 local function MirrorTimer_UpdateTimers(frame, elapsed)
 	local self = frame.module
 	for i=1,numMirrorTimerTypes do
-		if(self.timers[i] and not self.timers[i].paused) then
+		if(self.timers and self.timers[i] and not self.timers[i].paused) then
 			self.timers[i].value = self.timers[i].value + self.timers[i].scale * elapsed*1000
 			if(self.timers[i].value > self.timers[i].maxvalue) then
 				self.timers[i].value = self.timers[i].maxvalue
