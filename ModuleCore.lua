@@ -515,51 +515,53 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2, invertCurve)
 			f:SetRingAlpha(0)
 			if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(0) end
 		elseif (alpha2) then
-			if not self.alphaCurve then
-				-- Create Step curve: alpha2 for < 0.999, alpha for >= 1.0
-				self.alphaCurve = C_CurveUtil.CreateCurve()
-				if self.alphaCurve then
-					self.alphaCurve:SetType(Enum.LuaCurveType.Step)
-					-- Store alpha values in the module for reuse
-					self.alphaCurve.alpha2 = alpha2
-					self.alphaCurve.alpha = alpha
-					-- Add points immediately when creating the curve
-					self.alphaCurve:AddPoint(0.9999, alpha2)
-					self.alphaCurve:AddPoint(1.0, alpha)
-				end
-			end
-			if self.alphaCurve then
-				-- Update curve points if alpha values changed
-				if self.alphaCurve.alpha2 ~= alpha2 or self.alphaCurve.alpha ~= alpha then
-					self.alphaCurve:ClearPoints()
-					self.alphaCurve:AddPoint(0.9999, alpha2)
-					self.alphaCurve:AddPoint(1.0, alpha)
-					self.alphaCurve.alpha2 = alpha2
-					self.alphaCurve.alpha = alpha
-				end
-			end
-			if invertCurve then
-				if not self.invertedAlphaCurve then
+			if ArcHUD.isMidnight then
+				if not self.alphaCurve then
 					-- Create Step curve: alpha2 for < 0.999, alpha for >= 1.0
-					self.invertedAlphaCurve = C_CurveUtil.CreateCurve()
-					if self.invertedAlphaCurve then
-						self.invertedAlphaCurve:SetType(Enum.LuaCurveType.Step)
+					self.alphaCurve = C_CurveUtil.CreateCurve()
+					if self.alphaCurve then
+						self.alphaCurve:SetType(Enum.LuaCurveType.Step)
 						-- Store alpha values in the module for reuse
-						self.invertedAlphaCurve.alpha2 = alpha2
-						self.invertedAlphaCurve.alpha = alpha
+						self.alphaCurve.alpha2 = alpha2
+						self.alphaCurve.alpha = alpha
 						-- Add points immediately when creating the curve
-						self.invertedAlphaCurve:AddPoint(0.001, alpha2)
-						self.invertedAlphaCurve:AddPoint(0.000, alpha)
+						self.alphaCurve:AddPoint(0.9999, alpha2)
+						self.alphaCurve:AddPoint(1.0, alpha)
 					end
 				end
-				if self.invertedAlphaCurve then
+				if self.alphaCurve then
 					-- Update curve points if alpha values changed
-					if self.invertedAlphaCurve.alpha2 ~= alpha2 or self.invertedAlphaCurve.alpha ~= alpha then
-						self.invertedAlphaCurve:ClearPoints()
-						self.invertedAlphaCurve:AddPoint(0.001, alpha2)
-						self.invertedAlphaCurve:AddPoint(0.000, alpha)
-						self.invertedAlphaCurve.alpha2 = alpha2
-						self.invertedAlphaCurve.alpha = alpha
+					if self.alphaCurve.alpha2 ~= alpha2 or self.alphaCurve.alpha ~= alpha then
+						self.alphaCurve:ClearPoints()
+						self.alphaCurve:AddPoint(0.9999, alpha2)
+						self.alphaCurve:AddPoint(1.0, alpha)
+						self.alphaCurve.alpha2 = alpha2
+						self.alphaCurve.alpha = alpha
+					end
+				end
+				if invertCurve then
+					if not self.invertedAlphaCurve then
+						-- Create Step curve: alpha2 for < 0.999, alpha for >= 1.0
+						self.invertedAlphaCurve = C_CurveUtil.CreateCurve()
+						if self.invertedAlphaCurve then
+							self.invertedAlphaCurve:SetType(Enum.LuaCurveType.Step)
+							-- Store alpha values in the module for reuse
+							self.invertedAlphaCurve.alpha2 = alpha2
+							self.invertedAlphaCurve.alpha = alpha
+							-- Add points immediately when creating the curve
+							self.invertedAlphaCurve:AddPoint(0.001, alpha2)
+							self.invertedAlphaCurve:AddPoint(0.000, alpha)
+						end
+					end
+					if self.invertedAlphaCurve then
+						-- Update curve points if alpha values changed
+						if self.invertedAlphaCurve.alpha2 ~= alpha2 or self.invertedAlphaCurve.alpha ~= alpha then
+							self.invertedAlphaCurve:ClearPoints()
+							self.invertedAlphaCurve:AddPoint(0.001, alpha2)
+							self.invertedAlphaCurve:AddPoint(0.000, alpha)
+							self.invertedAlphaCurve.alpha2 = alpha2
+							self.invertedAlphaCurve.alpha = alpha
+						end
 					end
 				end
 			end
@@ -752,6 +754,7 @@ function ArcHUD.modulePrototype:CheckAlpha()
 			else
 				if (not UnitExists(unit)) or (self.isPower and (UnitIsDead(unit) or (not maxValueSecret and self.f.maxValue == 0))) then
 					self.f:SetRingAlpha(0)
+					if ArcHUD.isMidnight and self.f.statusBar then self.f.statusBar:SetAlpha(0) end
 				elseif (self.isHealth and UnitIsDead(unit)) then
 					self.f:SetRingAlpha(AH_profile.FadeFull)
 				else
