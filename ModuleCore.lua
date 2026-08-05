@@ -114,7 +114,7 @@ function ArcHUD.modulePrototype:OnEnable()
 		if(self.disableEvents and (not self.disableEvents.option or self.disableEvents.option and self.db.profile[self.disableEvents.option])) then
 			self:Debug(d_notice, "Disabling events:")
 			for k,v in ipairs(self.disableEvents) do
-				local f = getglobal(v.frame)
+				local f = _G[v.frame]
 				if(f) then
 					self:Debug(d_notice, "- Frame '"..f:GetName().."':")
 					for _, event in pairs(v.events) do
@@ -152,7 +152,7 @@ function ArcHUD.modulePrototype:OnDisable()
 	if(self.disableEvents and self.eventsDisabled) then
 		self:Debug(d_notice, "Re-enabling events:")
 		for k,v in ipairs(self.disableEvents) do
-			local f = getglobal(v.frame)
+			local f = _G[v.frame]
 			if(f) then
 				--self:Debug(d_notice, "- Frame '"..f:GetName().."':")
 				for _, event in pairs(v.events) do

@@ -2,6 +2,17 @@
 -- NamePlate Functions
 --
 
+-- The global MouseIsOver() was removed in 12.1, which made every tick of the
+-- CheckNamePlateMouseOver timer throw "attempt to call a nil value".
+-- Region:IsMouseOver() is the supported form and exists on every client we ship
+-- for; keep the old global as a fallback for the Classic flavours.
+local function isMouseOver(frame)
+	if (not frame) then return false end
+	if (frame.IsMouseOver) then return frame:IsMouseOver() end
+	if (MouseIsOver) then return MouseIsOver(frame) end
+	return false
+end
+
 function ArcHUD:InitNameplate(this, unit)
 
 	this.unit = unit
@@ -12,7 +23,7 @@ function ArcHUD:InitNameplate(this, unit)
 	this:SetAttribute("unit", this.unit)
 	this.menu = function(self)
 		local unit = ArcHUD:strcap(self.unit).."FrameDropDown"
-		local dd = getglobal(unit)
+		local dd = _G[unit]
 		if (dd) then
 			ToggleDropDownMenu(1, nil, dd, "cursor", 0, 0)
 		end
@@ -71,7 +82,7 @@ function ArcHUD:InitNameplate(this, unit)
 		if (InCombatLockdown() or self.state or self.disabled or self.lock) then return end
 		
 		if(self.unit == "player" or self.unit == "pet") then
-			if (not MouseIsOver(ArcHUD.Nameplates[self.unit])) then
+			if (not isMouseOver(ArcHUD.Nameplates[self.unit])) then
 				-- happens after leaving combat or when pet happiness changes
 				return
 			end
@@ -172,7 +183,7 @@ end
 
 function ArcHUD:CheckNamePlateMouseOver()
 	-- Check player nameplate
-	if(MouseIsOver(self.Nameplates.player) and not self.Nameplates.player.disabled) then
+	if(isMouseOver(self.Nameplates.player) and not self.Nameplates.player.disabled) then
 		if(not self.Nameplates.player.started) then
 			self.Nameplates.player.started = true
 			self:StartTimer("Enable_player")
@@ -188,7 +199,7 @@ function ArcHUD:CheckNamePlateMouseOver()
 
 	-- Check pet nameplate
 	if(not UnitExists("pet")) then return end
-	if(MouseIsOver(self.Nameplates.pet) and not self.Nameplates.pet.disabled) then
+	if(isMouseOver(self.Nameplates.pet) and not self.Nameplates.pet.disabled) then
 		if(not self.Nameplates.pet.started) then
 			self.Nameplates.pet.started = true
 			self:StartTimer("Enable_pet")

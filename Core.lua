@@ -506,8 +506,16 @@ function ArcHUD:TargetUpdate(event, arg1)
 
 		-- 3D target model
 		if((self.db.profile.PlayerModel and UnitIsPlayer("target")) or (self.db.profile.MobModel and not UnitIsPlayer("target"))) then
+			local modelWasShown = self.TargetHUD.Model:IsShown()
 			self.TargetHUD.Model:Show()
-			self.TargetHUD.Model:SetUnit("target")
+			-- Model:SetUnit restarts the model's animations and spell effects, and
+			-- TargetUpdate is re-run every second by the UpdateTargetTarget path as a
+			-- safety net - so calling it unconditionally reset the model ~1/sec. Only
+			-- re-set the unit when the target actually changed, or when the model has
+			-- just been revealed (settings toggle, target type change).
+			if (event == "PLAYER_TARGET_CHANGED") or (not modelWasShown) then
+				self.TargetHUD.Model:SetUnit("target")
+			end
 			--self:LevelDebug(d_notice, "TargetUpdate: Enabling 3D model. Player - "..((self.db.profile.PlayerModel and UnitIsPlayer("target")) and "yes" or "no")..", Mob - "..((self.db.profile.MobModel and not UnitIsPlayer("target")) and "yes" or "no"))
 		else
 			self.TargetHUD.Model:Hide()
@@ -756,8 +764,55 @@ end
 ----------------------------------------------
 -- TargetAuras()
 ----------------------------------------------
+-- 12.1 (PTR 3 / build 68412) restricts aura data: the index/slot/instanceID
+-- accessors RAISE rather than returning nil when the unit's auras are secret and
+-- we are tainted ("Auras cannot be accessed when secret while tainted by
+-- 'ArcHUD3'"), so a nil check cannot guard them.
+--
+-- This is deliberately retried on every update rather than latched off, because
+-- the restriction is per-call: auras are readable in plenty of situations (the
+-- fully-secret UNIT_AURA payloads are a combat thing), so normal display keeps
+-- working whenever the client allows it.
+--
+-- Only the secrecy refusal is swallowed. Any other error is a genuine bug and is
+-- re-raised, so this cannot quietly blank the aura display for an unrelated
+-- reason.
+--
+-- The long-term fix is not this guard: 12.1 adds AuraContainer/AuraButton frame
+-- types (SetUnit + AddAuraGroup(groupKey, filterString, options)) as the
+-- sanctioned replacement for enumerating auras by index. Migrating TargetAuras
+-- to those keeps the feature on 12.1 properly.
+local function fetchAura(getter, unit, index, filter)
+	if (not getter) then return nil, true end
+
+	-- The restriction is retail 12.1+ only - auras are never secret on the Classic
+	-- flavours, so call straight through there rather than wrapping up to 80 calls
+	-- per TargetAuras pass (which itself runs on UNIT_AURA and on a timer).
+	if (not ArcHUD.isMidnight) then
+		return getter(unit, index, filter), false
+	end
+
+	local ok, res = pcall(getter, unit, index, filter)
+	if (ok) then return res, false end
+	if (type(res) == "string" and (res:find("secret") or res:find("tainted"))) then
+		return nil, true -- restricted right now; try again next update
+	end
+	error(res, 0)
+end
+
 function ArcHUD:TargetAuras(event, arg1)
 	if(not arg1 == "target") then return end
+
+	-- On 12.1+ the index accessors raise while auras are secret, so hand the whole
+	-- job to AuraContainer (AuraContainers.lua) - the engine drives the buttons and
+	-- no aura data reaches Lua. Falls through to the index path when unsupported.
+	-- No refresh here on purpose: the container tracks the unit and its auras
+	-- itself, and it is driven by PLAYER_TARGET_CHANGED in AuraContainers.lua.
+	-- Refreshing per call re-assigned every aura and replayed the Cooldown bling.
+	if (self.EnsureAuraContainers and self:EnsureAuraContainers()) then
+		return
+	end
+
 	local unit = "target"
 	local i, color
 	local filter = ""
@@ -768,8 +823,16 @@ function ArcHUD:TargetAuras(event, arg1)
 
 	-- buffs
 	for i = 1, 40 do
-		local aura = C_UnitAuras.GetBuffDataByIndex(unit, i, filter)
+		local aura, blocked = fetchAura(C_UnitAuras.GetBuffDataByIndex, unit, i, filter)
 		button = self.TargetHUD["Buff"..i]
+		if (blocked) then
+			-- auras are unreadable for this unit; clear the rest and stop
+			for j = i, 40 do
+				local b = self.TargetHUD["Buff"..j]
+				if (b) then b:Hide() end
+			end
+			break
+		end
 		if (aura) then
 			local buff = aura.icon
 			local count = aura.applications
@@ -805,8 +868,15 @@ function ArcHUD:TargetAuras(event, arg1)
 
 	-- debuffs
 	for i = 1, 40 do
-		local aura = C_UnitAuras.GetDebuffDataByIndex(unit, i, filter)
+		local aura, blocked = fetchAura(C_UnitAuras.GetDebuffDataByIndex, unit, i, filter)
 		button = self.TargetHUD["Debuff"..i]
+		if (blocked) then
+			for j = i, 40 do
+				local b = self.TargetHUD["Debuff"..j]
+				if (b) then b:Hide() end
+			end
+			break
+		end
 		if (aura) then
 			local buff = aura.icon
 			local count = aura.applications

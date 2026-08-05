@@ -860,6 +860,19 @@ function ArcHUDRingTemplate:SetValue(value, fadeTime, startFadeTime, startValue)
 			self:SetAngle(self:GetAngle(self.endValue))
 		end
 	end
+
+	-- fillUpdate is what advances startValue towards endValue (via DoFadeUpdate),
+	-- but it is only ever started as a side effect of applyAlpha's OnPlay. Hiding
+	-- the ring - death, spec change, module disable - stops the group, and if the
+	-- alpha target has not changed since, applyAlpha never plays again, so the fill
+	-- stays frozen at its old startValue and the ring looks empty. Observed as a
+	-- blank Chi arc after reviving, which only recovered once max Chi triggered
+	-- StartPulse and kicked the alpha. Make the fade self-starting instead.
+	local fill = self.fillUpdate
+		or (self.fillUpdateFrame and self.fillUpdateFrame.fillUpdate)
+	if fill and not fill:IsPlaying() then
+		fill:Play()
+	end
 end
 
 -----------------------------------------------------------
@@ -1146,7 +1159,10 @@ function ArcHUDRingTemplate:SetRingAlpha(destAlpha, instant)
 		if not fromAlphaSecret then
 			self.applyAlpha.alphaAnim:SetFromAlpha(fromAlpha)
 		end
-		-- SetToAlpha can accept secret values, so always set it
+		-- NOTE: SetToAlpha does NOT accept secret values either - both SetFromAlpha
+		-- and SetToAlpha are SecretArguments = "AllowedWhenUntainted". This is only
+		-- safe because this branch is unreachable when destAlpha is secret (the
+		-- condition above requires "not destAlphaSecret"). Do not hoist it.
 		self.applyAlpha.alphaAnim:SetToAlpha(destAlpha)
 		self.applyAlpha:Play()
 	end

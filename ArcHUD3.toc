@@ -1,4 +1,4 @@
-## Interface: 120007
+## Interface: 120100
 ## Title: ArcHUD3
 ## Notes: Smooth combat HUD based on ArcHUD2
 ## Author: nyyr, Nenie, rookdorf
@@ -33,6 +33,7 @@ Frames.xml
 Nameplates.lua
 BlizzardFrames.lua
 Utils.lua
+AuraContainers.lua
 
 # Module core
 RingTemplate.xml

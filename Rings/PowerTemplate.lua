@@ -124,6 +124,7 @@ function module:UpdatePowerRing()
 
 	local maxPower = UnitPowerMax(self.unit, self.powerType);
 	local num = UnitPower(self.unit, self.powerType)
+
 	self.f:SetMax(maxPower)
 	self.f:SetValue(num)
 

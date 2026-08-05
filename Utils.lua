@@ -432,6 +432,43 @@ end
 -- StatusBar Arc System (12.0.0+)
 ----------------------------------------------
 
+-- Half-plane mask used for angular arc fill: left half opaque, right half clear,
+-- boundary through the texture centre so rotation pivots on the ring centre.
+local ARC_HALF_MASK = "Interface\\AddOns\\ArcHUD3\\Icons\\ArcHalfMask.png"
+
+-- Build the fill-mask rotation curve for a side. The whole mapping is baked into
+-- the curve because the fraction arrives as a secret and cannot be arithmetic'd.
+--
+-- Rotation theta = how far the opaque half is turned from "opaque left":
+--   0 -> opaque left, pi/2 -> opaque down, pi -> opaque right, 3pi/2 -> opaque up
+--
+-- LEFT arc runs bottom -> left -> top, and lies left of its start radius, so the
+-- start mask is 0 (opaque left) and the fill boundary must sweep
+--   f=0 -> pi (opaque right, nothing)   f=0.5 -> pi/2 (opaque down)   f=1 -> 0
+-- i.e. DESCENDING.
+--
+-- RIGHT arc is mirrored: it lies right of its start radius, so the start mask is
+-- pi (opaque right) and the fill boundary sweeps
+--   f=0 -> 0 (opaque left, nothing)     f=0.5 -> pi/2 (opaque down)   f=1 -> pi
+-- i.e. ASCENDING. Using the left arc's descending curve with a +pi offset gives
+-- the right endpoints but passes through opaque-UP at half, which fills the right
+-- arc from the top down.
+function ArcHUD:CreateArcRotationCurve(side)
+	if not ArcHUD.isMidnight or not C_CurveUtil then return nil end
+	local curveType = Enum.LuaCurveType or Enum.CurveType
+	if not curveType then return nil end
+	local curve = C_CurveUtil.CreateCurve(curveType.Linear)
+	if not curve then return nil end
+	if side == 2 then
+		curve:AddPoint(0, 0)
+		curve:AddPoint(1, math.pi)
+	else
+		curve:AddPoint(0, math.pi)
+		curve:AddPoint(1, 0)
+	end
+	return curve
+end
+
 -- Create a StatusBar-based arc for a ring frame
 -- parent: The ring frame to attach to
 -- moduleName: Optional module name to determine side (defaults to checking parent.module)
@@ -454,13 +491,34 @@ function ArcHUD:CreateStatusBar(parent, moduleName)
 	-- Store reference to parent ring for positioning
 	sb.parentRing = parent
 
+	-- Angular fill (see UpdateStatusBarSide / SetStatusBarArcFraction).
+	--
+	-- A StatusBar fill always cuts horizontally, but the correct arc edge is
+	-- RADIAL; the two only coincide at the arc's midpoint, so the ends looked
+	-- wrong ("flat tips"). Instead of the bar's own fill, draw the full arc and
+	-- cut it with two half-plane masks whose intersection is the filled wedge:
+	-- one pinned to the arc's start radius, one rotated to the fill radius.
+	--
+	-- Rotation pivots on a texture's centre, so the mask's opaque/transparent
+	-- boundary has to pass through its centre - hence Icons/ArcHalfMask.png.
+	-- The fraction reaches SetRotation straight out of a curve, so no secret is
+	-- ever read, and the rotation offset for the side is baked INTO the curve
+	-- (adding it in Lua would be arithmetic on a secret and throws).
+	sb.arcFill = sb:CreateTexture(nil, "ARTWORK")
+	sb.maskStart = sb:CreateMaskTexture()
+	sb.maskFill = sb:CreateMaskTexture()
+	sb.maskStart:SetTexture(ARC_HALF_MASK)
+	sb.maskFill:SetTexture(ARC_HALF_MASK)
+	sb.arcFill:AddMaskTexture(sb.maskStart)
+	sb.arcFill:AddMaskTexture(sb.maskFill)
+
 	self:UpdateStatusBarSide(sb, side)
 
-	-- Use global arc fill curve for proper percentage mapping
+	-- Kept for callers that still want a percentage mapped onto arc geometry
 	sb.arcFillCurve = self:CreateArcFillCurve()
 
 	sb:SetMinMaxValues(0, 1)
-	sb:SetValue(0)
+	sb:SetValue(1) -- the masks do the filling now, not the bar
 	sb:SetOrientation("VERTICAL")
 
 	-- StatusBar inherits parent's scale automatically via SetAllPoints
@@ -501,22 +559,66 @@ function ArcHUD:UpdateStatusBarSide(sb, side)
 	end
 
 	sb:SetStatusBarTexture(texturePath)
+
+	if not sb.arcFill then return end -- pre-angular-fill bar, nothing else to do
+
+	-- The bar's own fill is not used; hide it and draw our maskable copy instead.
+	local barTex = sb:GetStatusBarTexture()
+	if barTex then barTex:SetAlpha(0) end
+
+	sb.arcFill:SetTexture(texturePath)
+	sb.arcFill:SetAllPoints(sb)
+	sb.arcFill:Show()
+
+	-- The ring centre is the arc rect's inner edge at mid height; both masks pivot
+	-- there. Oversized so the kept half always covers the whole arc.
+	local centreAnchor = (side == 1) and "RIGHT" or "LEFT"
+	for _, m in ipairs({ sb.maskStart, sb.maskFill }) do
+		m:ClearAllPoints()
+		m:SetSize(radius * 3, radius * 3)
+		m:SetPoint("CENTER", sb, centreAnchor)
+		m:Show()
+	end
+
+	-- The start mask is pinned to the arc's start radius, keeping the side the arc
+	-- lies on: left arc -> opaque left (0), right arc -> opaque right (pi).
+	sb.startRot = (side == 1) and 0 or math.pi
+	sb.emptyRot = (side == 1) and math.pi or 0
+	sb.rotCurve = self:CreateArcRotationCurve(side)
+
+	sb.maskStart:SetRotation(sb.startRot)
+	sb.maskFill:SetRotation(sb.emptyRot) -- starts empty
+end
+
+-- Drive the arc's angular fill. fraction may be a SECRET straight from
+-- UnitHealthPercent/UnitPowerPercent evaluated through sb.rotCurve - it is passed
+-- to SetRotation untouched, never compared or arithmetic'd.
+function ArcHUD:SetStatusBarArcFraction(sb, rotation)
+	if not sb or not sb.maskFill then return end
+	if rotation == nil then return end
+	sb.maskFill:SetRotation(rotation)
 end
 
 -- Update StatusBar arc value from unit health
 -- Can accept secret values directly for SetValue
 function ArcHUD:UpdateStatusBarHealth(sb, unit)
 	if not ArcHUD.isMidnight or not sb then return end
-	-- Try to get percentage - can be secret value
+
+	if sb.rotCurve and UnitHealthPercent then
+		-- Angular fill: evaluate straight through the rotation curve so the secret
+		-- goes into SetRotation without ever being read.
+		self:SetStatusBarArcFraction(sb, UnitHealthPercent(unit, true, sb.rotCurve))
+		sb:Show()
+		return
+	end
+
+	-- Fallback: bar fill (no mask support)
 	local pct
 	if UnitHealthPercent then
-		-- Use arc fill curve if available for proper arc geometry mapping
-		local curve = sb.arcFillCurve
-		pct = UnitHealthPercent(unit, true, curve)
+		pct = UnitHealthPercent(unit, true, sb.arcFillCurve)
 	else
 		pct = self:GetHealthPercent(unit)
 	end
-	-- SetValue can handle secret values directly
 	sb:SetValue(pct)
 	sb:Show()
 end
@@ -525,16 +627,21 @@ end
 -- Can accept secret values directly for SetValue
 function ArcHUD:UpdateStatusBarPower(sb, unit, powerType)
 	if not ArcHUD.isMidnight or not sb then return end
-	-- Try to get percentage - can be secret value
+
+	if sb.rotCurve and UnitPowerPercent then
+		self:SetStatusBarArcFraction(sb,
+			UnitPowerPercent(unit, powerType, false, sb.rotCurve))
+		sb:Show()
+		return
+	end
+
+	-- Fallback: bar fill (no mask support)
 	local pct
 	if UnitPowerPercent then
-		-- Use arc fill curve if available for proper arc geometry mapping
-		local curve = sb.arcFillCurve
-		pct = UnitPowerPercent(unit, powerType, false, curve)
+		pct = UnitPowerPercent(unit, powerType, false, sb.arcFillCurve)
 	else
 		pct = self:GetPowerPercent(unit, powerType)
 	end
-	-- SetValue can handle secret values directly
 	sb:SetValue(pct)
 	sb:Show()
 end
@@ -545,13 +652,16 @@ end
 function ArcHUD:SetStatusBarTextureColor(sb, colorOrR, g, b, a)
 	if not ArcHUD.isMidnight or not sb then return end
 	
+	-- With angular fill the bar's own texture is hidden and arcFill is what draws,
+	-- so colour has to go there instead.
+	local target = sb.arcFill or sb:GetStatusBarTexture()
+
 	-- Check if first argument is a ColorMixin object (has GetRGB method)
 	if colorOrR and type(colorOrR) == "table" and colorOrR.GetRGB then
 		-- ColorMixin object - use GetRGB() directly in SetVertexColor
 		-- GetRGB() may return secret values, but SetVertexColor can handle them
-		local statusBarTexture = sb:GetStatusBarTexture()
-		if statusBarTexture then
-			statusBarTexture:SetVertexColor(colorOrR:GetRGB())
+		if target then
+			target:SetVertexColor(colorOrR:GetRGB())
 		end
 	else
 		-- Legacy mode: r, g, b, a values (for non-Midnight or fallback)
@@ -572,7 +682,11 @@ function ArcHUD:SetStatusBarTextureColor(sb, colorOrR, g, b, a)
 		if type(safeB) == "number" then safeB = math.max(0, math.min(1, safeB)) else safeB = 0 end
 		if type(safeA) == "number" then safeA = math.max(0, math.min(1, safeA)) else safeA = 1 end
 		
-		-- SetStatusBarColor takes separate r, g, b, a arguments
-		sb:SetStatusBarColor(safeR, safeG, safeB, safeA)
+		if sb.arcFill then
+			sb.arcFill:SetVertexColor(safeR, safeG, safeB, safeA)
+		else
+			-- SetStatusBarColor takes separate r, g, b, a arguments
+			sb:SetStatusBarColor(safeR, safeG, safeB, safeA)
+		end
 	end
 end

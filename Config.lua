@@ -360,10 +360,17 @@ ArcHUD.configOptionsTableCore = {
 							ArcHUD:RegisterEvent("UNIT_AURA", "TargetAuras")
 						else
 							ArcHUD:UnregisterEvent("UNIT_AURA")
-							for i=1,16 do
+							-- Frames.lua creates 40 of each (chains 1-10, 11-20, 21-30,
+							-- 31-40) and TargetAuras drives all 40, so stopping at 16
+							-- left buttons 17-40 visible after turning buffs off.
+							for i=1,40 do
 								ArcHUD.TargetHUD["Buff"..i]:Hide()
 								ArcHUD.TargetHUD["Debuff"..i]:Hide()
 							end
+						end
+						-- 12.1 aura containers (Midnight only; absent elsewhere)
+						if ArcHUD.SetAuraContainersShown then
+							ArcHUD:SetAuraContainersShown(v)
 						end
 						ArcHUD:UpdateTargetHUD()
 					end,
@@ -379,6 +386,8 @@ ArcHUD.configOptionsTableCore = {
 					end,
 					set			= function (info, v)
 						ArcHUD.db.profile.ShowOnlyBuffsCastByPlayer = v
+						-- rewrites the group's filter string to HELPFUL|PLAYER
+						if ArcHUD.UpdateAuraContainers then ArcHUD:UpdateAuraContainers() end
 						ArcHUD:UpdateTargetHUD()
 					end,
 				},
@@ -393,6 +402,7 @@ ArcHUD.configOptionsTableCore = {
 					end,
 					set			= function (info, v)
 						ArcHUD.db.profile.ReverseBuffCooldowns = v
+						if ArcHUD.UpdateAuraContainers then ArcHUD:UpdateAuraContainers() end
 						ArcHUD:UpdateTargetHUD()
 					end,
 				},
@@ -407,6 +417,8 @@ ArcHUD.configOptionsTableCore = {
 					end,
 					set			= function (info, v)
 						ArcHUD.db.profile.ShowBuffTooltips = v
+						-- drives SetMouseMotionEnabled on the aura buttons
+						if ArcHUD.UpdateAuraContainers then ArcHUD:UpdateAuraContainers() end
 					end,
 				},
 				-- Hide Buff tooltips in combat
@@ -420,6 +432,8 @@ ArcHUD.configOptionsTableCore = {
 					end,
 					set			= function (info, v)
 						ArcHUD.db.profile.HideBuffTooltipsIC = v
+						-- drives SetHideTooltipInCombat on the aura buttons
+						if ArcHUD.UpdateAuraContainers then ArcHUD:UpdateAuraContainers() end
 					end,
 				},
 				-- Hide Buff timer text
@@ -433,6 +447,8 @@ ArcHUD.configOptionsTableCore = {
 					end,
 					set			= function (info, v)
 						ArcHUD.db.profile.HideBuffTimerText = v
+						-- drives SetHideCountdownNumbers on the aura buttons
+						if ArcHUD.UpdateAuraContainers then ArcHUD:UpdateAuraContainers() end
 					end,
 				},
 				-- Buff icon size
@@ -450,14 +466,18 @@ ArcHUD.configOptionsTableCore = {
 					set			= function (info, v)
 						ArcHUD.db.profile.BuffIconSize = v
 						-- update buff icons
-						for i=1,16 do
+						-- all 40 exist (see Frames.lua); 17-40 kept their old size
+						for i=1,40 do
 							ArcHUDFrame.TargetHUD["Buff"..i]:SetWidth(v)
 							ArcHUDFrame.TargetHUD["Buff"..i]:SetHeight(v)
 						end
-						for i=1,16 do
+						for i=1,40 do
 							ArcHUDFrame.TargetHUD["Debuff"..i]:SetWidth(v)
 							ArcHUDFrame.TargetHUD["Debuff"..i]:SetHeight(v)
 						end
+						-- resizes the aura buttons AND recomputes the row width,
+						-- since maximumLineSize is derived from the icon size
+						if ArcHUD.UpdateAuraContainers then ArcHUD:UpdateAuraContainers() end
 					end,
 				},
 				-- Show PvP flag
