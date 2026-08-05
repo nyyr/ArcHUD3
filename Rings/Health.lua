@@ -73,9 +73,9 @@ function module:Initialize()
 	
 		-- Create StatusBar arc for 12.0.0+ (Midnight)
 		if ArcHUD.isMidnight then
-			self.statusBarArc = self.parent:CreateStatusBarArc(self.f, self.name)
-		if self.statusBarArc then
-			self.statusBarArc:Hide() -- Hide by default, show when we have valid data
+			self.statusBar = self.parent:CreateStatusBar(self.f, self.name)
+		if self.statusBar then
+			self.statusBar:Hide() -- Hide by default, show when we have valid data
 			self.f:HideAllButOutline()
 		end
 	end
@@ -106,8 +106,8 @@ function module:OnModuleUpdate()
 		self.DefText:Hide()
 	end
 
-	if self.db.profile.Side and self.statusBarArc then
-		self.parent:UpdateStatusBarSide(self.statusBarArc, self.db.profile.Side)
+	if self.db.profile.Side and self.statusBar then
+		self.parent:UpdateStatusBarSide(self.statusBar, self.db.profile.Side)
 	end
 	
 	if self.db.profile.SwapHealthPowerText then
@@ -168,19 +168,19 @@ function module:OnModuleEnable()
 
 		if(UnitIsGhost(self.unit)) then
 			self.f:GhostMode(true, self.unit)
-			if self.statusBarArc then
-				self.statusBarArc:Hide()
+			if self.statusBar then
+				self.statusBar:Hide()
 			end
 		else
 			self.f:GhostMode(false, self.unit)
 			
 			-- Update StatusBar arc
-			if self.statusBarArc then
-				self.parent:UpdateStatusBarArcHealth(self.statusBarArc, self.unit)
+			if self.statusBar then
+				self.parent:UpdateStatusBarHealth(self.statusBar, self.unit)
 				-- Update color from unit using ColorCurveObject
 				-- Returns ColorMixin object (may contain secret values)
 				local color = self.parent:GetHealthColorFromUnit(self.unit)
-				self.parent:SetStatusBarArcColor(self.statusBarArc, color)
+				self.parent:SetStatusBarTextureColor(self.statusBar, color)
 			end
 			
 			-- Update percentage text immediately (same time as StatusBar) to avoid lag
@@ -279,12 +279,12 @@ function module:UpdateHealth(event, arg1)
 			self.HPPerc:SetText(self.parent:FormatHealthPercent(self.unit))
 			
 			-- Update StatusBar arc
-			if self.statusBarArc then
-				self.parent:UpdateStatusBarArcHealth(self.statusBarArc, self.unit)
+			if self.statusBar then
+				self.parent:UpdateStatusBarHealth(self.statusBar, self.unit)
 				-- Update color from unit using ColorCurveObject
 				-- Returns ColorMixin object (may contain secret values)
 				local color = self.parent:GetHealthColorFromUnit(self.unit)
-				self.parent:SetStatusBarArcColor(self.statusBarArc, color)
+				self.parent:SetStatusBarTextureColor(self.statusBar, color)
 			end
 			
 			-- Update text display - display actual values, including secret values
@@ -343,8 +343,8 @@ function module:UpdateHealth(event, arg1)
 			-- Ghost mode handling
 			if(UnitIsGhost(self.unit)) then
 				self.f:GhostMode(true, self.unit)
-				if self.statusBarArc then
-					self.statusBarArc:Hide()
+				if self.statusBar then
+					self.statusBar:Hide()
 				end
 			else
 				self.f:GhostMode(false, self.unit)

@@ -267,11 +267,11 @@ ArcHUD.configOptionsTableCore = {
 					set			= function (info, v)
 						ArcHUD.db.profile.PlayerFrame = v
 						if (v) then
-							ArcHUD.Nameplates.player:Show()
-							ArcHUD.Nameplates.pet:Show()
+							ArcHUD:SetNameplateVisible(ArcHUD.Nameplates.player, true)
+							ArcHUD:SetNameplateVisible(ArcHUD.Nameplates.pet, true)
 						else
-							ArcHUD.Nameplates.player:Hide()
-							ArcHUD.Nameplates.pet:Hide()
+							ArcHUD:SetNameplateVisible(ArcHUD.Nameplates.player, false)
+							ArcHUD:SetNameplateVisible(ArcHUD.Nameplates.pet, false)
 						end
 					end,
 				},

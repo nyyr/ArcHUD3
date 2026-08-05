@@ -56,13 +56,12 @@ function module:InitializePowerRing(powerType)
 	self.isSecret = ArcHUD.isMidnight and C_Secrets.GetPowerTypeSecrecy(powerType) ~= 0
 
 	-- Create StatusBar arc for 12.0.0+ (Midnight) if not already created
-	if ArcHUD.isMidnight and self.isSecret and not self.statusBarArc then
-		self.statusBarArc = self.parent:CreateStatusBarArc(self.f, self.name)
-		self.f.statusBarArc = self.statusBarArc
+	if ArcHUD.isMidnight and self.isSecret and not self.statusBar then
+		self.statusBar = self.parent:CreateStatusBar(self.f, self.name)
 		self.zeroAlphaCurve = self.parent:CreateZeroAlphaCurve()
-		if self.statusBarArc then
-			self.statusBarArc:Hide() -- Hide by default
-			self.statusBarArc:SetAlpha(0)
+		if self.statusBar then
+			self.statusBar:Hide() -- Hide by default
+			self.statusBar:SetAlpha(0)
 			self.f:HideAllButOutline()
 		end
 	end
@@ -78,8 +77,8 @@ function module:OnModuleUpdate()
 		self.TextHuge:Hide()
 	end
 
-	if self.db.profile.Side and self.statusBarArc then
-		self.parent:UpdateStatusBarSide(self.statusBarArc, self.db.profile.Side)
+	if self.db.profile.Side and self.statusBar then
+		self.parent:UpdateStatusBarSide(self.statusBar, self.db.profile.Side)
 	end
 
 	self.f:StopPulse()
@@ -105,22 +104,22 @@ function module:OnModuleEnable()
 	self:OnModuleUpdate()
 
 	-- Initialize status bar
-	if ArcHUD.isMidnight and self.isSecret and self.statusBarArc then
+	if ArcHUD.isMidnight and self.isSecret and self.statusBar then
 		local powerType = self.powerType or UnitPowerType(self.unit)
-		self.parent:UpdateStatusBarArcPower(self.statusBarArc, self.unit, powerType)
+		self.parent:UpdateStatusBarPower(self.statusBar, self.unit, powerType)
 		local barColor = self.db.profile.Color
 		local r, g, b = barColor.r or barColor[1], barColor.g or barColor[2], barColor.b or barColor[3]
-		self.parent:SetStatusBarArcColor(self.statusBarArc, r, g, b, 1)
+		self.parent:SetStatusBarTextureColor(self.statusBar, r, g, b, 1)
 	end
 end
 
 function module:UpdatePowerRing()
-	if ArcHUD.isMidnight and self.isSecret and self.statusBarArc and self.f:IsShown() then
+	if ArcHUD.isMidnight and self.isSecret and self.statusBar and self.f:IsShown() then
 		local powerType = self.powerType or UnitPowerType(self.unit)
-		self.parent:UpdateStatusBarArcPower(self.statusBarArc, self.unit, powerType)
+		self.parent:UpdateStatusBarPower(self.statusBar, self.unit, powerType)
 		local barColor = self.db.profile.Color
 		local r, g, b = barColor.r or barColor[1], barColor.g or barColor[2], barColor.b or barColor[3]
-		self.parent:SetStatusBarArcColor(self.statusBarArc, r, g, b, 1)
+		self.parent:SetStatusBarTextureColor(self.statusBar, r, g, b, 1)
 	end
 
 	local maxPower = UnitPowerMax(self.unit, self.powerType);
@@ -147,7 +146,9 @@ function module:UpdatePowerRing()
 end
 
 function module:UpdatePower(event, arg1, arg2)
-	if (event == "UNIT_POWER_FREQUENT") then
+	-- These all carry (unit, powerToken), so filter on both to avoid redrawing
+	-- for every unrelated power type the player has.
+	if (event == "UNIT_POWER_FREQUENT" or event == "UNIT_POWER_UPDATE" or event == "UNIT_MAXPOWER") then
 		if (arg1 == self.unit and arg2 == self.powerTypeString) then
 			self:UpdatePowerRing()
 		end
@@ -183,6 +184,13 @@ function module:UpdateActive(event, arg1)
 			end
 			self:RegisterUnitEvent("UNIT_POWER_FREQUENT", "UpdatePower", self.unit)
 			self:RegisterUnitEvent("UNIT_DISPLAYPOWER", "UpdatePower", self.unit)
+			-- Not every resource reports through UNIT_POWER_FREQUENT, and the max can
+			-- change (e.g. Chi 5 -> 6 with Ascension) or be re-sent after a revive.
+			-- Without these the ring keeps drawing against a stale max. Power.lua has
+			-- always registered them; the power-ring template never did.
+			self:RegisterUnitEvent("UNIT_POWER_UPDATE", "UpdatePower", self.unit)
+			self:RegisterUnitEvent("UNIT_MAXPOWER", "UpdatePower", self.unit)
+			self:RegisterEvent("PLAYER_ALIVE", "UpdatePower")
 
 			-- Activate ring timers
 			self:StartRingTimers()
@@ -194,6 +202,9 @@ function module:UpdateActive(event, arg1)
 			end
 			self:UnregisterUnitEvent("UNIT_POWER_FREQUENT")
 			self:UnregisterUnitEvent("UNIT_DISPLAYPOWER")
+			self:UnregisterUnitEvent("UNIT_POWER_UPDATE")
+			self:UnregisterUnitEvent("UNIT_MAXPOWER")
+			self:UnregisterEvent("PLAYER_ALIVE")
 
 			-- Deactivate ring timers
 			self:StopRingTimers()
@@ -206,13 +217,13 @@ function module:UpdateActive(event, arg1)
 
 	if isActive and ((not self.CheckVisible) or self:CheckVisible()) then
 		self.f:Show()
-		if self.statusBarArc then
-			self.statusBarArc:Show()
+		if self.statusBar then
+			self.statusBar:Show()
 		end
 	else
 		self.f:Hide()
-		if self.statusBarArc then
-			self.statusBarArc:Hide()
+		if self.statusBar then
+			self.statusBar:Hide()
 		end
 	end
 end

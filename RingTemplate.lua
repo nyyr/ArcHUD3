@@ -1111,6 +1111,16 @@ function ArcHUDRingTemplate:SetRingAlpha(destAlpha, instant)
 	end
 	-- If secret, use destAlpha directly without modifications
 
+	-- Ghost mode's syncPulse owns this ring's alpha while it runs: it writes every
+	-- frame from its OnUpdate script. Writing here as well makes the two fight and
+	-- the ring visibly strobes (#108) - worst on Midnight, where a secret destAlpha
+	-- forces the instant path below and so writes on every CheckAlpha tick (10Hz).
+	-- GhostMode() clears destAlpha when it stops the pulse, so the next tick
+	-- re-applies the real alpha.
+	if (self.syncPulse and self.syncPulse:IsPlaying()) then
+		return
+	end
+
 	-- For secret values, always use instant mode (can't compare to detect changes)
 	if (instant or not self.applyAlpha or destAlphaSecret) then
 		self:SetAlpha(destAlpha)
@@ -1119,13 +1129,8 @@ function ArcHUDRingTemplate:SetRingAlpha(destAlpha, instant)
 			self.destAlpha = destAlpha
 		end
 		-- Sync StatusBar alpha if it exists (Midnight mode)
-		-- Check both statusBarArc (legacy) and statusBar (current) naming
-		if ArcHUD.isMidnight then
-			if self.statusBarArc then
-				self.statusBarArc:SetAlpha(destAlpha)
-			elseif self.statusBar then
-				self.statusBar:SetAlpha(destAlpha)
-			end
+		if ArcHUD.isMidnight and self.statusBar then
+			self.statusBar:SetAlpha(destAlpha)
 		end
 		return
 		
@@ -1168,8 +1173,8 @@ function ArcHUDRingTemplate:applyAlpha_OnFinished()
 	local curAlphaSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(curAlpha)
 	
 	-- Sync StatusBar alpha if it exists (Midnight mode)
-	if ArcHUD.isMidnight and self.statusBarArc then
-		self.statusBarArc:SetAlpha(curAlpha)
+	if ArcHUD.isMidnight and self.statusBar then
+		self.statusBar:SetAlpha(curAlpha)
 	end
 	
 	-- If curAlpha is secret, we can't do arithmetic or comparisons
@@ -1293,8 +1298,16 @@ function ArcHUDRingTemplate:GhostMode(state, unit)
 			else
 				fh.HPPerc:SetText(DEAD)
 			end
-			-- Enable pulsing
-			fh.f.syncPulse:Play()
+			-- Enable pulsing. GhostMode(true) is re-called on every health event
+			-- while ghosted, so don't restart a group that is already running -
+			-- that resets its loop and masks/varies the timing.
+			if(not fh.f.syncPulse:IsPlaying()) then
+				-- Stop an in-flight fade so it can't fight the pulse's OnUpdate
+				if(fh.f.applyAlpha:IsPlaying()) then
+					fh.f.applyAlpha:Stop()
+				end
+				fh.f.syncPulse:Play()
+			end
 		end
 
 		-- Prepare mana ring
@@ -1304,12 +1317,21 @@ function ArcHUDRingTemplate:GhostMode(state, unit)
 			fm.f:SetValue(1)
 			fm.MPText:SetText("")
 			fm.MPPerc:SetText("")
-			-- Enable pulsing
-			fm.f.syncPulse:Play()
+			-- Enable pulsing (see note above)
+			if(not fm.f.syncPulse:IsPlaying()) then
+				if(fm.f.applyAlpha:IsPlaying()) then
+					fm.f.applyAlpha:Stop()
+				end
+				fm.f.syncPulse:Play()
+			end
 		end
 	else
 		if(fh and fh.f.syncPulse:IsPlaying()) then
 			fh.f.syncPulse:Stop()
+			-- The pulse left the ring at an arbitrary alpha and SetRingAlpha was
+			-- suppressed while it ran, so destAlpha no longer reflects the ring.
+			-- Clear it to guarantee the next SetRingAlpha actually applies (#108).
+			fh.f.destAlpha = -1
 			if ArcHUD.isMidnight then
 				-- In Midnight, keep original rings empty - StatusBar handles display
 				-- Don't fill the original rings, they should stay at 0
@@ -1323,6 +1345,7 @@ function ArcHUDRingTemplate:GhostMode(state, unit)
 		end
 		if(fm and fm.f.syncPulse:IsPlaying()) then
 			fm.f.syncPulse:Stop()
+			fm.f.destAlpha = -1
 			if ArcHUD.isMidnight then
 				-- In Midnight, keep original rings empty - StatusBar handles display
 				-- Don't fill the original rings, they should stay at 0
@@ -1392,6 +1415,7 @@ function ArcHUDRingTemplate:OnLoad(frame)
 
 	frame.startValue = 0
 	frame.endValue = 0
+	frame.destAlpha = -1 -- never a valid alpha, so the first SetRingAlpha applies
 	frame.maxValue = 1
 	frame.fadeTime = 0
 	frame.maxFadeTime = 1

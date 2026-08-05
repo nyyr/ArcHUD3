@@ -47,9 +47,9 @@ function module:Initialize()
 	
 		-- Create StatusBar arc for 12.0.0+ (Midnight)
 		if ArcHUD.isMidnight then
-			self.statusBarArc = self.parent:CreateStatusBarArc(self.f, self.name)
-		if self.statusBarArc then
-			self.statusBarArc:Hide() -- Hide by default
+			self.statusBar = self.parent:CreateStatusBar(self.f, self.name)
+		if self.statusBar then
+			self.statusBar:Hide() -- Hide by default
 			self.f:HideAllButOutline()
 		end
 	end
@@ -77,8 +77,8 @@ function module:OnModuleUpdate()
 		self.MPPerc:Hide()
 	end
 
-	if self.db.profile.Side and self.statusBarArc then
-		self.parent:UpdateStatusBarSide(self.statusBarArc, self.db.profile.Side)
+	if self.db.profile.Side and self.statusBar then
+		self.parent:UpdateStatusBarSide(self.statusBar, self.db.profile.Side)
 	end
 	
 	if self.db.profile.SwapHealthPowerText then
@@ -119,8 +119,8 @@ function module:OnModuleEnable()
 		-- 12.0.0+ (Midnight): Initialize StatusBar arc
 		if(UnitIsGhost(self.unit)) then
 			self.f:GhostMode(true, self.unit)
-			if self.statusBarArc then
-				self.statusBarArc:Hide()
+			if self.statusBar then
+				self.statusBar:Hide()
 			end
 		else
 			self.f:GhostMode(false, self.unit)
@@ -130,12 +130,12 @@ function module:OnModuleEnable()
 			self.MPText:SetVertexColor(info.r, info.g, info.b)
 			
 			-- Update StatusBar arc
-			if self.statusBarArc then
-				self.parent:UpdateStatusBarArcPower(self.statusBarArc, self.unit, powerType)
+			if self.statusBar then
+				self.parent:UpdateStatusBarPower(self.statusBar, self.unit, powerType)
 				-- Use GetPowerBarColor (not GetPowerBarColorText) for StatusBar color
 				-- GetPowerBarColorText returns light colors for text readability, but bar should use actual power color
 				local barColor = self:GetPowerBarColor(powerType)
-				self.parent:SetStatusBarArcColor(self.statusBarArc, barColor.r, barColor.g, barColor.b, 1)
+				self.parent:SetStatusBarTextureColor(self.statusBar, barColor.r, barColor.g, barColor.b, 1)
 			end
 			
 			-- Update text - display actual values, including secret values
@@ -210,8 +210,8 @@ function module:UpdatePowerBar()
 			local canCalculate = not powerSecret and not maxPowerSecret
 			
 			-- Update StatusBar arc
-			if self.statusBarArc then
-				self.parent:UpdateStatusBarArcPower(self.statusBarArc, self.unit, powerType)
+			if self.statusBar then
+				self.parent:UpdateStatusBarPower(self.statusBar, self.unit, powerType)
 			end
 			
 			-- Update text
@@ -276,19 +276,19 @@ function module:UpdatePowerEvent(event, arg1)
 			
 			if(UnitIsGhost(self.unit) or (UnitIsDead(self.unit) and event == "PLAYER_ALIVE")) then
 				self.f:GhostMode(true, self.unit)
-				if self.statusBarArc then
-					self.statusBarArc:Hide()
+				if self.statusBar then
+					self.statusBar:Hide()
 				end
 			else
 				self.f:GhostMode(false, self.unit)
 				
 				-- Update StatusBar arc
-				if self.statusBarArc then
-					self.parent:UpdateStatusBarArcPower(self.statusBarArc, self.unit, powerType)
+				if self.statusBar then
+					self.parent:UpdateStatusBarPower(self.statusBar, self.unit, powerType)
 					-- Use GetPowerBarColor (not GetPowerBarColorText) for StatusBar color
 					-- GetPowerBarColorText returns light colors for text readability, but bar should use actual power color
 					local barColor = self:GetPowerBarColor(powerType)
-					self.parent:SetStatusBarArcColor(self.statusBarArc, barColor.r, barColor.g, barColor.b, 1)
+					self.parent:SetStatusBarTextureColor(self.statusBar, barColor.r, barColor.g, barColor.b, 1)
 				end
 				
 				-- Update text - display actual values, including secret values

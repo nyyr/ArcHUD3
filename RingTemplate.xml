@@ -106,11 +106,14 @@
 					<OnUpdate>
 						self.ring:SetAlpha(0.6 + math.cos(GetTime() * 3.14159265) * 0.3);
 					</OnUpdate>
-					<OnFinished>
-						local destAlpha = self.ring.destAlpha;
-						self.ring.destAlpha = -1;
-						self.ring:SetRingAlpha(destAlpha);
-					</OnFinished>
+					<!--
+						No OnFinished here. This group is looping="REPEAT", so a child
+						animation's OnFinished runs at every 1s loop boundary, not just
+						when the pulse stops. It used to force destAlpha = -1 and re-call
+						SetRingAlpha, which restarted the 0.5s applyAlpha ramp once per
+						second against the OnUpdate above - the 1Hz flicker in #108.
+						Restoring alpha after the pulse is GhostMode()'s job instead.
+					-->
 				</Scripts>
 			</Animation>
 		</AnimationGroup>

@@ -110,6 +110,29 @@ function ArcHUD:InitNameplate(this, unit)
 	end
 end
 
+----------------------------------------------
+-- Combat-safe visibility for nameplates
+--
+-- Nameplates are SecureUnitButtonTemplate buttons (see AH_CreateNameplate in
+-- Frames.lua), so Show()/Hide() are protected: calling them while in combat
+-- lockdown raises ADDON_ACTION_BLOCKED (#112). This can fire from the
+-- UpdateTargetPower/UpdateTargetTarget timers mid-fight.
+--
+-- Enable()/Disable() are safe to call directly - they are overridden above and
+-- already bail out on InCombatLockdown(). SetAlpha() is unprotected too, so
+-- callers keep doing their own alpha handling; only the Show/Hide is deferred,
+-- and the next out-of-combat update reconciles it.
+----------------------------------------------
+function ArcHUD:SetNameplateVisible(np, visible)
+	if (not np) or InCombatLockdown() then return end
+
+	if (visible) then
+		np:Show()
+	else
+		np:Hide()
+	end
+end
+
 -- For delayed clickable nameplates
 function ArcHUD:RestartNamePlateTimers()
 	local units = {"player", "pet"}

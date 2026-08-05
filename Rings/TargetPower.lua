@@ -36,10 +36,10 @@ function module:Initialize()
 	
 		-- Create StatusBar arc for 12.0.0+ (Midnight)
 		if ArcHUD.isMidnight then
-			self.statusBarArc = self.parent:CreateStatusBarArc(self.f, self.name)
+			self.statusBar = self.parent:CreateStatusBar(self.f, self.name)
 			self.zeroAlphaCurve = self.parent:CreateZeroAlphaCurve()
-		if self.statusBarArc then
-			self.statusBarArc:Hide() -- Hide by default
+		if self.statusBar then
+			self.statusBar:Hide() -- Hide by default
 			self.f:HideAllButOutline()
 		end
 	end
@@ -67,8 +67,8 @@ function module:OnModuleUpdate()
 		-- Attach to right side
 		self.MPPerc:SetPoint("TOP", self.f, "BOTTOMLEFT", 20, -130)
 	end
-	if self.db.profile.Side and self.statusBarArc then
-		self.parent:UpdateStatusBarSide(self.statusBarArc, self.db.profile.Side)
+	if self.db.profile.Side and self.statusBar then
+		self.parent:UpdateStatusBarSide(self.statusBar, self.db.profile.Side)
 	end
 	if(UnitExists(self.unit)) then
 		self.f:SetValue(UnitPower(self.unit))
@@ -81,18 +81,18 @@ function module:OnModuleEnable()
 		-- 12.0.0+ (Midnight): Initialize StatusBar arc
 		if not UnitExists(self.unit) then
 			self.MPPerc:SetText("")
-			if self.statusBarArc then
-				self.statusBarArc:Hide()
+			if self.statusBar then
+				self.statusBar:Hide()
 			end
 		else
 			local powerType = UnitPowerType(self.unit)
 			-- Update StatusBar arc
-			if self.statusBarArc then
-				self.parent:UpdateStatusBarArcPower(self.statusBarArc, self.unit, powerType)
+			if self.statusBar then
+				self.parent:UpdateStatusBarPower(self.statusBar, self.unit, powerType)
 				local info = self:GetPowerBarColorText(powerType)
 				-- Use GetPowerBarColor (not GetPowerBarColorText) for StatusBar color
 				local barColor = self:GetPowerBarColor(powerType)
-				self.parent:SetStatusBarArcColor(self.statusBarArc, barColor.r, barColor.g, barColor.b, 1)
+				self.parent:SetStatusBarTextureColor(self.statusBar, barColor.r, barColor.g, barColor.b, 1)
 			end
 			
 			-- Update text - display actual values, including secret values
@@ -129,8 +129,8 @@ function module:PLAYER_TARGET_CHANGED()
 		-- 12.0.0+ (Midnight): Use StatusBar approach
 		if(not UnitExists(self.unit)) then
 			self.MPPerc:SetText("")
-			if self.statusBarArc then
-				self.statusBarArc:Hide()
+			if self.statusBar then
+				self.statusBar:Hide()
 			end
 			self.f:Hide()
 		else
@@ -143,12 +143,12 @@ function module:PLAYER_TARGET_CHANGED()
 			self:UpdateColor(powerType)
 			
 			-- Update StatusBar arc
-			if self.statusBarArc then
-				self.parent:UpdateStatusBarArcPower(self.statusBarArc, self.unit, powerType)
+			if self.statusBar then
+				self.parent:UpdateStatusBarPower(self.statusBar, self.unit, powerType)
 				local info = self:GetPowerBarColorText(powerType)
 				-- Use GetPowerBarColor (not GetPowerBarColorText) for StatusBar color
 				local barColor = self:GetPowerBarColor(powerType)
-				self.parent:SetStatusBarArcColor(self.statusBarArc, barColor.r, barColor.g, barColor.b, 1)
+				self.parent:SetStatusBarTextureColor(self.statusBar, barColor.r, barColor.g, barColor.b, 1)
 			end
 			
 			if(UnitIsDead(self.unit) or UnitIsGhost(self.unit) or (not maxPowerSecret and maxPower == 0)) then
@@ -196,10 +196,10 @@ function module:UpdateDisplayPower(event, arg1)
 		self:UpdateColor(powerType)
 		
 		-- Update StatusBar arc
-		if self.statusBarArc then
-			self.parent:UpdateStatusBarArcPower(self.statusBarArc, self.unit, powerType)
+		if self.statusBar then
+			self.parent:UpdateStatusBarPower(self.statusBar, self.unit, powerType)
 			local info = self:GetPowerBarColorText(powerType)
-			self.parent:SetStatusBarArcColor(self.statusBarArc, info.r, info.g, info.b, 1)
+			self.parent:SetStatusBarTextureColor(self.statusBar, info.r, info.g, info.b, 1)
 		end
 		
 		-- Update text
@@ -233,10 +233,10 @@ function module:UpdatePower(event, arg1)
 		local canCalculate = not powerSecret and not maxPowerSecret
 
 		-- Update StatusBar arc
-		if self.statusBarArc then
-			self.parent:UpdateStatusBarArcPower(self.statusBarArc, self.unit, powerType)
+		if self.statusBar then
+			self.parent:UpdateStatusBarPower(self.statusBar, self.unit, powerType)
 			local info = self:GetPowerBarColorText(powerType)
-			self.parent:SetStatusBarArcColor(self.statusBarArc, info.r, info.g, info.b, 1)
+			self.parent:SetStatusBarTextureColor(self.statusBar, info.r, info.g, info.b, 1)
 		end
 
 		-- Update text

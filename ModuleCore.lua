@@ -365,10 +365,10 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2, invertCurve)
 
 			if maxValueSecret or f.isHidden then
 				f:SetRingAlpha(0)
-				if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(0) end
+				if ArcHUD.isMidnight and f.statusBar then f.statusBar:SetAlpha(0) end
 			elseif not maxValueSecret and (f.maxValue == 0) then
 				f:SetRingAlpha(0)
-				if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(0) end
+				if ArcHUD.isMidnight and f.statusBar then f.statusBar:SetAlpha(0) end
 			elseif (alpha2) then
 				-- In Midnight, use CurveObject to determine alpha based on percentage
 				-- The ring frame values are kept at 1/0 (not secret), so we must check actual unit health/power
@@ -436,16 +436,16 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2, invertCurve)
 							-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
 							if secretAlpha ~= nil then
 								f:SetRingAlpha(secretAlpha)
-								if f.statusBarArc then
-									f.statusBarArc:SetAlpha(secretAlpha)
+								if f.statusBar then
+									f.statusBar:SetAlpha(secretAlpha)
 								end
 							else
 								f:SetRingAlpha(alpha2)
-								if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
+								if ArcHUD.isMidnight and f.statusBar then f.statusBar:SetAlpha(alpha2) end
 							end
 						else
 							f:SetRingAlpha(alpha2)
-							if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
+							if ArcHUD.isMidnight and f.statusBar then f.statusBar:SetAlpha(alpha2) end
 						end
 					elseif self.isPower then
 						-- Use UnitPowerPercent with curve
@@ -460,43 +460,43 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2, invertCurve)
 							-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
 							if secretAlpha ~= nil then
 								f:SetRingAlpha(secretAlpha)
-								if f.statusBarArc then
-									f.statusBarArc:SetAlpha(secretAlpha)
+								if f.statusBar then
+									f.statusBar:SetAlpha(secretAlpha)
 								end
 							else
 								f:SetRingAlpha(alpha2)
-								if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
+								if ArcHUD.isMidnight and f.statusBar then f.statusBar:SetAlpha(alpha2) end
 							end
 						else
 							f:SetRingAlpha(alpha2)
-							if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
+							if ArcHUD.isMidnight and f.statusBar then f.statusBar:SetAlpha(alpha2) end
 						end
 					else
 						-- Not health or power - fallback
 						f:SetRingAlpha(alpha2)
-						if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
+						if ArcHUD.isMidnight and f.statusBar then f.statusBar:SetAlpha(alpha2) end
 					end
 				elseif not startValueSecret and not maxValueSecret and not endValueSecret then
 					-- Legacy: check ring frame values directly
 					if(f.startValue < f.maxValue or math.floor(f.startValue) ~= math.floor(f.endValue)) then
 						f:SetRingAlpha(alpha2)
-						if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
+						if ArcHUD.isMidnight and f.statusBar then f.statusBar:SetAlpha(alpha2) end
 					elseif(self.f.startValue == self.f.maxValue) then
 						f:SetRingAlpha(alpha)
-						if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha) end
+						if ArcHUD.isMidnight and f.statusBar then f.statusBar:SetAlpha(alpha) end
 					end
 				else
 					-- Values are secret but not in Midnight health/power mode - fallback
 					f:SetRingAlpha(alpha2)
-					if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
+					if ArcHUD.isMidnight and f.statusBar then f.statusBar:SetAlpha(alpha2) end
 				end
 			else
 				-- No alpha2: set alpha directly (e.g., when in combat)
 				-- Force instant update to ensure it works even if previous alpha was secret
 				f:SetRingAlpha(alpha, true)
 				-- Also sync StatusBar alpha if it exists (Midnight mode)
-				if ArcHUD.isMidnight and f.statusBarArc then
-					f.statusBarArc:SetAlpha(alpha)
+				if ArcHUD.isMidnight and f.statusBar then
+					f.statusBar:SetAlpha(alpha)
 				end
 			end
 		end
@@ -510,10 +510,10 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2, invertCurve)
 
 		if maxValueSecret or f.isHidden then
 			f:SetRingAlpha(0)
-			if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(0) end
+			if ArcHUD.isMidnight and f.statusBar then f.statusBar:SetAlpha(0) end
 		elseif not maxValueSecret and (f.maxValue == 0) then
 			f:SetRingAlpha(0)
-			if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(0) end
+			if ArcHUD.isMidnight and f.statusBar then f.statusBar:SetAlpha(0) end
 		elseif (alpha2) then
 			if ArcHUD.isMidnight then
 				if not self.alphaCurve then
@@ -582,8 +582,8 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2, invertCurve)
 						-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
 						if secretAlpha ~= nil then
 							f:SetRingAlpha(secretAlpha)
-							if f.statusBarArc then
-								f.statusBarArc:SetAlpha(secretAlpha)
+							if f.statusBar then
+								f.statusBar:SetAlpha(secretAlpha)
 							end
 						else
 							f:SetRingAlpha(alpha2)
@@ -604,30 +604,30 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2, invertCurve)
 						-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
 						if secretAlpha ~= nil then
 							f:SetRingAlpha(secretAlpha)
-							if f.statusBarArc then
-								f.statusBarArc:SetAlpha(secretAlpha)
+							if f.statusBar then
+								f.statusBar:SetAlpha(secretAlpha)
 							end
 						else
 							f:SetRingAlpha(alpha2)
-							if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
+							if ArcHUD.isMidnight and f.statusBar then f.statusBar:SetAlpha(alpha2) end
 						end
 					else
 						f:SetRingAlpha(alpha2)
-						if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
+						if ArcHUD.isMidnight and f.statusBar then f.statusBar:SetAlpha(alpha2) end
 					end
 				else
 					-- Not health or power - fallback
 					f:SetRingAlpha(alpha2)
-					if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
+					if ArcHUD.isMidnight and f.statusBar then f.statusBar:SetAlpha(alpha2) end
 				end
 			elseif not startValueSecret and not maxValueSecret and not endValueSecret then
 				-- Legacy: check ring frame values directly
 				if(f.startValue < f.maxValue or math.floor(f.startValue) ~= math.floor(f.endValue)) then
 					f:SetRingAlpha(alpha2)
-					if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
+					if ArcHUD.isMidnight and f.statusBar then f.statusBar:SetAlpha(alpha2) end
 				elseif(self.f.startValue == self.f.maxValue) then
 					f:SetRingAlpha(alpha)
-					if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha) end
+					if ArcHUD.isMidnight and f.statusBar then f.statusBar:SetAlpha(alpha) end
 				end
 			else
 				-- Determine if this is health or power
@@ -643,8 +643,8 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2, invertCurve)
 						-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
 						if secretAlpha ~= nil then
 							f:SetRingAlpha(secretAlpha)
-							if f.statusBarArc then
-								f.statusBarArc:SetAlpha(secretAlpha)
+							if f.statusBar then
+								f.statusBar:SetAlpha(secretAlpha)
 							end
 						else
 							f:SetRingAlpha(alpha2)
@@ -665,21 +665,21 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2, invertCurve)
 						-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
 						if secretAlpha ~= nil then
 							f:SetRingAlpha(secretAlpha)
-							if f.statusBarArc then
-								f.statusBarArc:SetAlpha(secretAlpha)
+							if f.statusBar then
+								f.statusBar:SetAlpha(secretAlpha)
 							end
 						else
 							f:SetRingAlpha(alpha2)
-							if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
+							if ArcHUD.isMidnight and f.statusBar then f.statusBar:SetAlpha(alpha2) end
 						end
 					else
 						f:SetRingAlpha(alpha2)
-						if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
+						if ArcHUD.isMidnight and f.statusBar then f.statusBar:SetAlpha(alpha2) end
 					end
 				else
 					-- Not health or power - fallback
 					f:SetRingAlpha(alpha2)
-					if ArcHUD.isMidnight and f.statusBarArc then f.statusBarArc:SetAlpha(alpha2) end
+					if ArcHUD.isMidnight and f.statusBar then f.statusBar:SetAlpha(alpha2) end
 				end
 			end
 		else
@@ -687,8 +687,8 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2, invertCurve)
 			-- Force instant update to ensure it works even if previous alpha was secret
 			f:SetRingAlpha(alpha, true)
 			-- Also sync StatusBar alpha if it exists (Midnight mode)
-			if ArcHUD.isMidnight and f.statusBarArc then
-				f.statusBarArc:SetAlpha(alpha)
+			if ArcHUD.isMidnight and f.statusBar then
+				f.statusBar:SetAlpha(alpha)
 			end
 		end
 	end
@@ -841,6 +841,13 @@ local color_switch = {
 -- UpdateColor
 ----------------------------------------------
 function ArcHUD.modulePrototype:UpdateColor(color)
+	-- While ghost mode runs it owns the ring colour (grey). Module enable order is
+	-- undefined, so Power's OnModuleUpdate could otherwise repaint the ghost ring
+	-- with the power colour after GhostMode() greyed it - the reload-while-ghosted
+	-- race in #108. GhostMode sets grey via the frame method self.f:UpdateColor(),
+	-- which this guard does not block.
+	if(self.f and self.f.syncPulse and self.f.syncPulse:IsPlaying()) then return end
+
 	if(color and type(color) == "table") then
 		self.f:UpdateColor(color)
 	elseif(color and type(color) == "number") then
@@ -865,12 +872,19 @@ end
 
 ----------------------------------------------
 -- Return power bar color
+--
+-- powerType may be nil (e.g. UnitPowerType() on a unit that just died or went
+-- out of range), and PowerBarColor has no entry for every power type, so both
+-- accessors must fall back rather than return nil - callers index .r/.g/.b
+-- directly. See issue #113.
 ----------------------------------------------
+local UNKNOWN_POWER_COLOR = { r = 1.00, g = 1.00, b = 1.00 }
+
 function ArcHUD.modulePrototype:GetPowerBarColor(powerType)
-	if (color_switch.manabar[powerType]) then
-		return color_switch.manabar[powerType](self)
+	if (powerType and color_switch.manabar[powerType]) then
+		return color_switch.manabar[powerType](self) or UNKNOWN_POWER_COLOR
 	else
-		return PowerBarColor[powerType]
+		return (powerType and PowerBarColor[powerType]) or UNKNOWN_POWER_COLOR
 	end
 end
 
@@ -880,10 +894,10 @@ end
 function ArcHUD.modulePrototype:GetPowerBarColorText(powerType)
 	if (powerType == 0) then
 		return { r = 0.00, g = 1.00, b = 1.00 }
-	elseif (color_switch.manabar[powerType]) then
-		return color_switch.manabar[powerType](self)
+	elseif (powerType and color_switch.manabar[powerType]) then
+		return color_switch.manabar[powerType](self) or UNKNOWN_POWER_COLOR
 	else
-		return PowerBarColor[powerType]
+		return (powerType and PowerBarColor[powerType]) or UNKNOWN_POWER_COLOR
 	end
 end
 

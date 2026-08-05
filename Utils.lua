@@ -436,7 +436,7 @@ end
 -- parent: The ring frame to attach to
 -- moduleName: Optional module name to determine side (defaults to checking parent.module)
 -- Returns: StatusBar frame
-function ArcHUD:CreateStatusBarArc(parent, moduleName)
+function ArcHUD:CreateStatusBar(parent, moduleName)
 	if not ArcHUD.isMidnight then return nil end
 	
 	local side = 1 -- default to left
@@ -505,7 +505,7 @@ end
 
 -- Update StatusBar arc value from unit health
 -- Can accept secret values directly for SetValue
-function ArcHUD:UpdateStatusBarArcHealth(sb, unit)
+function ArcHUD:UpdateStatusBarHealth(sb, unit)
 	if not ArcHUD.isMidnight or not sb then return end
 	-- Try to get percentage - can be secret value
 	local pct
@@ -523,7 +523,7 @@ end
 
 -- Update StatusBar arc value from unit power
 -- Can accept secret values directly for SetValue
-function ArcHUD:UpdateStatusBarArcPower(sb, unit, powerType)
+function ArcHUD:UpdateStatusBarPower(sb, unit, powerType)
 	if not ArcHUD.isMidnight or not sb then return end
 	-- Try to get percentage - can be secret value
 	local pct
@@ -542,7 +542,7 @@ end
 -- Set StatusBar arc color
 -- Accepts either a ColorMixin object (Midnight) or r, g, b, a values (legacy)
 -- ColorMixin may contain secret values that must be used directly
-function ArcHUD:SetStatusBarArcColor(sb, colorOrR, g, b, a)
+function ArcHUD:SetStatusBarTextureColor(sb, colorOrR, g, b, a)
 	if not ArcHUD.isMidnight or not sb then return end
 	
 	-- Check if first argument is a ColorMixin object (has GetRGB method)

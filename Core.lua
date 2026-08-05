@@ -332,11 +332,11 @@ function ArcHUD:OnProfileChanged(db, profile)
 	end
 	
 	if (self.db.profile.PlayerFrame) then
-		self.Nameplates.player:Show()
-		self.Nameplates.pet:Show()
+		self:SetNameplateVisible(self.Nameplates.player, true)
+		self:SetNameplateVisible(self.Nameplates.pet, true)
 	else
-		self.Nameplates.player:Hide()
-		self.Nameplates.pet:Hide()
+		self:SetNameplateVisible(self.Nameplates.player, false)
+		self:SetNameplateVisible(self.Nameplates.pet, false)
 	end
 	
 	if(self.db.profile.TargetFrame) then
@@ -748,7 +748,7 @@ function ArcHUD:TargetUpdate(event, arg1)
 		self:StopTimer("UpdateTargetPower")
 		--self.Nameplates.target:EnableMouse(false)
 		self.Nameplates.target:SetAlpha(0)
-		self.Nameplates.target:Hide()
+		self:SetNameplateVisible(self.Nameplates.target, false)
 		self.Nameplates.target:Disable()
 	end
 end
@@ -1056,7 +1056,9 @@ function ArcHUD:UpdateTargetTarget()
 		if (UnitPowerType("targettarget") == 0) then
 			info = { r = 0.00, g = 1.00, b = 1.00 }
 		else
-			info = PowerBarColor[UnitPowerType("targettarget")]
+			-- powerType can be nil (unit died/out of range) and PowerBarColor has
+			-- no entry for every type - fall back so info.r below is safe (#113)
+			info = PowerBarColor[UnitPowerType("targettarget")] or { r = 1.00, g = 1.00, b = 1.00 }
 		end
 		self.TargetHUD.Target.MPText:SetTextColor(info.r, info.g, info.b)
 
@@ -1109,14 +1111,14 @@ function ArcHUD:UpdateTargetTarget()
 			end
 		end
 		self.TargetHUD.Target:SetAlpha(1)
-		self.Nameplates.targettarget:Show()
+		self:SetNameplateVisible(self.Nameplates.targettarget, true)
 		self.Nameplates.targettarget:Enable()
 	else
 		-- Always hide and disable when TargetTarget is off so no ghost tooltip/click
 		self.TargetHUD.Target:SetAlpha(0)
 		--self.Nameplates.targettarget:EnableMouse(false)
 		self.Nameplates.targettarget:SetAlpha(0)
-		self.Nameplates.targettarget:Hide()
+		self:SetNameplateVisible(self.Nameplates.targettarget, false)
 		self.Nameplates.targettarget:Disable()
 	end
 
@@ -1147,7 +1149,7 @@ function ArcHUD:UpdateTargetTarget()
 		if (UnitPowerType("targettargettarget") == 0) then
 			info = { r = 0.00, g = 1.00, b = 1.00 }
 		else
-			info = PowerBarColor[UnitPowerType("targettargettarget")]
+			info = PowerBarColor[UnitPowerType("targettargettarget")] or { r = 1.00, g = 1.00, b = 1.00 }
 		end
 		self.TargetHUD.TargetTarget.MPText:SetTextColor(info.r, info.g, info.b)
 
@@ -1200,14 +1202,14 @@ function ArcHUD:UpdateTargetTarget()
 			end
 		end
 		self.TargetHUD.TargetTarget:SetAlpha(1)
-		self.Nameplates.targettargettarget:Show()
+		self:SetNameplateVisible(self.Nameplates.targettargettarget, true)
 		self.Nameplates.targettargettarget:Enable()
 	else
 		-- Always hide and disable when TargetTargetTarget is off so no ghost tooltip/click
 		self.TargetHUD.TargetTarget:SetAlpha(0)
 		--self.Nameplates.targettargettarget:EnableMouse(false)
 		self.Nameplates.targettargettarget:SetAlpha(0)
-		self.Nameplates.targettargettarget:Hide()
+		self:SetNameplateVisible(self.Nameplates.targettargettarget, false)
 		self.Nameplates.targettargettarget:Disable()
 	end
 end
@@ -1252,7 +1254,7 @@ function ArcHUD:EventHandler(event, arg1)
 			if (UnitPowerType(arg1) == 0) then
 				info = { r = 0.00, g = 1.00, b = 1.00 }
 			else
-				info = PowerBarColor[UnitPowerType(arg1)]
+				info = PowerBarColor[UnitPowerType(arg1)] or { r = 1.00, g = 1.00, b = 1.00 }
 			end
 			self.TargetHUD.MPText:SetTextColor(info.r, info.g, info.b)
 		end

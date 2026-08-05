@@ -33,9 +33,9 @@ function module:Initialize()
 	
 	-- Create StatusBar arc for 12.0.0+ (Midnight)
 	if ArcHUD.isMidnight then
-		self.statusBarArc = self.parent:CreateStatusBarArc(self.f, self.name)
-		if self.statusBarArc then
-			self.statusBarArc:Hide() -- Hide by default
+		self.statusBar = self.parent:CreateStatusBar(self.f, self.name)
+		if self.statusBar then
+			self.statusBar:Hide() -- Hide by default
 			self.f:HideAllButOutline()
 		end
 	end
@@ -50,8 +50,8 @@ function module:OnModuleUpdate()
 		self.HPPerc:Hide()
 	end
 
-	if self.db.profile.Side and self.statusBarArc then
-		self.parent:UpdateStatusBarSide(self.statusBarArc, self.db.profile.Side)
+	if self.db.profile.Side and self.statusBar then
+		self.parent:UpdateStatusBarSide(self.statusBar, self.db.profile.Side)
 	end
 
 	if not self.db.profile.InnerAnchor then
@@ -96,24 +96,24 @@ function module:OnModuleEnable()
 			
 			if not maxHealthSecret and maxHealth > 0 then
 				-- Update StatusBar arc
-				if self.statusBarArc then
-					self.parent:UpdateStatusBarArcHealth(self.statusBarArc, self.unit)
+				if self.statusBar then
+					self.parent:UpdateStatusBarHealth(self.statusBar, self.unit)
 					-- Returns ColorMixin object (may contain secret values)
 					local color = self.parent:GetHealthColorFromUnit(self.unit)
-					self.parent:SetStatusBarArcColor(self.statusBarArc, color)
+					self.parent:SetStatusBarTextureColor(self.statusBar, color)
 				end
 				
 			-- Update text - display actual values, including secret values
 			self.HPPerc:SetText(self.parent:FormatHealthPercent(self.unit))
 			else
-				if self.statusBarArc then
-					self.statusBarArc:Hide()
+				if self.statusBar then
+					self.statusBar:Hide()
 				end
 				self.HPPerc:SetText("")
 			end
 		else
-			if self.statusBarArc then
-				self.statusBarArc:Hide()
+			if self.statusBar then
+				self.statusBar:Hide()
 			end
 			self.HPPerc:SetText("")
 		end
@@ -153,10 +153,10 @@ function module:UpdatePet(event, arg1)
 			self:UpdateColor()
 			
 			-- Update StatusBar arc
-			if self.statusBarArc then
-				self.parent:UpdateStatusBarArcHealth(self.statusBarArc, self.unit)
+			if self.statusBar then
+				self.parent:UpdateStatusBarHealth(self.statusBar, self.unit)
 				local r, g, b, a = self.parent:GetHealthColorFromUnit(self.unit)
-				self.parent:SetStatusBarArcColor(self.statusBarArc, r, g, b, a)
+				self.parent:SetStatusBarTextureColor(self.statusBar, r, g, b, a)
 			end
 			
 			-- Update text
@@ -169,8 +169,8 @@ function module:UpdatePet(event, arg1)
 				self.f:Show()
 			else
 				self.HPPerc:SetText("")
-				if self.statusBarArc then
-					self.statusBarArc:Hide()
+				if self.statusBar then
+					self.statusBar:Hide()
 				end
 				self.f:Hide()
 			end
@@ -191,8 +191,8 @@ function module:UpdatePet(event, arg1)
 		end
 	else
 		self.parent.PetIsInCombat = false
-		if self.statusBarArc then
-			self.statusBarArc:Hide()
+		if self.statusBar then
+			self.statusBar:Hide()
 		end
 		self.f:Hide()
 	end
@@ -210,10 +210,10 @@ function module:UpdateHealth(event, arg1)
 			-- Get percentage using safe API - display actual values
 			
 			-- Update StatusBar arc
-			if self.statusBarArc then
-				self.parent:UpdateStatusBarArcHealth(self.statusBarArc, self.unit)
+			if self.statusBar then
+				self.parent:UpdateStatusBarHealth(self.statusBar, self.unit)
 				local r, g, b, a = self.parent:GetHealthColorFromUnit(self.unit)
-				self.parent:SetStatusBarArcColor(self.statusBarArc, r, g, b, a)
+				self.parent:SetStatusBarTextureColor(self.statusBar, r, g, b, a)
 			end
 			
 			-- Color calculation (only if we can calculate)

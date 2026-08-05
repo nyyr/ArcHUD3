@@ -46,9 +46,9 @@ function module:Initialize()
 	
 	-- Create StatusBar arc for 12.0.0+ (Midnight)
 	if ArcHUD.isMidnight then
-		self.statusBarArc = self.parent:CreateStatusBarArc(self.f, self:GetName())
-		if self.statusBarArc then
-			self.statusBarArc:Hide() -- Hide by default
+		self.statusBar = self.parent:CreateStatusBar(self.f, self:GetName())
+		if self.statusBar then
+			self.statusBar:Hide() -- Hide by default
 			self.f:HideAllButOutline()
 		end
 	end
@@ -63,8 +63,8 @@ function module:OnModuleUpdate()
 		self.HPPerc:Hide()
 	end
 
-	if self.db.profile.Side and self.statusBarArc then
-		self.parent:UpdateStatusBarSide(self.statusBarArc, self.db.profile.Side)
+	if self.db.profile.Side and self.statusBar then
+		self.parent:UpdateStatusBarSide(self.statusBar, self.db.profile.Side)
 	end
 --[[
 	if (self.db.profile.Attach) then
@@ -127,20 +127,20 @@ function module:OnModuleEnable()
 		-- 12.0.0+ (Midnight): Initialize StatusBar arc
 		if not UnitExists(self.unit) then
 			self.HPPerc:SetText("")
-			if self.statusBarArc then
-				self.statusBarArc:Hide()
+			if self.statusBar then
+				self.statusBar:Hide()
 			end
 		else
 			-- Update StatusBar arc
-			if self.statusBarArc then
-				self.parent:UpdateStatusBarArcHealth(self.statusBarArc, self.unit)
+			if self.statusBar then
+				self.parent:UpdateStatusBarHealth(self.statusBar, self.unit)
 				-- Set color based on friend/foe
 				if UnitIsFriend("player", self.unit) then
 					local color = self.db.profile.ColorFriend
-					self.parent:SetStatusBarArcColor(self.statusBarArc, color.r, color.g, color.b, 1)
+					self.parent:SetStatusBarTextureColor(self.statusBar, color.r, color.g, color.b, 1)
 				else
 					local color = self.db.profile.ColorFoe
-					self.parent:SetStatusBarArcColor(self.statusBarArc, color.r, color.g, color.b, 1)
+					self.parent:SetStatusBarTextureColor(self.statusBar, color.r, color.g, color.b, 1)
 				end
 			end
 			
@@ -182,8 +182,8 @@ function module:PLAYER_TARGET_CHANGED()
 		if not UnitExists(self.unit) then
 			self.f.pulse = false
 			self.HPPerc:SetText("")
-			if self.statusBarArc then
-				self.statusBarArc:Hide()
+			if self.statusBar then
+				self.statusBar:Hide()
 			end
 			self.f:Hide()
 		else
@@ -193,31 +193,31 @@ function module:PLAYER_TARGET_CHANGED()
 			self.friend = false
 			if(UnitIsDead(self.unit)) then
 				self.f:GhostMode(false, self.unit)
-				if self.statusBarArc then
-					self.statusBarArc:Hide()
+				if self.statusBar then
+					self.statusBar:Hide()
 				end
 				self.HPPerc:SetText("Dead")
 			elseif(UnitIsGhost(self.unit)) then
 				self.f:GhostMode(true, self.unit)
-				if self.statusBarArc then
-					self.statusBarArc:Hide()
+				if self.statusBar then
+					self.statusBar:Hide()
 				end
 			else
 				self.f:GhostMode(false, self.unit)
 				
 				-- Update StatusBar arc
-				if self.statusBarArc then
-					self.parent:UpdateStatusBarArcHealth(self.statusBarArc, self.unit)
+				if self.statusBar then
+					self.parent:UpdateStatusBarHealth(self.statusBar, self.unit)
 					if UnitIsTapDenied(self.unit) then
-						self.parent:SetStatusBarArcColor(self.statusBarArc, 0.5, 0.5, 0.5, 1)
+						self.parent:SetStatusBarTextureColor(self.statusBar, 0.5, 0.5, 0.5, 1)
 						self.tapped = true
 					elseif (UnitIsFriend("player", self.unit)) then
 						local color = self.db.profile.ColorFriend
-						self.parent:SetStatusBarArcColor(self.statusBarArc, color.r, color.g, color.b, 1)
+						self.parent:SetStatusBarTextureColor(self.statusBar, color.r, color.g, color.b, 1)
 						self.friend = true
 					else
 						local color = self.db.profile.ColorFoe
-						self.parent:SetStatusBarArcColor(self.statusBarArc, color.r, color.g, color.b, 1)
+						self.parent:SetStatusBarTextureColor(self.statusBar, color.r, color.g, color.b, 1)
 					end
 				end
 				
@@ -273,32 +273,32 @@ function module:UpdateHealth(event, arg1)
 			-- 12.0.0+ (Midnight): Use StatusBar approach
 			if(UnitIsDead(self.unit)) then
 				self.f:GhostMode(false, self.unit)
-				if self.statusBarArc then
-					self.statusBarArc:Hide()
+				if self.statusBar then
+					self.statusBar:Hide()
 				end
 				self.HPPerc:SetText("Dead")
 			elseif(UnitIsGhost(self.unit)) then
 				self.f:GhostMode(true, self.unit)
-				if self.statusBarArc then
-					self.statusBarArc:Hide()
+				if self.statusBar then
+					self.statusBar:Hide()
 				end
 			else
 				self.f:GhostMode(false, self.unit)
 
 				-- Update StatusBar arc
-				if self.statusBarArc then
-					self.parent:UpdateStatusBarArcHealth(self.statusBarArc, self.unit)
+				if self.statusBar then
+					self.parent:UpdateStatusBarHealth(self.statusBar, self.unit)
 					-- Update color based on target status
 					if (not self.tapped and UnitIsTapDenied(self.unit)) then
-						self.parent:SetStatusBarArcColor(self.statusBarArc, 0.5, 0.5, 0.5, 1)
+						self.parent:SetStatusBarTextureColor(self.statusBar, 0.5, 0.5, 0.5, 1)
 						self.tapped = true
 					elseif(not self.friend and UnitIsFriend("player", self.unit)) then
 						local color = self.db.profile.ColorFriend
-						self.parent:SetStatusBarArcColor(self.statusBarArc, color.r, color.g, color.b, 1)
+						self.parent:SetStatusBarTextureColor(self.statusBar, color.r, color.g, color.b, 1)
 						self.friend = true
 					elseif(self.friend and not UnitIsFriend("player", self.unit)) then
 						local color = self.db.profile.ColorFoe
-						self.parent:SetStatusBarArcColor(self.statusBarArc, color.r, color.g, color.b, 1)
+						self.parent:SetStatusBarTextureColor(self.statusBar, color.r, color.g, color.b, 1)
 						self.friend = false
 					end
 				end
