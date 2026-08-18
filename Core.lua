@@ -608,7 +608,23 @@ function ArcHUD:TargetUpdate(event, arg1)
 
 		local addtolevel = ""
 		if(self.db.profile.ShowClass) then
-			addtolevel = " " .. (UnitIsPlayer("target") and UnitClass("target") or UnitCreatureFamily("target") or UnitCreatureType("target") or "Unknown")
+			-- these three are secret for restricted targets, and a secret can be
+			-- neither concatenated nor used in an "or" chain
+			local descriptor
+			if(UnitIsPlayer("target")) then
+				local className = UnitClass("target")
+				if(not self:IsSecretValue(className)) then descriptor = className end
+			else
+				local family = UnitCreatureFamily("target")
+				if(not self:IsSecretValue(family)) then
+					descriptor = family
+					if(not descriptor) then
+						local creatureType = UnitCreatureType("target")
+						if(not self:IsSecretValue(creatureType)) then descriptor = creatureType end
+					end
+				end
+			end
+			addtolevel = " " .. (descriptor or "Unknown")
 			self.TargetHUD.Level:SetJustifyH("CENTER")
 		else
 			self.TargetHUD.Level:SetJustifyH("CENTER")
@@ -680,10 +696,9 @@ function ArcHUD:TargetUpdate(event, arg1)
 
 		-- The name of the target should be colored differently if it's a player or if
 		--   it's a mob
-		local _, class = UnitClass("target")
-		local color = self.ClassColor[class]
+		local color = self:GetUnitClassColorHex("target")
 		local decoration_l, decoration_r = "", ""
-		if not self:IsSecretValue("target") and not self:IsSecretValue("focus") then
+		if self:CanCompareUnitTokens("target", "focus") then
 			local ok = pcall(function()
 				if UnitIsUnit("target", "focus") then
 					decoration_l = "|cffffffff>>|r "
@@ -691,24 +706,30 @@ function ArcHUD:TargetUpdate(event, arg1)
 				end
 			end)
 		end
-		if (color and UnitIsPlayer("target")) then
+		local name = UnitName("target")
+		if self:IsSecretValue(name) then
+			-- decorations and guild suffix are lost - can't concatenate a secret
+			self:SetSecretUnitName(self.TargetHUD.Name, "target", name)
+		elseif (color and UnitIsPlayer("target")) then
 			-- Is target in a guild?
 			local guild, _, _ = GetGuildInfo("target")
 
 			-- Color the target name based on class since we have a player targeted
-			if(guild and ArcHUD.db.profile.ShowGuild) then
-				self.TargetHUD.Name:SetText(decoration_l.."|cff"..color..UnitName("target").." <"..guild..">".."|r"..decoration_r)
+			self.TargetHUD.Name:SetTextColor(1, 1, 1)
+			if(not self:IsSecretValue(guild) and guild and ArcHUD.db.profile.ShowGuild) then
+				self.TargetHUD.Name:SetText(decoration_l.."|cff"..color..(name or "").." <"..guild..">".."|r"..decoration_r)
 			else
-				self.TargetHUD.Name:SetText(decoration_l.."|cff"..color..UnitName("target").."|r"..decoration_r)
+				self.TargetHUD.Name:SetText(decoration_l.."|cff"..color..(name or "").."|r"..decoration_r)
 			end
 		else
 			-- Color the target name based on reaction (red to green) since we have a
 			--   mob targeted
 			local reaction = self.RepColor[UnitReaction("target","player")]
+			self.TargetHUD.Name:SetTextColor(1, 1, 1)
 			if(reaction) then
-				self.TargetHUD.Name:SetText(decoration_l.."|cff"..reaction..UnitName("target").."|r"..decoration_r)
+				self.TargetHUD.Name:SetText(decoration_l.."|cff"..reaction..(name or "").."|r"..decoration_r)
 			else
-				self.TargetHUD.Name:SetText(decoration_l..UnitName("target")..decoration_r)
+				self.TargetHUD.Name:SetText(decoration_l..(name or "")..decoration_r)
 			end
 		end
 
@@ -986,10 +1007,13 @@ function ArcHUD:UpdateFaction(unit)
 
 	if(unit and unit == "target") then
 		local factionGroup = UnitFactionGroup("target")
+		-- secret for restricted targets, so check before the "and" chain
+		local isPVP = UnitIsPVP("target")
+		if(self:IsSecretValue(isPVP)) then isPVP = false end
 		if(UnitIsPVPFreeForAll("target")) then
 			self.TargetHUD.PVPIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-FFA")
 			self.TargetHUD.PVPIcon:Show()
-		elseif(factionGroup and UnitIsPVP("target") and factionGroup ~= "Neutral") then
+		elseif(factionGroup and isPVP and factionGroup ~= "Neutral") then
 			self.TargetHUD.PVPIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-"..factionGroup)
 			self.TargetHUD.PVPIcon:Show()
 		else
@@ -997,8 +1021,7 @@ function ArcHUD:UpdateFaction(unit)
 		end
 	else
 		local factionGroup, factionName = UnitFactionGroup("player");
-		local _, class = UnitClass("player")
-		local color = self.ClassColor[class]
+		local color = self:GetUnitClassColorHex("player")
 		if(self.db.profile.ShowPVP and UnitIsPVPFreeForAll("player")) then
 			if(not self.PVPEnabled) then
 				PlaySound(SOUNDKIT.IG_PVP_UPDATE)
@@ -1024,8 +1047,11 @@ end
 function ArcHUD:UpdateRaidTargetIcon()
 	if(not UnitExists("target")) then self.TargetHUD.RaidTargetIcon:Hide() return end
 
+	-- the index is always secret, so it can't be nil-tested - but nil is never
+	-- secret, so a secret index means a marker IS set. SetSpriteSheetCell (via
+	-- SetRaidTargetIconTexture) takes secrets.
 	local index = GetRaidTargetIndex("target")
-	if(index) then
+	if(self:IsSecretValue(index) or index) then
 		SetRaidTargetIconTexture(self.TargetHUD.RaidTargetIcon, index)
 		self.TargetHUD.RaidTargetIcon:Show()
 	else
@@ -1041,9 +1067,17 @@ function ArcHUD:PLAYER_FLAGS_CHANGED(unit)
 	if(not UnitExists("target")) then self.TargetHUD.LeaderIcon:Hide() return end
 
 	if(unit == "target") then
-		if(UnitIsGroupLeader("target")) then
+		-- can't branch on a secret, so stay shown and let SetAlphaFromBoolean
+		-- (which takes secrets) do the hiding
+		local isLeader = UnitIsGroupLeader("target")
+		if(self:IsSecretValue(isLeader)) then
+			self.TargetHUD.LeaderIcon:Show()
+			self.TargetHUD.LeaderIcon:SetAlphaFromBoolean(isLeader)
+		elseif(isLeader) then
+			self.TargetHUD.LeaderIcon:SetAlpha(1)
 			self.TargetHUD.LeaderIcon:Show()
 		else
+			self.TargetHUD.LeaderIcon:SetAlpha(1)
 			self.TargetHUD.LeaderIcon:Hide()
 		end
 	end
@@ -1101,24 +1135,28 @@ function ArcHUD:UpdateTargetTarget()
 
 	-- Handle Target's Target
 	if(UnitExists("targettarget") and self.db.profile.TargetTarget) then
-		local _, class = UnitClass("targettarget")
-		local color = self.ClassColor[class]
+		local color = self:GetUnitClassColorHex("targettarget")
 		local decoration = ""
-		if not self:IsSecretValue("targettarget") and not self:IsSecretValue("focus") then
+		if self:CanCompareUnitTokens("targettarget", "focus") then
 			local ok = pcall(function()
 				if UnitIsUnit("targettarget", "focus") then
 					decoration = "|cffffffff>|r "
 				end
 			end)
 		end
-		if (color and UnitIsPlayer("targettarget")) then
-				self.TargetHUD.Target.Name:SetText(decoration.."|cff"..color..UnitName("targettarget").."|r")
+		local name = UnitName("targettarget")
+		if self:IsSecretValue(name) then
+			self:SetSecretUnitName(self.TargetHUD.Target.Name, "targettarget", name)
+		elseif (color and UnitIsPlayer("targettarget")) then
+			self.TargetHUD.Target.Name:SetTextColor(1, 1, 1)
+			self.TargetHUD.Target.Name:SetText(decoration.."|cff"..color..(name or "").."|r")
 		else
 			local reaction = self.RepColor[UnitReaction("targettarget","player")]
+			self.TargetHUD.Target.Name:SetTextColor(1, 1, 1)
 			if(reaction) then
-				self.TargetHUD.Target.Name:SetText(decoration.."|cff"..reaction..UnitName("targettarget").."|r")
+				self.TargetHUD.Target.Name:SetText(decoration.."|cff"..reaction..(name or "").."|r")
 			else
-				self.TargetHUD.Target.Name:SetText(decoration..UnitName("targettarget"))
+				self.TargetHUD.Target.Name:SetText(decoration..(name or ""))
 			end
 		end
 
@@ -1127,7 +1165,7 @@ function ArcHUD:UpdateTargetTarget()
 			info = { r = 0.00, g = 1.00, b = 1.00 }
 		else
 			-- powerType can be nil (unit died/out of range) and PowerBarColor has
-			-- no entry for every type - fall back so info.r below is safe (#113)
+			-- no entry for every type - fall back so info.r below is safe
 			info = PowerBarColor[UnitPowerType("targettarget")] or { r = 1.00, g = 1.00, b = 1.00 }
 		end
 		self.TargetHUD.Target.MPText:SetTextColor(info.r, info.g, info.b)
@@ -1194,24 +1232,28 @@ function ArcHUD:UpdateTargetTarget()
 
 	-- Handle Target's Target's Target
 	if(UnitExists("targettargettarget") and self.db.profile.TargetTargetTarget) then
-		local _, class = UnitClass("targettargettarget")
-		local color = self.ClassColor[class]
+		local color = self:GetUnitClassColorHex("targettargettarget")
 		local decoration = ""
-		if not self:IsSecretValue("targettargettarget") and not self:IsSecretValue("focus") then
+		if self:CanCompareUnitTokens("targettargettarget", "focus") then
 			local ok = pcall(function()
 				if UnitIsUnit("targettargettarget", "focus") then
 					decoration = "|cffffffff>|r "
 				end
 			end)
 		end
-		if (color and UnitIsPlayer("targettargettarget")) then
-				self.TargetHUD.TargetTarget.Name:SetText(decoration.."|cff"..color..UnitName("targettargettarget").."|r")
+		local name = UnitName("targettargettarget")
+		if self:IsSecretValue(name) then
+			self:SetSecretUnitName(self.TargetHUD.TargetTarget.Name, "targettargettarget", name)
+		elseif (color and UnitIsPlayer("targettargettarget")) then
+			self.TargetHUD.TargetTarget.Name:SetTextColor(1, 1, 1)
+			self.TargetHUD.TargetTarget.Name:SetText(decoration.."|cff"..color..(name or "").."|r")
 		else
 			local reaction = self.RepColor[UnitReaction("targettargettarget","player")]
+			self.TargetHUD.TargetTarget.Name:SetTextColor(1, 1, 1)
 			if(reaction) then
-				self.TargetHUD.TargetTarget.Name:SetText(decoration.."|cff"..reaction..UnitName("targettargettarget").."|r")
+				self.TargetHUD.TargetTarget.Name:SetText(decoration.."|cff"..reaction..(name or "").."|r")
 			else
-				self.TargetHUD.TargetTarget.Name:SetText(decoration..UnitName("targettargettarget"))
+				self.TargetHUD.TargetTarget.Name:SetText(decoration..(name or ""))
 			end
 		end
 
@@ -1313,11 +1355,6 @@ end
 -- Event Handler
 ----------------------------------------------
 function ArcHUD:EventHandler(event, arg1)
-	local class = nil
-	if (arg1 and type(arg1) == "string") then
-		_, class = UnitClass(arg1)
-	end
-
 	if (event == "UNIT_DISPLAYPOWER") then
 		local info = {}
 		if (arg1 == "target") then

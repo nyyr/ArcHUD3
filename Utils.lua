@@ -136,6 +136,68 @@ function ArcHUD:CanAccessValue(value)
 	return not self:IsSecretValue(value)
 end
 
+----------------------------------------------
+-- Secret-safe unit identity helpers
+--
+-- UnitClass/CreatureFamily/CreatureType/IsPVP/IsGroupLeader and UnitName return
+-- secrets for units outside the party/raid. A secret can only be passed into a
+-- permitted setter - indexing a table with it, concatenating it or testing it
+-- for truth all error. nil is never secret, so IsSecretValue(v) also proves
+-- v ~= nil. UnitReaction/UnitIsPlayer/UnitLevel are never secret.
+----------------------------------------------
+
+-- UnitIsUnit returns a secret bool when comparison is restricted, so ask first
+function ArcHUD:CanCompareUnitTokens(unit1, unit2)
+	if not ArcHUD.isMidnight then return true end
+	if C_Secrets and C_Secrets.CanCompareUnitTokens then
+		return C_Secrets.CanCompareUnitTokens(unit1, unit2)
+	end
+	return true
+end
+
+-- "RRGGBB" -> three 0-1 components
+function ArcHUD:HexToRGB(hex)
+	if type(hex) ~= "string" or #hex < 6 then return 1, 1, 1 end
+	local r = tonumber(strsub(hex, 1, 2), 16) or 255
+	local g = tonumber(strsub(hex, 3, 4), 16) or 255
+	local b = tonumber(strsub(hex, 5, 6), 16) or 255
+	return r / 255, g / 255, b / 255
+end
+
+-- Class colour hex for a unit, or nil when the class cannot be read
+function ArcHUD:GetUnitClassColorHex(unit)
+	local _, class = UnitClass(unit)
+	if self:IsSecretValue(class) then return nil end
+	if not class then return nil end
+	return self.ClassColor[class]
+end
+
+-- SetText takes a secret name untouched, but no |cff.. escape can be built
+-- around it, so the colour goes on the FontString instead
+function ArcHUD:SetSecretUnitName(fontString, unit, name)
+	if not fontString then return end
+
+	fontString:SetText(name)
+
+	-- GetClassColor accepts a secret class and returns a readable ColorMixin
+	-- whose r/g/b are secret, which is exactly what SetTextColor takes
+	if UnitIsPlayer(unit) and C_ClassColor and C_ClassColor.GetClassColor then
+		local _, class = UnitClass(unit)
+		local color = C_ClassColor.GetClassColor(class)
+		if color then
+			fontString:SetTextColor(color.r, color.g, color.b)
+			return
+		end
+	end
+
+	local hex = self.RepColor[UnitReaction(unit, "player")]
+	if hex then
+		fontString:SetTextColor(self:HexToRGB(hex))
+	else
+		fontString:SetTextColor(1, 1, 1)
+	end
+end
+
 -- Get health percentage using UnitHealthPercent API (0-1.0 range)
 -- Returns usable percentage even with secret values
 function ArcHUD:GetHealthPercent(unit, usePredicted)
