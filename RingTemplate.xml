@@ -83,6 +83,14 @@
 				<OnLoad>
 					self.ring = self:GetParent();
 				</OnLoad>
+				<OnUpdate>
+					-- Midnight StatusBars are parented to ArcHUDFrame rather than
+					-- the ring, so the ring's alpha animation does not cascade to
+					-- them. Mirror the animated alpha on every frame.
+					if (ArcHUD.isMidnight and self.ring.statusBar) then
+						self.ring.statusBar:SetAlpha(self.ring:GetAlpha());
+					end
+				</OnUpdate>
 				<OnPlay>
 					if (not self.ring.fillUpdate:IsPlaying()) then
 						self.ring.fillUpdate:Play();
@@ -104,7 +112,11 @@
 						self.ring = self:GetParent():GetParent();
 					</OnLoad>
 					<OnUpdate>
-						self.ring:SetAlpha(0.6 + math.cos(GetTime() * 3.14159265) * 0.3);
+						local alpha = 0.6 + math.cos(GetTime() * 3.14159265) * 0.3;
+						self.ring:SetAlpha(alpha);
+						if (ArcHUD.isMidnight and self.ring.statusBar) then
+							self.ring.statusBar:SetAlpha(alpha);
+						end
 					</OnUpdate>
 					<!--
 						No OnFinished here. This group is looping="REPEAT", so a child

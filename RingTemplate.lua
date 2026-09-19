@@ -1073,6 +1073,16 @@ function ArcHUDRingTemplate:DoFadeUpdate(tdelta)
 		self:UpdateHook(tdelta)
 	end
 	
+	-- 12.0.0+ (Midnight): ease the StatusBar arc's native radial-progress fill
+	-- toward whatever percent was last handed to sb:SetValue(pct, interpolation)
+	-- in UpdateStatusBarHealth/UpdateStatusBarPower. The StatusBar is the sole
+	-- value renderer in this mode, so do not continue into the legacy quadrant
+	-- animation below, even when the stored ring values happen to be public.
+	if ArcHUD.isMidnight and self.statusBar then
+		ArcHUD:RefreshStatusBarArc(self.statusBar)
+		return
+	end
+	
 	-- Check if values are secret (12.0.0+)
 	local startValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(self.startValue)
 	local endValueSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(self.endValue)
@@ -1187,7 +1197,7 @@ function ArcHUDRingTemplate:applyAlpha_OnFinished()
 	local curAlpha = self:GetAlpha()
 	-- Check if curAlpha is a secret value (12.0.0+)
 	local curAlphaSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(curAlpha)
-	
+
 	-- Sync StatusBar alpha if it exists (Midnight mode)
 	if ArcHUD.isMidnight and self.statusBar then
 		self.statusBar:SetAlpha(curAlpha)
