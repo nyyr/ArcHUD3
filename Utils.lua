@@ -350,57 +350,6 @@ function ArcHUD:FormatPowerText(unit, powerType)
 	return powerStr .. "/" .. maxPowerStr
 end
 
--- Create arc fill curve for StatusBar (global, created once)
--- Maps 0-1 percentages to vertical fill amounts that match arc geometry
-function ArcHUD:CreateArcFillCurve()
-	if not ArcHUD.isMidnight or not C_CurveUtil then return nil end
-
-	-- Return cached curve if it already exists
-	if self.arcFillCurve then return self.arcFillCurve end
-
-	local curveType = Enum.LuaCurveType or Enum.CurveType
-	if not curveType then return nil end
-
-	local curve = C_CurveUtil.CreateCurve(curveType.Linear)
-	if not curve then return nil end
-
-	local ringFactor = 0.94 -- matches ArcHUD default
-	local steps = 180 -- number of curve points for smooth mapping
-
-	curve:AddPoint(0, 0) -- explicitly specify 0,0
-	for i = 1, steps-1 do
-		local percent = i / steps
-		local angle_degrees = percent * 180 -- arc covers 180 degrees
-		local angle_radians = math.rad(angle_degrees)
-		local cos_a = math.cos(angle_radians)
-
-		-- Calculate correction factor (from DoQuadrant)
-		local corr1 = cos_a / 128
-
-		-- Calculate outer and inner Y positions
-		local Oy = cos_a
-		local Iy = Oy * ringFactor - corr1
-
-		-- Center Y between inner and outer edges
-		local center_y = (Iy + Oy) / 2
-
-		-- Normalize to 0-1 range (Oy ranges from 1 to -1, so shift and scale)
-		-- At 0%: center_y = (1*0.94 - 1/128 + 1) / 2 = ~0.97 -> map to 0
-		-- At 100%: center_y = (-1*0.94 - (-1)/128 + -1) / 2 = ~-0.97 -> map to 1
-		local normalized_y = (-center_y + 1) / 2 -- flip and normalize
-
-		-- Ensure within 0-1 bounds
-		normalized_y = math.max(0, math.min(1, normalized_y))
-
-		curve:AddPoint(percent, normalized_y)
-	end
-	curve:AddPoint(1, 1) -- explicitly specify 1,1
-
-	-- Cache the curve globally
-	self.arcFillCurve = curve
-	return curve
-end
-
 -- Create zero alpha curve for hiding elements when value is 0 (global, created once)
 -- Maps secret values directly to alpha: 0 = 0 alpha, >= 0.0001 = 1 alpha
 function ArcHUD:CreateZeroAlphaCurve()
@@ -494,41 +443,13 @@ end
 -- StatusBar Arc System (12.0.0+)
 ----------------------------------------------
 
--- Half-plane mask used for angular arc fill: left half opaque, right half clear,
--- boundary through the texture centre so rotation pivots on the ring centre.
-local ARC_HALF_MASK = "Interface\\AddOns\\ArcHUD3\\Icons\\ArcHalfMask.png"
-
--- Build the fill-mask rotation curve for a side. The whole mapping is baked into
--- the curve because the fraction arrives as a secret and cannot be arithmetic'd.
---
--- Rotation theta = how far the opaque half is turned from "opaque left":
---   0 -> opaque left, pi/2 -> opaque down, pi -> opaque right, 3pi/2 -> opaque up
---
--- LEFT arc runs bottom -> left -> top, and lies left of its start radius, so the
--- start mask is 0 (opaque left) and the fill boundary must sweep
---   f=0 -> pi (opaque right, nothing)   f=0.5 -> pi/2 (opaque down)   f=1 -> 0
--- i.e. DESCENDING.
---
--- RIGHT arc is mirrored: it lies right of its start radius, so the start mask is
--- pi (opaque right) and the fill boundary sweeps
---   f=0 -> 0 (opaque left, nothing)     f=0.5 -> pi/2 (opaque down)   f=1 -> pi
--- i.e. ASCENDING. Using the left arc's descending curve with a +pi offset gives
--- the right endpoints but passes through opaque-UP at half, which fills the right
--- arc from the top down.
-function ArcHUD:CreateArcRotationCurve(side)
-	if not ArcHUD.isMidnight or not C_CurveUtil then return nil end
-	local curveType = Enum.LuaCurveType or Enum.CurveType
-	if not curveType then return nil end
-	local curve = C_CurveUtil.CreateCurve(curveType.Linear)
-	if not curve then return nil end
-	if side == 2 then
-		curve:AddPoint(0, 0)
-		curve:AddPoint(1, math.pi)
-	else
-		curve:AddPoint(0, math.pi)
-		curve:AddPoint(1, 0)
-	end
-	return curve
+-- StatusBar:SetValue(value, interpolation) added a secret-safe interpolation
+-- argument in 12.0.0 (SecretArgumentsAddAspect) - the engine then animates
+-- GetInterpolatedValue()/IsInterpolating() toward it on its own, with no Lua
+-- arithmetic on the (possibly secret) percent required. Reuse that as the
+-- animation clock for the arc fill below.
+local function GetSmoothInterpolation()
+	return Enum.StatusBarInterpolation and Enum.StatusBarInterpolation.ExponentialEaseOut or nil
 end
 
 -- Create a StatusBar-based arc for a ring frame
@@ -553,34 +474,22 @@ function ArcHUD:CreateStatusBar(parent, moduleName)
 	-- Store reference to parent ring for positioning
 	sb.parentRing = parent
 
-	-- Angular fill (see UpdateStatusBarSide / SetStatusBarArcFraction).
+	-- Angular fill (see UpdateStatusBarSide / RefreshStatusBarArc).
 	--
 	-- A StatusBar fill always cuts horizontally, but the correct arc edge is
 	-- RADIAL; the two only coincide at the arc's midpoint, so the ends looked
-	-- wrong ("flat tips"). Instead of the bar's own fill, draw the full arc and
-	-- cut it with two half-plane masks whose intersection is the filled wedge:
-	-- one pinned to the arc's start radius, one rotated to the fill radius.
-	--
-	-- Rotation pivots on a texture's centre, so the mask's opaque/transparent
-	-- boundary has to pass through its centre - hence Icons/ArcHalfMask.png.
-	-- The fraction reaches SetRotation straight out of a curve, so no secret is
-	-- ever read, and the rotation offset for the side is baked INTO the curve
-	-- (adding it in Lua would be arithmetic on a secret and throws).
+	-- wrong ("flat tips"). SetRadialProgressBarPercent() (added Patch 12.1.0)
+	-- solves that natively and is secret-safe (AllowedWhenTainted), so the
+	-- (possibly secret) eased percent from sb:GetInterpolatedValue() can be fed
+	-- straight into it every frame with no CurveObject:Evaluate() or manual
+	-- rotation math needed. arcFill draws the ring artwork at its natural,
+	-- unstretched size, matching the StatusBar's own box.
 	sb.arcFill = sb:CreateTexture(nil, "ARTWORK")
-	sb.maskStart = sb:CreateMaskTexture()
-	sb.maskFill = sb:CreateMaskTexture()
-	sb.maskStart:SetTexture(ARC_HALF_MASK)
-	sb.maskFill:SetTexture(ARC_HALF_MASK)
-	sb.arcFill:AddMaskTexture(sb.maskStart)
-	sb.arcFill:AddMaskTexture(sb.maskFill)
 
 	self:UpdateStatusBarSide(sb, side)
 
-	-- Kept for callers that still want a percentage mapped onto arc geometry
-	sb.arcFillCurve = self:CreateArcFillCurve()
-
 	sb:SetMinMaxValues(0, 1)
-	sb:SetValue(1) -- the masks do the filling now, not the bar
+	sb:SetValue(0) -- starts empty; RefreshStatusBarArc mirrors this onto arcFill
 	sb:SetOrientation("VERTICAL")
 
 	-- StatusBar inherits parent's scale automatically via SetAllPoints
@@ -602,22 +511,17 @@ function ArcHUD:UpdateStatusBarSide(sb, side)
 	if sb.parentRing.module and sb.parentRing.module.db and sb.parentRing.module.db.profile and sb.parentRing.module.db.profile.InnerAnchor then
 		radius = radius * 0.6
 	end
-	if side == 1 then
-		sb:SetPoint("TOPLEFT", sb.parentRing, "BOTTOMLEFT", -radius, radius)
-		sb:SetPoint("BOTTOMRIGHT", sb.parentRing, "BOTTOMLEFT", 0, -radius)
-		sb:SetPoint("TOPRIGHT", sb.parentRing, "BOTTOMLEFT", 0, radius)
-		sb:SetPoint("BOTTOMLEFT", sb.parentRing, "BOTTOMLEFT", -radius, -radius)
-	elseif side == 2 then
-	 	sb:SetPoint("TOPLEFT", sb.parentRing, "BOTTOMLEFT", 0, radius)
-	 	sb:SetPoint("BOTTOMLEFT", sb.parentRing, "BOTTOMLEFT", 0, -radius)
-		sb:SetPoint("TOPRIGHT", sb.parentRing, "BOTTOMLEFT", radius, radius)
-		sb:SetPoint("BOTTOMRIGHT", sb.parentRing, "BOTTOMLEFT", radius, -radius)
-	end
+	-- Radial progress uses the texture's square coordinate space. Centre the
+	-- square on the ring's centre; the transparent half of the selected radial
+	-- texture leaves only the requested left or right half visible.
+	sb:SetPoint("CENTER", sb.parentRing, "BOTTOMLEFT")
+	sb:SetSize(radius * 2, radius * 2)
 
-	-- Use the original ArcHUD arc texture directly
-	local texturePath = "Interface\\AddOns\\ArcHUD3\\Icons\\RingFullLeft.png"
+	-- Use the square radial texture directly. Each asset contains the original
+	-- half-ring at natural size and transparent pixels on the opposite half.
+	local texturePath = "Interface\\AddOns\\ArcHUD3\\Icons\\RingLeftRadial.png"
 	if side == 2 then
-		texturePath = "Interface\\AddOns\\ArcHUD3\\Icons\\RingFullRight.png"
+		texturePath = "Interface\\AddOns\\ArcHUD3\\Icons\\RingRightRadial.png"
 	end
 
 	sb:SetStatusBarTexture(texturePath)
@@ -632,79 +536,58 @@ function ArcHUD:UpdateStatusBarSide(sb, side)
 	sb.arcFill:SetAllPoints(sb)
 	sb.arcFill:Show()
 
-	-- The ring centre is the arc rect's inner edge at mid height; both masks pivot
-	-- there. Oversized so the kept half always covers the whole arc.
-	local centreAnchor = (side == 1) and "RIGHT" or "LEFT"
-	for _, m in ipairs({ sb.maskStart, sb.maskFill }) do
-		m:ClearAllPoints()
-		m:SetSize(radius * 3, radius * 3)
-		m:SetPoint("CENTER", sb, centreAnchor)
-		m:Show()
-	end
-
-	-- The start mask is pinned to the arc's start radius, keeping the side the arc
-	-- lies on: left arc -> opaque left (0), right arc -> opaque right (pi).
-	sb.startRot = (side == 1) and 0 or math.pi
-	sb.emptyRot = (side == 1) and math.pi or 0
-	sb.rotCurve = self:CreateArcRotationCurve(side)
-
-	sb.maskStart:SetRotation(sb.startRot)
-	sb.maskFill:SetRotation(sb.emptyRot) -- starts empty
+	-- Both arcs are a half-circle (180 degrees) running bottom -> (side) -> top.
+	-- SetRadialProgressBar*Offset are normalized 0-1 around the full circle with
+	-- 0 at the bottom; the default (non-reversed) fill direction sweeps
+	-- clockwise from the bottom, which passes through the LEFT side first, so
+	-- side 1 (left arc, bottom -> left -> top) uses Reverse=false, and side 2
+	-- (right arc, bottom -> right -> top) mirrors that with Reverse=true. These
+	-- are static, literal values (never secret) - unlike SetRadialProgressBarPercent
+	-- they are AllowedWhenUntainted-only, so they must only ever be set here
+	-- during setup, never per-frame with unit data.
+	sb.arcFill:SetRadialProgressBarStartOffset(0)
+	sb.arcFill:SetRadialProgressBarEndOffset(0.5)
+	sb.arcFill:SetRadialProgressBarReverse(side == 2)
+	sb.arcFill:SetRadialProgressBarPercent(0) -- starts empty
 end
 
--- Drive the arc's angular fill. fraction may be a SECRET straight from
--- UnitHealthPercent/UnitPowerPercent evaluated through sb.rotCurve - it is passed
--- to SetRotation untouched, never compared or arithmetic'd.
-function ArcHUD:SetStatusBarArcFraction(sb, rotation)
-	if not sb or not sb.maskFill then return end
-	if rotation == nil then return end
-	sb.maskFill:SetRotation(rotation)
+-- Called every frame (from ArcHUDRingTemplate:DoFadeUpdate) while a Midnight
+-- StatusBar arc is showing, and once immediately from UpdateStatusBarHealth/
+-- UpdateStatusBarPower. sb:GetInterpolatedValue() reads back wherever the
+-- engine's own SetValue(pct, interpolation) animation currently eased to (may
+-- be secret) and hands it straight to arcFill's SetRadialProgressBarPercent(),
+-- which is natively secret-safe (AllowedWhenTainted, SecretArgumentsAddAspect).
+-- So the arc genuinely eases toward each new health/power value every frame
+-- with no Lua arithmetic and no CurveObject:Evaluate() (documented
+-- AllowedWhenUntainted only - throws if given a secret from addon/tainted
+-- code) ever involved.
+function ArcHUD:RefreshStatusBarArc(sb)
+	if not ArcHUD.isMidnight or not sb or not sb.arcFill then return end
+	local interpolated = sb:GetInterpolatedValue()
+	if interpolated == nil then return end
+	sb.arcFill:SetRadialProgressBarPercent(interpolated)
 end
 
 -- Update StatusBar arc value from unit health
 -- Can accept secret values directly for SetValue
 function ArcHUD:UpdateStatusBarHealth(sb, unit)
-	if not ArcHUD.isMidnight or not sb then return end
+	if not ArcHUD.isMidnight or not sb or not sb.arcFill or not UnitHealthPercent then return end
 
-	if sb.rotCurve and UnitHealthPercent then
-		-- Angular fill: evaluate straight through the rotation curve so the secret
-		-- goes into SetRotation without ever being read.
-		self:SetStatusBarArcFraction(sb, UnitHealthPercent(unit, true, sb.rotCurve))
-		sb:Show()
-		return
-	end
-
-	-- Fallback: bar fill (no mask support)
-	local pct
-	if UnitHealthPercent then
-		pct = UnitHealthPercent(unit, true, sb.arcFillCurve)
-	else
-		pct = self:GetHealthPercent(unit)
-	end
-	sb:SetValue(pct)
+	-- Feed the raw (possibly secret) percent into the StatusBar's own
+	-- interpolation engine; RefreshStatusBarArc() eases arcFill's radial
+	-- progress toward it every frame from the fillUpdate ticker.
+	sb:SetValue(UnitHealthPercent(unit, true), GetSmoothInterpolation())
+	self:RefreshStatusBarArc(sb)
 	sb:Show()
 end
 
 -- Update StatusBar arc value from unit power
 -- Can accept secret values directly for SetValue
 function ArcHUD:UpdateStatusBarPower(sb, unit, powerType)
-	if not ArcHUD.isMidnight or not sb then return end
+	if not ArcHUD.isMidnight or not sb or not sb.arcFill or not UnitPowerPercent then return end
 
-	if sb.rotCurve and UnitPowerPercent then
-		self:SetStatusBarArcFraction(sb,
-			UnitPowerPercent(unit, powerType, false, sb.rotCurve))
-		sb:Show()
-		return
-	end
-
-	-- Fallback: bar fill (no mask support)
-	local pct
-	if UnitPowerPercent then
-		pct = UnitPowerPercent(unit, powerType, false, sb.arcFillCurve)
-	else
-		pct = self:GetPowerPercent(unit, powerType)
-	end
-	sb:SetValue(pct)
+	sb:SetValue(UnitPowerPercent(unit, powerType, false), GetSmoothInterpolation())
+	self:RefreshStatusBarArc(sb)
 	sb:Show()
 end
 
