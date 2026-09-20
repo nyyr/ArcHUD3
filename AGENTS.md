@@ -51,4 +51,6 @@ Guidance for AI agents working in this repository. ArcHUD3 is a World of Warcraf
 
 ## Domain knowledge
 
-For general WoW addon development practices (TOC format, SavedVariables load order, Ace3 conventions, taint/secure-template rules, Midnight 12.0 secret-values migration, debugging via BugSack, packaging/distribution), consult the `wow-addon-dev` skill at `/home/denis/devel/wow/wow-addon-dev/SKILL.md` before making non-trivial changes — it documents the exact gotchas (event registration order, combat lockdown, addon-message limits, Interface version bumps) relevant to a multi-edition Ace3 addon like this one.
+For general WoW addon development practices (TOC format, SavedVariables load order, Ace3 conventions, taint/secure-template rules, Midnight 12.0 secret-values migration, debugging via BugSack, packaging/distribution), consult the `wow-addon-dev` skill at `https://github.com/TheMizeGuy/wow-addon-dev/blob/main/SKILL.md` before making non-trivial changes — it documents the exact gotchas (event registration order, combat lockdown, addon-message limits, Interface version bumps) relevant to a multi-edition Ace3 addon like this one.
+
+For recent changes of patch 12.1, consult https://warcraft.wiki.gg/wiki/Patch_12.1.0/API_changes
