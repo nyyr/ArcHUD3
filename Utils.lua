@@ -350,57 +350,6 @@ function ArcHUD:FormatPowerText(unit, powerType)
 	return powerStr .. "/" .. maxPowerStr
 end
 
--- Create arc fill curve for StatusBar (global, created once)
--- Maps 0-1 percentages to vertical fill amounts that match arc geometry
-function ArcHUD:CreateArcFillCurve()
-	if not ArcHUD.isMidnight or not C_CurveUtil then return nil end
-
-	-- Return cached curve if it already exists
-	if self.arcFillCurve then return self.arcFillCurve end
-
-	local curveType = Enum.LuaCurveType or Enum.CurveType
-	if not curveType then return nil end
-
-	local curve = C_CurveUtil.CreateCurve(curveType.Linear)
-	if not curve then return nil end
-
-	local ringFactor = 0.94 -- matches ArcHUD default
-	local steps = 180 -- number of curve points for smooth mapping
-
-	curve:AddPoint(0, 0) -- explicitly specify 0,0
-	for i = 1, steps-1 do
-		local percent = i / steps
-		local angle_degrees = percent * 180 -- arc covers 180 degrees
-		local angle_radians = math.rad(angle_degrees)
-		local cos_a = math.cos(angle_radians)
-
-		-- Calculate correction factor (from DoQuadrant)
-		local corr1 = cos_a / 128
-
-		-- Calculate outer and inner Y positions
-		local Oy = cos_a
-		local Iy = Oy * ringFactor - corr1
-
-		-- Center Y between inner and outer edges
-		local center_y = (Iy + Oy) / 2
-
-		-- Normalize to 0-1 range (Oy ranges from 1 to -1, so shift and scale)
-		-- At 0%: center_y = (1*0.94 - 1/128 + 1) / 2 = ~0.97 -> map to 0
-		-- At 100%: center_y = (-1*0.94 - (-1)/128 + -1) / 2 = ~-0.97 -> map to 1
-		local normalized_y = (-center_y + 1) / 2 -- flip and normalize
-
-		-- Ensure within 0-1 bounds
-		normalized_y = math.max(0, math.min(1, normalized_y))
-
-		curve:AddPoint(percent, normalized_y)
-	end
-	curve:AddPoint(1, 1) -- explicitly specify 1,1
-
-	-- Cache the curve globally
-	self.arcFillCurve = curve
-	return curve
-end
-
 -- Create zero alpha curve for hiding elements when value is 0 (global, created once)
 -- Maps secret values directly to alpha: 0 = 0 alpha, >= 0.0001 = 1 alpha
 function ArcHUD:CreateZeroAlphaCurve()
@@ -539,9 +488,6 @@ function ArcHUD:CreateStatusBar(parent, moduleName)
 
 	self:UpdateStatusBarSide(sb, side)
 
-	-- Kept for the fallback (non-angular) bar-fill path below.
-	sb.arcFillCurve = self:CreateArcFillCurve()
-
 	sb:SetMinMaxValues(0, 1)
 	sb:SetValue(0) -- starts empty; RefreshStatusBarArc mirrors this onto arcFill
 	sb:SetOrientation("VERTICAL")
@@ -625,51 +571,23 @@ end
 -- Update StatusBar arc value from unit health
 -- Can accept secret values directly for SetValue
 function ArcHUD:UpdateStatusBarHealth(sb, unit)
-	if not ArcHUD.isMidnight or not sb then return end
+	if not ArcHUD.isMidnight or not sb or not sb.arcFill or not UnitHealthPercent then return end
 
-	if sb.arcFill and UnitHealthPercent then
-		-- Feed the raw (possibly secret) percent into the StatusBar's own
-		-- interpolation engine; RefreshStatusBarArc() eases arcFill's radial
-		-- progress toward it every frame from the fillUpdate ticker.
-		sb:SetValue(UnitHealthPercent(unit, true), GetSmoothInterpolation())
-		self:RefreshStatusBarArc(sb)
-		sb:Show()
-		return
-	end
-
-	-- Fallback: bar fill (no angular arc support) - SetValue's interpolation
-	-- argument smooths this natively too.
-	local pct
-	if UnitHealthPercent then
-		pct = UnitHealthPercent(unit, true, sb.arcFillCurve)
-	else
-		pct = self:GetHealthPercent(unit)
-	end
-	sb:SetValue(pct, GetSmoothInterpolation())
+	-- Feed the raw (possibly secret) percent into the StatusBar's own
+	-- interpolation engine; RefreshStatusBarArc() eases arcFill's radial
+	-- progress toward it every frame from the fillUpdate ticker.
+	sb:SetValue(UnitHealthPercent(unit, true), GetSmoothInterpolation())
+	self:RefreshStatusBarArc(sb)
 	sb:Show()
 end
 
 -- Update StatusBar arc value from unit power
 -- Can accept secret values directly for SetValue
 function ArcHUD:UpdateStatusBarPower(sb, unit, powerType)
-	if not ArcHUD.isMidnight or not sb then return end
+	if not ArcHUD.isMidnight or not sb or not sb.arcFill or not UnitPowerPercent then return end
 
-	if sb.arcFill and UnitPowerPercent then
-		sb:SetValue(UnitPowerPercent(unit, powerType, false), GetSmoothInterpolation())
-		self:RefreshStatusBarArc(sb)
-		sb:Show()
-		return
-	end
-
-	-- Fallback: bar fill (no angular arc support) - SetValue's interpolation
-	-- argument smooths this natively too.
-	local pct
-	if UnitPowerPercent then
-		pct = UnitPowerPercent(unit, powerType, false, sb.arcFillCurve)
-	else
-		pct = self:GetPowerPercent(unit, powerType)
-	end
-	sb:SetValue(pct, GetSmoothInterpolation())
+	sb:SetValue(UnitPowerPercent(unit, powerType, false), GetSmoothInterpolation())
+	self:RefreshStatusBarArc(sb)
 	sb:Show()
 end
 
