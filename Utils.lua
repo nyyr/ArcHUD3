@@ -579,8 +579,8 @@ function ArcHUD:CreateStatusBar(parent, moduleName)
 	-- Kept for callers that still want a percentage mapped onto arc geometry
 	sb.arcFillCurve = self:CreateArcFillCurve()
 
-	sb:SetMinMaxValues(0, 1)
-	sb:SetValue(1) -- the masks do the filling now, not the bar
+	sb:SetMinMaxValues(0, math.pi)
+	sb:SetValue(sb.emptyRot) -- the masks do the filling now, not the bar
 	sb:SetOrientation("VERTICAL")
 
 	-- StatusBar inherits parent's scale automatically via SetAllPoints
@@ -650,6 +650,14 @@ function ArcHUD:UpdateStatusBarSide(sb, side)
 
 	sb.maskStart:SetRotation(sb.startRot)
 	sb.maskFill:SetRotation(sb.emptyRot) -- starts empty
+
+	-- Keep the StatusBar's value in sync with the mask. The native fill is
+	-- hidden, but its interpolated value provides a secret-safe animation
+	-- source for the angular mask.
+	sb.interpolation = Enum.StatusBarInterpolation.ExponentialEaseOut
+	sb:SetScript("OnUpdate", function(statusBar)
+		statusBar.maskFill:SetRotation(statusBar:GetInterpolatedValue())
+	end)
 end
 
 -- Drive the arc's angular fill. fraction may be a SECRET straight from
@@ -666,22 +674,10 @@ end
 function ArcHUD:UpdateStatusBarHealth(sb, unit)
 	if not ArcHUD.isMidnight or not sb then return end
 
-	if sb.rotCurve and UnitHealthPercent then
-		-- Angular fill: evaluate straight through the rotation curve so the secret
-		-- goes into SetRotation without ever being read.
-		self:SetStatusBarArcFraction(sb, UnitHealthPercent(unit, true, sb.rotCurve))
-		sb:Show()
-		return
-	end
-
-	-- Fallback: bar fill (no mask support)
-	local pct
-	if UnitHealthPercent then
-		pct = UnitHealthPercent(unit, true, sb.arcFillCurve)
-	else
-		pct = self:GetHealthPercent(unit)
-	end
-	sb:SetValue(pct)
+	-- SetValue owns the interpolation; OnUpdate reads its interpolated value
+	-- and passes the secret rotation directly to the mask texture.
+	local rotation = UnitHealthPercent(unit, true, sb.rotCurve)
+	sb:SetValue(rotation, sb.interpolation)
 	sb:Show()
 end
 
@@ -690,21 +686,10 @@ end
 function ArcHUD:UpdateStatusBarPower(sb, unit, powerType)
 	if not ArcHUD.isMidnight or not sb then return end
 
-	if sb.rotCurve and UnitPowerPercent then
-		self:SetStatusBarArcFraction(sb,
-			UnitPowerPercent(unit, powerType, false, sb.rotCurve))
-		sb:Show()
-		return
-	end
-
-	-- Fallback: bar fill (no mask support)
-	local pct
-	if UnitPowerPercent then
-		pct = UnitPowerPercent(unit, powerType, false, sb.arcFillCurve)
-	else
-		pct = self:GetPowerPercent(unit, powerType)
-	end
-	sb:SetValue(pct)
+	-- SetValue owns the interpolation; OnUpdate reads its interpolated value
+	-- and passes the secret rotation directly to the mask texture.
+	local rotation = UnitPowerPercent(unit, powerType, false, sb.rotCurve)
+	sb:SetValue(rotation, sb.interpolation)
 	sb:Show()
 end
 
