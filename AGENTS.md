@@ -54,3 +54,18 @@ Guidance for AI agents working in this repository. ArcHUD3 is a World of Warcraf
 For general WoW addon development practices (TOC format, SavedVariables load order, Ace3 conventions, taint/secure-template rules, Midnight 12.0 secret-values migration, debugging via BugSack, packaging/distribution), consult the `wow-addon-dev` skill at `https://github.com/TheMizeGuy/wow-addon-dev/blob/main/SKILL.md` before making non-trivial changes — it documents the exact gotchas (event registration order, combat lockdown, addon-message limits, Interface version bumps) relevant to a multi-edition Ace3 addon like this one.
 
 For recent changes of patch 12.1, consult https://warcraft.wiki.gg/wiki/Patch_12.1.0/API_changes
+
+## Local dev environment (working notes)
+
+- **Live test install**: `C:\Program Files (x86)\World of Warcraft\<branch>\Interface\AddOns\ArcHUD3`, where `<branch>` is either `_ptr_` or `_retail_` — **ask which one at the start of a session** rather than assuming, since both are used. It has a real, populated `Libs/` (unlike the repo, which only carries `.gitkeep`) — **never overwrite `Libs/` there**.
+- **Deploying** = copying changed `.lua`/`.xml` into that install **byte-exact**: keep CRLF line endings, and preserve whatever `version` string the packager already substituted into the deployed files. Do not "fix" `@project-version@`-style tokens in either direction.
+- **Syntax validation without a Lua interpreter**: there is no `luac`/`lua` on this machine, so the `luac -p` suggestion above does not apply. Use the Python `luaparser` package instead — `python -m pip install luaparser`, then `from luaparser import ast; ast.parse(src)`. Parse **every** changed `.lua` file before deploying. Validate `.xml` separately for well-formedness with `xml.etree.ElementTree.parse`.
+- **Counting `block`/`end` pairs is not sufficient on its own.** It once passed a file that could not compile: `obj:Method and ...` is a parse error, because colon syntax is a call and requires an argument list. A shipped parse error takes out the *whole file*, so every slash command and function defined in it silently disappears — which reads like a logic bug, not a syntax bug.
+
+## Additional conventions
+
+- **Ring frames do not inherit from `ArcHUDRingTemplate`.** Their methods are hand-copied onto each frame in `OnLoad` (`RingTemplate.lua`). Anything added as a ring method **must** be added to that copy list, or it will be `nil` at runtime.
+- **Secret values (12.0+)**: never compare, do arithmetic on, or branch from a secret. Pass them straight into the permitted setters — `SetValue`, `SetMinMaxValues`, `SetAlpha`, `SetVertexColor`, `SetTexCoord`, `SetRotation`. Geometry setters — `SetPoint`, `SetWidth`, `SetHeight`, `SetShown`, `SetScale` — reject secrets. Anchoring is free; extent is blocked.
+- **Fix nil/secret hazards at the source accessor**, not at each call site. One scrubbed accessor beats N patched callers, and it keeps the next caller safe by default.
+- When an API question actually matters, check a local `wow-ui-source` clone rather than web summaries — the summaries contradict each other on 12.x behavior.
+
