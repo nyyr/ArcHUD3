@@ -222,9 +222,7 @@ function module:PLAYER_TARGET_CHANGED()
 				end
 				
 				-- Update text
-				local p = self.parent:GetHealthPercent(self.unit)
-				local pctInt = math.floor(p * 100)
-				self.HPPerc:SetText(pctInt.."%")
+				self.HPPerc:SetText(self.parent:FormatHealthPercent(self.unit))
 				
 				self:UNIT_HEAL_PREDICTION(nil, self.unit)
 			end

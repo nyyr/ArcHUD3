@@ -574,6 +574,16 @@ function ArcHUD:CreateStatusBar(parent, moduleName)
 	sb.arcFill:AddMaskTexture(sb.maskStart)
 	sb.arcFill:AddMaskTexture(sb.maskFill)
 
+	-- The cast rings tint with the widget method, but arcFill is what draws - forward
+	-- it here rather than at every one of those call sites.
+	local setBarColor = sb.SetStatusBarColor
+	sb.SetStatusBarColor = function(self, r, g, b, a)
+		setBarColor(self, r, g, b, a)
+		if self.arcFill then
+			self.arcFill:SetVertexColor(r, g, b, a)
+		end
+	end
+
 	self:UpdateStatusBarSide(sb, side)
 
 	-- Kept for callers that still want a percentage mapped onto arc geometry
@@ -588,6 +598,18 @@ function ArcHUD:CreateStatusBar(parent, moduleName)
 
 	-- Set frame level to be above background but below text
 	sb:SetFrameLevel(parent:GetFrameLevel() + 1)
+
+	-- SetRingAlpha fades via an animation, which overrides the ring without changing
+	-- what GetAlpha() reports. The bar is a sibling, not a child, so it cannot inherit
+	-- that - give it its own Alpha animation in the SAME group and they ramp together.
+	if parent.applyAlpha and parent.applyAlpha.alphaAnim then
+		sb.alphaAnim = parent.applyAlpha:CreateAnimation("Alpha")
+		if sb.alphaAnim then
+			sb.alphaAnim:SetTarget(sb)
+			sb.alphaAnim:SetOrder(parent.applyAlpha.alphaAnim:GetOrder())
+			sb.alphaAnim:SetDuration(parent.applyAlpha.alphaAnim:GetDuration())
+		end
+	end
 
 
 	sb:Hide()
@@ -651,12 +673,21 @@ function ArcHUD:UpdateStatusBarSide(sb, side)
 	sb.maskStart:SetRotation(sb.startRot)
 	sb.maskFill:SetRotation(sb.emptyRot) -- starts empty
 
-	-- Keep the StatusBar's value in sync with the mask. The native fill is
-	-- hidden, but its interpolated value provides a secret-safe animation
-	-- source for the angular mask.
+	-- Drive the angular mask every frame. Health/power carry their fill in the bar's
+	-- own value, which is a rotation because SetValue was fed through sb.rotCurve. Cast
+	-- bars keep a duration object instead - see SetStatusBarTimerDuration.
 	sb.interpolation = Enum.StatusBarInterpolation.ExponentialEaseOut
 	sb:SetScript("OnUpdate", function(statusBar)
-		statusBar.maskFill:SetRotation(statusBar:GetInterpolatedValue())
+		if statusBar.timerDuration then
+			ArcHUD:UpdateStatusBarTimer(statusBar)
+		else
+			statusBar.maskFill:SetRotation(statusBar:GetInterpolatedValue())
+		end
+	end)
+
+	-- Every caller stops a cast by hiding the bar, so clear the timer in one place.
+	sb:SetScript("OnHide", function(statusBar)
+		ArcHUD:ClearStatusBarTimerDuration(statusBar)
 	end)
 end
 
@@ -667,6 +698,50 @@ function ArcHUD:SetStatusBarArcFraction(sb, rotation)
 	if not sb or not sb.maskFill then return end
 	if rotation == nil then return end
 	sb.maskFill:SetRotation(rotation)
+end
+
+-- Bind a cast/channel duration to the arc. SetTimerDuration works in the time domain,
+-- so the bar's own value is no use as a rotation; evaluate the duration through
+-- sb.rotCurve instead - the same secret-safe curve bridge UnitHealthPercent uses.
+function ArcHUD:SetStatusBarTimerDuration(sb, durationObj, interpolation, direction)
+	if not sb or not durationObj then return end
+
+	if sb.rotCurve and sb.maskFill and durationObj.EvaluateElapsedPercent then
+		sb.timerDuration = durationObj
+		-- rotCurve maps 0 -> empty and 1 -> full for this side, so elapsed fills and
+		-- remaining drains without any further handling.
+		sb.timerRemaining = (Enum.StatusBarTimerDirection ~= nil and direction == Enum.StatusBarTimerDirection.RemainingTime) or false
+		self:UpdateStatusBarTimer(sb)
+	else
+		-- Pre-angular-fill bar: let the bar's own timer fill do the work.
+		sb.timerDuration = nil
+		sb:SetTimerDuration(durationObj, interpolation, direction)
+	end
+end
+
+-- Stop driving the arc from a duration, so the next cast cannot flash this one's
+-- progress before its first OnUpdate.
+function ArcHUD:ClearStatusBarTimerDuration(sb)
+	if not sb then return end
+	sb.timerDuration = nil
+	if sb.maskFill and sb.emptyRot then
+		sb.maskFill:SetRotation(sb.emptyRot)
+	end
+end
+
+-- Evaluate the bound duration through the arc's rotation curve (see above).
+function ArcHUD:UpdateStatusBarTimer(sb)
+	if not sb or not sb.timerDuration or not sb.rotCurve or not sb.maskFill then return end
+
+	local rotation
+	if sb.timerRemaining then
+		rotation = sb.timerDuration:EvaluateRemainingPercent(sb.rotCurve)
+	else
+		rotation = sb.timerDuration:EvaluateElapsedPercent(sb.rotCurve)
+	end
+	if rotation ~= nil then
+		sb.maskFill:SetRotation(rotation)
+	end
 end
 
 -- Update StatusBar arc value from unit health

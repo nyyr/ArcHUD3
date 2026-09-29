@@ -173,9 +173,7 @@ function module:PLAYER_FOCUS_CHANGED()
 				end
 				
 				-- Update text
-				local p = self.parent:GetHealthPercent(self.unit)
-				local pctInt = math.floor(p * 100)
-				self.HPPerc:SetText(pctInt.."%")
+				self.HPPerc:SetText(self.parent:FormatHealthPercent(self.unit))
 				
 				self:UNIT_HEAL_PREDICTION(nil, self.unit)
 			end
@@ -255,9 +253,7 @@ function module:UpdateHealth(event, arg1)
 				end
 
 				-- Update text
-				local p = self.parent:GetHealthPercent(self.unit)
-				local pctInt = math.floor(p * 100)
-				self.HPPerc:SetText(pctInt.."%")
+				self.HPPerc:SetText(self.parent:FormatHealthPercent(self.unit))
 				
 				-- Heal prediction (only if we can calculate)
 				if self.healPrediction > 0 then

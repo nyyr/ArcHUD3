@@ -1164,6 +1164,17 @@ function ArcHUDRingTemplate:SetRingAlpha(destAlpha, instant)
 		-- safe because this branch is unreachable when destAlpha is secret (the
 		-- condition above requires "not destAlphaSecret"). Do not hoist it.
 		self.applyAlpha.alphaAnim:SetToAlpha(destAlpha)
+
+		-- CreateStatusBar puts a companion animation for the bar in this same group
+		-- (it cannot inherit the ring's alpha); give it the same from/to.
+		local sbAnim = self.statusBar and self.statusBar.alphaAnim
+		if sbAnim then
+			if not fromAlphaSecret then
+				sbAnim:SetFromAlpha(fromAlpha)
+			end
+			sbAnim:SetToAlpha(destAlpha)
+		end
+
 		self.applyAlpha:Play()
 	end
 end

@@ -254,7 +254,7 @@ function module:UNIT_SPELLCAST_START(event, arg1)
 					-- Use Elapsed direction for casting (fills from 0 to max)
 					local direction = Enum.StatusBarTimerDirection and Enum.StatusBarTimerDirection.ElapsedTime or nil
 					local interpolation = Enum.StatusBarInterpolation and Enum.StatusBarInterpolation.ExponentialEaseOut or nil
-					self.statusBar:SetTimerDuration(durationObj, interpolation, direction)
+					self.parent:SetStatusBarTimerDuration(self.statusBar, durationObj, interpolation, direction)
 					
 					-- Set color based on friend/foe and interruptibility
 					if(UnitIsFriend("player", self.unit)) then
@@ -324,7 +324,7 @@ function module:UNIT_SPELLCAST_CHANNEL_START(event, arg1)
 					-- Use Remaining direction for channeling (drains from max to 0)
 					local direction = Enum.StatusBarTimerDirection and Enum.StatusBarTimerDirection.RemainingTime or nil
 					local interpolation = Enum.StatusBarInterpolation and Enum.StatusBarInterpolation.ExponentialEaseOut or nil
-					self.statusBar:SetTimerDuration(durationObj, interpolation, direction)
+					self.parent:SetStatusBarTimerDuration(self.statusBar, durationObj, interpolation, direction)
 					
 					-- Set color based on friend/foe and interruptibility
 					if(UnitIsFriend("player", self.unit)) then
@@ -377,7 +377,7 @@ function module:UNIT_SPELLCAST_CHANNEL_UPDATE(event, arg1)
 			if durationObj and self.statusBar then
 				local direction = Enum.StatusBarTimerDirection and Enum.StatusBarTimerDirection.RemainingTime or nil
 				local interpolation = Enum.StatusBarInterpolation and Enum.StatusBarInterpolation.ExponentialEaseOut or nil
-				self.statusBar:SetTimerDuration(durationObj, interpolation, direction)
+				self.parent:SetStatusBarTimerDuration(self.statusBar, durationObj, interpolation, direction)
 			end
 		else
 			-- Legacy: Manual calculation
@@ -404,7 +404,7 @@ function module:UNIT_SPELLCAST_DELAYED(event, arg1)
 			if durationObj and self.statusBar then
 				local direction = Enum.StatusBarTimerDirection and Enum.StatusBarTimerDirection.ElapsedTime or nil
 				local interpolation = Enum.StatusBarInterpolation and Enum.StatusBarInterpolation.ExponentialEaseOut or nil
-				self.statusBar:SetTimerDuration(durationObj, interpolation, direction)
+				self.parent:SetStatusBarTimerDuration(self.statusBar, durationObj, interpolation, direction)
 			end
 		else
 			-- Legacy: Manual calculation

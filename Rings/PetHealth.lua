@@ -163,9 +163,7 @@ function module:UpdatePet(event, arg1)
 			local maxHealth = UnitHealthMax(self.unit)
 			local maxHealthSecret = self.parent:IsSecretValue(maxHealth)
 			if not maxHealthSecret and maxHealth > 0 then
-				local p = self.parent:GetHealthPercent(self.unit)
-				local pctInt = math.floor(p * 100)
-				self.HPPerc:SetText(pctInt.."%")
+				self.HPPerc:SetText(self.parent:FormatHealthPercent(self.unit))
 				self.f:Show()
 			else
 				self.HPPerc:SetText("")

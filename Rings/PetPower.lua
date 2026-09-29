@@ -190,9 +190,7 @@ function module:UpdatePet(event, arg1)
 			local maxPower = UnitPowerMax(self.unit)
 			local maxPowerSecret = self.parent:IsSecretValue(maxPower)
 			if not maxPowerSecret and maxPower > 0 then
-				local p = self.parent:GetPowerPercent(self.unit, powerType)
-				local pctInt = math.floor(p * 100)
-				self.MPPerc:SetText(pctInt.."%")
+				self.MPPerc:SetText(self.parent:FormatPowerPercent(self.unit, powerType))
 				self.f:Show()
 			else
 				self.MPPerc:SetText("")

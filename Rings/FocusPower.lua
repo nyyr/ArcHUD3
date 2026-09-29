@@ -156,9 +156,7 @@ function module:PLAYER_FOCUS_CHANGED()
 				-- Use zero alpha curve to show/hide text based on power
 				local alpha = UnitPowerPercent(self.unit, powerType, false, self.zeroAlphaCurve)
 				self.MPPerc:SetAlpha(alpha)
-				local p = self.parent:GetPowerPercent(self.unit, powerType)
-				local pctInt = math.floor(p * 100)
-				self.MPPerc:SetText(pctInt.."%")
+				self.MPPerc:SetText(self.parent:FormatPowerPercent(self.unit, powerType))
 			end
 		end
 	else
@@ -201,9 +199,7 @@ function module:UNIT_DISPLAYPOWER()
 		local maxPower = UnitPowerMax(self.unit)
 		local maxPowerSecret = self.parent:IsSecretValue(maxPower)
 		if not maxPowerSecret and maxPower > 0 then
-			local p = self.parent:GetPowerPercent(self.unit, powerType)
-			local pctInt = math.floor(p * 100)
-			self.MPPerc:SetText(pctInt.."%")
+			self.MPPerc:SetText(self.parent:FormatPowerPercent(self.unit, powerType))
 		else
 			local p = self.parent:GetPowerPercent(self.unit, powerType)
 			if p and not self.parent:IsSecretValue(p) then
