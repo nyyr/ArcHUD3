@@ -220,12 +220,12 @@ function module:UNIT_SPELLCAST_START(event, arg1)
 					if(UnitIsFriend("player", self.unit)) then
 						self.statusBar:SetStatusBarColor(0, 1, 0) -- Green for friendly
 					else
-						-- Protect against secret value boolean test (12.0.0+)
-						local notInterruptibleSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(notInterruptible)
-						if (self.db.profile.IndicateInterruptible and not notInterruptibleSecret and not notInterruptible) then
-							self.statusBar:SetStatusBarColor(1, 1, 0) -- Yellow for interruptible
+						-- Secret for a target, so it cannot be tested - but it can still
+						-- pick which of the two tinted arcs is visible.
+						if self.db.profile.IndicateInterruptible then
+							self.parent:SetStatusBarInterruptible(self.statusBar, notInterruptible)
 						else
-							self.statusBar:SetStatusBarColor(1, 0, 0) -- Red for non-interruptible
+							self.statusBar:SetStatusBarColor(1, 0, 0)
 						end
 					end
 
@@ -288,12 +288,12 @@ function module:UNIT_SPELLCAST_CHANNEL_START(event, arg1)
 					if(UnitIsFriend("player", self.unit)) then
 						self.statusBar:SetStatusBarColor(0, 1, 0) -- Green for friendly
 					else
-						-- Protect against secret value boolean test (12.0.0+)
-						local notInterruptibleSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(notInterruptible)
-						if (self.db.profile.IndicateInterruptible and not notInterruptibleSecret and not notInterruptible) then
-							self.statusBar:SetStatusBarColor(1, 1, 0) -- Yellow for interruptible
+						-- Secret for a target, so it cannot be tested - but it can still
+						-- pick which of the two tinted arcs is visible.
+						if self.db.profile.IndicateInterruptible then
+							self.parent:SetStatusBarInterruptible(self.statusBar, notInterruptible)
 						else
-							self.statusBar:SetStatusBarColor(1, 0, 0) -- Red for non-interruptible
+							self.statusBar:SetStatusBarColor(1, 0, 0)
 						end
 					end
 

@@ -1108,6 +1108,49 @@ end
 -----------------------------------------------------------
 -- Set ring alpha value
 -----------------------------------------------------------
+-- Smooth alpha for SECRET values: applyAlpha cannot carry one, but SetValue ->
+-- GetInterpolatedValue -> SetAlpha can. Two gotchas, both measured in game: a bar with
+-- no texture or size reports a flat 0 and never eases, and one bar eases far too fast
+-- (~85% in 0.1s) with no way to slow it, hence the chain.
+local ALPHA_INTERP_STAGES = 3
+
+local function GetAlphaInterpolator(ring)
+	if not ring.alphaInterp then
+		local stages = {}
+		local seed = ring:GetAlpha()
+		for i = 1, ALPHA_INTERP_STAGES do
+			local bar = CreateFrame("StatusBar", nil, ArcHUDFrame)
+			bar:SetSize(100, 10)
+			bar:SetPoint("TOPLEFT", ArcHUDFrame, "TOPLEFT")
+			bar:SetStatusBarTexture("Interface\\Buttons\\WHITE8X8")
+			local tex = bar:GetStatusBarTexture()
+			if tex then tex:SetAlpha(0) end
+			bar:SetIgnoreParentAlpha(true)
+			bar:SetAlpha(1)
+			bar:SetMinMaxValues(0, 1)
+			bar:SetValue(seed)
+			stages[i] = bar
+		end
+
+		-- One OnUpdate walks the chain: one script per ring, not per stage.
+		local ease = Enum.StatusBarInterpolation.ExponentialEaseOut
+		stages[1]:SetScript("OnUpdate", function()
+			if not ring.alphaInterpActive then return end
+			for i = 2, ALPHA_INTERP_STAGES do
+				stages[i]:SetValue(stages[i - 1]:GetInterpolatedValue(), ease)
+			end
+			local alpha = stages[ALPHA_INTERP_STAGES]:GetInterpolatedValue()
+			ring:SetAlpha(alpha)
+			if ring.statusBar then
+				ring.statusBar:SetAlpha(alpha)
+			end
+		end)
+
+		ring.alphaInterp = stages
+	end
+	return ring.alphaInterp
+end
+
 function ArcHUDRingTemplate:SetRingAlpha(destAlpha, instant)
 	-- Check if destAlpha is a secret value (12.0.0+)
 	local destAlphaSecret = ArcHUD.isMidnight and issecretvalue and issecretvalue(destAlpha)
@@ -1127,15 +1170,40 @@ function ArcHUDRingTemplate:SetRingAlpha(destAlpha, instant)
 	-- Ghost mode's syncPulse owns this ring's alpha while it runs: it writes every
 	-- frame from its OnUpdate script. Writing here as well makes the two fight and
 	-- the ring visibly strobes (#108) - worst on Midnight, where a secret destAlpha
-	-- forces the instant path below and so writes on every CheckAlpha tick (10Hz).
+	-- drives the interpolator below and so writes every frame.
 	-- GhostMode() clears destAlpha when it stops the pulse, so the next tick
 	-- re-applies the real alpha.
 	if (self.syncPulse and self.syncPulse:IsPlaying()) then
+		self.alphaInterpActive = false
 		return
 	end
 
-	-- For secret values, always use instant mode (can't compare to detect changes)
+	-- Once driven this way the ring's alpha is itself a secret, so SetFromAlpha can no
+	-- longer be given a start value and the animation would resume from a stale one.
+	-- Keep the interpolator in charge while it is active; it takes plain numbers too.
+	if (not instant and Enum.StatusBarInterpolation and (destAlphaSecret or self.alphaInterpActive)) then
+		local stages = GetAlphaInterpolator(self)
+		if not self.alphaInterpActive then
+			-- Stop the animation or its OnFinished overwrites us later, and re-seed from
+			-- the ring's actual alpha - stale stages usually sit on the new target already.
+			if self.applyAlpha and self.applyAlpha:IsPlaying() then
+				self.applyAlpha:Stop()
+			end
+			local current = self:GetAlpha()
+			for i = 1, ALPHA_INTERP_STAGES do
+				stages[i]:SetValue(current)
+			end
+			self.alphaInterpActive = true
+		end
+		-- Unstorable for comparison, so clear it: a stale value reads as "no change".
+		self.destAlpha = nil
+		stages[1]:SetValue(destAlpha, Enum.StatusBarInterpolation.ExponentialEaseOut)
+		return
+	end
+
+	-- Instant, or no animation available to fade with
 	if (instant or not self.applyAlpha or destAlphaSecret) then
+		self.alphaInterpActive = false
 		self:SetAlpha(destAlpha)
 		-- Only store destAlpha if it's not secret (can't compare secret values)
 		if not destAlphaSecret then
@@ -1148,6 +1216,7 @@ function ArcHUDRingTemplate:SetRingAlpha(destAlpha, instant)
 		return
 		
 	elseif not destAlphaSecret and (self.destAlpha ~= destAlpha) then
+		self.alphaInterpActive = false
 		--ArcHUD:LevelDebug(1, "ArcHUDRingTemplate:SetRingAlpha("..tostring(destAlpha).."), current "..tostring(self.destAlpha)..", name "..tostring(self:GetName()))
 		self.destAlpha = destAlpha
 		if (self.applyAlpha:IsPlaying()) then
@@ -1333,6 +1402,8 @@ function ArcHUDRingTemplate:GhostMode(state, unit)
 				if(fh.f.applyAlpha:IsPlaying()) then
 					fh.f.applyAlpha:Stop()
 				end
+				-- Same reason - it writes every frame until SetRingAlpha notices.
+				fh.f.alphaInterpActive = false
 				fh.f.syncPulse:Play()
 			end
 		end
@@ -1349,6 +1420,8 @@ function ArcHUDRingTemplate:GhostMode(state, unit)
 				if(fm.f.applyAlpha:IsPlaying()) then
 					fm.f.applyAlpha:Stop()
 				end
+				-- Same reason - it writes every frame until SetRingAlpha notices.
+				fm.f.alphaInterpActive = false
 				fm.f.syncPulse:Play()
 			end
 		end

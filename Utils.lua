@@ -574,12 +574,22 @@ function ArcHUD:CreateStatusBar(parent, moduleName)
 	sb.arcFill:AddMaskTexture(sb.maskStart)
 	sb.arcFill:AddMaskTexture(sb.maskFill)
 
+	-- Second arc for SetStatusBarInterruptible; transparent otherwise.
+	sb.arcFillAlt = sb:CreateTexture(nil, "ARTWORK", nil, 1)
+	sb.arcFillAlt:AddMaskTexture(sb.maskStart)
+	sb.arcFillAlt:AddMaskTexture(sb.maskFill)
+	sb.arcFillAlt:SetAlpha(0)
+
 	-- The cast rings tint with the widget method, but arcFill is what draws - forward
 	-- it here rather than at every one of those call sites.
 	local setBarColor = sb.SetStatusBarColor
 	sb.SetStatusBarColor = function(self, r, g, b, a)
 		setBarColor(self, r, g, b, a)
 		if self.arcFill then
+			-- A known colour ends the split, else this tints the hidden layer.
+			if self.dualArc then
+				ArcHUD:ClearStatusBarInterruptible(self)
+			end
 			self.arcFill:SetVertexColor(r, g, b, a)
 		end
 	end
@@ -654,6 +664,12 @@ function ArcHUD:UpdateStatusBarSide(sb, side)
 	sb.arcFill:SetAllPoints(sb)
 	sb.arcFill:Show()
 
+	if sb.arcFillAlt then
+		sb.arcFillAlt:SetTexture(texturePath)
+		sb.arcFillAlt:SetAllPoints(sb)
+		sb.arcFillAlt:Show()
+	end
+
 	-- The ring centre is the arc rect's inner edge at mid height; both masks pivot
 	-- there. Oversized so the kept half always covers the whole arc.
 	local centreAnchor = (side == 1) and "RIGHT" or "LEFT"
@@ -698,6 +714,32 @@ function ArcHUD:SetStatusBarArcFraction(sb, rotation)
 	if not sb or not sb.maskFill then return end
 	if rotation == nil then return end
 	sb.maskFill:SetRotation(rotation)
+end
+
+-- Colour the arc by interruptibility without reading it. notInterruptible is secret
+-- for anything but the player and pet, but SetAlphaFromBoolean takes a secret bool and
+-- picks between two alphas, so tint both arcs and let it choose which one shows.
+function ArcHUD:SetStatusBarInterruptible(sb, notInterruptible)
+	if not sb or not sb.arcFill or not sb.arcFillAlt then return end
+	if not sb.arcFill.SetAlphaFromBoolean then return end -- pre-12.x client
+
+	sb.arcFill:SetVertexColor(1, 1, 0)    -- interruptible
+	sb.arcFillAlt:SetVertexColor(1, 0, 0) -- immune
+
+	sb.arcFill:SetAlphaFromBoolean(notInterruptible, 0, 1)
+	sb.arcFillAlt:SetAlphaFromBoolean(notInterruptible, 1, 0)
+	sb.dualArc = true
+end
+
+-- Back to one arc, for when the colour is known (friendly caster, or the secret-free
+-- UNIT_SPELLCAST_*INTERRUPTIBLE events).
+function ArcHUD:ClearStatusBarInterruptible(sb)
+	if not sb or not sb.arcFill then return end
+	sb.dualArc = false
+	sb.arcFill:SetAlpha(1)
+	if sb.arcFillAlt then
+		sb.arcFillAlt:SetAlpha(0)
+	end
 end
 
 -- Bind a cast/channel duration to the arc. SetTimerDuration works in the time domain,

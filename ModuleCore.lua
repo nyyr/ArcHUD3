@@ -436,9 +436,6 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2, invertCurve)
 							-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
 							if secretAlpha ~= nil then
 								f:SetRingAlpha(secretAlpha)
-								if f.statusBar then
-									f.statusBar:SetAlpha(secretAlpha)
-								end
 							else
 								f:SetRingAlpha(alpha2)
 								if ArcHUD.isMidnight and f.statusBar then f.statusBar:SetAlpha(alpha2) end
@@ -460,9 +457,6 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2, invertCurve)
 							-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
 							if secretAlpha ~= nil then
 								f:SetRingAlpha(secretAlpha)
-								if f.statusBar then
-									f.statusBar:SetAlpha(secretAlpha)
-								end
 							else
 								f:SetRingAlpha(alpha2)
 								if ArcHUD.isMidnight and f.statusBar then f.statusBar:SetAlpha(alpha2) end
@@ -491,13 +485,9 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2, invertCurve)
 					if ArcHUD.isMidnight and f.statusBar then f.statusBar:SetAlpha(alpha2) end
 				end
 			else
-				-- No alpha2: set alpha directly (e.g., when in combat)
-				-- Force instant update to ensure it works even if previous alpha was secret
-				f:SetRingAlpha(alpha, true)
-				-- Also sync StatusBar alpha if it exists (Midnight mode)
-				if ArcHUD.isMidnight and f.statusBar then
-					f.statusBar:SetAlpha(alpha)
-				end
+				-- No alpha2 (entering combat): a plain number, so the normal fade
+				-- applies. The status bar rides SetRingAlpha's companion animation.
+				f:SetRingAlpha(alpha)
 			end
 		end
 	elseif (self.f) then
@@ -582,9 +572,6 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2, invertCurve)
 						-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
 						if secretAlpha ~= nil then
 							f:SetRingAlpha(secretAlpha)
-							if f.statusBar then
-								f.statusBar:SetAlpha(secretAlpha)
-							end
 						else
 							f:SetRingAlpha(alpha2)
 						end
@@ -604,9 +591,6 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2, invertCurve)
 						-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
 						if secretAlpha ~= nil then
 							f:SetRingAlpha(secretAlpha)
-							if f.statusBar then
-								f.statusBar:SetAlpha(secretAlpha)
-							end
 						else
 							f:SetRingAlpha(alpha2)
 							if ArcHUD.isMidnight and f.statusBar then f.statusBar:SetAlpha(alpha2) end
@@ -643,9 +627,6 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2, invertCurve)
 						-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
 						if secretAlpha ~= nil then
 							f:SetRingAlpha(secretAlpha)
-							if f.statusBar then
-								f.statusBar:SetAlpha(secretAlpha)
-							end
 						else
 							f:SetRingAlpha(alpha2)
 						end
@@ -665,9 +646,6 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2, invertCurve)
 						-- Check if secretAlpha is not nil (0 is a valid value, so check ~= nil)
 						if secretAlpha ~= nil then
 							f:SetRingAlpha(secretAlpha)
-							if f.statusBar then
-								f.statusBar:SetAlpha(secretAlpha)
-							end
 						else
 							f:SetRingAlpha(alpha2)
 							if ArcHUD.isMidnight and f.statusBar then f.statusBar:SetAlpha(alpha2) end
@@ -683,13 +661,9 @@ function ArcHUD.modulePrototype:SetFramesAlpha(alpha, alpha2, invertCurve)
 				end
 			end
 		else
-			-- No alpha2: set alpha directly (e.g., when in combat)
-			-- Force instant update to ensure it works even if previous alpha was secret
-			f:SetRingAlpha(alpha, true)
-			-- Also sync StatusBar alpha if it exists (Midnight mode)
-			if ArcHUD.isMidnight and f.statusBar then
-				f.statusBar:SetAlpha(alpha)
-			end
+			-- No alpha2 (entering combat): a plain number, so the normal fade
+			-- applies. The status bar rides SetRingAlpha's companion animation.
+			f:SetRingAlpha(alpha)
 		end
 	end
 end
