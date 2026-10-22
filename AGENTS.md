@@ -12,7 +12,7 @@ Guidance for AI agents working in this repository. ArcHUD3 is a World of Warcraf
 | `ArcHUD3_Wrath.toc` | Classic Wrath (`Interface: 30405`) |
 | `ArcHUD3_Cata.toc` | Classic Cata (`Interface: 40402`), loads `Rings/Rings-mop.xml`-style split (check file list per TOC) |
 | `ArcHUD3_MoP.toc` | Classic MoP (`Interface: 50504`) |
-| `ArcHUD3_Forever.toc` | WoW Forever (`Interface: 16001`, game type `forever`/`camelot`): retail API with vanilla content. Loads `embeds.xml` + `Rings/Rings-forever.xml` (retail-only class rings commented out); shared-code differences gate on `ArcHUD.isForever` |
+| `ArcHUD3_Camelot.toc` | WoW Forever (`Interface: 16001`, game type `forever`/`camelot`; `_Camelot` because BigWigs packager does not scan `_Forever.toc`): retail API with vanilla content. Loads `embeds.xml` + `Rings/Rings-forever.xml` (retail-only class rings commented out); shared-code differences gate on `ArcHUD.isForever` |
 | `Core.lua` | Addon bootstrap: creates the `ArcHUD` Ace3 addon object, expansion/edition detection flags (`isClassicWoW`, `isMidnight`, etc.), `ArcHUD.defaults` (AceDB profile defaults), class/rep colors |
 | `ModuleCore.lua` | `ArcHUD.modulePrototype` — shared lifecycle (`OnInitialize`, `OnEnable`, `InitConfigOptions`) that every "ring" module mixes into via `ArcHUD:NewModule(name)` |
 | `RingTemplate.lua` / `RingTemplate.xml` | Low-level quadrant-based partial-arc rendering engine (`ArcHUDRingTemplate`) — the math/texture-coordinate core that draws the partial circular arcs |
