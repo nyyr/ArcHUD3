@@ -18,11 +18,14 @@ ArcHUD.isClassicTbc = (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC)
 ArcHUD.isClassicWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
 ArcHUD.isClassicCata = (WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC)
 ArcHUD.isClassicMop = (WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC)
+-- WoW Forever: retail API, vanilla content. WOW_PROJECT_CAMELOT only exists on that client.
+ArcHUD.isForever = (WOW_PROJECT_CAMELOT ~= nil and WOW_PROJECT_ID == WOW_PROJECT_CAMELOT)
 -- generic classic only up to Wrath
 ArcHUD.classic = ArcHUD.isClassicWoW or ArcHUD.isClassicTbc or ArcHUD.isClassicWrath
 -- generic feature switches based on expansion
 ArcHUD.hasHealPrediction = not ArcHUD.classic
 ArcHUD.hasAbsorbs = not ArcHUD.classic and not ArcHUD.isClassicCata
+ArcHUD.hasPetHappiness = ArcHUD.classic or ArcHUD.isForever
 
 -- Detect 12.0.0+ (Midnight) - check for secret value API
 ArcHUD.isMidnight = (issecretvalue ~= nil) or (UnitHealthPercent ~= nil) or (C_CurveUtil ~= nil)
@@ -227,7 +230,7 @@ function ArcHUD:OnEnable()
 	self:RegisterEvent("PLAYER_FLAGS_CHANGED")
 	self:RegisterEvent("PLAYER_UPDATE_RESTING")
 
-	if ArcHUD.classic then
+	if ArcHUD.hasPetHappiness then
 		self:RegisterEvent("UNIT_HAPPINESS", "UpdatePetNamePlate")
 	end
 
@@ -287,7 +290,7 @@ function ArcHUD:OnDisable()
 	self:UnregisterEvent("PLAYER_FLAGS_CHANGED")
 	self:UnregisterEvent("PLAYER_UPDATE_RESTING")
 
-	if ArcHUD.classic then
+	if ArcHUD.hasPetHappiness then
 		self:UnregisterEvent("UNIT_HAPPINESS")
 	end
 
@@ -1091,8 +1094,9 @@ function ArcHUD:UpdatePetNamePlate()
 		local color = "00ff00"
 		local alpha = self.db.profile.FadeFull
 		local happiness = ""
-		if ArcHUD.classic then
-			happiness, _, _ = GetPetHappiness()
+		if ArcHUD.hasPetHappiness then
+			-- Forever moved it to C_PetInfo
+			happiness, _, _ = (C_PetInfo and C_PetInfo.GetPetHappiness or GetPetHappiness)()
 			if(happiness) then
 				if(happiness == 1) then
 					color = "ff0000"

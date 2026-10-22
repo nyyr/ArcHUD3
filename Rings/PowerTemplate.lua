@@ -42,6 +42,8 @@ function module:InitializePowerRing(powerType)
 
 	self.isPower = true
 	self.powerType = powerType
+	-- On Forever combo points live on the target, as in vanilla
+	self.targetBoundComboPoints = ArcHUD.isForever and powerType == Enum.PowerType.ComboPoints
 
 	self.TextHuge = self:CreateFontString(self.f, "BACKGROUND", {40, 30}, 30, "CENTER",
 			{ self.defaults.profile.Color.r, self.defaults.profile.Color.g, self.defaults.profile.Color.b },
@@ -123,7 +125,12 @@ function module:UpdatePowerRing()
 	end
 
 	local maxPower = UnitPowerMax(self.unit, self.powerType);
-	local num = UnitPower(self.unit, self.powerType)
+	local num
+	if self.targetBoundComboPoints then
+		num = GetComboPoints(self.unit, "target")
+	else
+		num = UnitPower(self.unit, self.powerType)
+	end
 
 	self.f:SetMax(maxPower)
 	self.f:SetValue(num)
@@ -192,6 +199,11 @@ function module:UpdateActive(event, arg1)
 			self:RegisterUnitEvent("UNIT_POWER_UPDATE", "UpdatePower", self.unit)
 			self:RegisterUnitEvent("UNIT_MAXPOWER", "UpdatePower", self.unit)
 			self:RegisterEvent("PLAYER_ALIVE", "UpdatePower")
+			if self.targetBoundComboPoints then
+				self:RegisterEvent("PLAYER_TARGET_CHANGED", "UpdatePower")
+				-- Points moving to a new target keep their count, so no power event fires
+				self:RegisterEvent("COMBO_TARGET_CHANGED", "UpdatePower")
+			end
 
 			-- Activate ring timers
 			self:StartRingTimers()
@@ -206,6 +218,10 @@ function module:UpdateActive(event, arg1)
 			self:UnregisterUnitEvent("UNIT_POWER_UPDATE")
 			self:UnregisterUnitEvent("UNIT_MAXPOWER")
 			self:UnregisterEvent("PLAYER_ALIVE")
+			if self.targetBoundComboPoints then
+				self:UnregisterEvent("PLAYER_TARGET_CHANGED")
+				self:UnregisterEvent("COMBO_TARGET_CHANGED")
+			end
 
 			-- Deactivate ring timers
 			self:StopRingTimers()

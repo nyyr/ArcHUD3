@@ -12,7 +12,7 @@ function ArcHUD:HideBlizzardPlayer(show)
 		PetFrame:UnregisterAllEvents()
 		PetFrame:Hide()
 
-		if not ArcHUD.isClassicWoW or ArcHUD.isClassicTbc then
+		if not (ArcHUD.isClassicWoW or ArcHUD.isForever) or ArcHUD.isClassicTbc then
 			RuneFrame:Hide()
 		end
 	else
@@ -27,7 +27,7 @@ function ArcHUD:HideBlizzardPlayer(show)
 			UnitFrame_Update(PetFrame, true)
 		end
 
-		if not ArcHUD.isClassicWoW or ArcHUD.isClassicTbc then
+		if not (ArcHUD.isClassicWoW or ArcHUD.isForever) or ArcHUD.isClassicTbc then
 			local _, class = UnitClass("player")
 			if ( class == "DEATHKNIGHT" ) then
 				RuneFrame:Show()
@@ -56,8 +56,20 @@ function ArcHUD:HideBlizzardTarget(show)
 			UnitFrame_Update(TargetFrame, false)
 		end
 
-		ComboFrame:RegisterAllEvents()
-		ComboFrame_Update(ComboFrame)
+		if ArcHUD.isForever then
+			-- Forever's ComboFrame is a mixin; re-register only what its OnLoad does
+			ComboFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
+			ComboFrame:RegisterUnitEvent("UNIT_POWER_FREQUENT", "player")
+			ComboFrame:RegisterUnitEvent("UNIT_POWER_UPDATE", "player")
+			ComboFrame:RegisterUnitEvent("UNIT_POWER_POINT_CHARGE", "player")
+			ComboFrame:RegisterUnitEvent("UNIT_MAXPOWER", "player")
+			ComboFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+			ComboFrame:UpdateMax()
+			ComboFrame:Update(true)
+		else
+			ComboFrame:RegisterAllEvents()
+			ComboFrame_Update(ComboFrame)
+		end
 	end
 end
 

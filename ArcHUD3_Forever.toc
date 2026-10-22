@@ -1,0 +1,52 @@
+## Interface: 16001
+## Title: ArcHUD3
+## Notes: Smooth combat HUD based on ArcHUD2
+## Author: nyyr, Nenie, rookdorf
+## IconTexture: Interface/Icons/spell_arcane_studentofmagic
+## Category-enUS: User Interface
+## Category-deDE: Benutzerinterface
+## Category-esES: Interfaz de usuario
+## Category-esMX: Interfaz de usuario
+## Category-frFR: Interface utilisateur
+## Category-itIT: Interfaccia utente
+## Category-koKR: 사용자 인터페이스
+## Category-ptBR: Interface do usuário
+## Category-ruRU: Интерфейс пользователя
+## Category-zhCN: 用户界面
+## Category-zhTW: 使用者介面
+## SavedVariables: ArcHUD3DB
+## Version: @project-version@
+## X-Date: @project-date-iso@
+## X-Category: HUDs
+## X-WoWI-ID: 24629
+## X-Curse-Project-ID: 26891
+
+# Libraries
+embeds.xml
+
+# Locales
+Locales\Locales.xml
+
+# Core addon
+Core.lua
+Frames.xml
+Nameplates.lua
+BlizzardFrames.lua
+Utils.lua
+AuraContainers.lua
+
+# Module core
+RingTemplate.xml
+ModuleCore.lua
+
+# Config
+Config.lua
+
+# Rings
+Rings\Rings-forever.xml
+
+# Extensions
+#Extensions\Extensions.xml
+
+# Unit frames
+#UnitFrames\UnitFrames.xml
